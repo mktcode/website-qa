@@ -54,6 +54,8 @@ Automatische Werkzeuge liefern atomare Prüfaussagen mit den Ergebnissen `pass`,
 
 Der Pilot ersetzt diese vollständige Markdown-Vorlage noch nicht. Ein Konsistenztest hält die im Pilot enthaltenen Punkttexte mit ihrer Markdown-Quelle synchron. Projektbezogene Modulauswahl, Nichtanwendbarkeit und nicht automatische Nachweise bleiben Teil der eigenständigen Projektakte.
 
+Die Reporting-Bibliothek kann technische JSON-Läufe und den strukturierten Projektnachweis zu einer JSON- und Markdown-Sicht zusammenführen. Sie startet keine Prüfer selbst. Die Auswertungsumgebung wird in der Projektkonfiguration festgelegt und die Ziel-URL gegen den technischen Bericht geprüft. Quell- und Deploymentstand sind projektseitig deklarierte Zuordnungen, keine unabhängige Werkzeugbestätigung. Workflowzustände wie `Extern`, `Zurückgestellt` oder `Akzeptierte Abweichung` bleiben von einem technischen `pass` getrennt und schließen einen offenen Punkt nicht als erfüllt ab.
+
 ## Anforderungen an Nachweise
 
 Ein belastbarer Nachweis nennt, soweit einschlägig:

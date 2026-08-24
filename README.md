@@ -57,6 +57,22 @@ import { evaluatePilotChecklist } from '@mktcode/website-qa/checklist'
 
 Der Pilot umfasst noch nicht die vollständige Website-Checkliste und verändert keine Projektcheckliste automatisch. Die vier Netzwerkprüfer bleiben unabhängige Befehle; ein Zielprojekt entscheidet selbst, welche JSON-Berichte und manuellen Nachweise es zusammenführt.
 
+Ein projektlokales Skript kann dafür die Reporting-Bibliothek verwenden, ohne einen weiteren Netzwerk- oder Sammelbefehl einzuführen:
+
+```js
+import { writeFileSync } from 'node:fs'
+import {
+  createPilotProjectReportFromFiles,
+  renderPilotProjectReportMarkdown,
+} from '@mktcode/website-qa/report'
+
+const report = createPilotProjectReportFromFiles('./website-qa.project.json')
+writeFileSync('./website-qa-report.json', `${JSON.stringify(report, null, 2)}\n`)
+writeFileSync('./website-qa-report.md', renderPilotProjectReportMarkdown(report))
+```
+
+Die zugehörigen allgemeinen Schemas und Beispiele liegen unter [`catalog/`](catalog/); ein vollständig gerendertes Beispiel ist [`catalog/project-report.example.md`](catalog/project-report.example.md). Die Projektkonfiguration wählt Module und Auswertungsumgebung aus, bindet technische JSON-Läufe und manuelle beziehungsweise externe Nachweise ein und kann `Nicht zutreffend`, `Extern`, `Zurückgestellt` und `Akzeptierte Abweichung` mit Begründung abbilden. Die Ziel-URL wird gegen den technischen Bericht geprüft; Quell- und Deploymentstand bleiben ausdrücklich projektseitig deklarierte Zuordnungen.
+
 ## Sicherheitsgrenzen
 
 - HTTP-Abrufe verwenden ausschließlich GET.

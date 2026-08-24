@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-24T12:00:00.000Z",
+  "tool": "http-check",
+  "toolPackage": {
+    "name": "@mktcode/website-qa",
+    "version": "0.1.0"
+  },
+  "checklistCoverage": {
+    "catalog": {
+      "id": "website-qa-pilot",
+      "status": "pilot",
+      "version": "1.0.0-pilot.1"
+    }
+  },
+  "results": [
+    {
+      "requestedUrl": "https://example.com/",
+      "assertions": [
+        {
+          "assertionId": "error.not-found.noindex",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "404-Antwort enthält noindex.",
+          "subject": {
+            "url": "https://example.com/.well-known/ops-http-check-not-found"
+          }
+        },
+        {
+          "assertionId": "error.not-found.no-url-metadata",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "404-Antwort enthält weder Canonical noch og:url.",
+          "subject": {
+            "url": "https://example.com/.well-known/ops-http-check-not-found"
+          }
+        }
+      ],
+      "issues": []
+    }
+  ],
+  "summary": {
+    "errors": 0,
+    "failed": false,
+    "targets": 1,
+    "warnings": 0
+  }
+}

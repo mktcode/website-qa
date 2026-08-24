@@ -113,6 +113,8 @@ Er kontrolliert Redirects, zentrale Sicherheits- und Cacheheader, einen konfigur
 
 Der strukturierte Nachweispilot des HTTP-Prüfers gibt zusätzlich atomare positive, negative, nicht anwendbare und unklare Prüfaussagen aus. Seine Zusammenfassung trennt vollständig belegte, teilweise belegte, fehlgeschlagene und offene Checklistenpunkte. Manuelle, redaktionelle, kommunikative, externe oder nur mit Infrastrukturzugang mögliche Kriterien bleiben ausdrücklich offen; ein erfolgreicher HTTP-Lauf schließt sie nicht ab. Da der Pilot noch nicht die gesamte Checkliste umfasst, darf seine Punktzahl nicht als Gesamtfortschritt des Websiteprojekts ausgegeben werden.
 
+Die optionale Bibliothek `@mktcode/website-qa/report` kann gespeicherte technische JSON-Berichte mit einer projektspezifischen Modulauswahl und manuellen beziehungsweise externen Nachweisen verbinden und daraus JSON und Markdown ableiten. Sie führt selbst keine Netzwerkprüfung aus und ändert keine Projektcheckliste. Nur Berichte der festgelegten Auswertungsumgebung werden berücksichtigt; die konfigurierte Ziel-URL muss im technischen Bericht ausgewiesen sein. Quell- und Deploymentstand sind projektseitig deklarierte Zuordnungen. Widersprüche innerhalb dieser Angaben führen zum geschlossenen Abbruch, sie sind aber keine unabhängige Bestätigung durch das Werkzeug.
+
 Der Prüfer deckt bewusst keine DNS-, Zertifikatsketten-, vollständige Headermatrix, Crawl-, Browser- oder fachliche Sicherheitsprüfung ab. Weitere Antwortklassen und Alternativhosts werden deshalb weiterhin projektspezifisch kontrolliert.
 
 Status und Header einer einzelnen Antwort:

@@ -15,7 +15,8 @@
   },
   "exports": {
     "./catalog/*": "./catalog/*",
-    "./checklist": "./src/lib/checklist-report.mjs"
+    "./checklist": "./src/lib/checklist-report.mjs",
+    "./report": "./src/lib/project-report.mjs"
   },
   "files": [
     "catalog",

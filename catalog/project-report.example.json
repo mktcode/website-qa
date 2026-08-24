@@ -1,0 +1,40 @@
+{
+  "$schema": "./project-report.schema.json",
+  "schemaVersion": 1,
+  "catalog": {
+    "id": "website-qa-pilot",
+    "version": "1.0.0-pilot.1"
+  },
+  "project": {
+    "name": "Beispielwebsite",
+    "preferredUrl": "https://example.com/",
+    "evaluationEnvironment": "production",
+    "sourceRevision": "PROJEKT-COMMIT",
+    "deploymentId": "DEPLOYMENT-ARTEFAKT"
+  },
+  "selectedModules": [
+    "core",
+    "auftrag-recht-uebergabe"
+  ],
+  "evidenceFile": "./project-evidence.example.json",
+  "technicalRuns": [
+    {
+      "reportFile": "./http-report.example.json",
+      "targetUrl": "https://example.com/",
+      "environment": "production",
+      "command": "website-qa-http https://example.com/ --strict --json",
+      "sourceRevision": "PROJEKT-COMMIT",
+      "deploymentId": "DEPLOYMENT-ARTEFAKT"
+    }
+  ],
+  "itemStates": [
+    {
+      "itemId": "CORE-DOM-04",
+      "status": "external",
+      "recordedAt": "2026-08-24",
+      "recordedBy": "technisch verantwortliche Stelle",
+      "note": "Der Nachweis zur automatischen Zertifikatserneuerung liegt beim Hostinganbieter.",
+      "responsible": "Hostinganbieter"
+    }
+  ]
+}
