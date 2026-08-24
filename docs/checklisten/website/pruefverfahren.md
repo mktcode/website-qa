@@ -177,6 +177,8 @@ npm run ops:crawl:check -- https://example.de/ --sitemap --max-pages=50 --max-re
 
 Der Crawler verwendet ausnahmslos GET und begrenzt Seiten, Ressourcen, Antwortgrößen, Redirects und Laufzeit. Formulare werden nur inventarisiert; ihre Actions werden nie aufgerufen, kein Formular wird abgesendet und kein Button betätigt. Externe Links werden erfasst, aber nicht abgerufen. Interne Navigationen mit verdächtigen Aktionspfaden oder sensitiven Query-Parametern werden vorsorglich nicht angefordert und als ausgelassene Prüfung ausgewiesen. `--json` erzeugt eine maschinenlesbare Ausgabe mit ausdrücklichem Nachweis dieser Nur-Lese-Grenzen. Werkzeugcommit, Ziel, Optionen, Abdeckung und ausgelassene Pfade werden protokolliert.
 
+Der strukturierte Nachweispilot bewertet zusätzlich Canonical-Vollständigkeit und -Konsistenz, vorhandene und eindeutige Titel beziehungsweise Meta-Beschreibungen sowie `lang` und die Anzahl der H1-Überschriften. Ein begrenzter, fehlgeschlagener oder aus Nur-Lese-Vorsicht ausgelassener Seitenlauf führt bei betroffenen Aussagen zu `inconclusive` statt zu einem stillschweigenden Erfolg. Inhaltliche Eignung, tatsächliche Sprachpassung und Überschriftenhierarchie bleiben manuelle Kriterien.
+
 Der technische Crawl erfasst mindestens:
 
 - alle vorgesehenen HTML-Routen,

@@ -32,6 +32,11 @@ describe('structured checklist pilot', () => {
       'CORE-PERF-01',
       'CORE-PERF-05',
     ])
+    expect(checklistItemIdsForTool('crawl-check', catalog, registry)).toEqual([
+      'CORE-DOM-05',
+      'CORE-SEO-01',
+      'CORE-SEO-02',
+    ])
     expect(() => evaluatePilotChecklist({ assertions: [assertion('unknown.assertion')] })).toThrow(/unbekannte Assertion/)
   })
 
@@ -86,7 +91,7 @@ describe('structured checklist pilot', () => {
     })).toThrow(/gültiges Datum/)
 
     const evidenceExample = JSON.parse(readFileSync(new URL('../catalog/project-evidence.example.json', import.meta.url), 'utf8'))
-    expect(evidenceExample.catalog).toEqual({ id: 'website-qa-pilot', version: '1.0.0-pilot.1' })
+    expect(evidenceExample.catalog).toEqual({ id: 'website-qa-pilot', version: '1.0.0-pilot.2' })
     const evidencedRights = evaluatePilotChecklist({
       evidence: evidenceExample.evidence,
       itemIds: ['GOV-RGT-02'],

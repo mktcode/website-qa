@@ -206,6 +206,7 @@ describe('crawl checker', () => {
       strict: true,
     })
     const result = report.results[0] as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
       externalLinks: unknown[]
       forms: Array<{ action: string, requested: boolean }>
       pages: unknown[]
@@ -223,12 +224,21 @@ describe('crawl checker', () => {
       skippedNavigation: 0,
       warnings: 0,
     })
-    expect(createJsonReport(report.results, report.options).readOnlyGuarantees).toEqual({
-      buttonsActivated: false,
-      externalLinksFetched: false,
-      formActionsFetched: false,
-      formsSubmitted: false,
-      methods: ['GET'],
+    const jsonReport = createJsonReport(report.results, report.options)
+    expect(jsonReport).toMatchObject({
+      checklistCoverage: {
+        summary: {
+          checklistItems: { pass: 0, partial: 3, total: 3 },
+        },
+      },
+      readOnlyGuarantees: {
+        buttonsActivated: false,
+        externalLinksFetched: false,
+        formActionsFetched: false,
+        formsSubmitted: false,
+        methods: ['GET'],
+      },
+      schemaVersion: 1,
     })
     expect(result.sitemaps).toHaveLength(2)
     expect(result.pages).toHaveLength(3)
@@ -237,6 +247,8 @@ describe('crawl checker', () => {
       action: `${origin}submit`,
       requested: false,
     })])
+    expect(result.assertions).toHaveLength(7)
+    expect(result.assertions.every(assertion => assertion.outcome === 'pass')).toBe(true)
     expect(requests.every(request => request.method === 'GET')).toBe(true)
     expect(requests.some(request => request.url?.startsWith('/submit'))).toBe(false)
     expect(requests.some(request => request.url?.includes('external.example'))).toBe(false)
@@ -265,11 +277,13 @@ describe('crawl checker', () => {
       allowPrivate: true,
     })
     const result = report.results[0] as unknown as {
+      assertions: Array<{ outcome: string }>
       skippedLinks: Array<{ targetUrl: string }>
     }
 
     expect(report.summary).toMatchObject({ errors: 0, skippedNavigation: 2, warnings: 2 })
     expect(result.skippedLinks).toHaveLength(2)
+    expect(result.assertions.every(assertion => assertion.outcome === 'inconclusive')).toBe(true)
     expect(requestedPaths).toEqual(['/'])
   })
 
@@ -324,7 +338,10 @@ describe('crawl checker', () => {
       sitemap: true,
       strict: true,
     })
-    const result = report.results[0] as unknown as { issues: Array<{ code: string }> }
+    const result = report.results[0] as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
+      issues: Array<{ code: string }>
+    }
     const issueCodes = result.issues.map(issue => issue.code)
 
     expect(report.summary.failed).toBe(true)
@@ -335,6 +352,8 @@ describe('crawl checker', () => {
       'sitemap-page-noindex',
       'sitemap-page-redirect',
     ]))
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.canonical.matches-final-url')?.outcome).toBe('fail')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.metadata.title-present')?.outcome).toBe('inconclusive')
   })
 
   it('rejects private targets unless explicitly allowed', async () => {

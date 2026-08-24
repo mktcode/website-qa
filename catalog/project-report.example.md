@@ -7,7 +7,7 @@
 | Feld | Wert |
 |---|---|
 | Erstellt | 2026-08-24T12:30:00.000Z |
-| Katalog | website-qa-pilot 1.0.0-pilot.1 (pilot) |
+| Katalog | website-qa-pilot 1.0.0-pilot.2 (pilot) |
 | Auswertungsumgebung | production |
 | Bevorzugte URL | https://example.com/ |
 | Quellstand | PROJEKT-COMMIT |
@@ -20,24 +20,25 @@
 |---|---:|
 | Vollständig nachgewiesen | 2 |
 | Fehlgeschlagen | 0 |
-| Teilweise nachgewiesen | 0 |
+| Teilweise nachgewiesen | 3 |
 | Offen | 6 |
 | Unklar | 0 |
 | Nicht zutreffend | 0 |
 | Externer Nachweis offen | 1 |
 | Zurückgestellt | 0 |
 | Akzeptierte Abweichung (offen) | 0 |
-| **Ausgewählte Pilotpunkte** | **9** |
+| **Ausgewählte Pilotpunkte** | **12** |
 
-Automatische Kriterien: 2 bestanden, 0 fehlgeschlagen, 0 unklar, 14 ohne Nachweis.
+Automatische Kriterien: 9 bestanden, 0 fehlgeschlagen, 0 unklar, 14 ohne Nachweis.
 
-Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 8 ohne Nachweis.
+Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 11 ohne Nachweis.
 
 ## Technische Läufe
 
 | Werkzeug | Ziel | Umgebung | Verwendet | Assertions | Befehl |
 |---|---|---|---:|---:|---|
 | http-check 0.1.0 | https://example.com/ | production | ja | 2 | <code>website-qa-http https://example.com/ --strict --json</code> |
+| crawl-check 0.1.0 | https://example.com/ | production | ja | 7 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
 
 ## Checklistenpunkte
 
@@ -45,10 +46,13 @@ Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 8 ohne Nachweis.
 |---|---|---|---:|---:|
 | CORE-DOM-02 | core | Offen | 0/2 | 0/0 |
 | CORE-DOM-04 | core | Externer Nachweis offen | 0/0 | 0/2 |
+| CORE-DOM-05 | core | Teilweise nachgewiesen | 2/2 | 0/1 |
 | CORE-DOM-07 | core | Offen | 0/3 | 0/1 |
 | CORE-DOM-08 | core | Offen | 0/2 | 0/2 |
 | CORE-ERR-01 | core | Offen | 0/2 | 0/1 |
 | CORE-ERR-02 | core | Vollständig nachgewiesen | 2/2 | 0/0 |
+| CORE-SEO-01 | core | Teilweise nachgewiesen | 3/3 | 0/1 |
+| CORE-SEO-02 | core | Teilweise nachgewiesen | 2/2 | 0/1 |
 | CORE-PERF-01 | core | Offen | 0/3 | 0/1 |
 | CORE-PERF-05 | core | Offen | 0/2 | 0/1 |
 | GOV-RGT-02 | auftrag-recht-uebergabe | Vollständig nachgewiesen | 0/0 | 1/1 |
@@ -70,6 +74,15 @@ Workflow: **Externer Nachweis offen** – Der Nachweis zur automatischen Zertifi
   - Erforderlicher Nachweis: Nachweis eines geeigneten TLS-Werkzeugs mit Datum, Hosts und Ergebnis referenzieren.
 - [ ] `CORE-DOM-04/C2` Die automatische Zertifikatserneuerung ist durch Infrastrukturkonfiguration oder einen erfolgreichen Erneuerungsvorgang plausibilisiert. — manual, noEvidence
   - Erforderlicher Nachweis: Plattformkonfiguration oder Erneuerungsnachweis ohne Zugangsdaten dokumentieren.
+
+### CORE-DOM-05: Teilweise nachgewiesen
+
+Jede indexierbare Seite enthält genau einen absoluten Canonical auf der festgelegten Host- und HTTPS-Variante.
+
+- [x] `CORE-DOM-05/C1` Alle vom Crawl geprüften indexierbaren Seiten besitzen genau einen absoluten Canonical. — automatic, pass
+- [x] `CORE-DOM-05/C2` Die geprüften Canonicals entsprechen der jeweiligen finalen Seiten-URL. — automatic, pass
+- [ ] `CORE-DOM-05/C3` Die finalen Seiten-URLs entsprechen der projektspezifisch festgelegten öffentlichen Host-, HTTPS- und Pfadstrategie. — manual, noEvidence
+  - Erforderlicher Nachweis: Crawlziel und finale URL-Stichprobe mit der dokumentierten öffentlichen URL-Strategie des Projekts abgleichen.
 
 ### CORE-DOM-07: Offen
 
@@ -107,6 +120,25 @@ Nicht indexierbare Fehlerseiten senden `noindex` und enthalten weder einen irref
 
 - [x] `CORE-ERR-02/C1` Die geprüfte 404-Antwort enthält eine noindex-Anweisung. — automatic, pass
 - [x] `CORE-ERR-02/C2` Die geprüfte 404-Antwort enthält weder Canonical noch og:url. — automatic, pass
+
+### CORE-SEO-01: Teilweise nachgewiesen
+
+Jede relevante Seite besitzt einen eindeutigen, inhaltlich passenden Titel und eine passende Meta-Beschreibung.
+
+- [x] `CORE-SEO-01/C1` Alle vom Crawl geprüften Seiten besitzen einen Seitentitel. — automatic, pass
+- [x] `CORE-SEO-01/C2` Alle vom Crawl geprüften Seiten besitzen genau eine Meta-Beschreibung. — automatic, pass
+- [x] `CORE-SEO-01/C3` Titel und Meta-Beschreibungen sind unter den geprüften indexierbaren Seiten eindeutig. — automatic, pass
+- [ ] `CORE-SEO-01/C4` Titel und Meta-Beschreibungen sind für die vorgesehenen Seiten inhaltlich passend. — manual, noEvidence
+  - Erforderlicher Nachweis: Titel und Meta-Beschreibungen redaktionell gegen Seiteninhalt, Suchintention und Projektvorgaben prüfen.
+
+### CORE-SEO-02: Teilweise nachgewiesen
+
+Die Seitensprache ist mit einem passenden `lang`-Attribut angegeben; Überschriften bilden eine nachvollziehbare Hierarchie mit verständlicher Hauptüberschrift.
+
+- [x] `CORE-SEO-02/C1` Alle vom Crawl geprüften Seiten besitzen ein lang-Attribut. — automatic, pass
+- [x] `CORE-SEO-02/C2` Alle vom Crawl geprüften Seiten besitzen genau eine H1-Überschrift. — automatic, pass
+- [ ] `CORE-SEO-02/C3` Seitensprache, Überschriftenhierarchie und Hauptüberschrift sind inhaltlich passend und verständlich. — manual, noEvidence
+  - Erforderlicher Nachweis: Sprachcode und Überschriftenstruktur auf repräsentativen Seitentypen redaktionell und semantisch prüfen.
 
 ### CORE-PERF-01: Offen
 

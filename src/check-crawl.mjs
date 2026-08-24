@@ -5,6 +5,7 @@
 
 import { XMLParser, XMLValidator } from 'fast-xml-parser'
 import { parse } from 'parse5'
+import { checklistItemIdsForTool, evaluatePilotChecklist } from './lib/checklist-report.mjs'
 import { fetchResource, normalizeMimeType, validateUrl } from './lib/http-client.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
 
@@ -152,6 +153,114 @@ export function parseArguments(argv) {
 
 function addIssue(result, severity, code, message, checklistIds = [], url = result.finalUrl || result.requestedUrl) {
   result.issues.push({ checklistIds, code, message, severity, url })
+}
+
+function addAssertion(result, assertionId, outcome, message) {
+  result.assertions.push({
+    assertionId,
+    assertionVersion: 1,
+    message,
+    outcome,
+    subject: {
+      checkedPages: result.pages.length,
+      skippedNavigations: result.skippedLinks.length,
+      url: result.finalUrl || result.requestedUrl,
+    },
+  })
+}
+
+const incompletePageCrawlIssueCodes = new Set([
+  'initial-fetch-failed',
+  'navigation-skipped-read-only',
+  'page-fetch-failed',
+  'page-http-status',
+  'page-limit-reached',
+])
+
+function crawlAssertionOutcome(result, failureCodes, dependencyCodes = []) {
+  const issueCodes = new Set(result.issues.map(issue => issue.code))
+  if (failureCodes.some(code => issueCodes.has(code))) {
+    return 'fail'
+  }
+  if (result.pages.length === 0
+    || [...incompletePageCrawlIssueCodes, ...dependencyCodes].some(code => issueCodes.has(code))) {
+    return 'inconclusive'
+  }
+  return 'pass'
+}
+
+function addCrawlAssertions(result) {
+  const definitions = [
+    {
+      failureCodes: ['page-canonical-missing', 'page-canonical-multiple', 'page-canonical-not-absolute'],
+      id: 'crawl.canonical.single-absolute',
+      messages: {
+        fail: 'Mindestens eine geprüfte indexierbare Seite besitzt nicht genau einen absoluten Canonical.',
+        inconclusive: 'Die Canonical-Vollständigkeit ist wegen eines unvollständigen Seitenlaufs nicht abschließend prüfbar.',
+        pass: 'Alle geprüften indexierbaren Seiten besitzen genau einen absoluten Canonical.',
+      },
+    },
+    {
+      dependencyCodes: ['page-canonical-missing', 'page-canonical-multiple', 'page-canonical-not-absolute'],
+      failureCodes: ['page-canonical-mismatch'],
+      id: 'crawl.canonical.matches-final-url',
+      messages: {
+        fail: 'Mindestens ein geprüfter Canonical weicht von der finalen Seiten-URL ab.',
+        inconclusive: 'Der Canonical-Abgleich ist wegen fehlender, mehrdeutiger oder unvollständig geprüfter Angaben nicht abschließend möglich.',
+        pass: 'Alle geprüften Canonicals entsprechen der jeweiligen finalen Seiten-URL.',
+      },
+    },
+    {
+      failureCodes: ['page-title-missing'],
+      id: 'crawl.metadata.title-present',
+      messages: {
+        fail: 'Mindestens einer geprüften Seite fehlt der Seitentitel.',
+        inconclusive: 'Die Titelprüfung ist wegen eines unvollständigen Seitenlaufs nicht abschließend möglich.',
+        pass: 'Alle geprüften Seiten besitzen einen Seitentitel.',
+      },
+    },
+    {
+      failureCodes: ['page-description-duplicate', 'page-description-missing'],
+      id: 'crawl.metadata.description-single',
+      messages: {
+        fail: 'Mindestens eine geprüfte Seite besitzt nicht genau eine Meta-Beschreibung.',
+        inconclusive: 'Die Prüfung der Meta-Beschreibungen ist wegen eines unvollständigen Seitenlaufs nicht abschließend möglich.',
+        pass: 'Alle geprüften Seiten besitzen genau eine Meta-Beschreibung.',
+      },
+    },
+    {
+      failureCodes: ['page-description-duplicate-across-pages', 'page-title-duplicate'],
+      id: 'crawl.metadata.unique',
+      messages: {
+        fail: 'Seitentitel oder Meta-Beschreibungen werden auf mehreren geprüften indexierbaren Seiten wiederholt.',
+        inconclusive: 'Die Duplikatprüfung ist wegen eines unvollständigen Seitenlaufs nicht abschließend möglich.',
+        pass: 'Die geprüften indexierbaren Seiten verwenden eindeutige Titel und Meta-Beschreibungen.',
+      },
+    },
+    {
+      failureCodes: ['page-language-missing'],
+      id: 'crawl.document.language-present',
+      messages: {
+        fail: 'Mindestens einer geprüften Seite fehlt das lang-Attribut.',
+        inconclusive: 'Die Sprachangaben sind wegen eines unvollständigen Seitenlaufs nicht abschließend prüfbar.',
+        pass: 'Alle geprüften Seiten besitzen ein lang-Attribut.',
+      },
+    },
+    {
+      failureCodes: ['page-h1-count'],
+      id: 'crawl.document.single-h1',
+      messages: {
+        fail: 'Mindestens eine geprüfte Seite besitzt nicht genau eine H1-Überschrift.',
+        inconclusive: 'Die H1-Prüfung ist wegen eines unvollständigen Seitenlaufs nicht abschließend möglich.',
+        pass: 'Alle geprüften Seiten besitzen genau eine H1-Überschrift.',
+      },
+    },
+  ]
+
+  for (const definition of definitions) {
+    const outcome = crawlAssertionOutcome(result, definition.failureCodes, definition.dependencyCodes)
+    addAssertion(result, definition.id, outcome, definition.messages[outcome])
+  }
 }
 
 function normalizedComparableUrl(value) {
@@ -968,6 +1077,7 @@ function checkDuplicateMetadata(result) {
 
 async function inspectSite(inputUrl, options) {
   const result = {
+    assertions: [],
     externalLinkKeys: new Set(),
     externalLinks: [],
     forms: [],
@@ -989,6 +1099,7 @@ async function inspectSite(inputUrl, options) {
   }
   catch (error) {
     addIssue(result, 'error', 'initial-fetch-failed', `Start-URL konnte nicht abgerufen werden: ${error.message}`, ['CORE-SEO-04'], inputUrl)
+    addCrawlAssertions(result)
     delete result.externalLinkKeys
     return result
   }
@@ -1038,8 +1149,16 @@ async function inspectSite(inputUrl, options) {
   checkFragments(state)
   checkSitemapCoverage(state)
   checkDuplicateMetadata(result)
+  addCrawlAssertions(result)
   delete result.externalLinkKeys
   return result
+}
+
+function checklistCoverage(results) {
+  return evaluatePilotChecklist({
+    assertions: results.flatMap(result => result.assertions),
+    itemIds: checklistItemIdsForTool('crawl-check'),
+  })
 }
 
 function summarize(results, strict) {
@@ -1060,6 +1179,7 @@ function summarize(results, strict) {
 
 export function createJsonReport(results, options) {
   return {
+    checklistCoverage: checklistCoverage(results),
     generatedAt: new Date().toISOString(),
     options: {
       maxPages: options.maxPages,
@@ -1078,6 +1198,7 @@ export function createJsonReport(results, options) {
       methods: ['GET'],
     },
     results,
+    schemaVersion: 1,
     summary: summarize(results, options.strict),
     tool: 'crawl-check',
     toolPackage: { name: packageName, version: packageVersion },
@@ -1109,6 +1230,12 @@ function printText(results, options) {
     }
   }
 
+  const coverage = checklistCoverage(results)
+  const checklistSummary = coverage.summary.checklistItems
+  const nonAutomaticSummary = coverage.summary.nonAutomaticCriteria
+  console.log(`\nPilot-Checklistennachweis ${coverage.catalog.version}: ${checklistSummary.pass} Punkt(e) vollständig, ${checklistSummary.partial} teilweise, ${checklistSummary.fail} fehlgeschlagen, ${checklistSummary.open + checklistSummary.inconclusive} offen/unklar.`)
+  console.log(`Nicht automatisch belegbare Kriterien: ${nonAutomaticSummary.pass} belegt, ${nonAutomaticSummary.total - nonAutomaticSummary.pass - nonAutomaticSummary.notApplicable} offen; sie werden durch diesen Lauf nicht stillschweigend abgeschlossen.`)
+
   const summary = summarize(results, options.strict)
   console.log('\nNur lesender Lauf: ausschließlich GET; keine Formular-Action und kein externer Link wurde abgerufen, kein Button betätigt.')
   console.log(`Ergebnis: ${summary.pages} Seite(n), ${summary.resources} Ressource(n), ${summary.errors} Fehler, ${summary.warnings} Warnung(en).`)
@@ -1130,6 +1257,7 @@ export async function runCrawlCheck(inputUrls, options = {}) {
   const inputUrl = validateUrl(inputUrls[0], mergedOptions).href
   const results = [await inspectSite(inputUrl, mergedOptions)]
   return {
+    checklistCoverage: checklistCoverage(results),
     options: mergedOptions,
     results,
     summary: summarize(results, mergedOptions.strict),
@@ -1169,6 +1297,7 @@ async function main() {
           formsSubmitted: false,
           methods: ['GET'],
         },
+        schemaVersion: 1,
         summary: { errors: 1, failed: true, pages: 0, resources: 0, warnings: 0 },
         tool: 'crawl-check',
       }, null, 2))

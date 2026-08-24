@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-24T12:10:00.000Z",
+  "tool": "crawl-check",
+  "toolPackage": {
+    "name": "@mktcode/website-qa",
+    "version": "0.1.0"
+  },
+  "checklistCoverage": {
+    "catalog": {
+      "id": "website-qa-pilot",
+      "status": "pilot",
+      "version": "1.0.0-pilot.2"
+    }
+  },
+  "results": [
+    {
+      "requestedUrl": "https://example.com/",
+      "finalUrl": "https://example.com/",
+      "assertions": [
+        {
+          "assertionId": "crawl.canonical.single-absolute",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Alle geprüften indexierbaren Seiten besitzen genau einen absoluten Canonical.",
+          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+        },
+        {
+          "assertionId": "crawl.canonical.matches-final-url",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Alle geprüften Canonicals entsprechen der jeweiligen finalen Seiten-URL.",
+          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+        },
+        {
+          "assertionId": "crawl.metadata.title-present",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Alle geprüften Seiten besitzen einen Seitentitel.",
+          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+        },
+        {
+          "assertionId": "crawl.metadata.description-single",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Alle geprüften Seiten besitzen genau eine Meta-Beschreibung.",
+          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+        },
+        {
+          "assertionId": "crawl.metadata.unique",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Die geprüften indexierbaren Seiten verwenden eindeutige Titel und Meta-Beschreibungen.",
+          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+        },
+        {
+          "assertionId": "crawl.document.language-present",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Alle geprüften Seiten besitzen ein lang-Attribut.",
+          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+        },
+        {
+          "assertionId": "crawl.document.single-h1",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Alle geprüften Seiten besitzen genau eine H1-Überschrift.",
+          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+        }
+      ],
+      "issues": [],
+      "pages": [
+        { "requestedUrl": "https://example.com/", "finalUrl": "https://example.com/", "status": 200 },
+        { "requestedUrl": "https://example.com/about", "finalUrl": "https://example.com/about", "status": 200 },
+        { "requestedUrl": "https://example.com/contact", "finalUrl": "https://example.com/contact", "status": 200 }
+      ]
+    }
+  ],
+  "summary": {
+    "errors": 0,
+    "externalLinks": 0,
+    "failed": false,
+    "formsObservedNotSubmitted": 0,
+    "pages": 3,
+    "resources": 0,
+    "skippedNavigation": 0,
+    "warnings": 0
+  }
+}

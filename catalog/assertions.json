@@ -16,6 +16,13 @@
     { "id": "compression.gzip.effective", "version": 1, "tool": "http-check", "description": "Gzip ist für eine geeignete Ressource gültig, variiert und wirksam." },
     { "id": "compression.br.effective", "version": 1, "tool": "http-check", "description": "Brotli ist für eine geeignete Ressource gültig, variiert und wirksam." },
     { "id": "cache.versioned-asset.immutable", "version": 1, "tool": "http-check", "description": "Ein versioniert wirkendes Asset besitzt langfristiges immutable-Caching." },
-    { "id": "cache.not-found.not-publicly-cacheable", "version": 1, "tool": "http-check", "description": "Die 404-Antwort ist nicht ausdrücklich langfristig öffentlich cachebar." }
+    { "id": "cache.not-found.not-publicly-cacheable", "version": 1, "tool": "http-check", "description": "Die 404-Antwort ist nicht ausdrücklich langfristig öffentlich cachebar." },
+    { "id": "crawl.canonical.single-absolute", "version": 1, "tool": "crawl-check", "description": "Alle geprüften indexierbaren Seiten besitzen genau einen absoluten Canonical." },
+    { "id": "crawl.canonical.matches-final-url", "version": 1, "tool": "crawl-check", "description": "Alle geprüften Canonicals entsprechen der jeweiligen finalen Seiten-URL." },
+    { "id": "crawl.metadata.title-present", "version": 1, "tool": "crawl-check", "description": "Alle geprüften Seiten besitzen einen Seitentitel." },
+    { "id": "crawl.metadata.description-single", "version": 1, "tool": "crawl-check", "description": "Alle geprüften Seiten besitzen genau eine Meta-Beschreibung." },
+    { "id": "crawl.metadata.unique", "version": 1, "tool": "crawl-check", "description": "Titel und Meta-Beschreibungen sind unter den geprüften indexierbaren Seiten eindeutig." },
+    { "id": "crawl.document.language-present", "version": 1, "tool": "crawl-check", "description": "Alle geprüften Seiten besitzen ein lang-Attribut." },
+    { "id": "crawl.document.single-h1", "version": 1, "tool": "crawl-check", "description": "Alle geprüften Seiten besitzen genau eine H1-Überschrift." }
   ]
 }

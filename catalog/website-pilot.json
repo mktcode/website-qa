@@ -2,9 +2,9 @@
   "$schema": "./website-catalog.schema.json",
   "schemaVersion": 1,
   "catalogId": "website-qa-pilot",
-  "catalogVersion": "1.0.0-pilot.1",
+  "catalogVersion": "1.0.0-pilot.2",
   "status": "pilot",
-  "description": "Strukturierter Pilotkatalog für HTTP-bezogene sowie bewusst nicht automatisierbare Website-Prüfnachweise.",
+  "description": "Strukturierter Pilotkatalog für HTTP- und Crawl-bezogene sowie bewusst nicht automatisierbare Website-Prüfnachweise.",
   "items": [
     {
       "id": "CORE-DOM-02",
@@ -52,6 +52,40 @@
             "mode": "manual",
             "evidenceClass": "administrative",
             "instructions": "Plattformkonfiguration oder Erneuerungsnachweis ohne Zugangsdaten dokumentieren."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-DOM-05",
+      "module": "core",
+      "statement": "Jede indexierbare Seite enthält genau einen absoluten Canonical auf der festgelegten Host- und HTTPS-Variante.",
+      "criteria": [
+        {
+          "id": "CORE-DOM-05/C1",
+          "statement": "Alle vom Crawl geprüften indexierbaren Seiten besitzen genau einen absoluten Canonical.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.canonical.single-absolute"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-DOM-05/C2",
+          "statement": "Die geprüften Canonicals entsprechen der jeweiligen finalen Seiten-URL.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.canonical.matches-final-url"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-DOM-05/C3",
+          "statement": "Die finalen Seiten-URLs entsprechen der projektspezifisch festgelegten öffentlichen Host-, HTTPS- und Pfadstrategie.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Crawlziel und finale URL-Stichprobe mit der dokumentierten öffentlichen URL-Strategie des Projekts abgleichen."
           }
         }
       ]
@@ -197,6 +231,83 @@
             "mode": "automatic",
             "assertions": ["error.not-found.no-url-metadata"],
             "aggregation": "all"
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-SEO-01",
+      "module": "core",
+      "statement": "Jede relevante Seite besitzt einen eindeutigen, inhaltlich passenden Titel und eine passende Meta-Beschreibung.",
+      "criteria": [
+        {
+          "id": "CORE-SEO-01/C1",
+          "statement": "Alle vom Crawl geprüften Seiten besitzen einen Seitentitel.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.metadata.title-present"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SEO-01/C2",
+          "statement": "Alle vom Crawl geprüften Seiten besitzen genau eine Meta-Beschreibung.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.metadata.description-single"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SEO-01/C3",
+          "statement": "Titel und Meta-Beschreibungen sind unter den geprüften indexierbaren Seiten eindeutig.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.metadata.unique"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SEO-01/C4",
+          "statement": "Titel und Meta-Beschreibungen sind für die vorgesehenen Seiten inhaltlich passend.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "editorial",
+            "instructions": "Titel und Meta-Beschreibungen redaktionell gegen Seiteninhalt, Suchintention und Projektvorgaben prüfen."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-SEO-02",
+      "module": "core",
+      "statement": "Die Seitensprache ist mit einem passenden `lang`-Attribut angegeben; Überschriften bilden eine nachvollziehbare Hierarchie mit verständlicher Hauptüberschrift.",
+      "criteria": [
+        {
+          "id": "CORE-SEO-02/C1",
+          "statement": "Alle vom Crawl geprüften Seiten besitzen ein lang-Attribut.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.document.language-present"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SEO-02/C2",
+          "statement": "Alle vom Crawl geprüften Seiten besitzen genau eine H1-Überschrift.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.document.single-h1"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SEO-02/C3",
+          "statement": "Seitensprache, Überschriftenhierarchie und Hauptüberschrift sind inhaltlich passend und verständlich.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "editorial",
+            "instructions": "Sprachcode und Überschriftenstruktur auf repräsentativen Seitentypen redaktionell und semantisch prüfen."
           }
         }
       ]
