@@ -1,0 +1,18 @@
+{
+  "$schema": "./project-evidence.schema.json",
+  "schemaVersion": 1,
+  "catalog": {
+    "id": "website-qa-pilot",
+    "version": "1.0.0-pilot.1"
+  },
+  "evidence": [
+    {
+      "criterionId": "GOV-RGT-02/C1",
+      "outcome": "pass",
+      "checkedAt": "2026-08-24",
+      "checkedBy": "inhaltlich verantwortliche Stelle",
+      "note": "Freigabe und Rechteumfang wurden bestätigt; vertrauliche Unterlagen verbleiben in der vorgesehenen Projektakte.",
+      "reference": "interner oder projektspezifischer Nachweisverweis"
+    }
+  ]
+}

@@ -3,7 +3,7 @@ import { Buffer } from 'node:buffer'
 import { createServer } from 'node:http'
 import { brotliCompressSync, gzipSync } from 'node:zlib'
 import { afterEach, describe, expect, it } from 'vitest'
-import { parseArguments, runHttpCheck } from '../src/check-http.mjs'
+import { createJsonReport, parseArguments, runHttpCheck } from '../src/check-http.mjs'
 
 const servers = new Set<ReturnType<typeof createServer>>()
 
@@ -128,12 +128,18 @@ describe('http checker', () => {
     })
 
     const result = report.results[0] as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
       notFound: { status: number }
       page: { finalUrl: string, redirects: unknown[] }
       resources: Array<{ variants: Record<string, unknown> }>
     }
 
     expect(report.summary).toEqual({ errors: 0, failed: false, targets: 1, warnings: 0 })
+    expect(report.checklistCoverage.summary.checklistItems).toMatchObject({
+      automaticallyPassed: 1,
+      pass: 1,
+      total: 7,
+    })
     expect(result.notFound).toMatchObject({ status: 404 })
     expect(result.page).toMatchObject({
       finalUrl: `${url}?source=qa`,
@@ -144,6 +150,19 @@ describe('http checker', () => {
       br: { contentEncoding: 'br', status: 200 },
       gzip: { contentEncoding: 'gzip', status: 200 },
       identity: { contentEncoding: 'identity', status: 200 },
+    })
+    expect(result.assertions).toEqual(expect.arrayContaining([
+      expect.objectContaining({ assertionId: 'error.not-found.status-404', outcome: 'pass' }),
+      expect.objectContaining({ assertionId: 'error.not-found.noindex', outcome: 'pass' }),
+      expect.objectContaining({ assertionId: 'compression.gzip.effective', outcome: 'pass' }),
+      expect.objectContaining({ assertionId: 'cache.versioned-asset.immutable', outcome: 'pass' }),
+    ]))
+
+    const json = createJsonReport(report.results, report.options)
+    expect(json).toMatchObject({
+      checklistCoverage: { catalog: { status: 'pilot' } },
+      readOnlyGuarantees: { methods: ['GET'], mutatingActionsInvoked: false },
+      schemaVersion: 1,
     })
   })
 
@@ -160,6 +179,7 @@ describe('http checker', () => {
       strict: true,
     })
     const result = report.results[0] as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
       issues: Array<{ code: string }>
     }
     const issueCodes = result.issues.map(issue => issue.code)
@@ -171,6 +191,10 @@ describe('http checker', () => {
       'not-found-noindex-missing',
       'not-found-status',
       'nosniff-missing',
+    ]))
+    expect(result.assertions).toEqual(expect.arrayContaining([
+      expect.objectContaining({ assertionId: 'error.not-found.status-404', outcome: 'fail' }),
+      expect.objectContaining({ assertionId: 'compression.gzip.effective', outcome: 'fail' }),
     ]))
   })
 

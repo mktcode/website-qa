@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "assertions": [
+    { "id": "http.redirect.permanent", "version": 1, "tool": "http-check", "description": "Die HTTP-Probe verwendet eine permanente Weiterleitung auf HTTPS." },
+    { "id": "http.redirect.path-query-preserved", "version": 1, "tool": "http-check", "description": "Die HTTP-Probe endet pfad- und queryerhaltend auf HTTPS." },
+    { "id": "http.redirect.chain-direct", "version": 1, "tool": "http-check", "description": "Die HTTP-Probe benötigt genau eine Weiterleitung." },
+    { "id": "https.redirect.no-downgrade", "version": 1, "tool": "http-check", "description": "Die Zielnavigation enthält keinen HTTPS-zu-HTTP-Downgrade." },
+    { "id": "https.redirect.chain-direct", "version": 1, "tool": "http-check", "description": "Die Zielnavigation benötigt höchstens eine Weiterleitung." },
+    { "id": "http.hsts.present", "version": 1, "tool": "http-check", "description": "Die untersuchte HTTPS-Antwort enthält Strict-Transport-Security." },
+    { "id": "http.hsts.max-age-adequate", "version": 1, "tool": "http-check", "description": "HSTS enthält einen gültigen max-age von mindestens 180 Tagen." },
+    { "id": "error.not-found.status-404", "version": 1, "tool": "http-check", "description": "Der unbekannte Pfad antwortet mit HTTP 404." },
+    { "id": "error.not-found.no-technical-details", "version": 1, "tool": "http-check", "description": "Die automatische Stichprobe erkennt keine typischen technischen Interna." },
+    { "id": "error.not-found.noindex", "version": 1, "tool": "http-check", "description": "Die 404-Antwort enthält noindex." },
+    { "id": "error.not-found.no-url-metadata", "version": 1, "tool": "http-check", "description": "Die 404-Antwort enthält weder Canonical noch og:url." },
+    { "id": "compression.identity.valid", "version": 1, "tool": "http-check", "description": "Die Identity-Variante ist erfolgreich und nicht komprimiert." },
+    { "id": "compression.gzip.effective", "version": 1, "tool": "http-check", "description": "Gzip ist für eine geeignete Ressource gültig, variiert und wirksam." },
+    { "id": "compression.br.effective", "version": 1, "tool": "http-check", "description": "Brotli ist für eine geeignete Ressource gültig, variiert und wirksam." },
+    { "id": "cache.versioned-asset.immutable", "version": 1, "tool": "http-check", "description": "Ein versioniert wirkendes Asset besitzt langfristiges immutable-Caching." },
+    { "id": "cache.not-found.not-publicly-cacheable", "version": 1, "tool": "http-check", "description": "Die 404-Antwort ist nicht ausdrücklich langfristig öffentlich cachebar." }
+  ]
+}

@@ -46,6 +46,14 @@ Ein Commit, Push, erfolgreicher Build, Plattformstatus und öffentlicher Produkt
 
 Jeder Prüfpunkt besitzt eine fachliche Kennung wie `CORE-DOM-01`, `FORM-SEC-03` oder `CONT-IMG-02`. Diese Kennungen werden in Projektkopien, Protokollen und späteren Vorlagenrevisionen beibehalten. Neue Punkte erhalten neue Kennungen; bestehende Kennungen werden nicht für andere Aussagen wiederverwendet.
 
+### Strukturierter Nachweispilot
+
+Unter [`../../../catalog/`](../../../catalog/) wird ein maschinenlesbarer Pilot für ausgewählte Punkte erprobt. Ein grober Checklistenpunkt wird dort in stabile Kriterien wie `CORE-DOM-08/C1` zerlegt. Jedes Kriterium legt fest, ob ein automatischer, manueller oder externer Nachweis erforderlich ist.
+
+Automatische Werkzeuge liefern atomare Prüfaussagen mit den Ergebnissen `pass`, `fail`, `inconclusive` oder `notApplicable`. Ein fehlender Befund gilt nicht als positiver Nachweis. Ein zusammengesetzter Punkt ist erst vollständig belegt, wenn alle erforderlichen Kriterien erfüllt sind. Insbesondere werden Infrastrukturzugänge, Betreiberentscheidungen, Kundenkommunikation, Freigaben, Medienrechte und redaktionelle Bewertungen nicht aus einem erfolgreichen technischen Lauf abgeleitet.
+
+Der Pilot ersetzt diese vollständige Markdown-Vorlage noch nicht. Ein Konsistenztest hält die im Pilot enthaltenen Punkttexte mit ihrer Markdown-Quelle synchron. Projektbezogene Modulauswahl, Nichtanwendbarkeit und nicht automatische Nachweise bleiben Teil der eigenständigen Projektakte.
+
 ## Anforderungen an Nachweise
 
 Ein belastbarer Nachweis nennt, soweit einschlägig:

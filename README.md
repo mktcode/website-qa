@@ -39,6 +39,24 @@ website-qa-social https://example.com/ --sitemap --max-pages=20
 
 Jeder Befehl ist unabhängig. Es gibt bewusst keinen Sammelbefehl und keine Annahme über projektspezifische Build-, Test- oder CI-Kommandos. Alle Befehle unterstützen `--help`; die Website-Prüfer bieten zudem eine maschinenlesbare Ausgabe über `--json`.
 
+## Strukturierter Checklistennachweis (Pilot)
+
+Der HTTP-Prüfer gibt zusätzlich zu Befunden positive, negative und unklare atomare Prüfaussagen sowie eine erste Auswertung ausgewählter Checklistenpunkte aus. Grundlage ist der mit dem Paket ausgelieferte [Pilotkatalog](catalog/README.md). Er unterscheidet ausdrücklich:
+
+- automatisch belegbare Kriterien,
+- manuell beziehungsweise redaktionell zu prüfende Kriterien,
+- externe, kommunikative oder nur mit Infrastrukturzugang belegbare Kriterien.
+
+Ein technisch erfolgreicher Lauf schließt einen zusammengesetzten Checklistenpunkt nicht ab, solange erforderliche manuelle oder externe Nachweise fehlen. Die Berichtszahlen weisen deshalb vollständig belegte, teilweise belegte, fehlgeschlagene und offene Punkte getrennt aus.
+
+Für eine projektspezifische Berichtserzeugung kann der Pilot programmatisch verwendet werden:
+
+```js
+import { evaluatePilotChecklist } from '@mktcode/website-qa/checklist'
+```
+
+Der Pilot umfasst noch nicht die vollständige Website-Checkliste und verändert keine Projektcheckliste automatisch. Die vier Netzwerkprüfer bleiben unabhängige Befehle; ein Zielprojekt entscheidet selbst, welche JSON-Berichte und manuellen Nachweise es zusammenführt.
+
 ## Sicherheitsgrenzen
 
 - HTTP-Abrufe verwenden ausschließlich GET.

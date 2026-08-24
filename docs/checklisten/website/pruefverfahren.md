@@ -111,6 +111,8 @@ npm run ops:http:check -- https://example.de/ --strict
 
 Er kontrolliert Redirects, zentrale Sicherheits- und Cacheheader, einen konfigurierbaren unbekannten Pfad sowie Identity-, Gzip- und Brotli-Auslieferung von HTML und je einer entdeckten CSS-/JavaScript-Ressource. Bei HTTPS-Zielen prüft er standardmäßig zusätzlich die HTTP-Weiterleitung mit einem ungefährlichen Query-Parameter auf permanente, pfad- und queryerhaltende Umleitung. `--json` erzeugt eine maschinenlesbare Ausgabe; private und unverschlüsselte Eingabeziele sind standardmäßig gesperrt. Werkzeugcommit, Ziel, Optionen und Befunde werden protokolliert.
 
+Der strukturierte Nachweispilot des HTTP-Prüfers gibt zusätzlich atomare positive, negative, nicht anwendbare und unklare Prüfaussagen aus. Seine Zusammenfassung trennt vollständig belegte, teilweise belegte, fehlgeschlagene und offene Checklistenpunkte. Manuelle, redaktionelle, kommunikative, externe oder nur mit Infrastrukturzugang mögliche Kriterien bleiben ausdrücklich offen; ein erfolgreicher HTTP-Lauf schließt sie nicht ab. Da der Pilot noch nicht die gesamte Checkliste umfasst, darf seine Punktzahl nicht als Gesamtfortschritt des Websiteprojekts ausgegeben werden.
+
 Der Prüfer deckt bewusst keine DNS-, Zertifikatsketten-, vollständige Headermatrix, Crawl-, Browser- oder fachliche Sicherheitsprüfung ab. Weitere Antwortklassen und Alternativhosts werden deshalb weiterhin projektspezifisch kontrolliert.
 
 Status und Header einer einzelnen Antwort:

@@ -13,7 +13,12 @@
     "website-qa-http": "./src/check-http.mjs",
     "website-qa-social": "./src/check-social-preview.mjs"
   },
+  "exports": {
+    "./catalog/*": "./catalog/*",
+    "./checklist": "./src/lib/checklist-report.mjs"
+  },
   "files": [
+    "catalog",
     "src"
   ],
   "scripts": {

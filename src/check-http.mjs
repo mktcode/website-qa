@@ -5,6 +5,7 @@
 
 import { brotliDecompressSync, gunzipSync } from 'node:zlib'
 import { parse } from 'parse5'
+import { checklistItemIdsForTool, evaluatePilotChecklist } from './lib/checklist-report.mjs'
 import { fetchResource, normalizeMimeType, validateUrl } from './lib/http-client.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
 
@@ -122,6 +123,19 @@ function addIssue(result, severity, code, message, checklistIds = [], url = resu
   result.issues.push({ checklistIds, code, message, severity, url })
 }
 
+function addAssertion(result, assertionId, outcome, message, url, details = {}) {
+  result.assertions.push({
+    assertionId,
+    assertionVersion: 1,
+    message,
+    outcome,
+    subject: {
+      ...details,
+      url,
+    },
+  })
+}
+
 function headerSnapshot(headers) {
   const names = [
     'cache-control',
@@ -154,14 +168,22 @@ function checkSecurityHeaders(result, response, label) {
     const hsts = headers['strict-transport-security']
     if (!hsts) {
       addIssue(result, 'error', 'hsts-missing', `${label}: Strict-Transport-Security fehlt.`, checklistIds, response.finalUrl)
+      addAssertion(result, 'http.hsts.present', 'fail', `${label}: HSTS fehlt.`, response.finalUrl, { responseClass: label })
+      addAssertion(result, 'http.hsts.max-age-adequate', 'inconclusive', `${label}: max-age ist ohne HSTS nicht prüfbar.`, response.finalUrl, { responseClass: label })
     }
     else {
+      addAssertion(result, 'http.hsts.present', 'pass', `${label}: HSTS ist vorhanden.`, response.finalUrl, { responseClass: label })
       const maxAge = Number(hsts.match(/(?:^|;)\s*max-age\s*=\s*(\d+)/i)?.[1])
       if (!Number.isFinite(maxAge)) {
         addIssue(result, 'error', 'hsts-invalid', `${label}: HSTS enthält kein gültiges max-age.`, checklistIds, response.finalUrl)
+        addAssertion(result, 'http.hsts.max-age-adequate', 'fail', `${label}: HSTS enthält kein gültiges max-age.`, response.finalUrl, { responseClass: label })
       }
       else if (maxAge < 15_552_000) {
         addIssue(result, 'warning', 'hsts-short', `${label}: HSTS max-age ist mit ${maxAge} Sekunden kürzer als 180 Tage.`, checklistIds, response.finalUrl)
+        addAssertion(result, 'http.hsts.max-age-adequate', 'fail', `${label}: HSTS max-age ist kürzer als 180 Tage.`, response.finalUrl, { maxAge, responseClass: label })
+      }
+      else {
+        addAssertion(result, 'http.hsts.max-age-adequate', 'pass', `${label}: HSTS max-age beträgt mindestens 180 Tage.`, response.finalUrl, { maxAge, responseClass: label })
       }
     }
   }
@@ -289,9 +311,18 @@ function checkMimeType(result, response, resourceType, label) {
 function checkCacheHeaders(result, response, resourceType, label) {
   const cacheControl = response.headers['cache-control'] || ''
   if (resourceType === 'not-found') {
-    if (/\bpublic\b/i.test(cacheControl) && /\bmax-age\s*=\s*[1-9]\d*/i.test(cacheControl)) {
+    const publiclyCacheable = /\bpublic\b/i.test(cacheControl) && /\bmax-age\s*=\s*[1-9]\d*/i.test(cacheControl)
+    if (publiclyCacheable) {
       addIssue(result, 'warning', 'not-found-public-cache', `${label}: Die 404-Antwort ist ausdrücklich öffentlich cachebar.`, ['CORE-PERF-05'], response.finalUrl)
     }
+    addAssertion(
+      result,
+      'cache.not-found.not-publicly-cacheable',
+      publiclyCacheable ? 'fail' : 'pass',
+      publiclyCacheable ? `${label}: 404 ist ausdrücklich öffentlich cachebar.` : `${label}: 404 ist nicht ausdrücklich öffentlich cachebar.`,
+      response.finalUrl,
+      { responseClass: label },
+    )
     return
   }
 
@@ -300,8 +331,19 @@ function checkCacheHeaders(result, response, resourceType, label) {
   }
 
   const looksVersioned = /\/(?:_nuxt|assets)\/|[._-][a-f\d]{8,}[._-]/i.test(new URL(response.finalUrl).pathname)
-  if (looksVersioned && (!/\bimmutable\b/i.test(cacheControl) || !/\bmax-age\s*=\s*(?:[3-9]\d{7}|\d{9,})/i.test(cacheControl))) {
-    addIssue(result, 'warning', 'versioned-asset-cache-short', `${label}: Die versioniert wirkende Ressource besitzt keinen langfristigen unveränderlichen Cache.`, ['CORE-PERF-05'], response.finalUrl)
+  if (looksVersioned) {
+    const immutable = /\bimmutable\b/i.test(cacheControl) && /\bmax-age\s*=\s*(?:[3-9]\d{7}|\d{9,})/i.test(cacheControl)
+    if (!immutable) {
+      addIssue(result, 'warning', 'versioned-asset-cache-short', `${label}: Die versioniert wirkende Ressource besitzt keinen langfristigen unveränderlichen Cache.`, ['CORE-PERF-05'], response.finalUrl)
+    }
+    addAssertion(
+      result,
+      'cache.versioned-asset.immutable',
+      immutable ? 'pass' : 'fail',
+      immutable ? `${label}: Versioniertes Asset ist langfristig immutable cachebar.` : `${label}: Langfristiges immutable-Caching fehlt.`,
+      response.finalUrl,
+      { resourceType },
+    )
   }
 }
 
@@ -332,6 +374,7 @@ async function checkCompression(result, resource, options) {
         bytes: response.body.byteLength,
         contentEncoding: response.headers['content-encoding'] || 'identity',
         contentType: normalizeMimeType(response.headers['content-type']),
+        decodable: true,
         finalUrl: response.finalUrl,
         status: response.status,
         vary: response.headers.vary,
@@ -349,6 +392,7 @@ async function checkCompression(result, resource, options) {
           decodeCompressedBody(response, encoding)
         }
         catch (error) {
+          variants[encoding].decodable = false
           addIssue(result, 'error', 'compression-invalid', `${resource.label}: ${encoding} lässt sich nicht dekodieren: ${error.message}`, ['CORE-PERF-01'], response.finalUrl)
         }
       }
@@ -380,6 +424,49 @@ async function checkCompression(result, resource, options) {
     }
   }
 
+  const identityValid = identity
+    && identity.status >= 200
+    && identity.status < 300
+    && identity.contentEncoding === 'identity'
+    && textMimeTypes.has(identity.contentType)
+  addAssertion(
+    result,
+    'compression.identity.valid',
+    identity ? (identityValid ? 'pass' : 'fail') : 'inconclusive',
+    identityValid ? `${resource.label}: Identity-Auslieferung ist gültig.` : `${resource.label}: Identity-Auslieferung ist nicht vollständig gültig.`,
+    resource.url,
+    { resourceType: resource.type },
+  )
+
+  for (const encoding of ['gzip', 'br']) {
+    const assertionId = encoding === 'gzip' ? 'compression.gzip.effective' : 'compression.br.effective'
+    const variant = variants[encoding]
+    let outcome = 'pass'
+    let message = `${resource.label}: ${encoding} ist gültig, variiert und reduziert die Übertragungsgröße.`
+    if (!identity || !variant) {
+      outcome = 'inconclusive'
+      message = `${resource.label}: ${encoding} konnte nicht vollständig geprüft werden.`
+    }
+    else if (identity.bytes < 1024) {
+      outcome = 'notApplicable'
+      message = `${resource.label}: Für ${identity.bytes} Bytes wird keine Kompression verlangt.`
+    }
+    else {
+      const varies = (variant.vary || '').toLowerCase().split(',').map(value => value.trim()).includes('accept-encoding')
+      const effective = variant.status >= 200
+        && variant.status < 300
+        && variant.contentEncoding === encoding
+        && variant.decodable
+        && varies
+        && variant.bytes < identity.bytes
+      if (!effective) {
+        outcome = 'fail'
+        message = `${resource.label}: ${encoding} ist nicht vollständig gültig, variiert oder größenwirksam.`
+      }
+    }
+    addAssertion(result, assertionId, outcome, message, resource.url, { resourceType: resource.type })
+  }
+
   return variants
 }
 
@@ -401,14 +488,22 @@ async function checkHttpRedirect(result, finalUrl, options) {
       status: response.status,
     }
 
-    if (response.redirects.length === 0) {
+    const hasRedirect = response.redirects.length > 0
+    const permanent = hasRedirect && [301, 308].includes(response.redirects[0].status)
+    const preservesTarget = response.finalUrl === expectedUrl.href
+    const direct = response.redirects.length === 1
+    addAssertion(result, 'http.redirect.permanent', permanent ? 'pass' : 'fail', permanent ? 'HTTP leitet permanent auf HTTPS.' : 'HTTP leitet nicht permanent auf HTTPS.', probeUrl.href)
+    addAssertion(result, 'http.redirect.path-query-preserved', preservesTarget ? 'pass' : 'fail', preservesTarget ? 'Pfad und Query bleiben erhalten.' : 'Pfad oder Query weichen am Weiterleitungsziel ab.', probeUrl.href)
+    addAssertion(result, 'http.redirect.chain-direct', direct ? 'pass' : 'fail', direct ? 'HTTP erreicht HTTPS mit genau einer Weiterleitung.' : `HTTP benötigt ${response.redirects.length} Weiterleitungen.`, probeUrl.href)
+
+    if (!hasRedirect) {
       addIssue(result, 'error', 'http-redirect-missing', 'HTTP leitet nicht auf HTTPS um.', ['CORE-DOM-02', 'CORE-DOM-07'], probeUrl.href)
       return
     }
-    if (![301, 308].includes(response.redirects[0].status)) {
+    if (!permanent) {
       addIssue(result, 'warning', 'http-redirect-temporary', `HTTP verwendet zunächst Status ${response.redirects[0].status} statt einer permanenten Weiterleitung.`, ['CORE-DOM-02'], probeUrl.href)
     }
-    if (response.finalUrl !== expectedUrl.href) {
+    if (!preservesTarget) {
       addIssue(result, 'error', 'http-redirect-target-mismatch', `HTTP endet bei ${response.finalUrl} statt pfad- und queryerhaltend bei ${expectedUrl.href}.`, ['CORE-DOM-02', 'CORE-DOM-07'], probeUrl.href)
     }
     if (response.redirects.length > 1) {
@@ -417,6 +512,9 @@ async function checkHttpRedirect(result, finalUrl, options) {
   }
   catch (error) {
     addIssue(result, 'error', 'http-redirect-fetch-failed', `HTTP-Weiterleitung konnte nicht geprüft werden: ${error.message}`, ['CORE-DOM-02'], probeUrl.href)
+    for (const assertionId of ['http.redirect.permanent', 'http.redirect.path-query-preserved', 'http.redirect.chain-direct']) {
+      addAssertion(result, assertionId, 'inconclusive', `HTTP-Weiterleitung konnte nicht geprüft werden: ${error.message}`, probeUrl.href)
+    }
   }
 }
 
@@ -435,7 +533,9 @@ async function checkNotFound(result, finalUrl, options) {
       status: response.status,
     }
 
-    if (response.status !== 404) {
+    const hasNotFoundStatus = response.status === 404
+    addAssertion(result, 'error.not-found.status-404', hasNotFoundStatus ? 'pass' : 'fail', hasNotFoundStatus ? 'Unbekannter Pfad antwortet mit HTTP 404.' : `Unbekannter Pfad antwortet mit HTTP ${response.status}.`, response.finalUrl)
+    if (!hasNotFoundStatus) {
       addIssue(result, 'error', 'not-found-status', `Der unbekannte Pfad antwortet mit HTTP ${response.status} statt 404.`, ['CORE-ERR-01'], response.finalUrl)
     }
     checkMimeType(result, response, 'html', '404-Antwort')
@@ -444,23 +544,33 @@ async function checkNotFound(result, finalUrl, options) {
 
     const facts = extractHtmlFacts(response.body.toString('utf8'), response.finalUrl)
     const robotDirectives = directives(response.headers['x-robots-tag'], ...facts.robots)
-    if (!robotDirectives.has('noindex')) {
+    const hasNoindex = robotDirectives.has('noindex')
+    const hasUrlMetadata = facts.canonicals.length > 0 || facts.openGraphUrls.length > 0
+    const hasTechnicalDetails = /\b(?:stack trace|node_modules\/|at [\w$.]+ \([^\n]+:\d+:\d+\))/i.test(response.body.toString('utf8'))
+    addAssertion(result, 'error.not-found.noindex', hasNoindex ? 'pass' : 'fail', hasNoindex ? '404-Antwort enthält noindex.' : '404-Antwort enthält kein noindex.', response.finalUrl)
+    addAssertion(result, 'error.not-found.no-url-metadata', hasUrlMetadata ? 'fail' : 'pass', hasUrlMetadata ? '404-Antwort enthält Canonical oder og:url.' : '404-Antwort enthält weder Canonical noch og:url.', response.finalUrl)
+    addAssertion(result, 'error.not-found.no-technical-details', hasTechnicalDetails ? 'fail' : 'pass', hasTechnicalDetails ? '404-Antwort enthält mögliche technische Interna.' : 'Automatische Stichprobe erkennt keine typischen technischen Interna.', response.finalUrl)
+    if (!hasNoindex) {
       addIssue(result, 'error', 'not-found-noindex-missing', 'Die 404-Antwort enthält keine noindex-Anweisung.', ['CORE-ERR-02'], response.finalUrl)
     }
-    if (facts.canonicals.length > 0 || facts.openGraphUrls.length > 0) {
+    if (hasUrlMetadata) {
       addIssue(result, 'warning', 'not-found-url-metadata', 'Die 404-Antwort enthält einen Canonical oder og:url.', ['CORE-ERR-02'], response.finalUrl)
     }
-    if (/\b(?:stack trace|node_modules\/|at [\w$.]+ \([^\n]+:\d+:\d+\))/i.test(response.body.toString('utf8'))) {
+    if (hasTechnicalDetails) {
       addIssue(result, 'error', 'not-found-technical-details', 'Die 404-Antwort enthält mögliche Stack- oder interne Pfaddetails.', ['CORE-ERR-01'], response.finalUrl)
     }
   }
   catch (error) {
     addIssue(result, 'error', 'not-found-fetch-failed', `Die 404-Antwort konnte nicht geprüft werden: ${error.message}`, ['CORE-ERR-01'], notFoundUrl.href)
+    for (const assertionId of ['error.not-found.status-404', 'error.not-found.noindex', 'error.not-found.no-url-metadata', 'error.not-found.no-technical-details', 'cache.not-found.not-publicly-cacheable']) {
+      addAssertion(result, assertionId, 'inconclusive', `404-Antwort konnte nicht geprüft werden: ${error.message}`, notFoundUrl.href)
+    }
   }
 }
 
 async function inspectTarget(inputUrl, options) {
   const result = {
+    assertions: [],
     issues: [],
     requestedUrl: inputUrl,
     resources: [],
@@ -481,14 +591,26 @@ async function inspectTarget(inputUrl, options) {
       status: page.status,
     }
 
+    const checksHttpsNavigation = new URL(inputUrl).protocol === 'https:'
+    const hasHttpsDowngrade = page.redirects.some(redirect => redirect.from.startsWith('https:') && redirect.to.startsWith('http:'))
+    const hasDirectChain = page.redirects.length <= 1
+    addAssertion(
+      result,
+      'https.redirect.no-downgrade',
+      checksHttpsNavigation ? (hasHttpsDowngrade ? 'fail' : 'pass') : 'notApplicable',
+      checksHttpsNavigation ? (hasHttpsDowngrade ? 'Zielnavigation enthält einen HTTPS-Downgrade.' : 'Zielnavigation enthält keinen HTTPS-Downgrade.') : 'Die ausdrücklich zugelassene HTTP-Eingabe ist keine HTTPS-Navigation.',
+      inputUrl,
+    )
+    addAssertion(result, 'https.redirect.chain-direct', hasDirectChain ? 'pass' : 'fail', hasDirectChain ? 'Zielnavigation besitzt keine unnötige Kette.' : `Zielnavigation benötigt ${page.redirects.length} Weiterleitungen.`, inputUrl)
+
     if (page.status < 200 || page.status >= 300) {
       addIssue(result, 'error', 'page-http-status', `Die Zielseite antwortet mit HTTP ${page.status}.`, ['CORE-DOM-01'], page.finalUrl)
       return result
     }
-    if (page.redirects.length > 1) {
+    if (!hasDirectChain) {
       addIssue(result, 'warning', 'page-redirect-chain', `Die Zielseite benötigt ${page.redirects.length} Weiterleitungen.`, ['CORE-DOM-07'], inputUrl)
     }
-    if (page.redirects.some(redirect => redirect.from.startsWith('https:') && redirect.to.startsWith('http:'))) {
+    if (hasHttpsDowngrade) {
       addIssue(result, 'error', 'page-https-downgrade', 'Die Zielseite leitet von HTTPS auf HTTP um.', ['CORE-DOM-07'], inputUrl)
     }
 
@@ -526,9 +648,20 @@ async function inspectTarget(inputUrl, options) {
   }
   catch (error) {
     addIssue(result, 'error', 'page-fetch-failed', `Die Zielseite konnte nicht geprüft werden: ${error.message}`, ['CORE-DOM-01'], inputUrl)
+    if (!result.page) {
+      addAssertion(result, 'https.redirect.no-downgrade', 'inconclusive', `Zielnavigation konnte nicht geprüft werden: ${error.message}`, inputUrl)
+      addAssertion(result, 'https.redirect.chain-direct', 'inconclusive', `Zielnavigation konnte nicht geprüft werden: ${error.message}`, inputUrl)
+    }
   }
 
   return result
+}
+
+function checklistCoverage(results) {
+  return evaluatePilotChecklist({
+    assertions: results.flatMap(result => result.assertions),
+    itemIds: checklistItemIdsForTool('http-check'),
+  })
 }
 
 function summarize(results, strict) {
@@ -543,8 +676,9 @@ function summarize(results, strict) {
   }
 }
 
-function jsonReport(results, options) {
+export function createJsonReport(results, options) {
   return {
+    checklistCoverage: checklistCoverage(results),
     generatedAt: new Date().toISOString(),
     options: {
       checkHttpRedirect: options.checkHttpRedirect,
@@ -553,7 +687,12 @@ function jsonReport(results, options) {
       strict: options.strict,
       timeoutMilliseconds: options.timeoutMilliseconds,
     },
+    readOnlyGuarantees: {
+      methods: ['GET'],
+      mutatingActionsInvoked: false,
+    },
     results,
+    schemaVersion: 1,
     summary: summarize(results, options.strict),
     tool: 'http-check',
     toolPackage: { name: packageName, version: packageVersion },
@@ -593,8 +732,14 @@ function printText(results, options) {
     }
   }
 
+  const coverage = checklistCoverage(results)
+  const checklistSummary = coverage.summary.checklistItems
+  const nonAutomaticSummary = coverage.summary.nonAutomaticCriteria
+  console.log(`\nPilot-Checklistennachweis ${coverage.catalog.version}: ${checklistSummary.pass} Punkt(e) vollständig, ${checklistSummary.partial} teilweise, ${checklistSummary.fail} fehlgeschlagen, ${checklistSummary.open + checklistSummary.inconclusive} offen/unklar.`)
+  console.log(`Nicht automatisch belegbare Kriterien: ${nonAutomaticSummary.pass} belegt, ${nonAutomaticSummary.total - nonAutomaticSummary.pass - nonAutomaticSummary.notApplicable} offen; sie werden durch diesen Lauf nicht stillschweigend abgeschlossen.`)
+
   const summary = summarize(results, options.strict)
-  console.log(`\nErgebnis: ${summary.targets} Ziel(e), ${summary.errors} Fehler, ${summary.warnings} Warnung(en).`)
+  console.log(`Ergebnis: ${summary.targets} Ziel(e), ${summary.errors} Fehler, ${summary.warnings} Warnung(en).`)
   if (summary.failed) {
     console.log(options.strict && summary.errors === 0
       ? 'NICHT BESTANDEN: --strict wertet Warnungen als Fehler.'
@@ -615,6 +760,7 @@ export async function runHttpCheck(inputUrls, options = {}) {
   }
 
   return {
+    checklistCoverage: checklistCoverage(results),
     options: mergedOptions,
     results,
     summary: summarize(results, mergedOptions.strict),
@@ -634,7 +780,7 @@ async function main() {
 
     const report = await runHttpCheck(urls, options)
     if (options.json) {
-      console.log(JSON.stringify(jsonReport(report.results, options), null, 2))
+      console.log(JSON.stringify(createJsonReport(report.results, options), null, 2))
     }
     else {
       printText(report.results, options)
@@ -647,6 +793,7 @@ async function main() {
     if (process.argv.includes('--json')) {
       console.log(JSON.stringify({
         error: error.message,
+        schemaVersion: 1,
         summary: { errors: 1, failed: true, targets: 0, warnings: 0 },
         tool: 'http-check',
       }, null, 2))

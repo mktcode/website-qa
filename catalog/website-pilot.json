@@ -1,0 +1,298 @@
+{
+  "$schema": "./website-catalog.schema.json",
+  "schemaVersion": 1,
+  "catalogId": "website-qa-pilot",
+  "catalogVersion": "1.0.0-pilot.1",
+  "status": "pilot",
+  "description": "Strukturierter Pilotkatalog für HTTP-bezogene sowie bewusst nicht automatisierbare Website-Prüfnachweise.",
+  "items": [
+    {
+      "id": "CORE-DOM-02",
+      "module": "core",
+      "statement": "HTTP leitet dauerhaft, pfad- und queryerhaltend und möglichst ohne unnötige Zwischenstation auf HTTPS um.",
+      "criteria": [
+        {
+          "id": "CORE-DOM-02/C1",
+          "statement": "Die geprüfte HTTP-Variante verwendet eine permanente Weiterleitung auf HTTPS.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["http.redirect.permanent"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-DOM-02/C2",
+          "statement": "Pfad und Query bleiben bei der geprüften HTTP-zu-HTTPS-Weiterleitung erhalten.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["http.redirect.path-query-preserved"],
+            "aggregation": "all"
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-DOM-04",
+      "module": "core",
+      "statement": "Zertifikat, Zertifikatskette, Hostabdeckung und unterstützte TLS-Versionen sind mit einem geeigneten Werkzeug geprüft. Die automatische Verlängerung ist durch Konfiguration oder einen erfolgreichen Erneuerungsnachweis plausibilisiert.",
+      "criteria": [
+        {
+          "id": "CORE-DOM-04/C1",
+          "statement": "Zertifikat, Zertifikatskette, Hostabdeckung und TLS-Versionen wurden für die vorgesehenen Hosts geprüft.",
+          "verification": {
+            "mode": "external",
+            "evidenceClass": "infrastructure-access",
+            "instructions": "Nachweis eines geeigneten TLS-Werkzeugs mit Datum, Hosts und Ergebnis referenzieren."
+          }
+        },
+        {
+          "id": "CORE-DOM-04/C2",
+          "statement": "Die automatische Zertifikatserneuerung ist durch Infrastrukturkonfiguration oder einen erfolgreichen Erneuerungsvorgang plausibilisiert.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "administrative",
+            "instructions": "Plattformkonfiguration oder Erneuerungsnachweis ohne Zugangsdaten dokumentieren."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-DOM-07",
+      "module": "core",
+      "statement": "Weiterleitungen wurden auf Statuscode, Pfad- und Queryerhalt, Schleifen und unnötige Ketten geprüft.",
+      "criteria": [
+        {
+          "id": "CORE-DOM-07/C1",
+          "statement": "Die geprüfte HTTPS-Navigation enthält keinen Downgrade auf HTTP.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["https.redirect.no-downgrade"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-DOM-07/C2",
+          "statement": "Die geprüfte Zielnavigation enthält keine unnötige Weiterleitungskette.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["https.redirect.chain-direct"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-DOM-07/C3",
+          "statement": "Die geprüfte HTTP-zu-HTTPS-Navigation enthält keine unnötige Weiterleitungskette.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["http.redirect.chain-direct"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-DOM-07/C4",
+          "statement": "Alle veröffentlichten Host- und Routenvarianten, die zum Projektumfang gehören, wurden inventarisiert und geprüft.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Geprüfte Hosts und projektspezifische Redirectrouten mit Ergebnis dokumentieren."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-DOM-08",
+      "module": "core",
+      "statement": "HSTS-Wert und Reichweite sind bewusst gewählt und auf allen relevanten HTTPS-Antworten einschließlich vorgeschalteter Weiterleitungshosts geprüft. `includeSubDomains` und `preload` werden nur nach Prüfung aller betroffenen Subdomains aktiviert.",
+      "criteria": [
+        {
+          "id": "CORE-DOM-08/C1",
+          "statement": "HSTS ist auf allen vom HTTP-Prüfer untersuchten HTTPS-Antwortklassen vorhanden.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["http.hsts.present"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-DOM-08/C2",
+          "statement": "Der HSTS-max-age ist syntaktisch gültig und beträgt mindestens 180 Tage.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["http.hsts.max-age-adequate"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-DOM-08/C3",
+          "statement": "Relevante HTTPS-Antwortklassen und vorgeschaltete Weiterleitungshosts wurden projektspezifisch bestimmt.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "infrastructure-access",
+            "instructions": "Antwortklassen, Hosts und nicht erreichbare Infrastrukturgrenzen dokumentieren."
+          }
+        },
+        {
+          "id": "CORE-DOM-08/C4",
+          "statement": "includeSubDomains und preload wurden anhand aller betroffenen Subdomains bewusst entschieden.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "administrative",
+            "instructions": "Entscheidung, Subdomaininventar und verantwortliche Stelle dokumentieren."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-ERR-01",
+      "module": "core",
+      "statement": "Eine unbekannte Browserroute liefert eine verständliche HTML-Fehlerseite mit tatsächlichem HTTP-404-Status und ohne interne technische Details.",
+      "criteria": [
+        {
+          "id": "CORE-ERR-01/C1",
+          "statement": "Der geprüfte unbekannte Pfad antwortet mit HTTP 404.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["error.not-found.status-404"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-ERR-01/C2",
+          "statement": "Die automatische Stichprobe erkennt keine typischen Stacktraces oder internen Dateipfade.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["error.not-found.no-technical-details"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-ERR-01/C3",
+          "statement": "Die Fehlerseite ist für die vorgesehenen Nutzer verständlich und enthält keine projektspezifisch sensiblen Details.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "editorial",
+            "instructions": "Fehlerseite visuell und redaktionell prüfen; automatische Mustererkennung genügt nicht."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-ERR-02",
+      "module": "core",
+      "statement": "Nicht indexierbare Fehlerseiten senden `noindex` und enthalten weder einen irreführenden Canonical noch `og:url` auf die Fehleradresse.",
+      "criteria": [
+        {
+          "id": "CORE-ERR-02/C1",
+          "statement": "Die geprüfte 404-Antwort enthält eine noindex-Anweisung.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["error.not-found.noindex"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-ERR-02/C2",
+          "statement": "Die geprüfte 404-Antwort enthält weder Canonical noch og:url.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["error.not-found.no-url-metadata"],
+            "aggregation": "all"
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-PERF-01",
+      "module": "core",
+      "statement": "Geeignete textbasierte Antworten wie HTML, CSS, JavaScript, JSON und größere SVG-Dateien werden per HTTP komprimiert. Produktion wurde mindestens für HTML, CSS und JavaScript mit Identity, Gzip und Brotli geprüft; `Content-Encoding`, `Vary` und tatsächliche Größenreduktion sind plausibel. Erfolgt die Kompression am Reverse Proxy, sind Middlewarekonfiguration und Zuordnung zum produktiven HTTPS-Router bestätigt.",
+      "criteria": [
+        {
+          "id": "CORE-PERF-01/C1",
+          "statement": "Identity-Antworten der ausgewählten textbasierten Ressourcen sind unverändert auslieferbar.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["compression.identity.valid"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-PERF-01/C2",
+          "statement": "Geeignete ausgewählte Ressourcen handeln wirksames Gzip mit passendem Vary aus.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["compression.gzip.effective"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-PERF-01/C3",
+          "statement": "Geeignete ausgewählte Ressourcen handeln wirksames Brotli mit passendem Vary aus.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["compression.br.effective"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-PERF-01/C4",
+          "statement": "Die Kompressionszuständigkeit der produktiven Anwendung beziehungsweise des Reverse Proxys wurde bestätigt.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "infrastructure-access",
+            "instructions": "Produktive Router-/Proxyzuordnung oder begründete Nichtanwendbarkeit dokumentieren."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-PERF-05",
+      "module": "core",
+      "statement": "Cacheheader passen zur Ressource: versionierte unveränderliche Assets dürfen langfristig cachen, veränderliche öffentliche Dateien bleiben aktualisierbar und sensible Antworten werden nicht öffentlich gespeichert.",
+      "criteria": [
+        {
+          "id": "CORE-PERF-05/C1",
+          "statement": "Vom HTTP-Prüfer ausgewählte versioniert wirkende Assets besitzen einen langfristigen unveränderlichen Cache.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["cache.versioned-asset.immutable"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-PERF-05/C2",
+          "statement": "Die geprüfte 404-Antwort ist nicht ausdrücklich langfristig öffentlich cachebar.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["cache.not-found.not-publicly-cacheable"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-PERF-05/C3",
+          "statement": "Die Cachepolitik für veränderliche, sensible und weitere projektspezifische Antwortklassen wurde bewertet.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Antwortklassen, erwartete Cachepolitik und tatsächliche Header dokumentieren."
+          }
+        }
+      ]
+    },
+    {
+      "id": "GOV-RGT-02",
+      "module": "auftrag-recht-uebergabe",
+      "statement": "Inhalte, Logo, Bilder, Videos, Schriftarten, Testimonials und sonstige Materialien sind freigegeben oder ihre Nutzungs- und Veröffentlichungsrechte sind dokumentiert.",
+      "criteria": [
+        {
+          "id": "GOV-RGT-02/C1",
+          "statement": "Die zuständige Stelle hat die Nutzungs- und Veröffentlichungsrechte der eingesetzten Materialien bestätigt oder dokumentiert.",
+          "verification": {
+            "mode": "external",
+            "evidenceClass": "communication",
+            "instructions": "Freigabe oder Rechteverweis mit zuständiger Stelle, Datum und Umfang dokumentieren; vertrauliche Vertragsinhalte nicht in den technischen Bericht kopieren."
+          }
+        }
+      ]
+    }
+  ]
+}
