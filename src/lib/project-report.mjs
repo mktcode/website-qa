@@ -254,6 +254,7 @@ export function createPilotProjectReport({ config, evidenceDocument, generatedAt
       'Automatische Ergebnisse sind technische Teilnachweise und ersetzen keine manuellen, externen, rechtlichen oder organisatorischen Prüfungen.',
       'Nur technische Läufe der festgelegten Auswertungsumgebung fließen in die Checklistenbewertung ein.',
       'Quell- und Deploymentstand technischer Läufe sind projektseitig deklarierte Zuordnungen; das technische Werkzeug bestätigt sie nicht unabhängig.',
+      'Simulierte Social-Crawler-User-Agents ersetzen keine echte Plattformvorschau und keinen Nachweis des Plattformcaches.',
     ],
     project: structuredClone(config.project),
     provenance: {
@@ -499,6 +500,7 @@ export function renderPilotProjectSummaryMarkdown(report, options = {}) {
     '- Automatische Ergebnisse sind technische Teilnachweise und ersetzen keine manuellen, externen, rechtlichen oder organisatorischen Prüfungen.',
     '- Ein unauffälliger Axe-Lauf ist kein vollständiger WCAG-Nachweis.',
     '- Headless-Chromium-Profile sind keine Prüfung realer Geräte, Safari-Browser oder Screenreader.',
+    '- Simulierte Social-Crawler-User-Agents sind keine echte Plattformvorschau und kein Nachweis des Plattformcaches.',
     '- Die Zusammenfassung enthält bewusst keine Rohbefunde, freien Nachweisnotizen, Personen, internen Umgebungskennungen oder lokalen Pfade.',
     '- Vor einem Commit oder einer Veröffentlichung ist die Datei trotzdem projektspezifisch zu prüfen.',
     '',
@@ -532,6 +534,9 @@ function manifestFile(path, baseDirectory, role) {
 }
 
 function technicalFileStem(tool) {
+  if (tool === 'social-preview-check') {
+    return 'social'
+  }
   const stem = String(tool || 'technical-report')
     .toLowerCase()
     .replace(/-check$/, '')

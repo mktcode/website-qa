@@ -7,7 +7,8 @@ import { fileTypeFromBuffer } from 'file-type'
 import { parse } from 'parse5'
 import robotsParser from 'robots-parser'
 import sharp from 'sharp'
-import { fetchResource, normalizeMimeType, redactReportData, redactText, validateUrl } from './lib/http-client.mjs'
+import { checklistItemIdsForTool, evaluatePilotChecklist } from './lib/checklist-report.mjs'
+import { fetchResource, normalizeMimeType, redactReportData, redactText, reportUrl, validateUrl } from './lib/http-client.mjs'
 import { writeJsonOutput } from './lib/json-output.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
 
@@ -920,6 +921,218 @@ function summarize(results, strict) {
   }
 }
 
+function metadataUrlIsSecure(value) {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'https:' && !url.username && !url.password
+  }
+  catch {
+    return false
+  }
+}
+
+function createSocialAssertions(result, options) {
+  const subject = {
+    checkedAgents: result.agents.map(agent => agent.key),
+    checkedImages: result.images.length,
+    robotsPolicyReviewedAt,
+    url: reportUrl(result.finalUrl || result.requestedUrl).url,
+  }
+  const assertions = []
+  const add = (assertionId, outcome, message) => assertions.push({
+    assertionId,
+    assertionVersion: 1,
+    message,
+    outcome,
+    subject,
+  })
+  const issueCodes = new Set(result.issues.map(issue => issue.code))
+  const metadata = result.metadata?.metadata
+  const canonicals = result.metadata?.canonicals || []
+
+  let outcome
+  if (!metadata) {
+    outcome = 'inconclusive'
+  }
+  else {
+    const requiredValuesAreSingle = requiredOpenGraphKeys.every(key => metadata[key]?.length === 1)
+    const urlsAreSecure = ['og:url', 'og:image'].every(key => metadataUrlIsSecure(firstValue(metadata, key)))
+    outcome = requiredValuesAreSingle && urlsAreSecure ? 'pass' : 'fail'
+  }
+  add('social.metadata.open-graph-complete', outcome, {
+    fail: 'Mindestens eine geprüfte Seite besitzt keine eindeutigen OpenGraph-Pflichtfelder oder verwendet für og:url beziehungsweise og:image keine absolute HTTPS-URL.',
+    inconclusive: 'Die OpenGraph-Pflichtfelder konnten nicht aus einem erfolgreichen serverseitigen HTML-Abruf ausgewertet werden.',
+    pass: 'Die geprüfte Seite besitzt eindeutige OpenGraph-Pflichtfelder mit absoluten HTTPS-URLs für og:url und og:image.',
+  }[outcome])
+
+  if (!metadata) {
+    outcome = 'inconclusive'
+  }
+  else {
+    const twitterCard = firstValue(metadata, 'twitter:card')
+    const cardIsValid = ['app', 'player', 'summary', 'summary_large_image'].includes(twitterCard)
+    const fallbackFieldsArePresent = [
+      ['twitter:title', 'og:title'],
+      ['twitter:description', 'og:description'],
+      ['twitter:image', 'og:image'],
+    ].every(([twitterKey, fallbackKey]) => firstValue(metadata, twitterKey) || firstValue(metadata, fallbackKey))
+    const imageUrl = firstValue(metadata, 'twitter:image') || firstValue(metadata, 'og:image')
+    outcome = cardIsValid && fallbackFieldsArePresent && metadataUrlIsSecure(imageUrl) ? 'pass' : 'fail'
+  }
+  add('social.metadata.twitter-card-valid', outcome, {
+    fail: 'twitter:card oder die erforderlichen X-/Twitter-Werte beziehungsweise OpenGraph-Fallbacks sind unvollständig oder das Bild verwendet keine absolute HTTPS-URL.',
+    inconclusive: 'Die X-/Twitter-Metadaten konnten nicht aus einem erfolgreichen serverseitigen HTML-Abruf ausgewertet werden.',
+    pass: 'twitter:card sowie die erforderlichen X-/Twitter-Werte oder OpenGraph-Fallbacks sind technisch verwendbar.',
+  }[outcome])
+
+  if (!metadata || !result.finalUrl) {
+    outcome = 'inconclusive'
+  }
+  else {
+    const canonical = canonicals.length === 1 ? canonicals[0] : undefined
+    const openGraphUrls = metadata['og:url'] || []
+    const openGraphUrl = openGraphUrls.length === 1 ? openGraphUrls[0] : undefined
+    outcome = canonical
+      && openGraphUrl
+      && normalizeComparableUrl(canonical) === normalizeComparableUrl(result.finalUrl)
+      && normalizeComparableUrl(canonical) === normalizeComparableUrl(openGraphUrl)
+      ? 'pass'
+      : 'fail'
+  }
+  add('social.metadata.canonical-open-graph-consistent', outcome, {
+    fail: 'Canonical, finale Seiten-URL und og:url sind nicht eindeutig oder stimmen nicht überein.',
+    inconclusive: 'Canonical-/OpenGraph-Konsistenz konnte ohne erfolgreichen HTML-Abruf nicht ausgewertet werden.',
+    pass: 'Canonical, finale Seiten-URL und og:url sind eindeutig und stimmen überein.',
+  }[outcome])
+
+  const expectedAgents = userAgents.map(agent => agent.key)
+  if (!expectedAgents.every(key => result.agents.some(agent => agent.key === key))) {
+    outcome = 'inconclusive'
+  }
+  else {
+    const responsesAreHtml = result.agents.every(agent => agent.status >= 200
+      && agent.status < 300
+      && ['text/html', 'application/xhtml+xml'].includes(agent.contentType))
+    const parityIssues = [
+      'crawler-final-url-mismatch',
+      'crawler-metadata-difference',
+      'crawler-missing-metadata',
+      'conflicting-metadata',
+      'duplicate-metadata',
+      'https-downgrade',
+      'redirect-chain',
+    ]
+    outcome = responsesAreHtml && !parityIssues.some(code => issueCodes.has(code)) ? 'pass' : 'fail'
+  }
+  add('social.crawlers.html-metadata-consistent', outcome, {
+    fail: 'Mindestens ein Social-Crawler erhält keine erfolgreiche HTML-Antwort, eine abweichende finale URL, abweichende Metadaten oder eine ungeeignete Weiterleitung.',
+    inconclusive: 'Nicht alle vorgesehenen Browser- und Social-Crawler-Abrufe konnten ausgewertet werden.',
+    pass: 'Browser, Facebook, X/Twitter und LinkedIn erhalten erfolgreiche, konsistente HTML-Antworten und Social-Metadaten.',
+  }[outcome])
+
+  const imageFailureCodes = [
+    'declared-image-height-mismatch',
+    'declared-image-type-mismatch',
+    'declared-image-width-mismatch',
+    'image-aspect-ratio',
+    'image-content-type',
+    'image-dimensions-missing',
+    'image-file-size',
+    'image-http-status',
+    'image-mime-mismatch',
+    'image-small',
+    'missing-image-alt',
+    'missing-twitter-image-alt',
+  ]
+  if (imageFailureCodes.some(code => issueCodes.has(code)) || result.images.length === 0) {
+    outcome = 'fail'
+  }
+  else if (issueCodes.has('image-fetch-failed') || result.images.some(image => !image.status)) {
+    outcome = 'inconclusive'
+  }
+  else {
+    outcome = 'pass'
+  }
+  add('social.images.preview-technically-valid', outcome, {
+    fail: 'Mindestens ein vorgesehenes Vorschaubild fehlt oder verletzt die geprüften Anforderungen an Abruf, MIME-Typ, Dateigröße, Pixelmaße, Seitenverhältnis, Deklarationen oder Alternativtext.',
+    inconclusive: 'Mindestens ein Vorschaubild konnte nicht vollständig abgerufen oder ausgewertet werden.',
+    pass: 'Die vorgesehenen Vorschaubilder erfüllen die geprüften technischen Anforderungen.',
+  }[outcome])
+
+  if (!result.robots) {
+    outcome = 'inconclusive'
+  }
+  else {
+    outcome = result.robots.status >= 200 && result.robots.status < 300 ? 'pass' : 'fail'
+  }
+  add('social.robots.file-retrievable', outcome, {
+    fail: 'robots.txt antwortet nicht erfolgreich.',
+    inconclusive: 'robots.txt konnte nicht belastbar abgerufen werden.',
+    pass: 'robots.txt wurde erfolgreich abgerufen und ausgewertet.',
+  }[outcome])
+
+  const policies = result.robots?.policies
+  if (!Array.isArray(policies) || policies.length !== robotsPolicies.length) {
+    outcome = 'inconclusive'
+  }
+  else {
+    const socialPolicies = policies.filter(policy => policy.category === 'social')
+    outcome = socialPolicies.length > 0
+      && socialPolicies.every(policy => policy.allowed)
+      && !issueCodes.has('crawler-robots-directive')
+      ? 'pass'
+      : 'fail'
+  }
+  add('social.robots.social-crawlers-allowed', outcome, {
+    fail: 'Mindestens ein vorgesehener Social-Crawler ist durch robots.txt oder eine Robots-Anweisung blockiert.',
+    inconclusive: 'Die Regeln für die vorgesehenen Social-Crawler konnten nicht vollständig ausgewertet werden.',
+    pass: 'Die vorgesehenen Social-Crawler sind für die geprüfte Seite nicht durch robots.txt oder Robots-Anweisungen blockiert.',
+  }[outcome])
+
+  if (!Array.isArray(policies) || policies.length !== robotsPolicies.length) {
+    outcome = 'inconclusive'
+  }
+  else {
+    const policyKeys = new Set(policies.map(policy => policy.key))
+    outcome = robotsPolicies.every(policy => policyKeys.has(policy.key)
+      && policy.documentation.startsWith('https://'))
+      ? 'pass'
+      : 'inconclusive'
+  }
+  add('social.robots.policy-matrix-recorded', outcome, {
+    inconclusive: 'Crawler-/Produktkennungen, Kategorien oder offizielle Quellen sind im technischen Bericht nicht vollständig dokumentiert.',
+    pass: 'Crawler-/Produktkennungen, Kategorien, offizielle Quellen und Quellenstand sind im technischen Bericht dokumentiert.',
+  }[outcome])
+
+  if (!Array.isArray(policies) || policies.length !== robotsPolicies.length) {
+    outcome = 'inconclusive'
+  }
+  else {
+    const allowedTraining = policies.filter(policy => policy.category === 'ai-training' && policy.allowed)
+    outcome = allowedTraining.length === 0 || options.aiTrainingOptIn ? 'pass' : 'fail'
+  }
+  add('social.robots.training-access-blocked-or-declared', outcome, {
+    fail: 'Mindestens ein Trainings-/Datennutzungstoken ist erlaubt, ohne dass für diesen Lauf ein dokumentiertes Opt-in erklärt wurde.',
+    inconclusive: 'Die Trainings-/Datennutzungsregeln konnten nicht vollständig ausgewertet werden.',
+    pass: 'Trainings-/Datennutzungstokens sind blockiert oder der Lauf deklariert ausdrücklich ein separat nachzuweisendes Opt-in.',
+  }[outcome])
+
+  outcome = options.strict ? 'pass' : 'fail'
+  add('social.run.strict-mode-recorded', outcome, {
+    fail: 'Der Social-Lauf wurde nicht im strikten Modus ausgeführt.',
+    pass: 'Der Social-Lauf dokumentiert den strikten Modus, in dem Warnungen den Exitcode 1 auslösen.',
+  }[outcome])
+
+  return assertions
+}
+
+function checklistCoverage(results) {
+  return evaluatePilotChecklist({
+    assertions: results.flatMap(result => result.assertions || []),
+    itemIds: checklistItemIdsForTool('social-preview-check'),
+  })
+}
+
 function compactMetadata(metadataResult) {
   if (!metadataResult) {
     return undefined
@@ -940,24 +1153,52 @@ function compactMetadata(metadataResult) {
 }
 
 export function createJsonReport(results, options) {
-  return redactReportData({
-    generatedAt: new Date().toISOString(),
-    results: results.map(result => ({
-      agents: result.agents,
-      finalUrl: result.finalUrl,
-      images: result.images,
-      issues: result.issues,
-      metadata: compactMetadata(result.metadata),
-      requestedUrl: result.requestedUrl,
-      robots: result.robots,
-    })),
+  const compactResults = results.map(result => ({
+    agents: result.agents,
+    assertions: result.assertions || createSocialAssertions(result, options),
+    finalUrl: result.finalUrl,
+    images: result.images,
+    issues: result.issues,
+    metadata: compactMetadata(result.metadata),
+    requestedUrl: result.requestedUrl,
+    robots: result.robots,
+  }))
+  const reportedResults = redactReportData(compactResults, '', { hideHosts: options.allowPrivate })
+  for (let index = 0; index < reportedResults.length; index += 1) {
+    const parameterNames = reportUrl(results[index].requestedUrl).parameterNames
+    if (parameterNames.length > 0) {
+      reportedResults[index].requestedUrlParameterNames = parameterNames
+    }
+  }
+  return {
     aiTrainingOptIn: options.aiTrainingOptIn,
+    checklistCoverage: checklistCoverage(reportedResults),
+    generatedAt: new Date().toISOString(),
+    options: {
+      aiTrainingOptIn: options.aiTrainingOptIn,
+      maxPages: options.maxPages,
+      maxRedirects: options.maxRedirects,
+      privateTargetsRedacted: Boolean(options.allowPrivate),
+      sitemap: options.sitemap,
+      sitemapUrl: redactReportData(options.sitemapUrl, 'sitemapUrl'),
+      strict: options.strict,
+      timeoutMilliseconds: options.timeoutMilliseconds,
+    },
     privateTargetsRedacted: Boolean(options.allowPrivate),
+    readOnlyGuarantees: {
+      browserInteractions: false,
+      buttonsActivated: false,
+      formActionsFetched: false,
+      formsSubmitted: false,
+      methods: ['GET'],
+    },
+    results: reportedResults,
     robotsPolicyReviewedAt,
-    summary: summarize(results, options.strict),
+    schemaVersion: 1,
+    summary: summarize(reportedResults, options.strict),
     tool: 'social-preview-check',
     toolPackage: { name: packageName, version: packageVersion },
-  }, '', { hideHosts: options.allowPrivate })
+  }
 }
 
 function printText(results, options) {
@@ -993,7 +1234,12 @@ function printText(results, options) {
   }
 
   const summary = summarize(results, options.strict)
-  console.log(`\nKI-Trainingsfreigabe: ${options.aiTrainingOptIn ? 'ausdrücklich für diese Prüfung bestätigt' : 'nicht bestätigt; Opt-out wird standardmäßig erwartet'}.`)
+  const coverage = checklistCoverage(results)
+  const checklistSummary = coverage.summary.checklistItems
+  const nonAutomaticSummary = coverage.summary.nonAutomaticCriteria
+  console.log(`\nPilot-Checklistennachweis ${coverage.catalog.version}: ${checklistSummary.pass} Punkt(e) vollständig, ${checklistSummary.partial} teilweise, ${checklistSummary.fail} fehlgeschlagen, ${checklistSummary.open + checklistSummary.inconclusive} offen/unklar.`)
+  console.log(`Nicht automatische Kriterien im Social-Ausschnitt: ${nonAutomaticSummary.pass} belegt, ${nonAutomaticSummary.noEvidence} ohne Nachweis.`)
+  console.log(`KI-Trainingsfreigabe: ${options.aiTrainingOptIn ? 'ausdrücklich für diese Prüfung bestätigt' : 'nicht bestätigt; Opt-out wird standardmäßig erwartet'}.`)
   console.log(`Robots-Matrix: ${robotsPolicies.length} Kennungen, Quellenstand ${robotsPolicyReviewedAt}.`)
   console.log(`Ergebnis: ${summary.pages} Seite(n), ${summary.errors} Fehler, ${summary.warnings} Warnung(en).`)
   if (summary.failed) {
@@ -1021,7 +1267,9 @@ export async function runSocialPreviewCheck(inputUrls, options = {}) {
   urls = [...new Set(urls)].slice(0, mergedOptions.maxPages)
   const results = []
   for (const url of urls) {
-    results.push(await inspectPage(url, mergedOptions))
+    const result = await inspectPage(url, mergedOptions)
+    result.assertions = createSocialAssertions(result, mergedOptions)
+    results.push(result)
   }
 
   return {
@@ -1064,7 +1312,15 @@ async function main() {
   catch (error) {
     const errorReport = {
       error: redactText(error.message),
+      readOnlyGuarantees: {
+        browserInteractions: false,
+        buttonsActivated: false,
+        formActionsFetched: false,
+        formsSubmitted: false,
+        methods: ['GET'],
+      },
       robotsPolicyReviewedAt,
+      schemaVersion: 1,
       summary: { errors: 1, failed: true, pages: 0, warnings: 0 },
       tool: 'social-preview-check',
     }

@@ -4,13 +4,13 @@
   "tool": "crawl-check",
   "toolPackage": {
     "name": "@mktcode/website-qa",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
   "checklistCoverage": {
     "catalog": {
       "id": "website-qa-pilot",
       "status": "pilot",
-      "version": "1.0.0-pilot.3"
+      "version": "1.0.0-pilot.4"
     }
   },
   "results": [

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "catalog": {
     "id": "website-qa-pilot",
-    "version": "1.0.0-pilot.3"
+    "version": "1.0.0-pilot.4"
   },
   "project": {
     "name": "Interne Projektbezeichnung",
@@ -30,6 +30,12 @@
       "targetUrl": "https://example.com/",
       "environment": "production",
       "command": "npm run qa:browser"
+    },
+    {
+      "reportFile": "./.website-qa/current/social.json",
+      "targetUrl": "https://example.com/",
+      "environment": "production",
+      "command": "npm run qa:social"
     }
   ],
   "itemStates": []

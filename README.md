@@ -28,7 +28,7 @@ Jeder Prüfer ist unabhängig aufrufbar:
 website-qa-http https://example.com/ --strict
 website-qa-crawl https://example.com/ --sitemap --max-pages=50 --strict
 website-qa-browser https://example.com/ --sitemap --max-pages=10 --strict
-website-qa-social https://example.com/ --sitemap --max-pages=20
+website-qa-social https://example.com/ --sitemap --max-pages=20 --strict
 ```
 
 Es gibt bewusst keinen allgemeinen Sammelbefehl. Ein Projekt entscheidet selbst, welche Prüfungen zu seinem Umfang gehören.
@@ -76,6 +76,7 @@ Ein Zielprojekt kann beispielsweise diese Skripte übernehmen und URL sowie Limi
     "qa:http": "website-qa-http https://example.com/ --strict --json-file=.website-qa/current/http.json",
     "qa:crawl": "website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json-file=.website-qa/current/crawl.json",
     "qa:browser": "website-qa-browser https://example.com/ --sitemap --max-pages=10 --max-requests=300 --strict --json-file=.website-qa/current/browser.json",
+    "qa:social": "website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json-file=.website-qa/current/social.json",
     "qa:report": "node scripts/website-qa-report.mjs"
   }
 }
@@ -87,6 +88,7 @@ Anschließend werden die gewählten Prüfungen bewusst gestartet:
 npm run qa:http
 npm run qa:crawl
 npm run qa:browser
+npm run qa:social
 npm run qa:report
 ```
 
@@ -96,7 +98,7 @@ Eine kopierbare Minimalintegration liegt unter [`examples/project-integration/`]
 
 ## Strukturierter Projektnachweis
 
-HTTP, Crawl und Browser geben neben Befunden positive, negative, nicht anwendbare und unklare atomare Prüfaussagen aus. Grundlage ist der mitgelieferte [Pilotkatalog](catalog/README.md). Er unterscheidet:
+HTTP, Crawl, Browser und Social geben neben Befunden positive, negative, nicht anwendbare und unklare atomare Prüfaussagen aus. Grundlage ist der mitgelieferte [Pilotkatalog](catalog/README.md). Er unterscheidet:
 
 - automatisch belegbare Kriterien;
 - manuell beziehungsweise redaktionell zu prüfende Kriterien;
@@ -152,7 +154,8 @@ Der Berichtsgenerator liest nur lokale Dateien. Er startet keinen Netzwerkprüfe
         └── technical/
             ├── http.json
             ├── crawl.json
-            └── browser.json
+            ├── browser.json
+            └── social.json
 ```
 
 - `technical/*.json` sind bytegleiche Kopien der eingebundenen vollständigen Werkzeugberichte.
@@ -232,7 +235,14 @@ const files = writePilotProjectReportBundle({
 })
 ```
 
-Schemas und Beispiele liegen unter [`catalog/`](catalog/). `report.json` verwendet Ausgabeschema 2, weil berichtete Ziel-URLs ohne Querywerte gebunden werden; bei Queryzielen werden zusätzlich nur die Parameternamen verglichen. Der Pilot umfasst noch nicht die vollständige Website-Checkliste und verändert keine Projektcheckliste automatisch. Social-Berichte werden in dieser Version noch nicht in den strukturierten Checklistennachweis aufgenommen.
+Schemas und Beispiele liegen unter [`catalog/`](catalog/). `report.json` verwendet Ausgabeschema 2, weil berichtete Ziel-URLs ohne Querywerte gebunden werden; bei Queryzielen werden zusätzlich nur die Parameternamen verglichen. Der Pilot umfasst noch nicht die vollständige Website-Checkliste und verändert keine Projektcheckliste automatisch.
+
+### Migration von 0.2.x
+
+- Social-Berichte verwenden nun `schemaVersion: 1`, zehn atomare Assertions, Nur-Lese-Garantien und `checklistCoverage`.
+- Der Pilotkatalog `1.0.0-pilot.4` ergänzt `CORE-SOC-01` bis `CORE-SOC-03` sowie ausgewählte Robots-Punkte. Projektkonfigurationen und Evidence-Dateien müssen diese Katalogversion ausdrücklich übernehmen.
+- Social-Berichte werden als vierter technischer Lauf in Projektbericht und Bundle eingebunden.
+- Echte Plattformvorschau, redaktionelle Eignung, Policy-Aktualität und Betreiberentscheidung bleiben manuelle Kriterien; ein technisch grüner Social-Lauf schließt sie nicht automatisch ab.
 
 ### Migration von 0.1.x
 

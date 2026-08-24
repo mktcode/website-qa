@@ -97,6 +97,10 @@ Wichtige Optionen:
 
 Exitcodes: `0` bestanden, `1` Prüffehler beziehungsweise Warnung im strikten Modus, `2` Aufruf- oder Laufzeitfehler.
 
+Der strukturierte Nachweispilot liefert atomare Aussagen zu OpenGraph-Pflichtfeldern, X-/Twitter-Metadaten beziehungsweise Fallbacks, Canonical-/OpenGraph-Konsistenz, Antworten und Metadaten der simulierten Social-Crawler, Vorschaubildern, Erreichbarkeit von `robots.txt`, Social-Crawler-Regeln, dokumentierter Policy-Matrix, Trainings-/Datennutzungsregeln und strengem Ausführungsmodus. Fehlende HTML-, Bild- oder Robots-Antworten führen bei nicht abschließend beobachtbaren Aussagen zu `inconclusive`, während beobachtete technische Abweichungen als `fail` ausgewiesen werden.
+
+Redaktionelle Eignung von Text und Bild, eine echte öffentliche Plattformvorschau, Plattformcache, projektspezifisch gewünschte Indexierung, Aktualitätsbewertung der Policy-Quellen und die tatsächliche Betreiberentscheidung zu Training beziehungsweise Datennutzung bleiben manuelle oder externe Kriterien. Insbesondere gilt `--ai-training-opt-in` nur als technische Laufdeklaration und nicht als Betreiber- oder Kundenfreigabe. Ein erfolgreicher Social-Lauf darf diese Kriterien nicht automatisch abschließen.
+
 Der Nachweis nennt den Commit des zentralen Werkzeugrepositorys und den im Bericht ausgegebenen Quellenstand der Robots-Matrix. Das Werkzeug prüft ausschließlich begrenzte GET-Abrufe von HTML, Vorschaubildern, `robots.txt` und optional Sitemap; es sendet keine Formulare. Es ersetzt nicht den allgemeinen Linkcrawl, TLS-, Browser-, Performance- oder echten Plattformvorschautest.
 
 ## 5. HTTP, Redirects, Header und Kompression

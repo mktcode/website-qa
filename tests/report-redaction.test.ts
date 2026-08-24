@@ -20,6 +20,7 @@ describe('report redaction', () => {
       url: '(privates/lokales Ziel)',
     })
     expect(redactText('Abruf http://internal.local/admin?token=secret fehlgeschlagen')).toBe('Abruf (privates/lokales Ziel) fehlgeschlagen')
+    expect(redactText('Beispiel https://[DOMAIN]/ unverändert')).toBe('Beispiel https://[DOMAIN]/ unverändert')
     expect(redactText('connect ECONNREFUSED 192.168.1.4, [::1] und service.internal.local')).toBe('connect ECONNREFUSED [REDACTED_PRIVATE_IP], [REDACTED_PRIVATE_IP] und [REDACTED_PRIVATE_HOST]')
   })
 

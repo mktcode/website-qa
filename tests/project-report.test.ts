@@ -27,7 +27,7 @@ function assertion(assertionId: string, outcome: 'fail' | 'inconclusive' | 'notA
 function technicalReport(assertions: ReturnType<typeof assertion>[]) {
   return {
     checklistCoverage: {
-      catalog: { id: 'website-qa-pilot', status: 'pilot', version: '1.0.0-pilot.3' },
+      catalog: { id: 'website-qa-pilot', status: 'pilot', version: '1.0.0-pilot.4' },
     },
     generatedAt: '2026-08-24T12:00:00.000Z',
     results: [{ assertions, requestedUrl: 'https://example.com/' }],
@@ -40,7 +40,7 @@ function technicalReport(assertions: ReturnType<typeof assertion>[]) {
 
 function projectConfig() {
   return {
-    catalog: { id: 'website-qa-pilot', version: '1.0.0-pilot.3' },
+    catalog: { id: 'website-qa-pilot', version: '1.0.0-pilot.4' },
     itemStates: [],
     project: {
       deploymentId: 'deployment-1',
@@ -89,8 +89,8 @@ describe('project report pilot', () => {
 
     expect(report.summary.checklistItems).toMatchObject({
       complete: 1,
-      open: 15,
-      total: 16,
+      open: 21,
+      total: 22,
     })
     expect(report.items.find((item: { id: string }) => item.id === 'CORE-ERR-02')).toMatchObject({
       evidenceOutcome: 'pass',
@@ -113,7 +113,7 @@ describe('project report pilot', () => {
     ].map(assertionId => assertion(assertionId))
     const browserReport = {
       checklistCoverage: {
-        catalog: { id: 'website-qa-pilot', status: 'pilot', version: '1.0.0-pilot.3' },
+        catalog: { id: 'website-qa-pilot', status: 'pilot', version: '1.0.0-pilot.4' },
       },
       generatedAt: '2026-08-24T12:05:00.000Z',
       result: { assertions: browserAssertions, requestedUrl: 'https://example.com/' },
@@ -131,7 +131,7 @@ describe('project report pilot', () => {
       }],
     })
 
-    expect(report.summary.checklistItems).toMatchObject({ open: 11, partial: 5, total: 16 })
+    expect(report.summary.checklistItems).toMatchObject({ open: 17, partial: 5, total: 22 })
     expect(report.items.find((item: { id: string }) => item.id === 'CORE-A11Y-13')).toMatchObject({
       evidenceOutcome: 'partial',
       projectStatus: 'partial',
@@ -153,7 +153,7 @@ describe('project report pilot', () => {
     const report = createPilotProjectReport({
       config,
       evidenceDocument: {
-        catalog: { id: 'website-qa-pilot', version: '1.0.0-pilot.3' },
+        catalog: { id: 'website-qa-pilot', version: '1.0.0-pilot.4' },
         evidence: [{
           checkedAt: '2026-08-24',
           checkedBy: 'inhaltlich verantwortliche Stelle',
@@ -172,7 +172,7 @@ describe('project report pilot', () => {
     expect(report.items.find((item: { id: string }) => item.id === 'CORE-DOM-04')).toMatchObject({
       projectStatus: 'external',
     })
-    expect(report.summary.checklistItems).toMatchObject({ complete: 2, external: 1, open: 14, total: 17 })
+    expect(report.summary.checklistItems).toMatchObject({ complete: 2, external: 1, open: 20, total: 23 })
   })
 
   it('binds query targets without retaining their values', () => {
@@ -303,12 +303,22 @@ describe('project report pilot', () => {
     temporaryDirectories.add(directory)
     const config = projectConfig()
     config.project.name = 'Nicht öffentliche Projektbezeichnung'
+    config.technicalRuns.push({
+      command: 'website-qa-social https://example.com/ --strict --json',
+      deploymentId: 'deployment-1',
+      environment: 'production',
+      reportFile: './social.json',
+      sourceRevision: 'commit-1',
+      targetUrl: 'https://example.com/',
+    })
     const rawReport = `${JSON.stringify(technicalReport([
       assertion('error.not-found.noindex'),
       assertion('error.not-found.no-url-metadata'),
     ]), null, 4)}\n`
+    const rawSocialReport = readFileSync(join(catalogDirectory, 'social-report.example.json'), 'utf8')
     writeFileSync(join(directory, 'project.json'), JSON.stringify(config))
     writeFileSync(join(directory, 'http.json'), rawReport)
+    writeFileSync(join(directory, 'social.json'), rawSocialReport)
 
     const result = writePilotProjectReportBundle({
       configFile: join(directory, 'project.json'),
@@ -317,6 +327,7 @@ describe('project report pilot', () => {
 
     expect(result.timestamp).toBe('2026-08-24T18-04-17Z')
     expect(readFileSync(join(result.bundleDirectory, 'technical/http.json'), 'utf8')).toBe(rawReport)
+    expect(readFileSync(join(result.bundleDirectory, 'technical/social.json'), 'utf8')).toBe(rawSocialReport)
     expect(existsSync(result.manifestFile)).toBe(true)
     expect(existsSync(result.reportFile)).toBe(true)
     expect(existsSync(result.reportMarkdownFile)).toBe(true)
@@ -332,6 +343,7 @@ describe('project report pilot', () => {
     expect(new Set(Object.keys(manifest))).toEqual(new Set(manifestSchema.required))
     expect(manifest.files).toEqual(expect.arrayContaining([
       expect.objectContaining({ path: 'technical/http.json', role: 'technicalReport', sha256: expect.stringMatching(/^[a-f\d]{64}$/) }),
+      expect.objectContaining({ path: 'technical/social.json', role: 'technicalReport', sha256: expect.stringMatching(/^[a-f\d]{64}$/) }),
     ]))
 
     expect(() => writePilotProjectReportBundle({

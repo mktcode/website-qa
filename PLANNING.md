@@ -1,10 +1,10 @@
 # Planung: einfache Projektintegration und lokale Website-QA-Berichte
 
-> **Status:** Implementiert für Paketversion `0.2.0`; Praxisumstellung und Release-Tag bleiben bewusste Folgeschritte.
+> **Status:** Der geplante Workflow wurde mit Paketversion `0.2.0` implementiert, in einem echten Websiteprojekt erprobt und als `v0.2.0` veröffentlicht. Die gesonderte Social-Assertion-Integration wird für `0.3.0` ergänzt.
 >
 > Diese Planung beschreibt ein frameworkunabhängiges Refactoring von `@mktcode/website-qa`. Sie enthält keine ausgefüllten Nachweise oder Vorgaben für eine bestimmte Website.
 >
-> Implementiert sind die gemeinsame Berichtsredaktion, `--json-file`, automatisch datierte lokale Bundles, bytegleiche technische Rohberichte, das Prüfsummenmanifest, der getrennte Whitelist-Markdownrenderer und kopierbare Projektvorlagen. Die bisherige programmatische Reporting-API bleibt erhalten. Noch nicht erfolgt sind die Umstellung eines neuen echten Projektprüfstands und die bewusste Veröffentlichung eines Tags.
+> Implementiert sind die gemeinsame Berichtsredaktion, `--json-file`, automatisch datierte lokale Bundles, bytegleiche technische Rohberichte, das Prüfsummenmanifest, der getrennte Whitelist-Markdownrenderer und kopierbare Projektvorlagen. Die bisherige programmatische Reporting-API bleibt erhalten. Praxisumstellung, installierter Verbrauchertest und Release-Tag wurden erfolgreich abgeschlossen.
 
 ## 1. Ausgangslage
 
@@ -15,7 +15,7 @@ Das Paket stellt vier unabhängige, ausschließlich lesende URL-Prüfer bereit:
 - `website-qa-browser`
 - `website-qa-social`
 
-HTTP, Crawl und Browser erzeugen strukturierte Assertions. Die Bibliothek `@mktcode/website-qa/report` kann gespeicherte technische JSON-Berichte mit manuellen beziehungsweise externen Projektnachweisen verbinden und daraus einen vollständigen JSON- und Markdown-Bericht ableiten.
+HTTP, Crawl, Browser und ab Paketversion 0.3.0 auch Social erzeugen strukturierte Assertions. Die Bibliothek `@mktcode/website-qa/report` kann gespeicherte technische JSON-Berichte mit manuellen beziehungsweise externen Projektnachweisen verbinden und daraus einen vollständigen JSON- und Markdown-Bericht ableiten.
 
 Der erste Praxispilot hat die fachliche Trennung erfolgreich bestätigt:
 
@@ -89,7 +89,7 @@ Dieses Refactoring führt ausdrücklich nicht ein:
 - keine automatische Produktionsfreigabe;
 - keine vollständige WCAG-, Rechts-, Datenschutz- oder Sicherheitsbewertung;
 - keine GitHub Actions, Registry-Tokens oder automatische Release-Infrastruktur;
-- keine Social-Assertions im strukturierten Projektbericht; diese Integration folgt gesondert;
+- im ursprünglichen 0.2.0-Refactoring keine Social-Assertions im strukturierten Projektbericht; diese gesonderte Integration folgt mit 0.3.0;
 - keine Formulareingaben, Klicks oder andere mutierende Websiteinteraktionen;
 - keine automatische Ermittlung eines ausgelieferten Quellcommits aus einer URL-Prüfung.
 
@@ -343,7 +343,7 @@ Vollständige Rohberichte dürfen erst als regulärer Bundlebestandteil empfohle
 2. URL-Zugangsdaten vollständig ablehnen und niemals in Fehlermeldungen wiederholen.
 3. Querywerte in allen Berichten entfernen; nur ausdrücklich benötigte Parameternamen dokumentieren.
 4. Fragmente standardmäßig entfernen.
-5. HTTP-, Crawl-, Browser- und später Social-Ausgaben auf dieselbe Redaktionslogik umstellen.
+5. HTTP-, Crawl-, Browser- und Social-Ausgaben auf dieselbe Redaktionslogik umstellen.
 6. Fehlermeldungen aus URL-Validierung, DNS, Redirects und Timeouts ebenfalls redigieren.
 7. Konsolen- und Laufzeittexte weiterhin begrenzen und bekannte Secretmuster redigieren.
 8. Tests mit Token-, Auth-, Code-, E-Mail- und frei benannten Queryparametern ergänzen; Werte dürfen weder in Text- noch JSON-Ausgaben erscheinen.
@@ -434,7 +434,7 @@ Die Beispiele dürfen keine reale Domain, projektspezifische Route, Seitenzahl, 
 ### Phase A – Verträge und Redaktion
 
 1. Gemeinsames redigiertes URL-Berichtsformat festlegen.
-2. HTTP-, Crawl- und Browserberichte auf vollständige Querywertredaktion prüfen.
+2. HTTP-, Crawl-, Browser- und Social-Berichte auf vollständige Querywertredaktion prüfen.
 3. Gemeinsame Implementierung in `src/lib/http-client.mjs` ergänzen.
 4. Positiv-, Negativ- und Regressionstests für Text- und JSON-Ausgaben ergänzen.
 5. Auswirkungen auf bestehende Beispielberichte dokumentieren.
@@ -532,7 +532,7 @@ Die Beispiele dürfen keine reale Domain, projektspezifische Route, Seitenzahl, 
 - Installation von Tarball beziehungsweise unveränderlichem Commit;
 - symlink-sichere Binärdateien;
 - alle vier `--help`-Aufrufe;
-- HTTP-, Crawl- und Browser-JSON gegen lokale kurzlebige Testserver;
+- HTTP-, Crawl-, Browser- und Social-JSON gegen lokale kurzlebige Testserver;
 - echter Chromium-Nebenwirkungstest;
 - Bundle-Erzeugung aus installierter Reporting-Bibliothek;
 - Berichtserzeugung ohne Netzwerkzugriff;

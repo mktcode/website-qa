@@ -7,7 +7,7 @@
 | Feld | Wert |
 |---|---|
 | Erstellt | 2026-08-24T12:30:00.000Z |
-| Katalog | website-qa-pilot 1.0.0-pilot.3 (pilot) |
+| Katalog | website-qa-pilot 1.0.0-pilot.4 (pilot) |
 | Auswertungsumgebung | production |
 | Bevorzugte URL | https://example.com/ |
 | Quellstand | PROJEKT-COMMIT |
@@ -18,28 +18,29 @@
 
 | Projektstatus | Anzahl |
 |---|---:|
-| Vollständig nachgewiesen | 2 |
+| Vollständig nachgewiesen | 3 |
 | Fehlgeschlagen | 0 |
-| Teilweise nachgewiesen | 8 |
-| Offen | 6 |
+| Teilweise nachgewiesen | 12 |
+| Offen | 7 |
 | Unklar | 0 |
 | Nicht zutreffend | 0 |
 | Externer Nachweis offen | 1 |
 | Zurückgestellt | 0 |
 | Akzeptierte Abweichung (offen) | 0 |
-| **Ausgewählte Pilotpunkte** | **17** |
+| **Ausgewählte Pilotpunkte** | **23** |
 
-Automatische Kriterien: 14 bestanden, 0 fehlgeschlagen, 0 unklar, 14 ohne Nachweis.
+Automatische Kriterien: 23 bestanden, 0 fehlgeschlagen, 0 unklar, 14 ohne Nachweis.
 
-Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 18 ohne Nachweis.
+Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 23 ohne Nachweis.
 
 ## Technische Läufe
 
 | Werkzeug | Ziel | Umgebung | Verwendet | Assertions | Befehl |
 |---|---|---|---:|---:|---|
-| http-check 0.2.0 | https://example.com/ | production | ja | 2 | <code>website-qa-http https://example.com/ --strict --json</code> |
-| crawl-check 0.2.0 | https://example.com/ | production | ja | 7 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
-| browser-check 0.2.0 | https://example.com/ | production | ja | 5 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
+| http-check 0.3.0 | https://example.com/ | production | ja | 2 | <code>website-qa-http https://example.com/ --strict --json</code> |
+| crawl-check 0.3.0 | https://example.com/ | production | ja | 7 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
+| browser-check 0.3.0 | https://example.com/ | production | ja | 5 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
+| social-preview-check 0.3.0 | https://example.com/ | production | ja | 10 | <code>website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json</code> |
 
 ## Checklistenpunkte
 
@@ -54,6 +55,12 @@ Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 18 ohne Nachweis.
 | CORE-ERR-02 | core | Vollständig nachgewiesen | 2/2 | 0/0 |
 | CORE-SEO-01 | core | Teilweise nachgewiesen | 3/3 | 0/1 |
 | CORE-SEO-02 | core | Teilweise nachgewiesen | 2/2 | 0/1 |
+| CORE-SOC-01 | core | Teilweise nachgewiesen | 2/2 | 0/1 |
+| CORE-SOC-02 | core | Vollständig nachgewiesen | 4/4 | 0/0 |
+| CORE-SOC-03 | core | Offen | 0/0 | 0/1 |
+| CORE-ROB-01 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
+| CORE-ROB-02 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
+| CORE-ROB-04 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-A11Y-01 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-A11Y-10 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-A11Y-13 | core | Teilweise nachgewiesen | 1/1 | 0/3 |
@@ -146,6 +153,55 @@ Die Seitensprache ist mit einem passenden `lang`-Attribut angegeben; Überschrif
 - [ ] `CORE-SEO-02/C3` Seitensprache, Überschriftenhierarchie und Hauptüberschrift sind inhaltlich passend und verständlich. — manual, noEvidence
   - Erforderlicher Nachweis: Sprachcode und Überschriftenstruktur auf repräsentativen Seitentypen redaktionell und semantisch prüfen.
 
+### CORE-SOC-01: Teilweise nachgewiesen
+
+Relevante Seiten enthalten mindestens `og:title`, `og:description`, `og:type`, `og:url` und ein geeignetes `og:image` mit absoluter HTTPS-URL sowie, soweit vorgesehen, passende X-/Twitter-Metadaten.
+
+- [x] `CORE-SOC-01/C1` Alle vom Social-Check geprüften Seiten besitzen eindeutige OpenGraph-Pflichtfelder mit absoluten HTTPS-URLs für og:url und og:image. — automatic, pass
+- [x] `CORE-SOC-01/C2` twitter:card sowie erforderliche X-/Twitter-Werte oder geeignete OpenGraph-Fallbacks sind technisch verwendbar. — automatic, pass
+- [ ] `CORE-SOC-01/C3` Titel, Beschreibungen, Bildinhalt und Bildzuschnitt sind für die vorgesehenen Seiten und Plattformen inhaltlich geeignet. — manual, noEvidence
+  - Erforderlicher Nachweis: Social-Texte und Vorschaubilder redaktionell gegen Seiteninhalt, Projektvorgaben und vorgesehenen Plattformkontext prüfen; technische Metadatenprüfung allein genügt nicht.
+
+### CORE-SOC-02: Vollständig nachgewiesen
+
+Öffentlich ausgelieferte Social-Metadaten wurden automatisiert aus serverseitigem HTML mit Browser-, Facebook-, X-/Twitter- und LinkedIn-User-Agent geprüft. Pflichtfelder, Mehrdeutigkeiten, Canonical-/OpenGraph-Konsistenz, Redirects sowie Bildabruf, MIME-Typ, Dateigröße und Pixelmaße sind umfasst; Fehler liefern einen CI-tauglichen Exitcode. Standardverfahren mit lokal eingebundenem `@mktcode/website-qa`: `npm run ops:social:check -- https://[DOMAIN]/ --sitemap --max-pages=50 --strict`; Paket-/Werkzeugcommit und Bericht werden protokolliert.
+
+- [x] `CORE-SOC-02/C1` Browser, Facebook, X/Twitter und LinkedIn erhalten erfolgreiche, konsistente HTML-Antworten und Social-Metadaten. — automatic, pass
+- [x] `CORE-SOC-02/C2` Canonical, finale Seiten-URL und og:url sind auf allen geprüften Seiten eindeutig und konsistent. — automatic, pass
+- [x] `CORE-SOC-02/C3` Alle vorgesehenen Vorschaubilder erfüllen die geprüften Anforderungen an Abruf, MIME-Typ, Dateigröße, Pixelmaße, Seitenverhältnis, Deklarationen und Alternativtext. — automatic, pass
+- [x] `CORE-SOC-02/C4` Der technische Social-Lauf wurde streng ausgewertet, sodass Warnungen einen fachlich negativen Exitcode erzeugen. — automatic, pass
+
+### CORE-SOC-03: Offen
+
+Zusätzlich wurde mindestens eine echte öffentliche Plattformvorschau oder ein echter Plattformcrawler manuell geprüft. Darstellung, Zuschnitt und Plattformcache werden nicht aus einer lokalen User-Agent-Simulation abgeleitet.
+
+- [ ] `CORE-SOC-03/C1` Mindestens eine echte öffentliche Plattformvorschau oder ein echter Plattformcrawler wurde mit Datum, Plattform, URL und Ergebnis dokumentiert. — manual, noEvidence
+  - Erforderlicher Nachweis: Echte öffentliche Plattformvorschau oder echten Plattformcrawler verwenden und Darstellung, Zuschnitt sowie gegebenenfalls Cacheverhalten dokumentieren; lokale User-Agent-Simulation nicht als Plattformnachweis ausgeben.
+
+### CORE-ROB-01: Teilweise nachgewiesen
+
+`robots.txt` ist öffentlich erreichbar, syntaktisch plausibel und blockiert keine für die gewünschte Indexierung notwendigen Seiten oder Ressourcen.
+
+- [x] `CORE-ROB-01/C1` robots.txt wurde erfolgreich ausgewertet und blockiert die vorgesehenen Social-Crawler auf den geprüften Seiten nicht. — automatic, pass
+- [ ] `CORE-ROB-01/C2` Die robots.txt-Regeln wurden gegen die projektspezifisch gewünschte Indexierung notwendiger Seiten und Ressourcen bewertet. — manual, noEvidence
+  - Erforderlicher Nachweis: Gewünschte Indexierung und erforderliche Seiten beziehungsweise Ressourcen mit den ausgelieferten Regeln abgleichen; robots.txt nicht als Zugriffsschutz bewerten.
+
+### CORE-ROB-02: Teilweise nachgewiesen
+
+Aktuelle, offiziell dokumentierte Kennungen wichtiger Social-, Such-, KI-Such-, Nutzerabruf- und Trainingsdienste sowie reine Produkt- beziehungsweise Datennutzungstokens werden mit dokumentiertem Quellenstand getrennt bewertet.
+
+- [x] `CORE-ROB-02/C1` Der technische Bericht dokumentiert die geprüften Kennungen, Kategorien, offiziellen Quellen und den Quellenstand der Policy-Matrix. — automatic, pass
+- [ ] `CORE-ROB-02/C2` Quellenstand und Auswahl der Kennungen wurden auf ausreichende Aktualität und projektspezifische Relevanz bewertet. — manual, noEvidence
+  - Erforderlicher Nachweis: Quellenstand, relevante Anbieter und erkennbare Richtlinienänderungen prüfen; der im Werkzeug eingebettete Stand ist kein automatischer Aktualitätsnachweis.
+
+### CORE-ROB-04: Teilweise nachgewiesen
+
+Die automatisierte Prüfung warnt vor jedem ohne dokumentiertes Opt-in erlaubten Training-/Datennutzungstoken und behandelt diese Warnungen im Standardaufruf mit `--strict` als Fehler. `--ai-training-opt-in` wird ausschließlich nach ausdrücklicher dokumentierter Freigabe verwendet und verändert keine Robots-Regel. `robots.txt` wird nicht als Zugriffsschutz, Rechtsgarantie oder rückwirkende Löschung dargestellt.
+
+- [x] `CORE-ROB-04/C1` Trainings-/Datennutzungstokens sind blockiert oder der strikte technische Lauf deklariert ausdrücklich ein separat nachzuweisendes Opt-in. — automatic, pass
+- [ ] `CORE-ROB-04/C2` Die projektspezifische Opt-out- beziehungsweise Opt-in-Entscheidung ist mit zuständiger Stelle, Umfang und Datum dokumentiert. — manual, noEvidence
+  - Erforderlicher Nachweis: Standardmäßiges Opt-out oder ausdrückliche Trainingsfreigabe dokumentieren; die CLI-Option allein gilt nicht als Betreiber- beziehungsweise Kundenfreigabe.
+
 ### CORE-A11Y-01: Teilweise nachgewiesen
 
 Semantische HTML-Elemente werden passend eingesetzt; Navigation, Hauptinhalt, ergänzende Bereiche und Footer sind sinnvoll ausgezeichnet.
@@ -221,3 +277,4 @@ Inhalte, Logo, Bilder, Videos, Schriftarten, Testimonials und sonstige Materiali
 - Automatische Ergebnisse sind technische Teilnachweise und ersetzen keine manuellen, externen, rechtlichen oder organisatorischen Prüfungen.
 - Nur technische Läufe der festgelegten Auswertungsumgebung fließen in die Checklistenbewertung ein.
 - Quell- und Deploymentstand technischer Läufe sind projektseitig deklarierte Zuordnungen; das technische Werkzeug bestätigt sie nicht unabhängig.
+- Simulierte Social-Crawler-User-Agents ersetzen keine echte Plattformvorschau und keinen Nachweis des Plattformcaches.

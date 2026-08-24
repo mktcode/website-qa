@@ -93,6 +93,50 @@ describe('social preview checker', () => {
     expect(robotsPolicies.every(policy => policy.documentation.startsWith('https://'))).toBe(true)
   })
 
+  it('marks assertions inconclusive when crawler, image, or robots observations are unavailable', async () => {
+    const server = createServer((request, response) => {
+      const origin = `http://${request.headers.host}`
+      if (request.url === '/robots.txt' || request.url === '/social.webp'
+        || request.headers['user-agent']?.includes('LinkedInBot')) {
+        response.destroy()
+        return
+      }
+      response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+      response.end(`<!doctype html><html><head>
+        <link rel="canonical" href="${origin}/">
+        <meta property="og:title" content="Technischer Social-Test">
+        <meta property="og:description" content="Eine ausreichend lange Beschreibung für den technischen Social-Testlauf.">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="${origin}/">
+        <meta property="og:image" content="${origin}/social.webp">
+        <meta property="og:image:alt" content="Testbild">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:image:alt" content="Testbild">
+      </head></html>`)
+    })
+    servers.add(server)
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
+    const address = server.address() as AddressInfo
+    const report = await runSocialPreviewCheck([`http://127.0.0.1:${address.port}/`], {
+      allowHttp: true,
+      allowPrivate: true,
+      strict: true,
+    })
+    const assertions = (report.results[0] as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
+    }).assertions
+    const outcomes = Object.fromEntries(assertions.map(assertion => [assertion.assertionId, assertion.outcome]))
+
+    expect(outcomes).toMatchObject({
+      'social.crawlers.html-metadata-consistent': 'inconclusive',
+      'social.images.preview-technically-valid': 'inconclusive',
+      'social.robots.file-retrievable': 'inconclusive',
+      'social.robots.policy-matrix-recorded': 'inconclusive',
+      'social.robots.social-crawlers-allowed': 'inconclusive',
+      'social.robots.training-access-blocked-or-declared': 'inconclusive',
+    })
+  })
+
   it('checks crawler parity, robots policies and the real image', async () => {
     const image = await sharp({
       create: {
@@ -102,9 +146,11 @@ describe('social preview checker', () => {
         width: 1200,
       },
     }).webp().toBuffer()
+    const seenMethods = new Set<string>()
     const seenUserAgents = new Set<string>()
 
     const server = createServer((request, response) => {
+      seenMethods.add(request.method || '')
       seenUserAgents.add(request.headers['user-agent'] || '')
       const origin = `http://${request.headers.host}`
 
@@ -155,10 +201,12 @@ describe('social preview checker', () => {
       aiTrainingOptIn: true,
       allowHttp: true,
       allowPrivate: true,
+      strict: true,
     })
 
     const result = report.results[0] as unknown as {
       agents: unknown[]
+      assertions: Array<{ assertionId: string, outcome: string }>
       images: Array<{ height?: number, width?: number }>
       robots: { policies: unknown[] }
     }
@@ -172,9 +220,31 @@ describe('social preview checker', () => {
     expect(result.agents).toHaveLength(4)
     expect(result.images[0]).toMatchObject({ height: 630, width: 1200 })
     expect(result.robots.policies).toHaveLength(robotsPolicies.length)
+    expect(result.assertions).toHaveLength(10)
+    expect(result.assertions.find(assertion => assertion.assertionId === 'social.crawlers.html-metadata-consistent')?.outcome).toBe('pass')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'social.robots.training-access-blocked-or-declared')?.outcome).toBe('fail')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'social.run.strict-mode-recorded')?.outcome).toBe('fail')
+    const optedInAssertions = (optedInReport.results[0] as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
+    })?.assertions || []
+    expect(optedInAssertions.find(assertion => assertion.assertionId === 'social.robots.training-access-blocked-or-declared')?.outcome).toBe('pass')
+    expect(optedInAssertions.find(assertion => assertion.assertionId === 'social.run.strict-mode-recorded')?.outcome).toBe('pass')
     const jsonReport = createJsonReport(report.results, report.options)
+    expect(jsonReport).toMatchObject({
+      checklistCoverage: {
+        catalog: { version: '1.0.0-pilot.4' },
+        summary: { checklistItems: { total: 5 } },
+      },
+      readOnlyGuarantees: {
+        browserInteractions: false,
+        formsSubmitted: false,
+        methods: ['GET'],
+      },
+      schemaVersion: 1,
+    })
     expect(JSON.stringify(jsonReport)).not.toContain('127.0.0.1')
     expect(JSON.stringify(jsonReport)).toContain('(privates/lokales Ziel)')
+    expect([...seenMethods]).toEqual(['GET'])
     expect([...seenUserAgents]).toEqual(expect.arrayContaining([
       expect.stringContaining('SocialPreviewCheck'),
       expect.stringContaining('facebookexternalhit'),

@@ -44,6 +44,13 @@ describe('structured checklist pilot', () => {
       'CORE-QA-02',
       'CORE-QA-07',
     ])
+    expect(checklistItemIdsForTool('social-preview-check', catalog, registry)).toEqual([
+      'CORE-SOC-01',
+      'CORE-SOC-02',
+      'CORE-ROB-01',
+      'CORE-ROB-02',
+      'CORE-ROB-04',
+    ])
     expect(() => evaluatePilotChecklist({ assertions: [assertion('unknown.assertion')] })).toThrow(/unbekannte Assertion/)
   })
 
@@ -98,7 +105,7 @@ describe('structured checklist pilot', () => {
     })).toThrow(/gültiges Datum/)
 
     const evidenceExample = JSON.parse(readFileSync(new URL('../catalog/project-evidence.example.json', import.meta.url), 'utf8'))
-    expect(evidenceExample.catalog).toEqual({ id: 'website-qa-pilot', version: '1.0.0-pilot.3' })
+    expect(evidenceExample.catalog).toEqual({ id: 'website-qa-pilot', version: '1.0.0-pilot.4' })
     const evidencedRights = evaluatePilotChecklist({
       evidence: evidenceExample.evidence,
       itemIds: ['GOV-RGT-02'],

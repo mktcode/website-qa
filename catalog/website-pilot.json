@@ -2,9 +2,9 @@
   "$schema": "./website-catalog.schema.json",
   "schemaVersion": 1,
   "catalogId": "website-qa-pilot",
-  "catalogVersion": "1.0.0-pilot.3",
+  "catalogVersion": "1.0.0-pilot.4",
   "status": "pilot",
-  "description": "Strukturierter Pilotkatalog für HTTP-, Crawl- und Browser-bezogene sowie bewusst nicht automatisierbare Website-Prüfnachweise.",
+  "description": "Strukturierter Pilotkatalog für HTTP-, Crawl-, Browser- und Social-bezogene sowie bewusst nicht automatisierbare Website-Prüfnachweise.",
   "items": [
     {
       "id": "CORE-DOM-02",
@@ -308,6 +308,174 @@
             "mode": "manual",
             "evidenceClass": "editorial",
             "instructions": "Sprachcode und Überschriftenstruktur auf repräsentativen Seitentypen redaktionell und semantisch prüfen."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-SOC-01",
+      "module": "core",
+      "statement": "Relevante Seiten enthalten mindestens `og:title`, `og:description`, `og:type`, `og:url` und ein geeignetes `og:image` mit absoluter HTTPS-URL sowie, soweit vorgesehen, passende X-/Twitter-Metadaten.",
+      "criteria": [
+        {
+          "id": "CORE-SOC-01/C1",
+          "statement": "Alle vom Social-Check geprüften Seiten besitzen eindeutige OpenGraph-Pflichtfelder mit absoluten HTTPS-URLs für og:url und og:image.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["social.metadata.open-graph-complete"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SOC-01/C2",
+          "statement": "twitter:card sowie erforderliche X-/Twitter-Werte oder geeignete OpenGraph-Fallbacks sind technisch verwendbar.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["social.metadata.twitter-card-valid"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SOC-01/C3",
+          "statement": "Titel, Beschreibungen, Bildinhalt und Bildzuschnitt sind für die vorgesehenen Seiten und Plattformen inhaltlich geeignet.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "editorial",
+            "instructions": "Social-Texte und Vorschaubilder redaktionell gegen Seiteninhalt, Projektvorgaben und vorgesehenen Plattformkontext prüfen; technische Metadatenprüfung allein genügt nicht."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-SOC-02",
+      "module": "core",
+      "statement": "Öffentlich ausgelieferte Social-Metadaten wurden automatisiert aus serverseitigem HTML mit Browser-, Facebook-, X-/Twitter- und LinkedIn-User-Agent geprüft. Pflichtfelder, Mehrdeutigkeiten, Canonical-/OpenGraph-Konsistenz, Redirects sowie Bildabruf, MIME-Typ, Dateigröße und Pixelmaße sind umfasst; Fehler liefern einen CI-tauglichen Exitcode. Standardverfahren mit lokal eingebundenem `@mktcode/website-qa`: `npm run ops:social:check -- https://[DOMAIN]/ --sitemap --max-pages=50 --strict`; Paket-/Werkzeugcommit und Bericht werden protokolliert.",
+      "criteria": [
+        {
+          "id": "CORE-SOC-02/C1",
+          "statement": "Browser, Facebook, X/Twitter und LinkedIn erhalten erfolgreiche, konsistente HTML-Antworten und Social-Metadaten.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["social.crawlers.html-metadata-consistent"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SOC-02/C2",
+          "statement": "Canonical, finale Seiten-URL und og:url sind auf allen geprüften Seiten eindeutig und konsistent.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["social.metadata.canonical-open-graph-consistent"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SOC-02/C3",
+          "statement": "Alle vorgesehenen Vorschaubilder erfüllen die geprüften Anforderungen an Abruf, MIME-Typ, Dateigröße, Pixelmaße, Seitenverhältnis, Deklarationen und Alternativtext.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["social.images.preview-technically-valid"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SOC-02/C4",
+          "statement": "Der technische Social-Lauf wurde streng ausgewertet, sodass Warnungen einen fachlich negativen Exitcode erzeugen.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["social.run.strict-mode-recorded"],
+            "aggregation": "all"
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-SOC-03",
+      "module": "core",
+      "statement": "Zusätzlich wurde mindestens eine echte öffentliche Plattformvorschau oder ein echter Plattformcrawler manuell geprüft. Darstellung, Zuschnitt und Plattformcache werden nicht aus einer lokalen User-Agent-Simulation abgeleitet.",
+      "criteria": [
+        {
+          "id": "CORE-SOC-03/C1",
+          "statement": "Mindestens eine echte öffentliche Plattformvorschau oder ein echter Plattformcrawler wurde mit Datum, Plattform, URL und Ergebnis dokumentiert.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "external-platform",
+            "instructions": "Echte öffentliche Plattformvorschau oder echten Plattformcrawler verwenden und Darstellung, Zuschnitt sowie gegebenenfalls Cacheverhalten dokumentieren; lokale User-Agent-Simulation nicht als Plattformnachweis ausgeben."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-ROB-01",
+      "module": "core",
+      "statement": "`robots.txt` ist öffentlich erreichbar, syntaktisch plausibel und blockiert keine für die gewünschte Indexierung notwendigen Seiten oder Ressourcen.",
+      "criteria": [
+        {
+          "id": "CORE-ROB-01/C1",
+          "statement": "robots.txt wurde erfolgreich ausgewertet und blockiert die vorgesehenen Social-Crawler auf den geprüften Seiten nicht.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["social.robots.file-retrievable", "social.robots.social-crawlers-allowed"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-ROB-01/C2",
+          "statement": "Die robots.txt-Regeln wurden gegen die projektspezifisch gewünschte Indexierung notwendiger Seiten und Ressourcen bewertet.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Gewünschte Indexierung und erforderliche Seiten beziehungsweise Ressourcen mit den ausgelieferten Regeln abgleichen; robots.txt nicht als Zugriffsschutz bewerten."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-ROB-02",
+      "module": "core",
+      "statement": "Aktuelle, offiziell dokumentierte Kennungen wichtiger Social-, Such-, KI-Such-, Nutzerabruf- und Trainingsdienste sowie reine Produkt- beziehungsweise Datennutzungstokens werden mit dokumentiertem Quellenstand getrennt bewertet.",
+      "criteria": [
+        {
+          "id": "CORE-ROB-02/C1",
+          "statement": "Der technische Bericht dokumentiert die geprüften Kennungen, Kategorien, offiziellen Quellen und den Quellenstand der Policy-Matrix.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["social.robots.policy-matrix-recorded"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-ROB-02/C2",
+          "statement": "Quellenstand und Auswahl der Kennungen wurden auf ausreichende Aktualität und projektspezifische Relevanz bewertet.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Quellenstand, relevante Anbieter und erkennbare Richtlinienänderungen prüfen; der im Werkzeug eingebettete Stand ist kein automatischer Aktualitätsnachweis."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-ROB-04",
+      "module": "core",
+      "statement": "Die automatisierte Prüfung warnt vor jedem ohne dokumentiertes Opt-in erlaubten Training-/Datennutzungstoken und behandelt diese Warnungen im Standardaufruf mit `--strict` als Fehler. `--ai-training-opt-in` wird ausschließlich nach ausdrücklicher dokumentierter Freigabe verwendet und verändert keine Robots-Regel. `robots.txt` wird nicht als Zugriffsschutz, Rechtsgarantie oder rückwirkende Löschung dargestellt.",
+      "criteria": [
+        {
+          "id": "CORE-ROB-04/C1",
+          "statement": "Trainings-/Datennutzungstokens sind blockiert oder der strikte technische Lauf deklariert ausdrücklich ein separat nachzuweisendes Opt-in.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["social.robots.training-access-blocked-or-declared", "social.run.strict-mode-recorded"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-ROB-04/C2",
+          "statement": "Die projektspezifische Opt-out- beziehungsweise Opt-in-Entscheidung ist mit zuständiger Stelle, Umfang und Datum dokumentiert.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "administrative",
+            "instructions": "Standardmäßiges Opt-out oder ausdrückliche Trainingsfreigabe dokumentieren; die CLI-Option allein gilt nicht als Betreiber- beziehungsweise Kundenfreigabe."
           }
         }
       ]

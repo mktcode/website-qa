@@ -117,7 +117,7 @@ function redactPath(value) {
 
 export function redactText(value, maximumLength = 1000, options = {}) {
   return String(value)
-    .replace(/https?:\/\/[^\s"')<>]+/gi, match => reportUrl(match, options).url)
+    .replace(/https?:\/\/(?!\[)[^\s"')<>]+/gi, match => reportUrl(match, options).url)
     .replace(/\b(token|secret|password|authorization|code)=[^\s&,;]+/gi, '$1=[REDACTED]')
     .replace(/\bbearer\s+[\w.~+/=-]+/gi, 'Bearer [REDACTED]')
     .replace(/\b[\w.!#$%&'*+/=?^`{|}~-]+@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+\b/gi, '[REDACTED_EMAIL]')

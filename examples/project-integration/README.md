@@ -6,7 +6,7 @@ Diese Dateien sind allgemeine Kopiervorlagen. Vor Verwendung müssen URL, Auswer
 2. `website-qa-report.mjs` als `scripts/website-qa-report.mjs` kopieren.
 3. Die Einträge aus `package-scripts.json` in das Ziel-`package.json` übernehmen.
 4. Den Inhalt von `gitignore.txt` in die projektseitige `.gitignore` übernehmen.
-5. HTTP, Crawl und Browser bewusst einzeln ausführen; anschließend `npm run qa:report` starten.
+5. HTTP, Crawl, Browser und Social bewusst einzeln ausführen; anschließend `npm run qa:report` starten.
 
 Ein Exitcode 1 ist ein fachlicher Befund und der zugehörige JSON-Bericht bleibt auswertbar. Ein Exitcode 2 ist ein Laufzeit- oder Aufruffehler und muss vor der Berichtserzeugung behoben werden.
 
