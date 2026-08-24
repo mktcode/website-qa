@@ -6,13 +6,15 @@
 import { XMLParser, XMLValidator } from 'fast-xml-parser'
 import { parse } from 'parse5'
 import { checklistItemIdsForTool, evaluatePilotChecklist } from './lib/checklist-report.mjs'
-import { fetchResource, normalizeMimeType, validateUrl } from './lib/http-client.mjs'
+import { fetchResource, normalizeMimeType, redactReportData, redactText, reportUrl, validateUrl } from './lib/http-client.mjs'
+import { writeJsonOutput } from './lib/json-output.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
 
 const defaultOptions = {
   allowHttp: false,
   allowPrivate: false,
   json: false,
+  jsonFile: undefined,
   maxHtmlBytes: 5 * 1024 * 1024,
   maxPages: 50,
   maxRedirects: 5,
@@ -78,7 +80,8 @@ Optionen:
   --max-resources=<Anzahl>  Höchstens so viele Seitenressourcen prüfen (Standard: 500)
   --timeout=<Millisek.>     Timeout je GET-Abruf (Standard: 15000)
   --max-redirects=<N>       Maximale Anzahl Weiterleitungen (Standard: 5)
-  --json                    Maschinenlesbare JSON-Ausgabe
+  --json                    Maschinenlesbare JSON-Ausgabe auf stdout
+  --json-file=<Pfad>        JSON atomar in eine lokale Datei schreiben
   --strict                  Warnungen führen ebenfalls zu Exitcode 1
   --allow-http              HTTP-Eingabe für lokale Prüfungen erlauben
   --allow-private           localhost und private IP-Adressen erlauben
@@ -113,6 +116,13 @@ export function parseArguments(argv) {
     }
     else if (argument === '--strict') {
       options.strict = true
+    }
+    else if (argument.startsWith('--json-file=')) {
+      options.json = true
+      options.jsonFile = argument.slice('--json-file='.length)
+      if (!options.jsonFile) {
+        throw new Error('--json-file benötigt einen Pfad.')
+      }
     }
     else if (argument === '--allow-http') {
       options.allowHttp = true
@@ -1178,15 +1188,23 @@ function summarize(results, strict) {
 }
 
 export function createJsonReport(results, options) {
+  const reportedResults = redactReportData(results, '', { hideHosts: options.allowPrivate })
+  for (let index = 0; index < reportedResults.length; index += 1) {
+    const parameterNames = reportUrl(results[index].requestedUrl).parameterNames
+    if (parameterNames.length > 0) {
+      reportedResults[index].requestedUrlParameterNames = parameterNames
+    }
+  }
   return {
-    checklistCoverage: checklistCoverage(results),
+    checklistCoverage: checklistCoverage(reportedResults),
     generatedAt: new Date().toISOString(),
     options: {
       maxPages: options.maxPages,
       maxRedirects: options.maxRedirects,
       maxResources: options.maxResources,
+      privateTargetsRedacted: Boolean(options.allowPrivate),
       sitemap: options.sitemap,
-      sitemapUrl: options.sitemapUrl,
+      sitemapUrl: redactReportData(options.sitemapUrl, 'sitemapUrl'),
       strict: options.strict,
       timeoutMilliseconds: options.timeoutMilliseconds,
     },
@@ -1197,9 +1215,9 @@ export function createJsonReport(results, options) {
       formsSubmitted: false,
       methods: ['GET'],
     },
-    results,
+    results: reportedResults,
     schemaVersion: 1,
-    summary: summarize(results, options.strict),
+    summary: summarize(reportedResults, options.strict),
     tool: 'crawl-check',
     toolPackage: { name: packageName, version: packageVersion },
   }
@@ -1265,8 +1283,10 @@ export async function runCrawlCheck(inputUrls, options = {}) {
 }
 
 async function main() {
+  let parsed
   try {
-    const { options, urls } = parseArguments(process.argv.slice(2))
+    parsed = parseArguments(process.argv.slice(2))
+    const { options, urls } = parsed
     if (options.help) {
       console.log(usage())
       return
@@ -1277,33 +1297,50 @@ async function main() {
 
     const report = await runCrawlCheck(urls, options)
     if (options.json) {
-      console.log(JSON.stringify(createJsonReport(report.results, options), null, 2))
+      const jsonReport = createJsonReport(report.results, options)
+      if (options.jsonFile) {
+        writeJsonOutput(options.jsonFile, jsonReport)
+      }
+      else {
+        console.log(JSON.stringify(jsonReport, null, 2))
+      }
     }
     else {
-      printText(report.results, options)
+      printText(redactReportData(report.results, '', { hideHosts: options.allowPrivate }), options)
     }
     if (report.summary.failed) {
       process.exitCode = 1
     }
   }
   catch (error) {
-    if (process.argv.includes('--json')) {
-      console.log(JSON.stringify({
-        error: error.message,
-        readOnlyGuarantees: {
-          buttonsActivated: false,
-          externalLinksFetched: false,
-          formActionsFetched: false,
-          formsSubmitted: false,
-          methods: ['GET'],
-        },
-        schemaVersion: 1,
-        summary: { errors: 1, failed: true, pages: 0, resources: 0, warnings: 0 },
-        tool: 'crawl-check',
-      }, null, 2))
+    const errorReport = {
+      error: redactText(error.message),
+      readOnlyGuarantees: {
+        buttonsActivated: false,
+        externalLinksFetched: false,
+        formActionsFetched: false,
+        formsSubmitted: false,
+        methods: ['GET'],
+      },
+      schemaVersion: 1,
+      summary: { errors: 1, failed: true, pages: 0, resources: 0, warnings: 0 },
+      tool: 'crawl-check',
+    }
+    if (process.argv.includes('--json') || parsed?.options?.json) {
+      if (parsed?.options?.jsonFile) {
+        try {
+          writeJsonOutput(parsed.options.jsonFile, errorReport)
+        }
+        catch (outputError) {
+          console.error(`Fehler beim Schreiben des JSON-Berichts: ${redactText(outputError.message)}`)
+        }
+      }
+      else {
+        console.log(JSON.stringify(errorReport, null, 2))
+      }
     }
     else {
-      console.error(`Fehler: ${error.message}`)
+      console.error(`Fehler: ${redactText(error.message)}`)
     }
     process.exitCode = 2
   }

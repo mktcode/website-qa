@@ -7,7 +7,8 @@ import { fileTypeFromBuffer } from 'file-type'
 import { parse } from 'parse5'
 import robotsParser from 'robots-parser'
 import sharp from 'sharp'
-import { fetchResource, normalizeMimeType, validateUrl } from './lib/http-client.mjs'
+import { fetchResource, normalizeMimeType, redactReportData, redactText, validateUrl } from './lib/http-client.mjs'
+import { writeJsonOutput } from './lib/json-output.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
 
 const defaultOptions = {
@@ -15,6 +16,7 @@ const defaultOptions = {
   allowHttp: false,
   allowPrivate: false,
   json: false,
+  jsonFile: undefined,
   maxHtmlBytes: 2 * 1024 * 1024,
   maxImageBytes: 10 * 1024 * 1024,
   maxPages: 50,
@@ -244,7 +246,8 @@ Aufruf:
   website-qa-social <URL> [weitere URL ...] [Optionen]
 
 Optionen:
-  --json                 Maschinenlesbare JSON-Ausgabe
+  --json                 Maschinenlesbare JSON-Ausgabe auf stdout
+  --json-file=<Pfad>     JSON atomar in eine lokale Datei schreiben
   --strict               Warnungen führen ebenfalls zu Exitcode 1
   --ai-training-opt-in   Dokumentierte ausdrückliche KI-Trainingsfreigabe bestätigen
                          (ändert robots.txt nicht; unterdrückt nur diese Warnung)
@@ -284,6 +287,13 @@ export function parseArguments(argv) {
     }
     else if (argument === '--strict') {
       options.strict = true
+    }
+    else if (argument.startsWith('--json-file=')) {
+      options.json = true
+      options.jsonFile = argument.slice('--json-file='.length)
+      if (!options.jsonFile) {
+        throw new Error('--json-file benötigt einen Pfad.')
+      }
     }
     else if (argument === '--ai-training-opt-in') {
       options.aiTrainingOptIn = true
@@ -929,8 +939,8 @@ function compactMetadata(metadataResult) {
   }
 }
 
-function jsonResult(results, options) {
-  return {
+export function createJsonReport(results, options) {
+  return redactReportData({
     generatedAt: new Date().toISOString(),
     results: results.map(result => ({
       agents: result.agents,
@@ -942,11 +952,12 @@ function jsonResult(results, options) {
       robots: result.robots,
     })),
     aiTrainingOptIn: options.aiTrainingOptIn,
+    privateTargetsRedacted: Boolean(options.allowPrivate),
     robotsPolicyReviewedAt,
     summary: summarize(results, options.strict),
     tool: 'social-preview-check',
     toolPackage: { name: packageName, version: packageVersion },
-  }
+  }, '', { hideHosts: options.allowPrivate })
 }
 
 function printText(results, options) {
@@ -1021,8 +1032,10 @@ export async function runSocialPreviewCheck(inputUrls, options = {}) {
 }
 
 async function main() {
+  let parsed
   try {
-    const { options, urls } = parseArguments(process.argv.slice(2))
+    parsed = parseArguments(process.argv.slice(2))
+    const { options, urls } = parsed
     if (options.help) {
       console.log(usage())
       return
@@ -1033,27 +1046,43 @@ async function main() {
 
     const report = await runSocialPreviewCheck(urls, options)
     if (options.json) {
-      console.log(JSON.stringify(jsonResult(report.results, options), null, 2))
+      const output = createJsonReport(report.results, options)
+      if (options.jsonFile) {
+        writeJsonOutput(options.jsonFile, output)
+      }
+      else {
+        console.log(JSON.stringify(output, null, 2))
+      }
     }
     else {
-      printText(report.results, options)
+      printText(redactReportData(report.results, '', { hideHosts: options.allowPrivate }), options)
     }
     if (report.summary.failed) {
       process.exitCode = 1
     }
   }
   catch (error) {
-    const wantsJson = process.argv.includes('--json')
-    if (wantsJson) {
-      console.log(JSON.stringify({
-        error: error.message,
-        robotsPolicyReviewedAt,
-        summary: { errors: 1, failed: true, pages: 0, warnings: 0 },
-        tool: 'social-preview-check',
-      }, null, 2))
+    const errorReport = {
+      error: redactText(error.message),
+      robotsPolicyReviewedAt,
+      summary: { errors: 1, failed: true, pages: 0, warnings: 0 },
+      tool: 'social-preview-check',
+    }
+    if (process.argv.includes('--json') || parsed?.options?.json) {
+      if (parsed?.options?.jsonFile) {
+        try {
+          writeJsonOutput(parsed.options.jsonFile, errorReport)
+        }
+        catch (outputError) {
+          console.error(`Fehler beim Schreiben des JSON-Berichts: ${redactText(outputError.message)}`)
+        }
+      }
+      else {
+        console.log(JSON.stringify(errorReport, null, 2))
+      }
     }
     else {
-      console.error(`Fehler: ${error.message}`)
+      console.error(`Fehler: ${redactText(error.message)}`)
     }
     process.exitCode = 2
   }

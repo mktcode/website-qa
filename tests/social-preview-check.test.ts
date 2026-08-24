@@ -3,6 +3,7 @@ import { createServer } from 'node:http'
 import sharp from 'sharp'
 import { afterEach, describe, expect, it } from 'vitest'
 import {
+  createJsonReport,
   extractHtmlMetadata,
   parseArguments,
   robotsPolicies,
@@ -29,7 +30,7 @@ describe('social preview checker', () => {
   it('parses URLs and reusable CLI options', () => {
     const parsed = parseArguments([
       'https://example.com/',
-      '--json',
+      '--json-file=.website-qa/current/social.json',
       '--strict',
       '--ai-training-opt-in',
       '--sitemap',
@@ -41,6 +42,7 @@ describe('social preview checker', () => {
     expect(parsed.options).toMatchObject({
       aiTrainingOptIn: true,
       json: true,
+      jsonFile: '.website-qa/current/social.json',
       maxPages: 12,
       sitemap: true,
       strict: true,
@@ -170,6 +172,9 @@ describe('social preview checker', () => {
     expect(result.agents).toHaveLength(4)
     expect(result.images[0]).toMatchObject({ height: 630, width: 1200 })
     expect(result.robots.policies).toHaveLength(robotsPolicies.length)
+    const jsonReport = createJsonReport(report.results, report.options)
+    expect(JSON.stringify(jsonReport)).not.toContain('127.0.0.1')
+    expect(JSON.stringify(jsonReport)).toContain('(privates/lokales Ziel)')
     expect([...seenUserAgents]).toEqual(expect.arrayContaining([
       expect.stringContaining('SocialPreviewCheck'),
       expect.stringContaining('facebookexternalhit'),

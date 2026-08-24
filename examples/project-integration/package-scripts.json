@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "qa:http": "website-qa-http https://example.com/ --strict --json-file=.website-qa/current/http.json",
+    "qa:crawl": "website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json-file=.website-qa/current/crawl.json",
+    "qa:browser": "website-qa-browser https://example.com/ --sitemap --max-pages=10 --max-requests=300 --strict --json-file=.website-qa/current/browser.json",
+    "qa:report": "node scripts/website-qa-report.mjs"
+  }
+}

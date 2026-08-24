@@ -53,7 +53,7 @@ describe('http checker', () => {
   it('parses URLs and safe CLI options', () => {
     const parsed = parseArguments([
       'https://example.com/',
-      '--json',
+      '--json-file=.website-qa/current/http.json',
       '--strict',
       '--timeout=5000',
       '--max-redirects=3',
@@ -65,6 +65,7 @@ describe('http checker', () => {
     expect(parsed.options).toMatchObject({
       checkHttpRedirect: false,
       json: true,
+      jsonFile: '.website-qa/current/http.json',
       maxRedirects: 3,
       notFoundPath: '/missing?source=qa',
       strict: true,
@@ -162,8 +163,10 @@ describe('http checker', () => {
     expect(json).toMatchObject({
       checklistCoverage: { catalog: { status: 'pilot' } },
       readOnlyGuarantees: { methods: ['GET'], mutatingActionsInvoked: false },
+      results: [{ requestedUrl: '(privates/lokales Ziel)', requestedUrlParameterNames: ['source'] }],
       schemaVersion: 1,
     })
+    expect(JSON.stringify(json)).not.toContain('source=qa')
   })
 
   it('reports missing protections, compression and a soft 404', async () => {

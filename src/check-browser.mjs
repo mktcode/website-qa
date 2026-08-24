@@ -8,7 +8,8 @@ import axe from 'axe-core'
 import puppeteer from 'puppeteer-core'
 import { parseSitemapXml, readOnlyNavigationConcern } from './check-crawl.mjs'
 import { checklistItemIdsForTool, evaluatePilotChecklist } from './lib/checklist-report.mjs'
-import { assertPublicResolution, fetchResource, normalizeMimeType, validateUrl } from './lib/http-client.mjs'
+import { assertPublicResolution, fetchResource, normalizeMimeType, redactReportData, redactText, reportUrl, validateUrl } from './lib/http-client.mjs'
+import { writeJsonOutput } from './lib/json-output.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
 
 const defaultProfiles = ['desktop', 'mobile', 'narrow', 'reduced-motion', 'zoom-200']
@@ -25,6 +26,7 @@ const defaultOptions = {
   allowPrivate: false,
   chromiumPath: undefined,
   json: false,
+  jsonFile: undefined,
   maxPages: 10,
   maxRedirects: 5,
   maxRequests: 300,
@@ -52,7 +54,8 @@ Optionen:
   --timeout=<Millisek.>     Navigations- und Browser-Timeout (Standard: 20000)
   --settle=<Millisek.>      Beobachtungszeit nach DOMContentLoaded (Standard: 750)
   --chromium-path=<Pfad>    Chromium-/Chrome-Binärdatei
-  --json                    Maschinenlesbare JSON-Ausgabe
+  --json                    Maschinenlesbare JSON-Ausgabe auf stdout
+  --json-file=<Pfad>        JSON atomar in eine lokale Datei schreiben
   --strict                  Warnungen führen ebenfalls zu Exitcode 1
   --allow-http              HTTP-Eingabe für lokale Prüfungen erlauben
   --allow-private           localhost und private IP-Adressen erlauben
@@ -95,6 +98,13 @@ export function parseArguments(argv) {
     }
     else if (argument === '--strict') {
       options.strict = true
+    }
+    else if (argument.startsWith('--json-file=')) {
+      options.json = true
+      options.jsonFile = argument.slice('--json-file='.length)
+      if (!options.jsonFile) {
+        throw new Error('--json-file benötigt einen Pfad.')
+      }
     }
     else if (argument === '--allow-http') {
       options.allowHttp = true
@@ -163,29 +173,6 @@ function comparableUrl(value) {
   const url = new URL(value)
   url.hash = ''
   return url.href
-}
-
-function reportUrl(value) {
-  try {
-    const url = new URL(value)
-    const parameterNames = [...new Set(url.searchParams.keys())]
-    url.search = ''
-    url.hash = ''
-    return {
-      parameterNames,
-      url: url.href,
-    }
-  }
-  catch {
-    return { parameterNames: [], url: '(ungültige URL)' }
-  }
-}
-
-function redactText(value) {
-  return String(value)
-    .replace(/https?:\/\/[^\s"')]+/gi, match => reportUrl(match).url)
-    .replace(/\b(token|secret|password|authorization|code)=[^\s&]+/gi, '$1=[REDACTED]')
-    .slice(0, 1000)
 }
 
 function issueKey(issue) {
@@ -923,9 +910,14 @@ export async function runBrowserCheck(input, suppliedOptions = {}) {
 }
 
 export function createJsonReport(inputResult, options) {
-  const result = Array.isArray(inputResult.assertions)
+  const assertionResult = Array.isArray(inputResult.assertions)
     ? inputResult
     : { ...inputResult, assertions: createBrowserAssertions(inputResult) }
+  const result = redactReportData(assertionResult, '', { hideHosts: options.allowPrivate })
+  const parameterNames = reportUrl(assertionResult.requestedUrl).parameterNames
+  if (parameterNames.length > 0) {
+    result.requestedUrlParameterNames = parameterNames
+  }
   const errors = result.issues.filter(issue => issue.severity === 'error').length
   const warnings = result.issues.filter(issue => issue.severity === 'warning').length
   const pages = new Set(result.profiles.map(profile => profile.url)).size
@@ -935,6 +927,7 @@ export function createJsonReport(inputResult, options) {
     options: {
       maxPages: options.maxPages,
       maxRequests: options.maxRequests,
+      privateTargetsRedacted: Boolean(options.allowPrivate),
       profiles: options.profiles,
       sitemap: options.sitemap,
       strict: options.strict,
@@ -1003,7 +996,12 @@ async function main() {
     const result = await runBrowserCheck(parsed.urls[0], parsed.options)
     const report = createJsonReport(result, parsed.options)
     if (parsed.options.json) {
-      console.log(JSON.stringify(report, null, 2))
+      if (parsed.options.jsonFile) {
+        writeJsonOutput(parsed.options.jsonFile, report)
+      }
+      else {
+        console.log(JSON.stringify(report, null, 2))
+      }
     }
     else {
       printReport(report)
@@ -1011,8 +1009,19 @@ async function main() {
     process.exitCode = report.summary.failed ? 1 : 0
   }
   catch (error) {
+    const errorReport = { error: redactText(error.message), schemaVersion: 1, tool: 'browser-check', toolPackage: { name: packageName, version: packageVersion } }
     if (parsed?.options?.json) {
-      console.log(JSON.stringify({ error: redactText(error.message), schemaVersion: 1, tool: 'browser-check', toolPackage: { name: packageName, version: packageVersion } }, null, 2))
+      if (parsed.options.jsonFile) {
+        try {
+          writeJsonOutput(parsed.options.jsonFile, errorReport)
+        }
+        catch (outputError) {
+          console.error(`Fehler beim Schreiben des JSON-Berichts: ${redactText(outputError.message)}`)
+        }
+      }
+      else {
+        console.log(JSON.stringify(errorReport, null, 2))
+      }
     }
     else {
       console.error(`FEHLER: ${redactText(error.message)}`)

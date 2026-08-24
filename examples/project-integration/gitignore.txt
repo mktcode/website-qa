@@ -1,0 +1,4 @@
+# Vollständige lokale Website-QA-Läufe, Rohberichte und Arbeitsdateien
+.website-qa/
+
+# docs/website-qa/berichte/ bleibt bewusst versionierbar.

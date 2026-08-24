@@ -61,13 +61,14 @@ describe('crawl checker', () => {
       '--max-resources=200',
       '--max-redirects=3',
       '--timeout=5000',
-      '--json',
+      '--json-file=.website-qa/current/crawl.json',
       '--strict',
     ])
 
     expect(parsed.urls).toEqual(['https://example.com/'])
     expect(parsed.options).toMatchObject({
       json: true,
+      jsonFile: '.website-qa/current/crawl.json',
       maxPages: 25,
       maxRedirects: 3,
       maxResources: 200,
@@ -186,7 +187,7 @@ describe('crawl checker', () => {
             <a href="/about#section">Über uns</a>
             <a href="/private">Privat</a>
             <a href="/download.pdf">Download</a>
-            <a href="https://external.example/path">Extern</a>
+            <a href="https://external.example/path?email=person%40example.com">Extern</a>
             <form action="/submit" method="post"><button type="submit">Absenden</button></form>`,
           description: 'Eindeutige Beschreibung der Startseite',
           title: 'Startseite',
@@ -240,6 +241,10 @@ describe('crawl checker', () => {
       },
       schemaVersion: 1,
     })
+    expect(JSON.stringify(jsonReport)).not.toContain('person%40example.com')
+    expect(JSON.stringify(jsonReport)).not.toContain('person@example.com')
+    expect(JSON.stringify(jsonReport)).not.toContain('127.0.0.1')
+    expect(JSON.stringify(jsonReport)).toContain('(privates/lokales Ziel)')
     expect(result.sitemaps).toHaveLength(2)
     expect(result.pages).toHaveLength(3)
     expect(result.resources).toHaveLength(5)

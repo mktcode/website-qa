@@ -1,8 +1,10 @@
 # Planung: einfache Projektintegration und lokale Website-QA-Berichte
 
-> **Status:** Diskussions- und Implementierungsplan, noch kein veröffentlichter Schnittstellenvertrag.
+> **Status:** Implementiert für Paketversion `0.2.0`; Praxisumstellung und Release-Tag bleiben bewusste Folgeschritte.
 >
 > Diese Planung beschreibt ein frameworkunabhängiges Refactoring von `@mktcode/website-qa`. Sie enthält keine ausgefüllten Nachweise oder Vorgaben für eine bestimmte Website.
+>
+> Implementiert sind die gemeinsame Berichtsredaktion, `--json-file`, automatisch datierte lokale Bundles, bytegleiche technische Rohberichte, das Prüfsummenmanifest, der getrennte Whitelist-Markdownrenderer und kopierbare Projektvorlagen. Die bisherige programmatische Reporting-API bleibt erhalten. Noch nicht erfolgt sind die Umstellung eines neuen echten Projektprüfstands und die bewusste Veröffentlichung eines Tags.
 
 ## 1. Ausgangslage
 
@@ -30,7 +32,7 @@ Die bisherige Projektintegration ist jedoch noch zu aufwendig:
 - im Praxispilot wurden technische Berichte einmalig außerhalb einer öffentlichen API verkleinert;
 - das README zeigt APIs, aber noch keinen vollständigen Weg von Installation bis archiviertem Projektbericht;
 - die URL-Redaktion ist zwischen HTTP, Crawl und Browser noch nicht einheitlich;
-- die README-Installation verweist noch auf `v0.1.0`, obwohl der Berichtspilot erst danach entstanden ist.
+- die README-Installation verwies vor dem Refactoring noch auf `v0.1.0`, obwohl der Berichtspilot erst danach entstanden war.
 
 ## 2. Geänderte Nutzungsannahme
 
@@ -536,17 +538,15 @@ Die Beispiele dürfen keine reale Domain, projektspezifische Route, Seitenzahl, 
 - Berichtserzeugung ohne Netzwerkzugriff;
 - `.gitignore` lässt nur die vorgesehene Markdown-Zusammenfassung sichtbar.
 
-## 18. Offene Detailentscheidungen
+## 18. Entschiedene Detailfragen
 
-Diese Punkte sind vor der Implementierung festzulegen:
-
-1. **Zusammenfassungsverlauf:** Erhält jeder Lauf eine neue versionierbare Markdown-Datei oder wird zusätzlich eine stabile `latest.md` gepflegt? Empfehlung: datierte Dateien als Nachweishistorie; `latest.md` zunächst vermeiden.
-2. **Zeitformat:** Sekundenauflösung mit Kollisionssuffix oder Millisekunden im Ordnernamen? Empfehlung: Sekundenauflösung plus geschlossenes Kollisionsverhalten.
-3. **Öffentliche Bezeichnung:** Soll eine Projektbezeichnung in der sicheren Zusammenfassung standardmäßig fehlen oder über ein ausdrückliches Feld freigegeben werden? Empfehlung: standardmäßig fehlen.
-4. **Technische Dateierzeugung:** Neue sichere CLI-Option für JSON-Dateien oder projektlokaler Node-Wrapper? Diese Entscheidung benötigt eine kleine Bedrohungs- und Portabilitätsbewertung.
-5. **Abgebrochene Läufe:** Nur Diagnose im Arbeitsbereich oder explizites unvollständiges Bundle? Empfehlung für Version 1: Diagnose behalten, aber kein scheinbar vollständiges Bundle erzeugen.
-6. **Manifestbefehle:** Exakte redigierte Befehle zusätzlich im Manifest oder ausschließlich im vollständigen Bericht? Empfehlung: keine unnötige Duplizierung.
-7. **Eingabesnapshots:** Sollen Projektkonfiguration und manuelle Nachweisdatei zusätzlich in das ignorierte Bundle kopiert werden? Empfehlung für Version 1: nicht blind kopieren; Reportrecords und Prüfsummen der Quellen genügen, bis relative Referenzen formalisiert sind.
+1. **Zusammenfassungsverlauf:** Jeder Lauf erzeugt eine datierte Markdown-Datei; eine automatisch gepflegte `latest.md` gibt es zunächst nicht.
+2. **Zeitformat:** Der Dateiname verwendet UTC mit Sekundenauflösung. Eine Kollision bricht geschlossen ab und überschreibt keine vorhandene Datei.
+3. **Öffentliche Bezeichnung:** Projektbezeichnung und URL fehlen standardmäßig. Sie werden ausschließlich über `publicProject` ausdrücklich für die Zusammenfassung freigegeben.
+4. **Technische Dateierzeugung:** Alle vier CLIs unterstützen `--json-file=<Pfad>`. Die Option impliziert JSON, legt Elternverzeichnisse an und ersetzt die lokale Arbeitsdatei atomar.
+5. **Abgebrochene Läufe:** Diagnoseoutput bleibt im Arbeitsbereich; strukturell unvollständige Berichte erzeugen kein scheinbar vollständiges Bundle.
+6. **Manifestbefehle:** Das Manifest dupliziert keine exakten Befehle. Diese stehen nur im vollständigen, ignorierten Bericht.
+7. **Eingabesnapshots:** Projektkonfiguration und manuelle Nachweisdatei werden nicht blind in das Bundle kopiert. Der ausgewertete Bericht enthält die relevanten Records; relative Referenzen werden dadurch nicht stillschweigend umgedeutet.
 
 ## 19. Definition of Done
 

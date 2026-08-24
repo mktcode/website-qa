@@ -56,6 +56,8 @@ Der Pilot ersetzt diese vollständige Markdown-Vorlage noch nicht. Ein Konsisten
 
 Die Reporting-Bibliothek kann technische JSON-Läufe und den strukturierten Projektnachweis zu einer JSON- und Markdown-Sicht zusammenführen. Sie startet keine Prüfer selbst. Die Auswertungsumgebung wird in der Projektkonfiguration festgelegt und die Ziel-URL gegen den technischen Bericht geprüft. Quell- und Deploymentstand sind projektseitig deklarierte Zuordnungen, keine unabhängige Werkzeugbestätigung. Workflowzustände wie `Extern`, `Zurückgestellt` oder `Akzeptierte Abweichung` bleiben von einem technischen `pass` getrennt und schließen einen offenen Punkt nicht als erfüllt ab.
 
+Für bewusst gestartete lokale Prüfserien kann die Bibliothek ein automatisch datiertes, standardmäßig ignoriertes Bundle aus vollständigen technischen JSON-Berichten, strukturierter Gesamtauswertung, vollständigem Markdown und Prüfsummenmanifest erzeugen. Eine getrennte datenarme Markdown-Zusammenfassung übernimmt nur allgemeine Statuszahlen, stabile Kennungen und Katalogtexte. Sie kann nach projektspezifischer Sichtprüfung versioniert werden. Vollständige Rohberichte, freie Nachweisnotizen oder interne Kontextangaben gehören nicht in diese Zusammenfassung.
+
 ## Anforderungen an Nachweise
 
 Ein belastbarer Nachweis nennt, soweit einschlägig:

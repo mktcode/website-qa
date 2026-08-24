@@ -37,11 +37,14 @@ describe('browser check', () => {
       '--max-requests=80',
       '--profiles=desktop,narrow',
       '--settle=0',
+      '--json-file=.website-qa/current/browser.json',
       '--strict',
     ])
 
     expect(parsed.urls).toEqual(['https://example.com/'])
     expect(parsed.options).toMatchObject({
+      json: true,
+      jsonFile: '.website-qa/current/browser.json',
       maxPages: 4,
       maxRequests: 80,
       profiles: ['desktop', 'narrow'],
@@ -87,7 +90,7 @@ describe('browser check', () => {
         { facts: { overflow: { clientWidth: 320, scrollWidth: 320 } }, profile: 'narrow', url: 'https://example.com/' },
         { facts: { overflow: { clientWidth: 640, scrollWidth: 640 } }, profile: 'zoom-200', url: 'https://example.com/' },
       ],
-      requestedUrl: 'https://example.com/',
+      requestedUrl: 'https://example.com/?session=private-value',
     }
     const report = createJsonReport(result, {
       maxPages: 10,
@@ -114,6 +117,11 @@ describe('browser check', () => {
       schemaVersion: 1,
       summary: { errors: 0, failed: false, pages: 1, warnings: 0 },
     })
+    expect(report.result).toMatchObject({
+      requestedUrl: 'https://example.com/',
+      requestedUrlParameterNames: ['session'],
+    })
+    expect(JSON.stringify(report)).not.toContain('private-value')
     expect(report.result.assertions).toHaveLength(5)
     expect(report.result.assertions.every((assertion: { outcome: string }) => assertion.outcome === 'pass')).toBe(true)
   })
@@ -197,5 +205,16 @@ describe('browser check', () => {
     expect(typedResult.assertions.find(assertion => assertion.assertionId === 'browser.context.chromium-headless-recorded')?.outcome).toBe('pass')
     expect(typedResult.assertions.filter(assertion => assertion.assertionId !== 'browser.context.chromium-headless-recorded').every(assertion => assertion.outcome === 'inconclusive')).toBe(true)
     expect(typedResult.profiles[0]?.facts.forms).toEqual([{ action: `${origin}/submit`, method: 'POST' }])
+    const jsonReport = createJsonReport(result, {
+      allowPrivate: true,
+      maxPages: 1,
+      maxRequests: 300,
+      profiles: ['desktop'],
+      sitemap: false,
+      strict: false,
+      timeoutMilliseconds: 20_000,
+    })
+    expect(JSON.stringify(jsonReport)).not.toContain('127.0.0.1')
+    expect(JSON.stringify(jsonReport)).toContain('(privates/lokales Ziel)')
   }, 30_000)
 })

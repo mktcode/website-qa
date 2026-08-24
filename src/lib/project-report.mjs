@@ -1,6 +1,20 @@
-import { readFileSync } from 'node:fs'
-import { dirname, resolve } from 'node:path'
+import { createHash } from 'node:crypto'
+import {
+  chmodSync,
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs'
+import { dirname, join, relative, resolve, sep } from 'node:path'
 import { evaluatePilotChecklist, loadPilotCatalog } from './checklist-report.mjs'
+import { redactReportData, redactText, reportUrl } from './http-client.mjs'
+import { packageName, packageVersion } from './package-info.mjs'
 
 const allowedItemStates = new Set(['acceptedDeviation', 'deferred', 'external', 'notApplicable'])
 const projectStatusOrder = ['complete', 'failed', 'partial', 'open', 'inconclusive', 'notApplicable', 'external', 'deferred', 'acceptedDeviation']
@@ -113,6 +127,8 @@ function validateTechnicalRun(run, config, catalog) {
   requireText(run.targetUrl, 'Ziel-URL eines technischen Laufs')
   const targetUrl = normalizeUrl(run.targetUrl, 'Ziel-URL eines technischen Laufs')
   const report = run.report
+  const privateTargetsRedacted = report?.options?.privateTargetsRedacted === true
+  const reportedTargetUrl = reportUrl(targetUrl, { hideHosts: privateTargetsRedacted }).url
   const results = technicalReportResults(report)
   if (report?.schemaVersion !== 1 || !results) {
     throw new Error(`Technischer Bericht ${run.reportFile || run.command} verwendet kein unterstütztes Schema.`)
@@ -121,11 +137,19 @@ function validateTechnicalRun(run, config, catalog) {
   requireText(report.tool, 'Werkzeugkennung des technischen Berichts')
   requireText(report.toolPackage?.version, 'Werkzeugversion des technischen Berichts')
   validateCatalogReference(report.checklistCoverage?.catalog, catalog, `Technischer Bericht ${run.reportFile || run.command}`)
-  const reportedTargetUrls = results
-    .map(result => result.requestedUrl)
-    .filter(Boolean)
-    .map(value => normalizeUrl(value, 'Ziel-URL im technischen Bericht'))
-  if (!reportedTargetUrls.includes(targetUrl)) {
+  const expectedParameterNames = reportUrl(targetUrl).parameterNames
+  const targetReported = results.some((result) => {
+    if (!result.requestedUrl) {
+      return false
+    }
+    const resultUrl = result.requestedUrl === '(privates/lokales Ziel)'
+      ? result.requestedUrl
+      : reportUrl(normalizeUrl(result.requestedUrl, 'Ziel-URL im technischen Bericht')).url
+    const parameterNames = result.requestedUrlParameterNames || []
+    return resultUrl === reportedTargetUrl
+      && JSON.stringify(parameterNames) === JSON.stringify(expectedParameterNames)
+  })
+  if (!targetReported) {
     throw new Error(`Technischer Bericht ${run.reportFile || run.command} weist die deklarierte Ziel-URL nicht aus.`)
   }
 
@@ -149,11 +173,11 @@ function validateTechnicalRun(run, config, catalog) {
     }),
     record: {
       assertionCount: results.reduce((sum, result) => sum + (result.assertions?.length || 0), 0),
-      command: run.command,
+      command: redactText(run.command, 10_000),
       contextProvenance: {
         deploymentId: 'projectDeclared',
         sourceRevision: 'projectDeclared',
-        targetUrl: 'verifiedFromTechnicalReport',
+        targetUrl: 'matchedAgainstRedactedTechnicalReport',
       },
       deploymentId: run.deploymentId,
       environment: run.environment,
@@ -161,7 +185,7 @@ function validateTechnicalRun(run, config, catalog) {
       reportFile: run.reportFile,
       sourceRevision: run.sourceRevision,
       summary: report.summary,
-      targetUrl,
+      targetUrl: reportedTargetUrl,
       tool: report.tool,
       toolPackage: report.toolPackage,
       usedForEvaluation: run.environment === config.project.evaluationEnvironment,
@@ -184,7 +208,7 @@ function countProjectStatuses(items) {
   return Object.fromEntries(projectStatusOrder.map(status => [status, items.filter(item => item.projectStatus === status).length]))
 }
 
-export function createPilotProjectReport({ config, evidenceDocument, technicalRuns }) {
+export function createPilotProjectReport({ config, evidenceDocument, generatedAt = new Date().toISOString(), technicalRuns }) {
   const catalog = loadPilotCatalog()
   const selectedItemIds = validateProjectConfiguration(config, catalog)
   const evidence = validateEvidenceDocument(evidenceDocument, catalog)
@@ -216,9 +240,14 @@ export function createPilotProjectReport({ config, evidenceDocument, technicalRu
     }
   })
 
-  return {
+  const reportGeneratedAt = generatedAt
+  if (Number.isNaN(new Date(reportGeneratedAt).valueOf())) {
+    throw new TypeError('Erstellungszeit des Projektberichts ist ungültig.')
+  }
+
+  return redactReportData({
     catalog: evaluated.catalog,
-    generatedAt: new Date().toISOString(),
+    generatedAt: reportGeneratedAt,
     items,
     limitations: [
       'Der strukturierte Katalog ist ein Pilot und umfasst noch nicht die vollständige Website-Checkliste.',
@@ -229,9 +258,9 @@ export function createPilotProjectReport({ config, evidenceDocument, technicalRu
     project: structuredClone(config.project),
     provenance: {
       deploymentAndSourceContext: 'projectDeclared',
-      targetUrlBinding: 'verifiedFromTechnicalReport',
+      targetUrlBinding: 'matchedAgainstRedactedTechnicalReport',
     },
-    schemaVersion: 1,
+    schemaVersion: 2,
     scope: {
       selectedItemIds,
       selectedModules: [...config.selectedModules],
@@ -246,7 +275,7 @@ export function createPilotProjectReport({ config, evidenceDocument, technicalRu
     },
     technicalRuns: runEvaluations.map(run => run.record),
     warnings,
-  }
+  })
 }
 
 export function createPilotProjectReportFromFiles(configFile) {
@@ -361,4 +390,266 @@ export function renderPilotProjectReportMarkdown(report) {
   }
   lines.push('', '## Grenzen', '', ...report.limitations.map(limitation => `- ${limitation}`), '')
   return lines.join('\n')
+}
+
+function publicLabelText(value) {
+  return markdownText(redactText(value, 200))
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('[', '\\[')
+    .replaceAll(']', '\\]')
+}
+
+function publicSummaryUrl(value) {
+  let url
+  try {
+    url = new URL(value)
+  }
+  catch {
+    throw new TypeError('Freigegebene öffentliche URL ist ungültig.')
+  }
+  if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) {
+    throw new TypeError('Freigegebene öffentliche URL muss HTTP oder HTTPS ohne Zugangsdaten verwenden.')
+  }
+  const reported = reportUrl(url.href).url
+  if (['(privates/lokales Ziel)', '(ungültige URL)'].includes(reported)) {
+    throw new TypeError('Freigegebene öffentliche URL ist keine berichtsfähige öffentliche URL.')
+  }
+  return reported
+}
+
+export function renderPilotProjectSummaryMarkdown(report, options = {}) {
+  const publicLabel = options.publicProject?.label
+    ? publicLabelText(options.publicProject.label)
+    : undefined
+  const publicUrl = options.publicProject?.url
+    ? publicSummaryUrl(options.publicProject.url)
+    : undefined
+  const title = publicLabel
+    ? `# Website-QA-Zusammenfassung: ${publicLabel}`
+    : '# Website-QA-Zusammenfassung'
+  const lines = [
+    title,
+    '',
+    '> Automatisch erzeugte, bewusst datenarme Übersicht. Der vollständige technische Bericht und seine Rohdaten werden standardmäßig nur lokal aufbewahrt.',
+    '',
+    '## Stand',
+    '',
+    '| Feld | Wert |',
+    '|---|---|',
+    `| Erstellt | ${markdownText(report.generatedAt)} |`,
+    `| Katalog | ${markdownText(report.catalog.id)} ${markdownText(report.catalog.version)} (${markdownText(report.catalog.status)}) |`,
+  ]
+
+  if (publicUrl) {
+    lines.push(`| Öffentlich freigegebene URL | ${markdownText(publicUrl)} |`)
+  }
+
+  lines.push(
+    '',
+    '## Zusammenfassung',
+    '',
+    '| Status | Anzahl |',
+    '|---|---:|',
+  )
+  for (const status of projectStatusOrder) {
+    lines.push(`| ${statusLabel(status)} | ${report.summary.checklistItems[status]} |`)
+  }
+  lines.push(
+    `| **Ausgewählte Pilotpunkte** | **${report.summary.checklistItems.total}** |`,
+    '',
+    `Automatische Kriterien: ${report.summary.automaticCriteria.pass} bestanden, ${report.summary.automaticCriteria.fail} fehlgeschlagen, ${report.summary.automaticCriteria.inconclusive} unklar, ${report.summary.automaticCriteria.noEvidence} ohne Nachweis.`,
+    '',
+    `Nicht automatische Kriterien: ${report.summary.nonAutomaticCriteria.pass} belegt, ${report.summary.nonAutomaticCriteria.fail} fehlgeschlagen, ${report.summary.nonAutomaticCriteria.noEvidence} ohne Nachweis.`,
+    '',
+    '## Technische Läufe',
+    '',
+    '| Werkzeug | Version | Für Auswertung verwendet | Assertions |',
+    '|---|---|---:|---:|',
+  )
+
+  for (const run of report.technicalRuns) {
+    lines.push(`| ${markdownText(run.tool)} | ${markdownText(run.toolPackage?.version || 'nicht angegeben')} | ${run.usedForEvaluation ? 'ja' : 'nein'} | ${run.assertionCount} |`)
+  }
+  if (report.technicalRuns.length === 0) {
+    lines.push('| – | – | nein | 0 |')
+  }
+
+  const unfinishedItems = report.items.filter(item => !['complete', 'notApplicable'].includes(item.projectStatus))
+  lines.push(
+    '',
+    '## Noch nicht vollständig nachgewiesene Pilotpunkte',
+    '',
+    '| ID | Status | Allgemeine Aussage |',
+    '|---|---|---|',
+  )
+  for (const item of unfinishedItems) {
+    lines.push(`| ${item.id} | ${statusLabel(item.projectStatus)} | ${markdownText(item.statement)} |`)
+  }
+  if (unfinishedItems.length === 0) {
+    lines.push('| – | Keine offenen Pilotpunkte | – |')
+  }
+
+  lines.push(
+    '',
+    '## Grenzen',
+    '',
+    '- Der strukturierte Katalog ist ein Pilot und umfasst noch nicht die vollständige Website-Checkliste.',
+    '- Automatische Ergebnisse sind technische Teilnachweise und ersetzen keine manuellen, externen, rechtlichen oder organisatorischen Prüfungen.',
+    '- Ein unauffälliger Axe-Lauf ist kein vollständiger WCAG-Nachweis.',
+    '- Headless-Chromium-Profile sind keine Prüfung realer Geräte, Safari-Browser oder Screenreader.',
+    '- Die Zusammenfassung enthält bewusst keine Rohbefunde, freien Nachweisnotizen, Personen, internen Umgebungskennungen oder lokalen Pfade.',
+    '- Vor einem Commit oder einer Veröffentlichung ist die Datei trotzdem projektspezifisch zu prüfen.',
+    '',
+  )
+  return lines.join('\n')
+}
+
+function bundleTimestamp(now) {
+  const date = now instanceof Date ? now : new Date(now)
+  if (Number.isNaN(date.valueOf())) {
+    throw new TypeError('Bundle-Zeitpunkt ist ungültig.')
+  }
+  return date.toISOString().replace(/\.\d{3}Z$/, 'Z').replaceAll(':', '-')
+}
+
+function portablePath(value) {
+  return value.split(sep).join('/')
+}
+
+function fileDigest(path) {
+  return createHash('sha256').update(readFileSync(path)).digest('hex')
+}
+
+function manifestFile(path, baseDirectory, role) {
+  return {
+    bytes: statSync(path).size,
+    path: portablePath(relative(baseDirectory, path)),
+    role,
+    sha256: fileDigest(path),
+  }
+}
+
+function technicalFileStem(tool) {
+  const stem = String(tool || 'technical-report')
+    .toLowerCase()
+    .replace(/-check$/, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+  return stem || 'technical-report'
+}
+
+function jsonWithNewline(value) {
+  return `${JSON.stringify(value, null, 2)}\n`
+}
+
+export function writePilotProjectReportBundle({
+  bundleDirectory = './.website-qa/reports',
+  configFile = '',
+  now = new Date(),
+  publicProject = {},
+  summaryDirectory = './docs/website-qa/berichte',
+} = {}) {
+  requireText(configFile, 'Projektberichtskonfiguration')
+  const absoluteConfigFile = resolve(configFile)
+  const configDirectory = dirname(absoluteConfigFile)
+  const config = readJson(absoluteConfigFile)
+  const timestamp = bundleTimestamp(now)
+  const absoluteBundleRoot = resolve(configDirectory, bundleDirectory)
+  const absoluteSummaryRoot = resolve(configDirectory, summaryDirectory)
+  const finalBundleDirectory = join(absoluteBundleRoot, timestamp)
+  const finalSummaryFile = join(absoluteSummaryRoot, `${timestamp}.md`)
+
+  if (existsSync(finalBundleDirectory) || existsSync(finalSummaryFile)) {
+    throw new Error(`Für ${timestamp} existiert bereits ein Website-QA-Bericht.`)
+  }
+
+  mkdirSync(absoluteBundleRoot, { recursive: true })
+  mkdirSync(absoluteSummaryRoot, { recursive: true })
+  const temporaryBundleDirectory = mkdtempSync(join(absoluteBundleRoot, '.bundle-'))
+  const temporarySummaryFile = `${finalSummaryFile}.${process.pid}.tmp`
+
+  try {
+    const technicalDirectory = join(temporaryBundleDirectory, 'technical')
+    mkdirSync(technicalDirectory)
+    const stemCounts = new Map()
+    const archivedRuns = config.technicalRuns.map((run) => {
+      const sourceFile = resolve(configDirectory, run.reportFile)
+      const sourceReport = readJson(sourceFile)
+      requireText(sourceReport.tool, `Werkzeugkennung in ${run.reportFile}`)
+      const stem = technicalFileStem(sourceReport.tool)
+      const count = (stemCounts.get(stem) || 0) + 1
+      stemCounts.set(stem, count)
+      const fileName = `${stem}${count > 1 ? `-${count}` : ''}.json`
+      const archivedFile = join(technicalDirectory, fileName)
+      copyFileSync(sourceFile, archivedFile)
+      chmodSync(archivedFile, 0o600)
+      return Object.assign({}, run, {
+        archivedFile,
+        report: readJson(archivedFile),
+        reportFile: `./technical/${fileName}`,
+      })
+    })
+    const evidenceDocument = config.evidenceFile
+      ? readJson(resolve(configDirectory, config.evidenceFile))
+      : undefined
+    const generatedAt = (now instanceof Date ? now : new Date(now)).toISOString()
+    const report = createPilotProjectReport({
+      config,
+      evidenceDocument,
+      generatedAt,
+      technicalRuns: archivedRuns,
+    })
+    const reportJsonFile = join(temporaryBundleDirectory, 'report.json')
+    const reportMarkdownFile = join(temporaryBundleDirectory, 'report.md')
+    writeFileSync(reportJsonFile, jsonWithNewline(report), { encoding: 'utf8', mode: 0o600 })
+    writeFileSync(reportMarkdownFile, renderPilotProjectReportMarkdown(report), { encoding: 'utf8', mode: 0o600 })
+
+    const summary = renderPilotProjectSummaryMarkdown(report, { publicProject })
+    writeFileSync(temporarySummaryFile, summary, { encoding: 'utf8', flag: 'wx', mode: 0o600 })
+
+    const technicalFiles = archivedRuns.map(run => manifestFile(run.archivedFile, temporaryBundleDirectory, 'technicalReport'))
+    const manifest = {
+      catalog: report.catalog,
+      files: [
+        ...technicalFiles,
+        manifestFile(reportJsonFile, temporaryBundleDirectory, 'projectReportJson'),
+        manifestFile(reportMarkdownFile, temporaryBundleDirectory, 'projectReportMarkdown'),
+      ],
+      generatedAt,
+      package: { name: packageName, version: packageVersion },
+      schemaVersion: 1,
+      technicalRuns: report.technicalRuns.map(run => ({
+        generatedAt: run.generatedAt,
+        reportFile: run.reportFile,
+        tool: run.tool,
+        usedForEvaluation: run.usedForEvaluation,
+      })),
+    }
+    writeFileSync(join(temporaryBundleDirectory, 'manifest.json'), jsonWithNewline(manifest), { encoding: 'utf8', mode: 0o600 })
+
+    renameSync(temporaryBundleDirectory, finalBundleDirectory)
+    try {
+      renameSync(temporarySummaryFile, finalSummaryFile)
+    }
+    catch (error) {
+      rmSync(finalBundleDirectory, { force: true, recursive: true })
+      throw error
+    }
+
+    return {
+      bundleDirectory: finalBundleDirectory,
+      manifestFile: join(finalBundleDirectory, 'manifest.json'),
+      reportFile: join(finalBundleDirectory, 'report.json'),
+      reportMarkdownFile: join(finalBundleDirectory, 'report.md'),
+      summaryFile: finalSummaryFile,
+      timestamp,
+    }
+  }
+  catch (error) {
+    rmSync(temporaryBundleDirectory, { force: true, recursive: true })
+    rmSync(temporarySummaryFile, { force: true })
+    throw error
+  }
 }

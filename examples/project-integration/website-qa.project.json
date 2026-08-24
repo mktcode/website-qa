@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "catalog": {
+    "id": "website-qa-pilot",
+    "version": "1.0.0-pilot.3"
+  },
+  "project": {
+    "name": "Interne Projektbezeichnung",
+    "preferredUrl": "https://example.com/",
+    "evaluationEnvironment": "production"
+  },
+  "selectedModules": [
+    "core"
+  ],
+  "technicalRuns": [
+    {
+      "reportFile": "./.website-qa/current/http.json",
+      "targetUrl": "https://example.com/",
+      "environment": "production",
+      "command": "npm run qa:http"
+    },
+    {
+      "reportFile": "./.website-qa/current/crawl.json",
+      "targetUrl": "https://example.com/",
+      "environment": "production",
+      "command": "npm run qa:crawl"
+    },
+    {
+      "reportFile": "./.website-qa/current/browser.json",
+      "targetUrl": "https://example.com/",
+      "environment": "production",
+      "command": "npm run qa:browser"
+    }
+  ],
+  "itemStates": []
+}

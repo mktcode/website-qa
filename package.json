@@ -1,6 +1,6 @@
 {
   "name": "@mktcode/website-qa",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Read-only HTTP, crawl, browser and social-preview checks for public websites",
   "license": "MIT",
   "type": "module",
@@ -20,6 +20,9 @@
   },
   "files": [
     "catalog",
+    "docs",
+    "examples",
+    "PLANNING.md",
     "src"
   ],
   "scripts": {

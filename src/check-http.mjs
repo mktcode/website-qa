@@ -6,7 +6,8 @@
 import { brotliDecompressSync, gunzipSync } from 'node:zlib'
 import { parse } from 'parse5'
 import { checklistItemIdsForTool, evaluatePilotChecklist } from './lib/checklist-report.mjs'
-import { fetchResource, normalizeMimeType, validateUrl } from './lib/http-client.mjs'
+import { fetchResource, normalizeMimeType, redactReportData, redactText, reportUrl, validateUrl } from './lib/http-client.mjs'
+import { writeJsonOutput } from './lib/json-output.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
 
 const defaultOptions = {
@@ -14,6 +15,7 @@ const defaultOptions = {
   allowPrivate: false,
   checkHttpRedirect: true,
   json: false,
+  jsonFile: undefined,
   maxHtmlBytes: 5 * 1024 * 1024,
   maxRedirects: 5,
   notFoundPath: '/.well-known/ops-http-check-not-found',
@@ -42,7 +44,8 @@ Aufruf:
   website-qa-http <URL> [weitere URL ...] [Optionen]
 
 Optionen:
-  --json                    Maschinenlesbare JSON-Ausgabe
+  --json                    Maschinenlesbare JSON-Ausgabe auf stdout
+  --json-file=<Pfad>        JSON atomar in eine lokale Datei schreiben
   --strict                  Warnungen führen ebenfalls zu Exitcode 1
   --timeout=<Millisek.>     Timeout je Abruf (Standard: 15000)
   --max-redirects=<N>       Maximale Anzahl Weiterleitungen (Standard: 5)
@@ -89,6 +92,13 @@ export function parseArguments(argv) {
     }
     else if (argument === '--strict') {
       options.strict = true
+    }
+    else if (argument.startsWith('--json-file=')) {
+      options.json = true
+      options.jsonFile = argument.slice('--json-file='.length)
+      if (!options.jsonFile) {
+        throw new Error('--json-file benötigt einen Pfad.')
+      }
     }
     else if (argument === '--skip-http-redirect') {
       options.checkHttpRedirect = false
@@ -677,13 +687,21 @@ function summarize(results, strict) {
 }
 
 export function createJsonReport(results, options) {
+  const reportedResults = redactReportData(results, '', { hideHosts: options.allowPrivate })
+  for (let index = 0; index < reportedResults.length; index += 1) {
+    const parameterNames = reportUrl(results[index].requestedUrl).parameterNames
+    if (parameterNames.length > 0) {
+      reportedResults[index].requestedUrlParameterNames = parameterNames
+    }
+  }
   return {
-    checklistCoverage: checklistCoverage(results),
+    checklistCoverage: checklistCoverage(reportedResults),
     generatedAt: new Date().toISOString(),
     options: {
       checkHttpRedirect: options.checkHttpRedirect,
       maxRedirects: options.maxRedirects,
-      notFoundPath: options.notFoundPath,
+      notFoundPath: redactReportData(options.notFoundPath, 'notFoundPath'),
+      privateTargetsRedacted: Boolean(options.allowPrivate),
       strict: options.strict,
       timeoutMilliseconds: options.timeoutMilliseconds,
     },
@@ -691,9 +709,9 @@ export function createJsonReport(results, options) {
       methods: ['GET'],
       mutatingActionsInvoked: false,
     },
-    results,
+    results: reportedResults,
     schemaVersion: 1,
-    summary: summarize(results, options.strict),
+    summary: summarize(reportedResults, options.strict),
     tool: 'http-check',
     toolPackage: { name: packageName, version: packageVersion },
   }
@@ -768,8 +786,10 @@ export async function runHttpCheck(inputUrls, options = {}) {
 }
 
 async function main() {
+  let parsed
   try {
-    const { options, urls } = parseArguments(process.argv.slice(2))
+    parsed = parseArguments(process.argv.slice(2))
+    const { options, urls } = parsed
     if (options.help) {
       console.log(usage())
       return
@@ -780,26 +800,43 @@ async function main() {
 
     const report = await runHttpCheck(urls, options)
     if (options.json) {
-      console.log(JSON.stringify(createJsonReport(report.results, options), null, 2))
+      const jsonReport = createJsonReport(report.results, options)
+      if (options.jsonFile) {
+        writeJsonOutput(options.jsonFile, jsonReport)
+      }
+      else {
+        console.log(JSON.stringify(jsonReport, null, 2))
+      }
     }
     else {
-      printText(report.results, options)
+      printText(redactReportData(report.results, '', { hideHosts: options.allowPrivate }), options)
     }
     if (report.summary.failed) {
       process.exitCode = 1
     }
   }
   catch (error) {
-    if (process.argv.includes('--json')) {
-      console.log(JSON.stringify({
-        error: error.message,
-        schemaVersion: 1,
-        summary: { errors: 1, failed: true, targets: 0, warnings: 0 },
-        tool: 'http-check',
-      }, null, 2))
+    const errorReport = {
+      error: redactText(error.message),
+      schemaVersion: 1,
+      summary: { errors: 1, failed: true, targets: 0, warnings: 0 },
+      tool: 'http-check',
+    }
+    if (process.argv.includes('--json') || parsed?.options?.json) {
+      if (parsed?.options?.jsonFile) {
+        try {
+          writeJsonOutput(parsed.options.jsonFile, errorReport)
+        }
+        catch (outputError) {
+          console.error(`Fehler beim Schreiben des JSON-Berichts: ${redactText(outputError.message)}`)
+        }
+      }
+      else {
+        console.log(JSON.stringify(errorReport, null, 2))
+      }
     }
     else {
-      console.error(`Fehler: ${error.message}`)
+      console.error(`Fehler: ${redactText(error.message)}`)
     }
     process.exitCode = 2
   }

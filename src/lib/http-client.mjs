@@ -7,6 +7,22 @@ import https from 'node:https'
 import { isIP } from 'node:net'
 
 const redirectStatuses = new Set([301, 302, 303, 307, 308])
+const urlFieldNames = new Set([
+  'action',
+  'canonical',
+  'finalurl',
+  'from',
+  'helpurl',
+  'href',
+  'location',
+  'pageurl',
+  'preferredurl',
+  'requestedurl',
+  'sourceurl',
+  'targeturl',
+  'to',
+  'url',
+])
 
 function isNonPublicIpv4(address) {
   const octets = address.split('.').map(Number)
@@ -65,26 +81,103 @@ function isPrivateHostname(hostname) {
   return isIP(normalized) > 0 && isNonPublicIp(normalized)
 }
 
+export function reportUrl(value, options = {}) {
+  try {
+    const url = new URL(value)
+    const parameterNames = [...new Set(url.searchParams.keys())]
+    if (options.hideHosts || isPrivateHostname(url.hostname)) {
+      return { parameterNames, url: '(privates/lokales Ziel)' }
+    }
+    url.username = ''
+    url.password = ''
+    url.search = ''
+    url.hash = ''
+    return {
+      parameterNames,
+      url: url.href,
+    }
+  }
+  catch {
+    return { parameterNames: [], url: '(ungültige URL)' }
+  }
+}
+
+function redactPath(value) {
+  if (!String(value).startsWith('/')) {
+    return undefined
+  }
+  try {
+    const url = new URL(value, 'https://website-qa.invalid')
+    return url.pathname
+  }
+  catch {
+    return undefined
+  }
+}
+
+export function redactText(value, maximumLength = 1000, options = {}) {
+  return String(value)
+    .replace(/https?:\/\/[^\s"')<>]+/gi, match => reportUrl(match, options).url)
+    .replace(/\b(token|secret|password|authorization|code)=[^\s&,;]+/gi, '$1=[REDACTED]')
+    .replace(/\bbearer\s+[\w.~+/=-]+/gi, 'Bearer [REDACTED]')
+    .replace(/\b[\w.!#$%&'*+/=?^`{|}~-]+@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+\b/gi, '[REDACTED_EMAIL]')
+    .replace(/\b(?:\d{1,3}\.){3}\d{1,3}\b/g, match => isNonPublicIp(match) ? '[REDACTED_PRIVATE_IP]' : match)
+    .replace(/\[?(?:::1|f[cd][\da-f:]+|fe[89ab][\da-f:]+)\]?/gi, '[REDACTED_PRIVATE_IP]')
+    .replace(/\b(?:localhost|[\w-]+(?:\.[\w-]+)*\.local)\b/gi, '[REDACTED_PRIVATE_HOST]')
+    .slice(0, maximumLength)
+}
+
+function redactString(value, key, options) {
+  if (['(privates/lokales Ziel)', '(ungültige URL)'].includes(value)) {
+    return value
+  }
+  const normalizedKey = String(key || '').toLowerCase()
+  if (urlFieldNames.has(normalizedKey) || normalizedKey.endsWith('url')) {
+    const path = redactPath(value)
+    return path || reportUrl(value, options).url
+  }
+  if (normalizedKey === 'notfoundpath' || normalizedKey === 'sitemapurl') {
+    return redactPath(value) || reportUrl(value, options).url
+  }
+  return redactText(value, 10_000, options)
+}
+
+export function redactReportData(value, key = '', options = {}) {
+  if (typeof value === 'string') {
+    return redactString(value, key, options)
+  }
+  if (Array.isArray(value)) {
+    return value.map(item => redactReportData(item, key, options))
+  }
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([entryKey, entryValue]) => [
+      entryKey,
+      redactReportData(entryValue, entryKey, options),
+    ]))
+  }
+  return value
+}
+
 export function validateUrl(value, options, context = 'URL') {
   let url
   try {
     url = new URL(value)
   }
   catch {
-    throw new Error(`${context} ist ungültig: ${value}`)
+    throw new Error(`${context} ist ungültig.`)
   }
 
   if (!['http:', 'https:'].includes(url.protocol)) {
-    throw new Error(`${context} muss HTTP oder HTTPS verwenden: ${value}`)
+    throw new Error(`${context} muss HTTP oder HTTPS verwenden.`)
   }
   if (url.username || url.password) {
-    throw new Error(`${context} darf keine Zugangsdaten enthalten: ${value}`)
+    throw new Error(`${context} darf keine Zugangsdaten enthalten.`)
   }
   if (url.protocol === 'http:' && !options.allowHttp) {
-    throw new Error(`${context} verwendet HTTP. Nur mit --allow-http zulassen: ${value}`)
+    throw new Error(`${context} verwendet HTTP. Nur mit --allow-http zulassen: ${reportUrl(url.href).url}`)
   }
   if (isPrivateHostname(url.hostname) && !options.allowPrivate) {
-    throw new Error(`${context} verweist auf ein privates Ziel. Nur mit --allow-private zulassen: ${value}`)
+    throw new Error(`${context} verweist auf ein privates Ziel. Nur mit --allow-private zulassen.`)
   }
 
   url.hash = ''
@@ -101,7 +194,7 @@ export async function assertPublicResolution(url, options) {
     addresses = await lookup(url.hostname, { all: true, verbatim: true })
   }
   catch (error) {
-    throw new Error(`DNS-Auflösung für ${url.hostname} fehlgeschlagen: ${error.message}`, { cause: error })
+    throw new Error(`DNS-Auflösung fehlgeschlagen: ${redactText(error.message)}`, { cause: error })
   }
 
   if (addresses.length === 0) {
@@ -110,7 +203,7 @@ export async function assertPublicResolution(url, options) {
 
   const nonPublicAddress = addresses.find(result => isNonPublicIp(result.address))
   if (nonPublicAddress) {
-    throw new Error(`Abrufziel ${url.hostname} löst auf eine nicht öffentliche Adresse auf.`)
+    throw new Error('Abrufziel löst auf eine nicht öffentliche Adresse auf.')
   }
 }
 
@@ -164,7 +257,7 @@ async function requestOnce(url, options, request) {
     })
 
     clientRequest.setTimeout(options.timeoutMilliseconds, () => {
-      clientRequest.destroy(new Error(`Abruf von ${url.href} überschritt ${options.timeoutMilliseconds} ms.`))
+      clientRequest.destroy(new Error(`Abruf von ${reportUrl(url.href).url} überschritt ${options.timeoutMilliseconds} ms.`))
     })
     clientRequest.on('error', reject)
     clientRequest.end()
@@ -182,10 +275,10 @@ export async function fetchResource(input, options, request = {}) {
     if (redirectStatuses.has(response.status)) {
       const location = response.headers.location
       if (!location) {
-        throw new Error(`HTTP ${response.status} ohne Location-Header bei ${currentUrl}`)
+        throw new Error(`HTTP ${response.status} ohne Location-Header bei ${reportUrl(currentUrl.href).url}`)
       }
       if (redirectCount === options.maxRedirects) {
-        throw new Error(`Mehr als ${options.maxRedirects} Weiterleitungen ab ${input}`)
+        throw new Error(`Mehr als ${options.maxRedirects} Weiterleitungen ab ${reportUrl(input).url}`)
       }
 
       const nextUrl = validateUrl(new URL(location, currentUrl).href, options, 'Weiterleitungsziel')
@@ -193,7 +286,7 @@ export async function fetchResource(input, options, request = {}) {
         throw new Error(`Weiterleitungsziel ${nextUrl.origin} liegt außerhalb der erlaubten Origins.`)
       }
       if (request.validateRedirect && request.validateRedirect(nextUrl, currentUrl) === false) {
-        throw new Error(`Weiterleitungsziel ${nextUrl.href} wurde durch die Nur-Lese-Richtlinie abgelehnt.`)
+        throw new Error(`Weiterleitungsziel ${reportUrl(nextUrl.href).url} wurde durch die Nur-Lese-Richtlinie abgelehnt.`)
       }
       redirects.push({
         from: currentUrl.href,
@@ -211,7 +304,7 @@ export async function fetchResource(input, options, request = {}) {
     }
   }
 
-  throw new Error(`Weiterleitungslimit ab ${input} überschritten.`)
+  throw new Error(`Weiterleitungslimit ab ${reportUrl(input).url} überschritten.`)
 }
 
 export function normalizeMimeType(value) {

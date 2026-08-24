@@ -32,6 +32,7 @@ describe('installed package commands', () => {
       expect(execution.status).toBe(0)
       expect(execution.stderr).toBe('')
       expect(execution.stdout).toContain(`website-qa-${command.split('-').at(-1)}`)
+      expect(execution.stdout).toContain('--json-file=<Pfad>')
       expect(realpathSync(link)).toBe(resolve(source))
     }
   })
