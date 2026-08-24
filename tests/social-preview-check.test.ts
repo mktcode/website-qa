@@ -1,0 +1,180 @@
+import type { AddressInfo } from 'node:net'
+import { createServer } from 'node:http'
+import sharp from 'sharp'
+import { afterEach, describe, expect, it } from 'vitest'
+import {
+  extractHtmlMetadata,
+  parseArguments,
+  robotsPolicies,
+  runSocialPreviewCheck,
+} from '../src/check-social-preview.mjs'
+
+const servers = new Set<ReturnType<typeof createServer>>()
+
+afterEach(async () => {
+  await Promise.all([...servers].map(server => new Promise<void>((resolve, reject) => {
+    server.close((error) => {
+      if (error) {
+        reject(error)
+      }
+      else {
+        resolve()
+      }
+    })
+  })))
+  servers.clear()
+})
+
+describe('social preview checker', () => {
+  it('parses URLs and reusable CLI options', () => {
+    const parsed = parseArguments([
+      'https://example.com/',
+      '--json',
+      '--strict',
+      '--ai-training-opt-in',
+      '--sitemap',
+      '--max-pages=12',
+      '--timeout=5000',
+    ])
+
+    expect(parsed.urls).toEqual(['https://example.com/'])
+    expect(parsed.options).toMatchObject({
+      aiTrainingOptIn: true,
+      json: true,
+      maxPages: 12,
+      sitemap: true,
+      strict: true,
+      timeoutMilliseconds: 5000,
+    })
+  })
+
+  it('extracts server-rendered social metadata without a browser', () => {
+    const metadata = extractHtmlMetadata(`<!doctype html>
+      <html lang="de"><head>
+        <title>Beispiel</title>
+        <link rel="canonical" href="https://example.com/">
+        <meta property="og:title" content="OpenGraph-Titel">
+        <meta name="twitter:card" content="summary_large_image">
+      </head></html>`)
+
+    expect(metadata.canonicals).toEqual(['https://example.com/'])
+    expect(metadata.documentTitle).toBe('Beispiel')
+    expect(metadata.htmlLanguage).toBe('de')
+    expect(metadata.metadata['og:title']).toEqual(['OpenGraph-Titel'])
+    expect(metadata.metadata['twitter:card']).toEqual(['summary_large_image'])
+  })
+
+  it('contains verified policies for major AI providers', () => {
+    const tokens = robotsPolicies.map(policy => policy.token)
+
+    expect(tokens).toEqual(expect.arrayContaining([
+      'OAI-SearchBot',
+      'ChatGPT-User',
+      'GPTBot',
+      'Claude-SearchBot',
+      'Claude-User',
+      'ClaudeBot',
+      'Googlebot',
+      'Google-CloudVertexBot',
+      'Google-Extended',
+      'bingbot',
+      'MistralAI-Index',
+      'MistralAI-User',
+      'MistralAI-Training',
+      'PerplexityBot',
+      'Perplexity-User',
+      'meta-externalagent',
+      'meta-externalfetcher',
+      'Applebot',
+      'Applebot-Extended',
+    ]))
+    expect(robotsPolicies.every(policy => policy.documentation.startsWith('https://'))).toBe(true)
+  })
+
+  it('checks crawler parity, robots policies and the real image', async () => {
+    const image = await sharp({
+      create: {
+        background: '#123456',
+        channels: 3,
+        height: 630,
+        width: 1200,
+      },
+    }).webp().toBuffer()
+    const seenUserAgents = new Set<string>()
+
+    const server = createServer((request, response) => {
+      seenUserAgents.add(request.headers['user-agent'] || '')
+      const origin = `http://${request.headers.host}`
+
+      if (request.url === '/robots.txt') {
+        response.writeHead(200, { 'content-type': 'text/plain' })
+        response.end('User-agent: *\nAllow: /\n')
+        return
+      }
+      if (request.url === '/social.webp') {
+        response.writeHead(200, {
+          'cache-control': 'public, max-age=3600',
+          'content-type': 'image/webp',
+        })
+        response.end(image)
+        return
+      }
+
+      response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+      response.end(`<!doctype html><html lang="de"><head>
+        <title>Automatisierter Social-Test</title>
+        <link rel="canonical" href="${origin}/">
+        <meta property="og:title" content="Automatisierter Social-Test">
+        <meta property="og:description" content="Eine ausreichend lange Beschreibung für den automatisierten Social-Metadaten-Test.">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="${origin}/">
+        <meta property="og:image" content="${origin}/social.webp">
+        <meta property="og:image:type" content="image/webp">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta property="og:image:alt" content="Testbild">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="Automatisierter Social-Test">
+        <meta name="twitter:description" content="Eine ausreichend lange Beschreibung für den automatisierten Social-Metadaten-Test.">
+        <meta name="twitter:image" content="${origin}/social.webp">
+        <meta name="twitter:image:alt" content="Testbild">
+      </head><body></body></html>`)
+    })
+    servers.add(server)
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
+    const address = server.address() as AddressInfo
+    const url = `http://127.0.0.1:${address.port}/`
+
+    const report = await runSocialPreviewCheck([url], {
+      allowHttp: true,
+      allowPrivate: true,
+    })
+    const optedInReport = await runSocialPreviewCheck([url], {
+      aiTrainingOptIn: true,
+      allowHttp: true,
+      allowPrivate: true,
+    })
+
+    const result = report.results[0] as unknown as {
+      agents: unknown[]
+      images: Array<{ height?: number, width?: number }>
+      robots: { policies: unknown[] }
+    }
+
+    expect(report.summary).toMatchObject({ errors: 0, failed: false, pages: 1, warnings: 1 })
+    expect(report.results[0]?.issues).toContainEqual(expect.objectContaining({
+      code: 'ai-training-opt-in-missing',
+      severity: 'warning',
+    }))
+    expect(optedInReport.summary).toMatchObject({ errors: 0, failed: false, pages: 1, warnings: 0 })
+    expect(result.agents).toHaveLength(4)
+    expect(result.images[0]).toMatchObject({ height: 630, width: 1200 })
+    expect(result.robots.policies).toHaveLength(robotsPolicies.length)
+    expect([...seenUserAgents]).toEqual(expect.arrayContaining([
+      expect.stringContaining('SocialPreviewCheck'),
+      expect.stringContaining('facebookexternalhit'),
+      expect.stringContaining('Twitterbot'),
+      expect.stringContaining('LinkedInBot'),
+    ]))
+  })
+})

@@ -1,0 +1,60 @@
+{
+  "name": "@mktcode/website-qa",
+  "version": "0.1.0",
+  "description": "Read-only HTTP, crawl, browser and social-preview checks for public websites",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.19 <23"
+  },
+  "bin": {
+    "website-qa-browser": "./src/check-browser.mjs",
+    "website-qa-crawl": "./src/check-crawl.mjs",
+    "website-qa-http": "./src/check-http.mjs",
+    "website-qa-social": "./src/check-social-preview.mjs"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "lint": "oxlint --deny-warnings -D correctness -D suspicious -D perf src tests && eslint --max-warnings 0 src tests",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run lint && npm run typecheck && npm test",
+    "prepack": "npm run check"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mktcode/website-qa.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mktcode/website-qa/issues"
+  },
+  "homepage": "https://github.com/mktcode/website-qa#readme",
+  "keywords": [
+    "accessibility",
+    "axe-core",
+    "crawler",
+    "quality-assurance",
+    "read-only",
+    "website"
+  ],
+  "dependencies": {
+    "axe-core": "4.13.0",
+    "fast-xml-parser": "5.11.0",
+    "file-type": "22.0.1",
+    "parse5": "8.0.0",
+    "puppeteer-core": "25.8.0",
+    "robots-parser": "3.0.1",
+    "sharp": "0.35.3"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "9.3.0",
+    "@types/node": "22.20.1",
+    "eslint": "10.8.1",
+    "oxlint": "1.78.0",
+    "typescript": "6.0.3",
+    "vitest": "3.2.7"
+  }
+}
