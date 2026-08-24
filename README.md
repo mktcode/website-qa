@@ -51,6 +51,10 @@ Jeder Befehl ist unabhängig. Es gibt bewusst keinen Sammelbefehl und keine Anna
 
 Die Prüfberichte sind technische Teilnachweise. Sie haken keine Checklistenpunkte ab und ersetzen insbesondere keine vollständige WCAG-, Tastatur-, Screenreader-, Safari-, reale Mobilgeräte- oder fachliche Datenschutzprüfung.
 
+## Wiederverwendbare Prüfdokumentation
+
+Unter [`docs/`](docs/) liegen eine modulare allgemeine [Website-Checkliste](docs/checklisten/website/) und ein zugehöriger [Agenten-Prompt](docs/prompts/website-checkliste.md). Diese Dateien sind ausschließlich Vorlagen. Für jedes Zielprojekt wird daraus eine eigenständige Projektkopie mit festgehaltenem Vorlagencommit erstellt; ausgefüllte Nachweise gehören nicht in dieses Repository.
+
 ## Entwicklung
 
 ```bash
