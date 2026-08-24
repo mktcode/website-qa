@@ -23,6 +23,11 @@
     { "id": "crawl.metadata.description-single", "version": 1, "tool": "crawl-check", "description": "Alle geprüften Seiten besitzen genau eine Meta-Beschreibung." },
     { "id": "crawl.metadata.unique", "version": 1, "tool": "crawl-check", "description": "Titel und Meta-Beschreibungen sind unter den geprüften indexierbaren Seiten eindeutig." },
     { "id": "crawl.document.language-present", "version": 1, "tool": "crawl-check", "description": "Alle geprüften Seiten besitzen ein lang-Attribut." },
-    { "id": "crawl.document.single-h1", "version": 1, "tool": "crawl-check", "description": "Alle geprüften Seiten besitzen genau eine H1-Überschrift." }
+    { "id": "crawl.document.single-h1", "version": 1, "tool": "crawl-check", "description": "Alle geprüften Seiten besitzen genau eine H1-Überschrift." },
+    { "id": "browser.document.main-landmark-single", "version": 1, "tool": "browser-check", "description": "Alle geprüften Seiten-/Profil-Läufe besitzen genau ein Main-Landmark." },
+    { "id": "browser.viewport.narrow-zoom-no-horizontal-overflow", "version": 1, "tool": "browser-check", "description": "Die schmalen und 200-%-Näherungsprofile weisen keinen horizontalen Dokumentüberlauf auf." },
+    { "id": "browser.accessibility.axe-no-detected-violations", "version": 1, "tool": "browser-check", "description": "Der Axe-Audit wurde ausgeführt und hat auf den geprüften Seiten-/Profil-Läufen keine Verstöße erkannt." },
+    { "id": "browser.context.chromium-headless-recorded", "version": 1, "tool": "browser-check", "description": "Chromium-Version und ausgeführte Headless-Emulationsprofile sind dokumentiert." },
+    { "id": "browser.runtime.no-observed-errors", "version": 1, "tool": "browser-check", "description": "In den geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet." }
   ]
 }

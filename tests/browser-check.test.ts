@@ -80,8 +80,14 @@ describe('browser check', () => {
   it('publishes explicit read-only guarantees in JSON', () => {
     const result = {
       blockedRequests: [],
+      browser: { product: 'Chromium', version: 'Chromium 140.0' },
+      finalUrl: 'https://example.com/',
       issues: [],
-      profiles: [{ url: 'https://example.com/' }],
+      profiles: [
+        { facts: { overflow: { clientWidth: 320, scrollWidth: 320 } }, profile: 'narrow', url: 'https://example.com/' },
+        { facts: { overflow: { clientWidth: 640, scrollWidth: 640 } }, profile: 'zoom-200', url: 'https://example.com/' },
+      ],
+      requestedUrl: 'https://example.com/',
     }
     const report = createJsonReport(result, {
       maxPages: 10,
@@ -101,7 +107,49 @@ describe('browser check', () => {
       methodsAllowed: ['GET'],
       persistentBrowserProfile: false,
     })
-    expect(report.summary).toMatchObject({ errors: 0, failed: false, pages: 1, warnings: 0 })
+    expect(report).toMatchObject({
+      checklistCoverage: {
+        summary: { checklistItems: { partial: 5, total: 5 } },
+      },
+      schemaVersion: 1,
+      summary: { errors: 0, failed: false, pages: 1, warnings: 0 },
+    })
+    expect(report.result.assertions).toHaveLength(5)
+    expect(report.result.assertions.every((assertion: { outcome: string }) => assertion.outcome === 'pass')).toBe(true)
+  })
+
+  it('reports observed browser defects as failed structured assertions', () => {
+    const url = 'https://example.com/'
+    const report = createJsonReport({
+      blockedRequests: [],
+      browser: { product: 'Chromium', version: 'Chromium 140.0' },
+      finalUrl: url,
+      issues: [
+        { code: 'main-landmark-count', severity: 'warning' },
+        { code: 'horizontal-overflow', severity: 'error' },
+        { code: 'axe-landmark-one-main', severity: 'error' },
+        { code: 'console-error', severity: 'error' },
+      ],
+      profiles: [
+        { facts: { overflow: { clientWidth: 320, scrollWidth: 500 } }, profile: 'narrow', url },
+        { facts: { overflow: { clientWidth: 640, scrollWidth: 800 } }, profile: 'zoom-200', url },
+      ],
+      requestedUrl: url,
+    }, {
+      maxPages: 10,
+      maxRequests: 300,
+      profiles: ['narrow', 'zoom-200'],
+      sitemap: false,
+      strict: true,
+      timeoutMilliseconds: 20_000,
+    })
+
+    const outcomes = new Map(report.result.assertions.map((assertion: { assertionId: string, outcome: string }) => [assertion.assertionId, assertion.outcome]))
+    expect(outcomes.get('browser.document.main-landmark-single')).toBe('fail')
+    expect(outcomes.get('browser.viewport.narrow-zoom-no-horizontal-overflow')).toBe('fail')
+    expect(outcomes.get('browser.accessibility.axe-no-detected-violations')).toBe('fail')
+    expect(outcomes.get('browser.runtime.no-observed-errors')).toBe('fail')
+    expect(report.checklistCoverage.summary.checklistItems).toMatchObject({ fail: 4, partial: 1, total: 5 })
   })
 
   const chromiumPath = ['/usr/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'].find(existsSync)
@@ -134,6 +182,7 @@ describe('browser check', () => {
       settleMilliseconds: 100,
     })
     const typedResult = result as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
       issues: Array<{ code: string }>
       profiles: Array<{ facts: { forms: Array<{ action: string, method: string }> } }>
     }
@@ -145,6 +194,8 @@ describe('browser check', () => {
     expect(issueCodes).toContain('external-request-blocked')
     expect(issueCodes).toContain('form-submission-blocked')
     expect(issueCodes).toContain('popup-blocked')
+    expect(typedResult.assertions.find(assertion => assertion.assertionId === 'browser.context.chromium-headless-recorded')?.outcome).toBe('pass')
+    expect(typedResult.assertions.filter(assertion => assertion.assertionId !== 'browser.context.chromium-headless-recorded').every(assertion => assertion.outcome === 'inconclusive')).toBe(true)
     expect(typedResult.profiles[0]?.facts.forms).toEqual([{ action: `${origin}/submit`, method: 'POST' }])
   }, 30_000)
 })

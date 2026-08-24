@@ -25,7 +25,7 @@ function assertion(assertionId: string, outcome: 'fail' | 'inconclusive' | 'notA
 function technicalReport(assertions: ReturnType<typeof assertion>[]) {
   return {
     checklistCoverage: {
-      catalog: { id: 'website-qa-pilot', status: 'pilot', version: '1.0.0-pilot.2' },
+      catalog: { id: 'website-qa-pilot', status: 'pilot', version: '1.0.0-pilot.3' },
     },
     generatedAt: '2026-08-24T12:00:00.000Z',
     results: [{ assertions, requestedUrl: 'https://example.com/' }],
@@ -38,7 +38,7 @@ function technicalReport(assertions: ReturnType<typeof assertion>[]) {
 
 function projectConfig() {
   return {
-    catalog: { id: 'website-qa-pilot', version: '1.0.0-pilot.2' },
+    catalog: { id: 'website-qa-pilot', version: '1.0.0-pilot.3' },
     itemStates: [],
     project: {
       deploymentId: 'deployment-1',
@@ -60,7 +60,7 @@ function projectConfig() {
   }
 }
 
-function technicalRun(report = technicalReport([
+function technicalRun(report: Record<string, unknown> = technicalReport([
   assertion('error.not-found.noindex'),
   assertion('error.not-found.no-url-metadata'),
 ])) {
@@ -87,8 +87,8 @@ describe('project report pilot', () => {
 
     expect(report.summary.checklistItems).toMatchObject({
       complete: 1,
-      open: 10,
-      total: 11,
+      open: 15,
+      total: 16,
     })
     expect(report.items.find((item: { id: string }) => item.id === 'CORE-ERR-02')).toMatchObject({
       evidenceOutcome: 'pass',
@@ -99,6 +99,42 @@ describe('project report pilot', () => {
       projectStatus: 'open',
     })
     expect(report.technicalRuns[0]).toMatchObject({ assertionCount: 2, usedForEvaluation: true })
+  })
+
+  it('accepts the singular browser result and evaluates its structured assertions', () => {
+    const browserAssertions = [
+      'browser.document.main-landmark-single',
+      'browser.viewport.narrow-zoom-no-horizontal-overflow',
+      'browser.accessibility.axe-no-detected-violations',
+      'browser.context.chromium-headless-recorded',
+      'browser.runtime.no-observed-errors',
+    ].map(assertionId => assertion(assertionId))
+    const browserReport = {
+      checklistCoverage: {
+        catalog: { id: 'website-qa-pilot', status: 'pilot', version: '1.0.0-pilot.3' },
+      },
+      generatedAt: '2026-08-24T12:05:00.000Z',
+      result: { assertions: browserAssertions, requestedUrl: 'https://example.com/' },
+      schemaVersion: 1,
+      summary: { errors: 0, failed: false, pages: 1, warnings: 0 },
+      tool: 'browser-check',
+      toolPackage: { name: '@mktcode/website-qa', version: '0.1.0' },
+    }
+    const report = createPilotProjectReport({
+      config: projectConfig(),
+      evidenceDocument: undefined,
+      technicalRuns: [{
+        ...technicalRun(browserReport),
+        command: 'website-qa-browser https://example.com/ --strict --json',
+      }],
+    })
+
+    expect(report.summary.checklistItems).toMatchObject({ open: 11, partial: 5, total: 16 })
+    expect(report.items.find((item: { id: string }) => item.id === 'CORE-A11Y-13')).toMatchObject({
+      evidenceOutcome: 'partial',
+      projectStatus: 'partial',
+    })
+    expect(report.technicalRuns[0]).toMatchObject({ assertionCount: 5, tool: 'browser-check', usedForEvaluation: true })
   })
 
   it('includes communication evidence and explicit external workflow states', () => {
@@ -115,7 +151,7 @@ describe('project report pilot', () => {
     const report = createPilotProjectReport({
       config,
       evidenceDocument: {
-        catalog: { id: 'website-qa-pilot', version: '1.0.0-pilot.2' },
+        catalog: { id: 'website-qa-pilot', version: '1.0.0-pilot.3' },
         evidence: [{
           checkedAt: '2026-08-24',
           checkedBy: 'inhaltlich verantwortliche Stelle',
@@ -134,7 +170,7 @@ describe('project report pilot', () => {
     expect(report.items.find((item: { id: string }) => item.id === 'CORE-DOM-04')).toMatchObject({
       projectStatus: 'external',
     })
-    expect(report.summary.checklistItems).toMatchObject({ complete: 2, external: 1, open: 9, total: 12 })
+    expect(report.summary.checklistItems).toMatchObject({ complete: 2, external: 1, open: 14, total: 17 })
   })
 
   it('uses only matching environments and rejects deployment mismatches', () => {

@@ -97,20 +97,31 @@ function normalizeUrl(value, label) {
   }
 }
 
+function technicalReportResults(report) {
+  if (Array.isArray(report?.results)) {
+    return report.results
+  }
+  if (report?.result && typeof report.result === 'object') {
+    return [report.result]
+  }
+  return undefined
+}
+
 function validateTechnicalRun(run, config, catalog) {
   requireText(run.environment, 'Umgebung eines technischen Laufs')
   requireText(run.command, 'Befehl eines technischen Laufs')
   requireText(run.targetUrl, 'Ziel-URL eines technischen Laufs')
   const targetUrl = normalizeUrl(run.targetUrl, 'Ziel-URL eines technischen Laufs')
   const report = run.report
-  if (report?.schemaVersion !== 1 || !Array.isArray(report.results)) {
+  const results = technicalReportResults(report)
+  if (report?.schemaVersion !== 1 || !results) {
     throw new Error(`Technischer Bericht ${run.reportFile || run.command} verwendet kein unterstütztes Schema.`)
   }
   requireText(report.generatedAt, 'Erstellungszeit des technischen Berichts')
   requireText(report.tool, 'Werkzeugkennung des technischen Berichts')
   requireText(report.toolPackage?.version, 'Werkzeugversion des technischen Berichts')
   validateCatalogReference(report.checklistCoverage?.catalog, catalog, `Technischer Bericht ${run.reportFile || run.command}`)
-  const reportedTargetUrls = report.results
+  const reportedTargetUrls = results
     .map(result => result.requestedUrl)
     .filter(Boolean)
     .map(value => normalizeUrl(value, 'Ziel-URL im technischen Bericht'))
@@ -126,7 +137,7 @@ function validateTechnicalRun(run, config, catalog) {
   }
 
   return {
-    assertions: report.results.flatMap(result => result.assertions || []).map((assertion) => {
+    assertions: results.flatMap(result => result.assertions || []).map((assertion) => {
       const scopedAssertion = structuredClone(assertion)
       scopedAssertion.subject = Object.assign({}, scopedAssertion.subject, {
         deploymentId: run.deploymentId,
@@ -137,7 +148,7 @@ function validateTechnicalRun(run, config, catalog) {
       return scopedAssertion
     }),
     record: {
-      assertionCount: report.results.reduce((sum, result) => sum + (result.assertions?.length || 0), 0),
+      assertionCount: results.reduce((sum, result) => sum + (result.assertions?.length || 0), 0),
       command: run.command,
       contextProvenance: {
         deploymentId: 'projectDeclared',

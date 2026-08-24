@@ -2,9 +2,9 @@
   "$schema": "./website-catalog.schema.json",
   "schemaVersion": 1,
   "catalogId": "website-qa-pilot",
-  "catalogVersion": "1.0.0-pilot.2",
+  "catalogVersion": "1.0.0-pilot.3",
   "status": "pilot",
-  "description": "Strukturierter Pilotkatalog für HTTP- und Crawl-bezogene sowie bewusst nicht automatisierbare Website-Prüfnachweise.",
+  "description": "Strukturierter Pilotkatalog für HTTP-, Crawl- und Browser-bezogene sowie bewusst nicht automatisierbare Website-Prüfnachweise.",
   "items": [
     {
       "id": "CORE-DOM-02",
@@ -308,6 +308,149 @@
             "mode": "manual",
             "evidenceClass": "editorial",
             "instructions": "Sprachcode und Überschriftenstruktur auf repräsentativen Seitentypen redaktionell und semantisch prüfen."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-A11Y-01",
+      "module": "core",
+      "statement": "Semantische HTML-Elemente werden passend eingesetzt; Navigation, Hauptinhalt, ergänzende Bereiche und Footer sind sinnvoll ausgezeichnet.",
+      "criteria": [
+        {
+          "id": "CORE-A11Y-01/C1",
+          "statement": "Alle geprüften Seiten-/Profil-Läufe besitzen genau ein Main-Landmark.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["browser.document.main-landmark-single"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-A11Y-01/C2",
+          "statement": "Navigation, Hauptinhalt, ergänzende Bereiche und Footer sind semantisch passend und verständlich ausgezeichnet.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Semantische Struktur auf repräsentativen Seitentypen im DOM und Accessibility Tree fachlich prüfen."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-A11Y-10",
+      "module": "core",
+      "statement": "Bei 320 CSS-Pixeln und bei 200 Prozent reiner Textvergrößerung bleibt der Inhalt ohne zweidimensionales Scrollen sinnvoll nutzbar; lange URLs, E-Mail-Adressen und Komposita verursachen keinen Dokumentüberlauf.",
+      "criteria": [
+        {
+          "id": "CORE-A11Y-10/C1",
+          "statement": "Die technischen 320-Pixel- und 200-%-Näherungsprofile erkennen auf den geprüften Seiten keinen horizontalen Dokumentüberlauf.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["browser.viewport.narrow-zoom-no-horizontal-overflow"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-A11Y-10/C2",
+          "statement": "Inhalt und Funktionen bleiben bei 320 CSS-Pixeln und tatsächlicher reiner Textvergrößerung sinnvoll sichtbar und bedienbar.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Repräsentative Seiten in einem realen Browser bei 320 CSS-Pixeln und 200 Prozent reiner Textvergrößerung visuell und funktional prüfen; die technische Näherung allein genügt nicht."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-A11Y-13",
+      "module": "core",
+      "statement": "Tastaturprüfung, automatisierter Accessibility-Audit und reale Mobilbrowserprüfung sind getrennt mit Datum und Werkzeug dokumentiert; eine Screenreader-Stichprobe erfolgt risikogerecht und bei vereinbarter Konformität zwingend.",
+      "criteria": [
+        {
+          "id": "CORE-A11Y-13/C1",
+          "statement": "Der Axe-Audit wurde auf allen vorgesehenen Seiten-/Profil-Läufen ausgeführt und hat keine automatisiert erkennbaren Verstöße gemeldet.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["browser.accessibility.axe-no-detected-violations"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-A11Y-13/C2",
+          "statement": "Eine eigenständige Tastaturprüfung ist mit Datum, Werkzeug beziehungsweise Browser und Ergebnis dokumentiert.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Tastaturprüfung ohne Maus auf repräsentativen Seiten und Funktionen durchführen und separat protokollieren."
+          }
+        },
+        {
+          "id": "CORE-A11Y-13/C3",
+          "statement": "Eine Prüfung in mindestens einem realen Mobilbrowser ist mit Gerät, Browser, Datum und Ergebnis dokumentiert.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Realen Mobilbrowser und Gerät verwenden; Headless- oder Desktop-Emulation nicht als reale Mobilbrowserprüfung ausgeben."
+          }
+        },
+        {
+          "id": "CORE-A11Y-13/C4",
+          "statement": "Die risikogerechte Screenreader-Stichprobe beziehungsweise ihre begründete Nichtanwendbarkeit ist dokumentiert.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Screenreader-Stichprobe risikogerecht durchführen; bei vereinbarter Konformität ist sie verpflichtend und nicht als nicht anwendbar zu behandeln."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-QA-02",
+      "module": "core",
+      "statement": "Browserengine, Headless-Emulation und reale Browser beziehungsweise Geräte werden im Nachweis korrekt unterschieden; eine WebKit-Prüfung wird nicht als Safari-Prüfung bezeichnet.",
+      "criteria": [
+        {
+          "id": "CORE-QA-02/C1",
+          "statement": "Der technische Browserbericht dokumentiert Chromium-Version und ausgeführte Headless-Emulationsprofile.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["browser.context.chromium-headless-recorded"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-QA-02/C2",
+          "statement": "Der Projektnachweis unterscheidet Headless-Emulationen, Browserengines und reale Browser beziehungsweise Geräte und benennt nicht geprüfte Plattformen.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Ausgeführte und nicht ausgeführte Browser-/Geräteprüfungen korrekt deklarieren; Chromium nicht als Safari und Emulation nicht als reales Gerät bezeichnen."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-QA-07",
+      "module": "core",
+      "statement": "Die Seiten wurden ohne sichtbare JavaScript-, Netzwerk- oder Hydrationsfehler in der Browserkonsole geprüft.",
+      "criteria": [
+        {
+          "id": "CORE-QA-07/C1",
+          "statement": "In den automatisch geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["browser.runtime.no-observed-errors"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-QA-07/C2",
+          "statement": "Interaktionsabhängige und vom beobachtenden Browserlauf nicht erreichte Zustände wurden zusätzlich auf Konsolen-, Netzwerk- und Hydrationsfehler geprüft.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Vereinbarte interaktive Zustände manuell aufrufen und Browserkonsole sowie Netzwerkprotokoll beobachten; keine schreibenden Produktionsaktionen ausführen."
           }
         }
       ]

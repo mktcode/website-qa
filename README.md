@@ -41,7 +41,7 @@ Jeder Befehl ist unabhängig. Es gibt bewusst keinen Sammelbefehl und keine Anna
 
 ## Strukturierter Checklistennachweis (Pilot)
 
-Der HTTP- und der Crawl-Prüfer geben zusätzlich zu Befunden positive, negative und unklare atomare Prüfaussagen sowie eine erste Auswertung ausgewählter Checklistenpunkte aus. Grundlage ist der mit dem Paket ausgelieferte [Pilotkatalog](catalog/README.md). Er unterscheidet ausdrücklich:
+Der HTTP-, Crawl- und Browser-Prüfer geben zusätzlich zu Befunden positive, negative und unklare atomare Prüfaussagen sowie eine erste Auswertung ausgewählter Checklistenpunkte aus. Grundlage ist der mit dem Paket ausgelieferte [Pilotkatalog](catalog/README.md). Er unterscheidet ausdrücklich:
 
 - automatisch belegbare Kriterien,
 - manuell beziehungsweise redaktionell zu prüfende Kriterien,

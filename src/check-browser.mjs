@@ -7,6 +7,7 @@ import { existsSync } from 'node:fs'
 import axe from 'axe-core'
 import puppeteer from 'puppeteer-core'
 import { parseSitemapXml, readOnlyNavigationConcern } from './check-crawl.mjs'
+import { checklistItemIdsForTool, evaluatePilotChecklist } from './lib/checklist-report.mjs'
 import { assertPublicResolution, fetchResource, normalizeMimeType, validateUrl } from './lib/http-client.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
 
@@ -210,6 +211,129 @@ function addIssue(result, severity, code, message, checklistIds, url, profile) {
   }
   result.issueMap.set(key, issue)
   result.issues.push(issue)
+}
+
+const incompleteBrowserIssueCodes = new Set([
+  'beacon-blocked',
+  'browser-action-blocked',
+  'browser-page-failed',
+  'eventsource-blocked',
+  'external-request-blocked',
+  'external-sitemap-page-skipped',
+  'external-sitemap-skipped',
+  'form-submission-blocked',
+  'invalid-sitemap-page',
+  'navigation-skipped-read-only',
+  'non-get-blocked',
+  'page-limit',
+  'page-probe-failed',
+  'page-probe-status',
+  'popup-blocked',
+  'request-limit',
+  'sitemap-fetch',
+  'sitemap-limit',
+  'start-mime',
+  'start-status',
+  'suspicious-get-blocked',
+  'unexpected-navigation-blocked',
+  'unsafe-request-blocked',
+  'webrtc-blocked',
+  'websocket-blocked',
+  'webtransport-blocked',
+  'worker-blocked',
+])
+
+function browserAssertionOutcome(result, failure) {
+  if (result.issues.some(failure)) {
+    return 'fail'
+  }
+  if (result.profiles.length === 0 || result.issues.some(issue => incompleteBrowserIssueCodes.has(issue.code))) {
+    return 'inconclusive'
+  }
+  return 'pass'
+}
+
+function profilesCoverEveryPage(result, requiredProfiles) {
+  const profilesByUrl = new Map()
+  for (const profile of result.profiles) {
+    const profiles = profilesByUrl.get(profile.url) || new Set()
+    profiles.add(profile.profile)
+    profilesByUrl.set(profile.url, profiles)
+  }
+  return profilesByUrl.size > 0
+    && [...profilesByUrl.values()].every(profiles => requiredProfiles.every(profile => profiles.has(profile)))
+}
+
+function createBrowserAssertions(result) {
+  const subject = {
+    browserProduct: result.browser?.product,
+    browserVersion: result.browser?.version,
+    checkedPages: new Set(result.profiles.map(profile => profile.url)).size,
+    profileRuns: result.profiles.length,
+    profiles: [...new Set(result.profiles.map(profile => profile.profile))],
+    url: reportUrl(result.finalUrl || result.requestedUrl).url,
+  }
+  const assertions = []
+  const add = (assertionId, outcome, message) => assertions.push({
+    assertionId,
+    assertionVersion: 1,
+    message,
+    outcome,
+    subject,
+  })
+
+  let outcome = browserAssertionOutcome(result, issue => issue.code === 'main-landmark-count')
+  add('browser.document.main-landmark-single', outcome, {
+    fail: 'Mindestens ein geprüfter Seiten-/Profil-Lauf besitzt nicht genau ein Main-Landmark.',
+    inconclusive: 'Die Landmark-Prüfung ist wegen eines unvollständigen oder sicherheitsbedingt begrenzten Browserlaufs nicht abschließend.',
+    pass: 'Alle geprüften Seiten-/Profil-Läufe besitzen genau ein Main-Landmark.',
+  }[outcome])
+
+  outcome = browserAssertionOutcome(result, issue => issue.code === 'horizontal-overflow')
+  if (outcome === 'pass' && !profilesCoverEveryPage(result, ['narrow', 'zoom-200'])) {
+    outcome = 'inconclusive'
+  }
+  add('browser.viewport.narrow-zoom-no-horizontal-overflow', outcome, {
+    fail: 'Mindestens ein geprüfter Viewport weist horizontalen Dokumentüberlauf auf.',
+    inconclusive: 'Die Überlaufprüfung ist ohne vollständige schmale und 200-%-Näherungsprofile oder wegen eines begrenzten Browserlaufs nicht abschließend.',
+    pass: 'Die schmalen und 200-%-Näherungsprofile weisen auf allen geprüften Seiten keinen horizontalen Dokumentüberlauf auf.',
+  }[outcome])
+
+  outcome = browserAssertionOutcome(result, issue => issue.code.startsWith('axe-') && issue.code !== 'axe-runtime')
+  if (outcome === 'pass' && result.issues.some(issue => issue.code === 'axe-runtime')) {
+    outcome = 'inconclusive'
+  }
+  add('browser.accessibility.axe-no-detected-violations', outcome, {
+    fail: 'Der automatisierte Axe-Audit hat mindestens einen Verstoß auf einer geprüften Seite erkannt.',
+    inconclusive: 'Der Axe-Audit konnte nicht für alle vorgesehenen Seiten-/Profil-Läufe belastbar ausgewertet werden.',
+    pass: 'Der automatisierte Axe-Audit hat auf den geprüften Seiten-/Profil-Läufen keine Verstöße erkannt.',
+  }[outcome])
+
+  const browserContextRecorded = result.profiles.length > 0
+    && result.browser?.product === 'Chromium'
+    && Boolean(result.browser?.version)
+    && result.profiles.every(profile => Boolean(profile.profile) && Boolean(profile.facts?.overflow))
+  outcome = browserContextRecorded ? 'pass' : 'inconclusive'
+  add('browser.context.chromium-headless-recorded', outcome, {
+    inconclusive: 'Browserengine, Version oder ausgeführte Emulationsprofile sind nicht vollständig dokumentiert.',
+    pass: 'Chromium-Version und ausgeführte Headless-Emulationsprofile sind dokumentiert.',
+  }[outcome])
+
+  outcome = browserAssertionOutcome(result, issue => ['browser-http-error', 'console-error', 'page-error', 'request-failed'].includes(issue.code))
+  add('browser.runtime.no-observed-errors', outcome, {
+    fail: 'Mindestens ein geprüfter Seiten-/Profil-Lauf erzeugte einen Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler.',
+    inconclusive: 'Die Laufzeitfehlerprüfung ist wegen eines unvollständigen oder sicherheitsbedingt begrenzten Browserlaufs nicht abschließend.',
+    pass: 'In den geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet.',
+  }[outcome])
+
+  return assertions
+}
+
+function checklistCoverage(result) {
+  return evaluatePilotChecklist({
+    assertions: result.assertions,
+    itemIds: checklistItemIdsForTool('browser-check'),
+  })
 }
 
 function addBlockedRequest(result, profile, request, reason, code, severity = 'warning') {
@@ -717,6 +841,7 @@ export async function runBrowserCheck(input, suppliedOptions = {}) {
   })
   const finalUrl = validateUrl(preflight.finalUrl, options, 'Finale URL')
   const result = {
+    assertions: [],
     blockedRequestKeys: new Set(),
     blockedRequests: [],
     browser: {},
@@ -790,17 +915,22 @@ export async function runBrowserCheck(input, suppliedOptions = {}) {
     await browser.close()
   }
 
+  result.assertions = createBrowserAssertions(result)
   delete result.blockedRequestKeys
   delete result.issueMap
   delete result.omittedPageKeys
   return result
 }
 
-export function createJsonReport(result, options) {
+export function createJsonReport(inputResult, options) {
+  const result = Array.isArray(inputResult.assertions)
+    ? inputResult
+    : { ...inputResult, assertions: createBrowserAssertions(inputResult) }
   const errors = result.issues.filter(issue => issue.severity === 'error').length
   const warnings = result.issues.filter(issue => issue.severity === 'warning').length
   const pages = new Set(result.profiles.map(profile => profile.url)).size
   return {
+    checklistCoverage: checklistCoverage(result),
     generatedAt: new Date().toISOString(),
     options: {
       maxPages: options.maxPages,
@@ -820,6 +950,7 @@ export function createJsonReport(result, options) {
       persistentBrowserProfile: false,
     },
     result,
+    schemaVersion: 1,
     summary: {
       blockedRequests: result.blockedRequests.length,
       errors,
@@ -848,6 +979,11 @@ function printReport(report) {
   if (result.issues.length === 0) {
     console.log('OK: Keine Fehler oder Warnungen.')
   }
+
+  const checklistSummary = report.checklistCoverage.summary.checklistItems
+  const nonAutomaticSummary = report.checklistCoverage.summary.nonAutomaticCriteria
+  console.log(`\nPilot-Checklistennachweis ${report.checklistCoverage.catalog.version}: ${checklistSummary.pass} Punkt(e) vollständig, ${checklistSummary.partial} teilweise, ${checklistSummary.fail} fehlgeschlagen, ${checklistSummary.open + checklistSummary.inconclusive} offen/unklar.`)
+  console.log(`Nicht automatisch belegbare Kriterien: ${nonAutomaticSummary.pass} belegt, ${nonAutomaticSummary.total - nonAutomaticSummary.pass - nonAutomaticSummary.notApplicable} offen; sie werden durch diesen Lauf nicht stillschweigend abgeschlossen.`)
   console.log('\nNur lesender Lauf: ausschließlich GET; externe Requests und alle anderen Methoden wurden blockiert; keine Klicks, Uploads oder Formularübermittlungen.')
   console.log(`Ergebnis: ${summary.errors} Fehler, ${summary.warnings} Warnung(en).`)
   console.log(summary.failed ? 'NICHT BESTANDEN.' : 'BESTANDEN.')
@@ -876,7 +1012,7 @@ async function main() {
   }
   catch (error) {
     if (parsed?.options?.json) {
-      console.log(JSON.stringify({ error: redactText(error.message), tool: 'browser-check', toolPackage: { name: packageName, version: packageVersion } }, null, 2))
+      console.log(JSON.stringify({ error: redactText(error.message), schemaVersion: 1, tool: 'browser-check', toolPackage: { name: packageName, version: packageVersion } }, null, 2))
     }
     else {
       console.error(`FEHLER: ${redactText(error.message)}`)

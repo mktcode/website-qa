@@ -7,7 +7,7 @@
 | Feld | Wert |
 |---|---|
 | Erstellt | 2026-08-24T12:30:00.000Z |
-| Katalog | website-qa-pilot 1.0.0-pilot.2 (pilot) |
+| Katalog | website-qa-pilot 1.0.0-pilot.3 (pilot) |
 | Auswertungsumgebung | production |
 | Bevorzugte URL | https://example.com/ |
 | Quellstand | PROJEKT-COMMIT |
@@ -20,18 +20,18 @@
 |---|---:|
 | Vollständig nachgewiesen | 2 |
 | Fehlgeschlagen | 0 |
-| Teilweise nachgewiesen | 3 |
+| Teilweise nachgewiesen | 8 |
 | Offen | 6 |
 | Unklar | 0 |
 | Nicht zutreffend | 0 |
 | Externer Nachweis offen | 1 |
 | Zurückgestellt | 0 |
 | Akzeptierte Abweichung (offen) | 0 |
-| **Ausgewählte Pilotpunkte** | **12** |
+| **Ausgewählte Pilotpunkte** | **17** |
 
-Automatische Kriterien: 9 bestanden, 0 fehlgeschlagen, 0 unklar, 14 ohne Nachweis.
+Automatische Kriterien: 14 bestanden, 0 fehlgeschlagen, 0 unklar, 14 ohne Nachweis.
 
-Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 11 ohne Nachweis.
+Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 18 ohne Nachweis.
 
 ## Technische Läufe
 
@@ -39,6 +39,7 @@ Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 11 ohne Nachweis.
 |---|---|---|---:|---:|---|
 | http-check 0.1.0 | https://example.com/ | production | ja | 2 | <code>website-qa-http https://example.com/ --strict --json</code> |
 | crawl-check 0.1.0 | https://example.com/ | production | ja | 7 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
+| browser-check 0.1.0 | https://example.com/ | production | ja | 5 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
 
 ## Checklistenpunkte
 
@@ -53,6 +54,11 @@ Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 11 ohne Nachweis.
 | CORE-ERR-02 | core | Vollständig nachgewiesen | 2/2 | 0/0 |
 | CORE-SEO-01 | core | Teilweise nachgewiesen | 3/3 | 0/1 |
 | CORE-SEO-02 | core | Teilweise nachgewiesen | 2/2 | 0/1 |
+| CORE-A11Y-01 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
+| CORE-A11Y-10 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
+| CORE-A11Y-13 | core | Teilweise nachgewiesen | 1/1 | 0/3 |
+| CORE-QA-02 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
+| CORE-QA-07 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-PERF-01 | core | Offen | 0/3 | 0/1 |
 | CORE-PERF-05 | core | Offen | 0/2 | 0/1 |
 | GOV-RGT-02 | auftrag-recht-uebergabe | Vollständig nachgewiesen | 0/0 | 1/1 |
@@ -139,6 +145,50 @@ Die Seitensprache ist mit einem passenden `lang`-Attribut angegeben; Überschrif
 - [x] `CORE-SEO-02/C2` Alle vom Crawl geprüften Seiten besitzen genau eine H1-Überschrift. — automatic, pass
 - [ ] `CORE-SEO-02/C3` Seitensprache, Überschriftenhierarchie und Hauptüberschrift sind inhaltlich passend und verständlich. — manual, noEvidence
   - Erforderlicher Nachweis: Sprachcode und Überschriftenstruktur auf repräsentativen Seitentypen redaktionell und semantisch prüfen.
+
+### CORE-A11Y-01: Teilweise nachgewiesen
+
+Semantische HTML-Elemente werden passend eingesetzt; Navigation, Hauptinhalt, ergänzende Bereiche und Footer sind sinnvoll ausgezeichnet.
+
+- [x] `CORE-A11Y-01/C1` Alle geprüften Seiten-/Profil-Läufe besitzen genau ein Main-Landmark. — automatic, pass
+- [ ] `CORE-A11Y-01/C2` Navigation, Hauptinhalt, ergänzende Bereiche und Footer sind semantisch passend und verständlich ausgezeichnet. — manual, noEvidence
+  - Erforderlicher Nachweis: Semantische Struktur auf repräsentativen Seitentypen im DOM und Accessibility Tree fachlich prüfen.
+
+### CORE-A11Y-10: Teilweise nachgewiesen
+
+Bei 320 CSS-Pixeln und bei 200 Prozent reiner Textvergrößerung bleibt der Inhalt ohne zweidimensionales Scrollen sinnvoll nutzbar; lange URLs, E-Mail-Adressen und Komposita verursachen keinen Dokumentüberlauf.
+
+- [x] `CORE-A11Y-10/C1` Die technischen 320-Pixel- und 200-%-Näherungsprofile erkennen auf den geprüften Seiten keinen horizontalen Dokumentüberlauf. — automatic, pass
+- [ ] `CORE-A11Y-10/C2` Inhalt und Funktionen bleiben bei 320 CSS-Pixeln und tatsächlicher reiner Textvergrößerung sinnvoll sichtbar und bedienbar. — manual, noEvidence
+  - Erforderlicher Nachweis: Repräsentative Seiten in einem realen Browser bei 320 CSS-Pixeln und 200 Prozent reiner Textvergrößerung visuell und funktional prüfen; die technische Näherung allein genügt nicht.
+
+### CORE-A11Y-13: Teilweise nachgewiesen
+
+Tastaturprüfung, automatisierter Accessibility-Audit und reale Mobilbrowserprüfung sind getrennt mit Datum und Werkzeug dokumentiert; eine Screenreader-Stichprobe erfolgt risikogerecht und bei vereinbarter Konformität zwingend.
+
+- [x] `CORE-A11Y-13/C1` Der Axe-Audit wurde auf allen vorgesehenen Seiten-/Profil-Läufen ausgeführt und hat keine automatisiert erkennbaren Verstöße gemeldet. — automatic, pass
+- [ ] `CORE-A11Y-13/C2` Eine eigenständige Tastaturprüfung ist mit Datum, Werkzeug beziehungsweise Browser und Ergebnis dokumentiert. — manual, noEvidence
+  - Erforderlicher Nachweis: Tastaturprüfung ohne Maus auf repräsentativen Seiten und Funktionen durchführen und separat protokollieren.
+- [ ] `CORE-A11Y-13/C3` Eine Prüfung in mindestens einem realen Mobilbrowser ist mit Gerät, Browser, Datum und Ergebnis dokumentiert. — manual, noEvidence
+  - Erforderlicher Nachweis: Realen Mobilbrowser und Gerät verwenden; Headless- oder Desktop-Emulation nicht als reale Mobilbrowserprüfung ausgeben.
+- [ ] `CORE-A11Y-13/C4` Die risikogerechte Screenreader-Stichprobe beziehungsweise ihre begründete Nichtanwendbarkeit ist dokumentiert. — manual, noEvidence
+  - Erforderlicher Nachweis: Screenreader-Stichprobe risikogerecht durchführen; bei vereinbarter Konformität ist sie verpflichtend und nicht als nicht anwendbar zu behandeln.
+
+### CORE-QA-02: Teilweise nachgewiesen
+
+Browserengine, Headless-Emulation und reale Browser beziehungsweise Geräte werden im Nachweis korrekt unterschieden; eine WebKit-Prüfung wird nicht als Safari-Prüfung bezeichnet.
+
+- [x] `CORE-QA-02/C1` Der technische Browserbericht dokumentiert Chromium-Version und ausgeführte Headless-Emulationsprofile. — automatic, pass
+- [ ] `CORE-QA-02/C2` Der Projektnachweis unterscheidet Headless-Emulationen, Browserengines und reale Browser beziehungsweise Geräte und benennt nicht geprüfte Plattformen. — manual, noEvidence
+  - Erforderlicher Nachweis: Ausgeführte und nicht ausgeführte Browser-/Geräteprüfungen korrekt deklarieren; Chromium nicht als Safari und Emulation nicht als reales Gerät bezeichnen.
+
+### CORE-QA-07: Teilweise nachgewiesen
+
+Die Seiten wurden ohne sichtbare JavaScript-, Netzwerk- oder Hydrationsfehler in der Browserkonsole geprüft.
+
+- [x] `CORE-QA-07/C1` In den automatisch geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet. — automatic, pass
+- [ ] `CORE-QA-07/C2` Interaktionsabhängige und vom beobachtenden Browserlauf nicht erreichte Zustände wurden zusätzlich auf Konsolen-, Netzwerk- und Hydrationsfehler geprüft. — manual, noEvidence
+  - Erforderlicher Nachweis: Vereinbarte interaktive Zustände manuell aufrufen und Browserkonsole sowie Netzwerkprotokoll beobachten; keine schreibenden Produktionsaktionen ausführen.
 
 ### CORE-PERF-01: Offen
 

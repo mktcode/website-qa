@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-24T12:20:00.000Z",
+  "tool": "browser-check",
+  "toolPackage": {
+    "name": "@mktcode/website-qa",
+    "version": "0.1.0"
+  },
+  "checklistCoverage": {
+    "catalog": {
+      "id": "website-qa-pilot",
+      "status": "pilot",
+      "version": "1.0.0-pilot.3"
+    }
+  },
+  "options": {
+    "maxPages": 10,
+    "maxRequests": 300,
+    "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"],
+    "sitemap": false,
+    "strict": true,
+    "timeoutMilliseconds": 20000
+  },
+  "readOnlyGuarantees": {
+    "buttonsActivated": false,
+    "externalRequestsAllowed": false,
+    "fileUploads": false,
+    "formActionsInvoked": false,
+    "formsSubmitted": false,
+    "methodsAllowed": ["GET"],
+    "persistentBrowserProfile": false
+  },
+  "result": {
+    "requestedUrl": "https://example.com/",
+    "finalUrl": "https://example.com/",
+    "browser": {
+      "product": "Chromium",
+      "version": "Chrome/140.0.0.0"
+    },
+    "assertions": [
+      {
+        "assertionId": "browser.document.main-landmark-single",
+        "assertionVersion": 1,
+        "outcome": "pass",
+        "message": "Alle geprüften Seiten-/Profil-Läufe besitzen genau ein Main-Landmark.",
+        "subject": { "url": "https://example.com/", "checkedPages": 1, "profileRuns": 5, "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"], "browserProduct": "Chromium", "browserVersion": "Chrome/140.0.0.0" }
+      },
+      {
+        "assertionId": "browser.viewport.narrow-zoom-no-horizontal-overflow",
+        "assertionVersion": 1,
+        "outcome": "pass",
+        "message": "Die schmalen und 200-%-Näherungsprofile weisen auf allen geprüften Seiten keinen horizontalen Dokumentüberlauf auf.",
+        "subject": { "url": "https://example.com/", "checkedPages": 1, "profileRuns": 5, "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"], "browserProduct": "Chromium", "browserVersion": "Chrome/140.0.0.0" }
+      },
+      {
+        "assertionId": "browser.accessibility.axe-no-detected-violations",
+        "assertionVersion": 1,
+        "outcome": "pass",
+        "message": "Der automatisierte Axe-Audit hat auf den geprüften Seiten-/Profil-Läufen keine Verstöße erkannt.",
+        "subject": { "url": "https://example.com/", "checkedPages": 1, "profileRuns": 5, "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"], "browserProduct": "Chromium", "browserVersion": "Chrome/140.0.0.0" }
+      },
+      {
+        "assertionId": "browser.context.chromium-headless-recorded",
+        "assertionVersion": 1,
+        "outcome": "pass",
+        "message": "Chromium-Version und ausgeführte Headless-Emulationsprofile sind dokumentiert.",
+        "subject": { "url": "https://example.com/", "checkedPages": 1, "profileRuns": 5, "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"], "browserProduct": "Chromium", "browserVersion": "Chrome/140.0.0.0" }
+      },
+      {
+        "assertionId": "browser.runtime.no-observed-errors",
+        "assertionVersion": 1,
+        "outcome": "pass",
+        "message": "In den geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet.",
+        "subject": { "url": "https://example.com/", "checkedPages": 1, "profileRuns": 5, "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"], "browserProduct": "Chromium", "browserVersion": "Chrome/140.0.0.0" }
+      }
+    ],
+    "blockedRequests": [],
+    "issues": [],
+    "profiles": [
+      { "profile": "desktop", "url": "https://example.com/" },
+      { "profile": "mobile", "url": "https://example.com/" },
+      { "profile": "narrow", "url": "https://example.com/" },
+      { "profile": "reduced-motion", "url": "https://example.com/" },
+      { "profile": "zoom-200", "url": "https://example.com/" }
+    ]
+  },
+  "summary": {
+    "blockedRequests": 0,
+    "errors": 0,
+    "failed": false,
+    "pages": 1,
+    "profileRuns": 5,
+    "warnings": 0
+  }
+}

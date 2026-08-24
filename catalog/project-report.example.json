@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "catalog": {
     "id": "website-qa-pilot",
-    "version": "1.0.0-pilot.2"
+    "version": "1.0.0-pilot.3"
   },
   "project": {
     "name": "Beispielwebsite",
@@ -31,6 +31,14 @@
       "targetUrl": "https://example.com/",
       "environment": "production",
       "command": "website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json",
+      "sourceRevision": "PROJEKT-COMMIT",
+      "deploymentId": "DEPLOYMENT-ARTEFAKT"
+    },
+    {
+      "reportFile": "./browser-report.example.json",
+      "targetUrl": "https://example.com/",
+      "environment": "production",
+      "command": "website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json",
       "sourceRevision": "PROJEKT-COMMIT",
       "deploymentId": "DEPLOYMENT-ARTEFAKT"
     }
