@@ -29,22 +29,22 @@
 | Akzeptierte Abweichung (offen) | 0 |
 | **Ausgewählte Pilotpunkte** | **34** |
 
-Automatische Kriterien: 46 bestanden, 0 fehlgeschlagen, 0 unklar, 11 ohne Nachweis.
+Automatische Kriterien (57 gesamt): 46 bestanden, 0 fehlgeschlagen, 0 unklar, 0 nicht zutreffend, 11 ohne Nachweis.
 
-Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 35 ohne Nachweis.
+Nicht automatische Kriterien (36 gesamt): 1 belegt, 0 fehlgeschlagen, 0 unklar, 0 nicht zutreffend, 35 ohne Nachweis.
 
 ## Technische Läufe
 
 | Werkzeug | Ziel | Umgebung | Verwendet | Assertions | Befehl |
 |---|---|---|---:|---:|---|
-| http-check 0.6.0 | https://example.com/ | production | ja | 12 | <code>website-qa-http https://example.com/ --strict --json</code> |
-| crawl-check 0.6.0 | https://example.com/ | production | ja | 16 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
-| browser-check 0.6.0 | https://example.com/ | production | ja | 7 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
-| social-preview-check 0.6.0 | https://example.com/ | production | ja | 10 | <code>website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json</code> |
+| http-check 0.6.1 | https://example.com/ | production | ja | 12 | <code>website-qa-http https://example.com/ --strict --json</code> |
+| crawl-check 0.6.1 | https://example.com/ | production | ja | 16 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
+| browser-check 0.6.1 | https://example.com/ | production | ja | 7 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
+| social-preview-check 0.6.1 | https://example.com/ | production | ja | 10 | <code>website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json</code> |
 
 ## Checklistenpunkte
 
-| ID | Modul | Projektstatus | Automatisch | Nicht automatisch |
+| ID | Modul | Projektstatus | Automatisch geklärt | Nicht automatisch geklärt |
 |---|---|---|---:|---:|
 | CORE-DOM-02 | core | Offen | 0/2 | 0/0 |
 | CORE-DOM-04 | core | Externer Nachweis offen | 0/0 | 0/2 |

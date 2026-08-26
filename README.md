@@ -239,6 +239,12 @@ const files = writePilotProjectReportBundle({
 
 Schemas und Beispiele liegen unter [`catalog/`](catalog/). `report.json` verwendet Ausgabeschema 2, weil berichtete Ziel-URLs ohne Querywerte gebunden werden; bei Queryzielen werden zusätzlich nur die Parameternamen verglichen. Der Pilot umfasst noch nicht die vollständige Website-Checkliste und verändert keine Projektcheckliste automatisch.
 
+### Migration von 0.6.0
+
+- Die vollständige und die datenarme Markdowndarstellung nennen für automatische und nicht automatische Kriterien nun jeweils Gesamtzahl, bestandene beziehungsweise belegte, fehlgeschlagene, unklare, nicht zutreffende und nicht belegte Kriterien. Die Kurzzeilen sind damit summengleich.
+- In der Kriterienübersicht des vollständigen Markdownberichts zählen `pass` und `notApplicable` als geklärt. Ein fachlich nicht zutreffendes Kriterium wird dadurch nicht länger wie ein fehlender Nachweis dargestellt.
+- JSON-Schemas, Pilotkatalog, Assertions und technische Prüfergebnisse ändern sich nicht. Bereits mit `0.6.0` erzeugte technische Berichte können deshalb ohne erneute Netzwerkprüfung mit dem korrigierten Berichtsgenerator verarbeitet werden.
+
 ### Migration von 0.5.x
 
 - Der Browser-Prüfer liefert zwei zusätzliche atomare Assertions für die vollständige passive Beobachtung externer Requestversuche sowie des initialen Cookie-, Local-/Session-Storage- und IndexedDB-Inventars.

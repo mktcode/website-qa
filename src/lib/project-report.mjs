@@ -312,6 +312,14 @@ function statusLabel(status) {
   }[status] || status
 }
 
+function criterionSummary(label, counts, successfulLabel) {
+  return `${label} (${counts.total} gesamt): ${counts.pass} ${successfulLabel}, ${counts.fail} fehlgeschlagen, ${counts.inconclusive} unklar, ${counts.notApplicable} nicht zutreffend, ${counts.noEvidence} ohne Nachweis.`
+}
+
+function resolvedCriterionCount(criteria) {
+  return criteria.filter(criterion => ['notApplicable', 'pass'].includes(criterion.outcome)).length
+}
+
 export function renderPilotProjectReportMarkdown(report) {
   const lines = [
     `# Website-QA-Prüfbericht: ${markdownText(report.project.name)}`,
@@ -342,9 +350,9 @@ export function renderPilotProjectReportMarkdown(report) {
   lines.push(`| **Ausgewählte Pilotpunkte** | **${report.summary.checklistItems.total}** |`)
   lines.push(
     '',
-    `Automatische Kriterien: ${report.summary.automaticCriteria.pass} bestanden, ${report.summary.automaticCriteria.fail} fehlgeschlagen, ${report.summary.automaticCriteria.inconclusive} unklar, ${report.summary.automaticCriteria.noEvidence} ohne Nachweis.`,
+    criterionSummary('Automatische Kriterien', report.summary.automaticCriteria, 'bestanden'),
     '',
-    `Nicht automatische Kriterien: ${report.summary.nonAutomaticCriteria.pass} belegt, ${report.summary.nonAutomaticCriteria.fail} fehlgeschlagen, ${report.summary.nonAutomaticCriteria.noEvidence} ohne Nachweis.`,
+    criterionSummary('Nicht automatische Kriterien', report.summary.nonAutomaticCriteria, 'belegt'),
     '',
     '## Technische Läufe',
     '',
@@ -363,13 +371,13 @@ export function renderPilotProjectReportMarkdown(report) {
     '',
     '## Checklistenpunkte',
     '',
-    '| ID | Modul | Projektstatus | Automatisch | Nicht automatisch |',
+    '| ID | Modul | Projektstatus | Automatisch geklärt | Nicht automatisch geklärt |',
     '|---|---|---|---:|---:|',
   )
   for (const item of report.items) {
     const automatic = item.criteria.filter(criterion => criterion.mode === 'automatic')
     const nonAutomatic = item.criteria.filter(criterion => criterion.mode !== 'automatic')
-    lines.push(`| ${item.id} | ${markdownText(item.module)} | ${statusLabel(item.projectStatus)} | ${automatic.filter(criterion => criterion.outcome === 'pass').length}/${automatic.length} | ${nonAutomatic.filter(criterion => criterion.outcome === 'pass').length}/${nonAutomatic.length} |`)
+    lines.push(`| ${item.id} | ${markdownText(item.module)} | ${statusLabel(item.projectStatus)} | ${resolvedCriterionCount(automatic)}/${automatic.length} | ${resolvedCriterionCount(nonAutomatic)}/${nonAutomatic.length} |`)
   }
 
   for (const item of report.items) {
@@ -460,9 +468,9 @@ export function renderPilotProjectSummaryMarkdown(report, options = {}) {
   lines.push(
     `| **Ausgewählte Pilotpunkte** | **${report.summary.checklistItems.total}** |`,
     '',
-    `Automatische Kriterien: ${report.summary.automaticCriteria.pass} bestanden, ${report.summary.automaticCriteria.fail} fehlgeschlagen, ${report.summary.automaticCriteria.inconclusive} unklar, ${report.summary.automaticCriteria.noEvidence} ohne Nachweis.`,
+    criterionSummary('Automatische Kriterien', report.summary.automaticCriteria, 'bestanden'),
     '',
-    `Nicht automatische Kriterien: ${report.summary.nonAutomaticCriteria.pass} belegt, ${report.summary.nonAutomaticCriteria.fail} fehlgeschlagen, ${report.summary.nonAutomaticCriteria.noEvidence} ohne Nachweis.`,
+    criterionSummary('Nicht automatische Kriterien', report.summary.nonAutomaticCriteria, 'belegt'),
     '',
     '## Technische Läufe',
     '',

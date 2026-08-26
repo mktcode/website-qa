@@ -300,6 +300,43 @@ describe('project report pilot', () => {
     })).toThrow(/öffentliche URL/)
   })
 
+  it('renders criterion totals and not-applicable evidence consistently', () => {
+    const report = createPilotProjectReport({
+      config: projectConfig(),
+      evidenceDocument: {
+        catalog: { id: 'website-qa-pilot', version: '1.0.0-pilot.7' },
+        evidence: [{
+          checkedAt: '2026-08-26',
+          checkedBy: 'technisch verantwortliche Stelle',
+          criterionId: 'CORE-PRIV-04/C2',
+          note: 'Initialinventar und Dokumentation stimmen überein.',
+          outcome: 'pass',
+        }, {
+          checkedAt: '2026-08-26',
+          checkedBy: 'technisch verantwortliche Stelle',
+          criterionId: 'CORE-PRIV-04/C3',
+          note: 'Es werden keine Cookies gesetzt.',
+          outcome: 'notApplicable',
+        }],
+        schemaVersion: 1,
+      },
+      technicalRuns: [technicalRun(technicalReport([
+        assertion('browser.privacy.initial-storage-observation-complete'),
+      ]))],
+    })
+    const fullMarkdown = renderPilotProjectReportMarkdown(report)
+    const summaryMarkdown = renderPilotProjectSummaryMarkdown(report)
+
+    const automaticSummary = 'Automatische Kriterien (57 gesamt): 1 bestanden, 0 fehlgeschlagen, 0 unklar, 0 nicht zutreffend, 56 ohne Nachweis.'
+    const nonAutomaticSummary = 'Nicht automatische Kriterien (35 gesamt): 1 belegt, 0 fehlgeschlagen, 0 unklar, 1 nicht zutreffend, 33 ohne Nachweis.'
+    expect(fullMarkdown).toContain(automaticSummary)
+    expect(fullMarkdown).toContain(nonAutomaticSummary)
+    expect(summaryMarkdown).toContain(automaticSummary)
+    expect(summaryMarkdown).toContain(nonAutomaticSummary)
+    expect(fullMarkdown).toContain('| ID | Modul | Projektstatus | Automatisch geklärt | Nicht automatisch geklärt |')
+    expect(fullMarkdown).toContain('| CORE-PRIV-04 | core | Vollständig nachgewiesen | 1/1 | 2/2 |')
+  })
+
   it('writes a timestamped bundle with byte-identical raw reports and a separate summary', () => {
     const directory = mkdtempSync(join(tmpdir(), 'website-qa-bundle-'))
     temporaryDirectories.add(directory)

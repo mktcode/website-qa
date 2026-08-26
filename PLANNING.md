@@ -650,7 +650,7 @@ Erste Beobachtungen aus der abgeschlossenen Migration:
 
 - Die Versions- und Katalogumstellung sowie die kontrollierte Übernahme stabiler Evidence-IDs funktionierten ohne Sonderformat.
 - Das vollständige Bundle blieb mit rund 650 KiB für vier technische Läufe handhabbar; die versionierbare Zusammenfassung blieb frei von Projektname, Ziel-URL, Befundtexten und lokalen Pfaden.
-- Die Kurzzeilen für automatische und nicht automatische Kriterien nennen derzeit nicht alle vorhandenen Kategorien. Insbesondere wird ein nicht anwendbares manuelles Kriterium korrekt im JSON gezählt, aber in der textlichen Kriterienkurzzeile nicht ausdrücklich genannt. Vor einem stabilen Berichtsvertrag ist zu entscheiden, ob die Kurzzeilen alle Statuskategorien summengleich ausweisen sollen.
+- Die Pilotmigration zeigte eine redaktionelle Lücke: Die Kriterienkurzzeilen nannten nicht alle im JSON korrekt gezählten Kategorien, und ein nicht anwendbares Kriterium erschien in der Detailübersicht wie ungeklärt. Die Patchkorrektur `0.6.1` weist Gesamtzahl, fehlgeschlagene, unklare, nicht zutreffende und nicht belegte Kriterien summengleich aus; `pass` und `notApplicable` zählen in der Detailübersicht als geklärt. Schemas, Katalog, Assertions und technische Netzwerkprüfer bleiben unverändert.
 - Die bewusst offenen API-/Content-Negotiation-, External-Link-, Textzoom-, Mobilgerät-, Screenreader- und Plattformkriterien blieben trotz vollständig grüner technischer Läufe sichtbar.
 
 ### Phase I – Verträge für eine spätere 1.0 stabilisieren
