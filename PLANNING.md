@@ -1,6 +1,6 @@
 # Website-QA: abgeschlossene Umsetzung und nächste Konsolidierungsphase
 
-> **Status:** Der Workflow wurde mit Paketversion `0.2.0` eingeführt, mit `0.3.0` um strukturierte Social-Nachweise, mit `0.4.0` um vorhandene Sitemap-, Crawl- und Ressourcenbeobachtungen, mit `0.5.0` um öffentlich beobachtbare Sicherheitsheadernachweise und mit `0.6.0` um passive technische Datenschutzbeobachtungen ergänzt. Die Funktionsstände werden jeweils lokal und in installierten Verbraucherprojekten geprüft. Nach `0.6.0` folgt bewusst zuerst eine reale Pilotmigration und Konsolidierung; neue Assertions werden erst aus den dabei belegten Lücken priorisiert.
+> **Status:** Der Workflow wurde mit Paketversion `0.2.0` eingeführt, mit `0.3.0` um strukturierte Social-Nachweise, mit `0.4.0` um vorhandene Sitemap-, Crawl- und Ressourcenbeobachtungen, mit `0.5.0` um öffentlich beobachtbare Sicherheitsheadernachweise und mit `0.6.0` um passive technische Datenschutzbeobachtungen ergänzt. Die Funktionsstände werden jeweils lokal und in installierten Verbraucherprojekten geprüft. Die reale Pilotmigration auf `0.6.0` wurde abgeschlossen; anschließend folgt bewusst ein Stabilisierungsfenster. Neue Assertions werden erst aus den dabei belegten Lücken priorisiert.
 >
 > Dieses Dokument bewahrt Planung, Entscheidungen, Sicherheitsanforderungen und Abnahmekriterien des frameworkunabhängigen Refactorings von `@mktcode/website-qa`. Es enthält keine ausgefüllten Nachweise oder Vorgaben für eine bestimmte Website. Zukunftsformulierungen in den historischen Planungsabschnitten beschreiben den damaligen Implementierungsweg und keine noch offene Zusage.
 >
@@ -622,6 +622,8 @@ Es werden keine neuen Requests, externen Freigaben, Klicks, Consent-Interaktione
 
 ### Phase G – Bestehenden Praxispiloten kontrolliert migrieren
 
+**Status 26. August 2026: abgeschlossen.** Der reale Verbraucher wurde vom strukturierten Stand `0.3.0` auf den unveränderlichen Releasecommit von `0.6.0` und Katalog `1.0.0-pilot.7` migriert. Alle vier neuen technischen Läufe bestanden mit insgesamt 136 Assertions; das Bundle enthält bytegleiche Eingaben und sechs verifizierte Manifestdateien. 29 von 34 Punkten sind vollständig, vier teilweise und einer offen. Alle 57 automatischen Kriterien bestanden; sechs nicht automatische Kriterien blieben ohne Nachweis und wurden weder simuliert noch automatisch geschlossen. Die Migration veränderte keine Websiteauslieferung und führte ausschließlich GET-basierte öffentliche Prüfungen aus.
+
 1. Das bestehende Verbraucherprojekt auf den unveränderlichen Werkzeugstand `0.6.0` aktualisieren.
 2. Projektkonfiguration und Evidence-Datei ausdrücklich auf Katalog `1.0.0-pilot.7` umstellen.
 3. Alle vier technischen Läufe mit demselben Werkzeug- und Katalogstand neu erzeugen; alte Berichte werden nicht mit neuen Katalogen vermischt.
@@ -643,6 +645,13 @@ Nach der Pilotmigration werden zunächst Praxisbefunde gesammelt:
 - Upgradeaufwand für Konfiguration, Evidence-Datei und sichere Zusammenfassung.
 
 Korrekturen an Fehlern, Redaktion oder Dokumentation sind in dieser Phase gegenüber neuen fachlichen Assertions vorrangig. Ein reiner Dokumentationsabschluss oder eine fehlerkompatible Wartung erzwingt nicht automatisch eine neue Funktionsversion.
+
+Erste Beobachtungen aus der abgeschlossenen Migration:
+
+- Die Versions- und Katalogumstellung sowie die kontrollierte Übernahme stabiler Evidence-IDs funktionierten ohne Sonderformat.
+- Das vollständige Bundle blieb mit rund 650 KiB für vier technische Läufe handhabbar; die versionierbare Zusammenfassung blieb frei von Projektname, Ziel-URL, Befundtexten und lokalen Pfaden.
+- Die Kurzzeilen für automatische und nicht automatische Kriterien nennen derzeit nicht alle vorhandenen Kategorien. Insbesondere wird ein nicht anwendbares manuelles Kriterium korrekt im JSON gezählt, aber in der textlichen Kriterienkurzzeile nicht ausdrücklich genannt. Vor einem stabilen Berichtsvertrag ist zu entscheiden, ob die Kurzzeilen alle Statuskategorien summengleich ausweisen sollen.
+- Die bewusst offenen API-/Content-Negotiation-, External-Link-, Textzoom-, Mobilgerät-, Screenreader- und Plattformkriterien blieben trotz vollständig grüner technischer Läufe sichtbar.
 
 ### Phase I – Verträge für eine spätere 1.0 stabilisieren
 
