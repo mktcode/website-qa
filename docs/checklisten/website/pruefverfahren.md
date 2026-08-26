@@ -183,7 +183,7 @@ npm run ops:crawl:check -- https://example.de/ --sitemap --max-pages=50 --max-re
 
 Der Crawler verwendet ausnahmslos GET und begrenzt Seiten, Ressourcen, Antwortgrößen, Redirects und Laufzeit. Formulare werden nur inventarisiert; ihre Actions werden nie aufgerufen, kein Formular wird abgesendet und kein Button betätigt. Externe Links werden erfasst, aber nicht abgerufen. Interne Navigationen mit verdächtigen Aktionspfaden oder sensitiven Query-Parametern werden vorsorglich nicht angefordert und als ausgelassene Prüfung ausgewiesen. `--json` erzeugt eine maschinenlesbare Ausgabe mit ausdrücklichem Nachweis dieser Nur-Lese-Grenzen; `--json-file=<Pfad>` schreibt sie direkt in eine lokale Datei. Werkzeugcommit, Ziel, Optionen, Abdeckung und ausgelassene Pfade werden protokolliert.
 
-Der strukturierte Nachweispilot bewertet zusätzlich Canonical-Vollständigkeit und -Konsistenz, vorhandene und eindeutige Titel beziehungsweise Meta-Beschreibungen sowie `lang` und die Anzahl der H1-Überschriften. Ein begrenzter, fehlgeschlagener oder aus Nur-Lese-Vorsicht ausgelassener Seitenlauf führt bei betroffenen Aussagen zu `inconclusive` statt zu einem stillschweigenden Erfolg. Inhaltliche Eignung, tatsächliche Sprachpassung und Überschriftenhierarchie bleiben manuelle Kriterien.
+Der strukturierte Nachweispilot bewertet zusätzlich Canonical-Vollständigkeit und -Konsistenz, vorhandene und eindeutige Titel beziehungsweise Meta-Beschreibungen, `lang`, die Anzahl der H1-Überschriften, Sitemap-Dateien und -Einträge, robots.txt-Referenz, Sitemap-Abdeckung, interne Seiten- und Fragmentziele sowie Status und MIME-Typ interner Ressourcen. Ein begrenzter, fehlgeschlagener oder aus Nur-Lese-Vorsicht ausgelassener Seiten-, Ressourcen- oder Sitemaplauf führt bei betroffenen Aussagen zu `inconclusive` statt zu einem stillschweigenden Erfolg. Inhaltliche Eignung, tatsächliche Sprachpassung, Überschriftenhierarchie, projektspezifische Inventarvollständigkeit, API- und Content-Negotiation-Fehler, externe Links sowie dynamische oder interaktionsabhängige Ressourcen bleiben manuelle beziehungsweise gesonderte Kriterien.
 
 Der technische Crawl erfasst mindestens:
 
@@ -193,7 +193,9 @@ Der technische Crawl erfasst mindestens:
 - unbekannte Route,
 - Canonical, Robots-Meta und Status,
 - Sitemapziele und deren Self-Canonical,
-- Browserkonsole und fehlgeschlagene Netzwerkanfragen.
+- fehlgeschlagene serverseitige Seiten- und Ressourcenabrufe.
+
+Browserkonsole, clientseitig nachgeladene und erst durch Interaktion ausgelöste Ressourcen gehören dagegen zum getrennten Browserverfahren.
 
 Die Sitemap wird unabhängig vom Social-Check als XML geparst. Inhaltstyp, absolute Hosts, Duplikate, Statuscodes, Canonicals und Ausschluss von Fehler-, Redirect- und `noindex`-Seiten werden kontrolliert. Eine vorhandene XSL-Ansicht wird im Browser beziehungsweise als Text auf sichtbare Platzhalter wie `undefined` geprüft.
 

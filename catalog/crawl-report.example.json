@@ -4,13 +4,13 @@
   "tool": "crawl-check",
   "toolPackage": {
     "name": "@mktcode/website-qa",
-    "version": "0.3.0"
+    "version": "0.4.0"
   },
   "checklistCoverage": {
     "catalog": {
       "id": "website-qa-pilot",
       "status": "pilot",
-      "version": "1.0.0-pilot.4"
+      "version": "1.0.0-pilot.5"
     }
   },
   "results": [
@@ -66,6 +66,69 @@
           "outcome": "pass",
           "message": "Alle geprüften Seiten besitzen genau eine H1-Überschrift.",
           "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+        },
+        {
+          "assertionId": "crawl.sitemap.file-valid",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Alle geprüften Sitemap-Dateien sind direkt als erfolgreiche, gültige XML-Antworten mit passendem Medientyp verfügbar.",
+          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+        },
+        {
+          "assertionId": "crawl.sitemap.robots-reference-present",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "robots.txt referenziert die geprüfte Sitemap.",
+          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+        },
+        {
+          "assertionId": "crawl.sitemap.entries-valid",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Die geprüfte Sitemap enthält ausschließlich eindeutige, absolute, kanonische, indexierbare 200-URLs des Zielorigins.",
+          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+        },
+        {
+          "assertionId": "crawl.sitemap.coverage-complete",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Alle gültig erfassten Sitemap-URLs wurden innerhalb der dokumentierten Limits geprüft.",
+          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+        },
+        {
+          "assertionId": "crawl.navigation.internal-valid",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Alle geprüften internen Seiten- und Fragmentziele sind erfolgreich erreichbar.",
+          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+        },
+        {
+          "assertionId": "crawl.navigation.internal-direct",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Alle geprüften internen Seitenziele sind ohne Weiterleitung direkt erreichbar.",
+          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+        },
+        {
+          "assertionId": "crawl.resources.status-valid",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Alle geprüften internen Ressourcen antworten erfolgreich.",
+          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+        },
+        {
+          "assertionId": "crawl.resources.mime-valid",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Alle geprüften internen Ressourcen verwenden zum Einbindungszweck passende MIME-Typen.",
+          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+        },
+        {
+          "assertionId": "crawl.run.coverage-complete",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Der ausschließlich lesende Crawl blieb innerhalb der dokumentierten Seiten-, Ressourcen- und Sitemapgrenzen und musste keine Navigation aus Sicherheitsgründen auslassen.",
+          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
         }
       ],
       "issues": [],
@@ -73,6 +136,14 @@
         { "requestedUrl": "https://example.com/", "finalUrl": "https://example.com/", "status": 200 },
         { "requestedUrl": "https://example.com/about", "finalUrl": "https://example.com/about", "status": 200 },
         { "requestedUrl": "https://example.com/contact", "finalUrl": "https://example.com/contact", "status": 200 }
+      ],
+      "resources": [
+        { "requestedUrl": "https://example.com/assets/site.12345678.css", "finalUrl": "https://example.com/assets/site.12345678.css", "status": 200, "contentType": "text/css" },
+        { "requestedUrl": "https://example.com/assets/site.12345678.js", "finalUrl": "https://example.com/assets/site.12345678.js", "status": 200, "contentType": "application/javascript" }
+      ],
+      "robots": { "finalUrl": "https://example.com/robots.txt", "status": 200, "contentType": "text/plain" },
+      "sitemaps": [
+        { "requestedUrl": "https://example.com/sitemap.xml", "finalUrl": "https://example.com/sitemap.xml", "status": 200, "contentType": "application/xml", "kind": "urlset", "locations": 3 }
       ]
     }
   ],
@@ -82,7 +153,7 @@
     "failed": false,
     "formsObservedNotSubmitted": 0,
     "pages": 3,
-    "resources": 0,
+    "resources": 2,
     "skippedNavigation": 0,
     "warnings": 0
   }

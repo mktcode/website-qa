@@ -98,7 +98,7 @@ Eine kopierbare Minimalintegration liegt unter [`examples/project-integration/`]
 
 ## Strukturierter Projektnachweis
 
-HTTP, Crawl, Browser und Social geben neben Befunden positive, negative, nicht anwendbare und unklare atomare Prüfaussagen aus. Grundlage ist der mitgelieferte [Pilotkatalog](catalog/README.md). Er unterscheidet:
+HTTP, Crawl, Browser und Social geben neben Befunden positive, negative, nicht anwendbare und unklare atomare Prüfaussagen aus. Der Crawl bildet zusätzlich Sitemap-Dateien und -Einträge, robots.txt-Referenz, vollständige Sitemap-Abdeckung, interne Navigationen, Ressourcenstatus und MIME-Typen sowie erreichte Sicherheits- und Umfangsgrenzen atomar ab. Grundlage ist der mitgelieferte [Pilotkatalog](catalog/README.md). Er unterscheidet:
 
 - automatisch belegbare Kriterien;
 - manuell beziehungsweise redaktionell zu prüfende Kriterien;
@@ -236,6 +236,14 @@ const files = writePilotProjectReportBundle({
 ```
 
 Schemas und Beispiele liegen unter [`catalog/`](catalog/). `report.json` verwendet Ausgabeschema 2, weil berichtete Ziel-URLs ohne Querywerte gebunden werden; bei Queryzielen werden zusätzlich nur die Parameternamen verglichen. Der Pilot umfasst noch nicht die vollständige Website-Checkliste und verändert keine Projektcheckliste automatisch.
+
+### Migration von 0.3.x
+
+- Der Crawl liefert neun zusätzliche atomare Assertions für Sitemap, interne Navigationen, Ressourcen und Laufabdeckung. Es werden dafür keine neuen Netzwerkpfade geöffnet; ausgewertet werden bereits vorhandene GET-Beobachtungen.
+- Der Pilotkatalog `1.0.0-pilot.5` ergänzt `CORE-ERR-03`, `CORE-MAP-01`, `CORE-MAP-02`, `CORE-SEO-04`, `CORE-QA-05` und `CORE-QA-08`. Projektkonfigurationen und Evidence-Dateien müssen die neue Katalogversion ausdrücklich übernehmen.
+- Technische Berichte aller vier Werkzeuge weisen die aktuelle Katalogversion aus. Für einen gemeinsamen Projektbericht müssen deshalb alle eingebundenen Berichte mit einem einheitlichen `0.4.x`-Werkzeugstand neu erzeugt werden.
+- API-/Content-Negotiation-Fehler, projektspezifischer Routen- und Indexierungsumfang, optionale Sitemap-Metadaten und XSL, externe Links sowie dynamische oder interaktionsabhängige Ressourcen bleiben nicht automatische Kriterien.
+- Abruffehler, Sicherheitsauslassungen und erreichte Seiten-, Ressourcen- oder Sitemaplimits führen bei abhängigen Assertions weiterhin zu `inconclusive` statt zu einem stillschweigenden Erfolg.
 
 ### Migration von 0.2.x
 

@@ -34,8 +34,14 @@ describe('structured checklist pilot', () => {
     ])
     expect(checklistItemIdsForTool('crawl-check', catalog, registry)).toEqual([
       'CORE-DOM-05',
+      'CORE-ERR-03',
       'CORE-SEO-01',
       'CORE-SEO-02',
+      'CORE-MAP-01',
+      'CORE-MAP-02',
+      'CORE-SEO-04',
+      'CORE-QA-05',
+      'CORE-QA-08',
     ])
     expect(checklistItemIdsForTool('browser-check', catalog, registry)).toEqual([
       'CORE-A11Y-01',
@@ -105,13 +111,38 @@ describe('structured checklist pilot', () => {
     })).toThrow(/gültiges Datum/)
 
     const evidenceExample = JSON.parse(readFileSync(new URL('../catalog/project-evidence.example.json', import.meta.url), 'utf8'))
-    expect(evidenceExample.catalog).toEqual({ id: 'website-qa-pilot', version: '1.0.0-pilot.4' })
+    expect(evidenceExample.catalog).toEqual({ id: 'website-qa-pilot', version: '1.0.0-pilot.5' })
     const evidencedRights = evaluatePilotChecklist({
       evidence: evidenceExample.evidence,
       itemIds: ['GOV-RGT-02'],
     })
     expect(evidencedRights.items[0]?.outcome).toBe('pass')
     expect(evidencedRights.summary.checklistItems.automaticallyPassed).toBe(0)
+  })
+
+  it('keeps project scope, APIs, external links and dynamic resources open after a complete crawl', () => {
+    const crawlAssertions = [
+      'crawl.sitemap.file-valid',
+      'crawl.sitemap.robots-reference-present',
+      'crawl.sitemap.entries-valid',
+      'crawl.sitemap.coverage-complete',
+      'crawl.navigation.internal-valid',
+      'crawl.navigation.internal-direct',
+      'crawl.resources.status-valid',
+      'crawl.resources.mime-valid',
+      'crawl.run.coverage-complete',
+    ].map(assertionId => assertion(assertionId))
+    const report = evaluatePilotChecklist({
+      assertions: crawlAssertions,
+      itemIds: ['CORE-ERR-03', 'CORE-MAP-01', 'CORE-MAP-02', 'CORE-SEO-04', 'CORE-QA-05', 'CORE-QA-08'],
+    })
+
+    expect(report.items.every((item: { outcome: string }) => item.outcome === 'partial')).toBe(true)
+    expect(report.summary).toMatchObject({
+      automaticCriteria: { pass: 10, total: 10 },
+      checklistItems: { pass: 0, partial: 6, total: 6 },
+      nonAutomaticCriteria: { noEvidence: 6, total: 6 },
+    })
   })
 
   it('can fully substantiate a point whose required criteria are automatic', () => {

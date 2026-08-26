@@ -2,7 +2,7 @@
   "$schema": "./website-catalog.schema.json",
   "schemaVersion": 1,
   "catalogId": "website-qa-pilot",
-  "catalogVersion": "1.0.0-pilot.4",
+  "catalogVersion": "1.0.0-pilot.5",
   "status": "pilot",
   "description": "Strukturierter Pilotkatalog für HTTP-, Crawl-, Browser- und Social-bezogene sowie bewusst nicht automatisierbare Website-Prüfnachweise.",
   "items": [
@@ -231,6 +231,31 @@
             "mode": "automatic",
             "assertions": ["error.not-found.no-url-metadata"],
             "aggregation": "all"
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-ERR-03",
+      "module": "core",
+      "statement": "API-, Asset- und Content-Negotiation-Fehler liefern passende Statuscodes und Medientypen statt einer scheinbar erfolgreichen HTML-Antwort.",
+      "criteria": [
+        {
+          "id": "CORE-ERR-03/C1",
+          "statement": "Alle vom Crawl geprüften internen Seitenressourcen antworten erfolgreich und verwenden einen zum Einbindungszweck passenden MIME-Typ.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.resources.status-valid", "crawl.resources.mime-valid"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-ERR-03/C2",
+          "statement": "API- und projektspezifische Content-Negotiation-Fehler liefern die vorgesehenen Statuscodes und Medientypen statt einer scheinbar erfolgreichen HTML-Antwort.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Einschlägige API- und Content-Negotiation-Fehler mit nebenwirkungsfreien Anfragen prüfen oder ihre begründete Nichtanwendbarkeit dokumentieren; der Ressourcenlauf allein genügt nicht."
           }
         }
       ]
@@ -481,6 +506,117 @@
       ]
     },
     {
+      "id": "CORE-MAP-01",
+      "module": "core",
+      "statement": "Soweit sinnvoll, ist eine Sitemap vorhanden und in `robots.txt` referenziert. Sie enthält ausschließlich absolute, kanonische, indexierbare 200-URLs und keine Fehler-, Redirect- oder `noindex`-Ziele.",
+      "criteria": [
+        {
+          "id": "CORE-MAP-01/C1",
+          "statement": "Die geprüften Sitemap-Dateien sind als gültiges XML erreichbar und die Einstiegssitemap ist in robots.txt referenziert.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.sitemap.file-valid", "crawl.sitemap.robots-reference-present"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-MAP-01/C2",
+          "statement": "Die geprüfte Sitemap enthält ausschließlich eindeutige, absolute, kanonische, indexierbare 200-URLs des Zielorigins.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.sitemap.entries-valid"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-MAP-01/C3",
+          "statement": "Vorhandensein und erwarteter Seitenumfang der Sitemap entsprechen dem projektspezifischen Routen- und Indexierungsinventar.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Sinnhaftigkeit der Sitemap und erwartete indexierbare Routen mit dem Projektinventar abgleichen; der begrenzte Crawl kennt nicht selbständig alle vorgesehenen Seiten."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-MAP-02",
+      "module": "core",
+      "statement": "Die öffentlich erzeugte Sitemap wurde als XML geparst, auf Medientyp, Hosts, Duplikate und Canonical-Abgleich geprüft. Nicht belastbare `lastmod`-, `changefreq`- oder `priority`-Werte werden nicht künstlich gesetzt; eine vorhandene XSL-Darstellung enthält keine Platzhalter oder sichtbaren Fehler.",
+      "criteria": [
+        {
+          "id": "CORE-MAP-02/C1",
+          "statement": "Sitemap-XML, Medientyp, Zielorigin, eindeutige Einträge und Canonical-Abgleich sind technisch unauffällig.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.sitemap.file-valid", "crawl.sitemap.entries-valid"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-MAP-02/C2",
+          "statement": "Alle gültig erfassten Sitemap-URLs wurden innerhalb der dokumentierten Limits vollständig geprüft.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.sitemap.coverage-complete"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-MAP-02/C3",
+          "statement": "Optionale lastmod-, changefreq-, priority- und XSL-Angaben wurden auf tatsächliche Belastbarkeit beziehungsweise sichtbare Fehler geprüft oder begründet als nicht anwendbar dokumentiert.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Optionale Sitemap-Metadaten und eine vorhandene XSL-Ausgabe fachlich prüfen; fehlen alle optionalen Angaben, ihre Nichtanwendbarkeit ausdrücklich dokumentieren."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-SEO-04",
+      "module": "core",
+      "statement": "Statuscodes, Weiterleitungen, Canonicals, Robots-Angaben, interne Links, Downloads und notwendige Seitenressourcen wurden mit einem technischen Crawl und echten GET-Abrufen kontrolliert. Standardverfahren mit lokal eingebundenem `@mktcode/website-qa`: `npm run ops:crawl:check -- https://[DOMAIN]/ --sitemap --max-pages=50 --max-resources=500 --strict`; Paket-/Werkzeugcommit und Bericht werden protokolliert. Der zentrale Social-Check ersetzt diesen allgemeinen Crawl nicht.",
+      "criteria": [
+        {
+          "id": "CORE-SEO-04/C1",
+          "statement": "Die geprüften internen Seiten- und Fragmentziele sind erfolgreich und ohne Weiterleitung erreichbar.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.navigation.internal-valid", "crawl.navigation.internal-direct"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SEO-04/C2",
+          "statement": "Die geprüften internen Seitenressourcen antworten erfolgreich und mit passendem MIME-Typ.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.resources.status-valid", "crawl.resources.mime-valid"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SEO-04/C3",
+          "statement": "Der ausschließlich lesende Crawl blieb innerhalb seiner dokumentierten Grenzen und ließ keine Navigation aus Sicherheitsgründen aus.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.run.coverage-complete"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SEO-04/C4",
+          "statement": "Der geprüfte Seiten-, Download- und Ressourcenumfang entspricht dem projektspezifisch vorgesehenen öffentlichen Inventar; bewusst ausgelassene Pfade sind bewertet.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Crawlbericht und ausgelassene Navigationen gegen das Projektinventar abgleichen; externe Links, dynamische Interaktionspfade und sicherheitsbedingt übersprungene Ziele getrennt bewerten."
+          }
+        }
+      ]
+    },
+    {
       "id": "CORE-A11Y-01",
       "module": "core",
       "statement": "Semantische HTML-Elemente werden passend eingesetzt; Navigation, Hauptinhalt, ergänzende Bereiche und Footer sind sinnvoll ausgezeichnet.",
@@ -599,6 +735,31 @@
       ]
     },
     {
+      "id": "CORE-QA-05",
+      "module": "core",
+      "statement": "Bilder, Videos, Dokumente und externe Einbettungen laden wie erwartet; defekte interne und externe Links wurden automatisiert oder manuell gesucht.",
+      "criteria": [
+        {
+          "id": "CORE-QA-05/C1",
+          "statement": "Die geprüften internen Seiten-, Fragment- und Ressourcenziele sind technisch erfolgreich erreichbar.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.navigation.internal-valid", "crawl.resources.status-valid"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-QA-05/C2",
+          "statement": "Darstellung von Medien und Einbettungen sowie nur inventarisierte externe Links wurden risikogerecht zusätzlich geprüft.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Medien und Einbettungen visuell prüfen und externe Links mit einem gesondert freigegebenen Verfahren bewerten; der allgemeine Crawler ruft externe Ziele bewusst nicht ab."
+          }
+        }
+      ]
+    },
+    {
       "id": "CORE-QA-07",
       "module": "core",
       "statement": "Die Seiten wurden ohne sichtbare JavaScript-, Netzwerk- oder Hydrationsfehler in der Browserkonsole geprüft.",
@@ -619,6 +780,31 @@
             "mode": "manual",
             "evidenceClass": "project-review",
             "instructions": "Vereinbarte interaktive Zustände manuell aufrufen und Browserkonsole sowie Netzwerkprotokoll beobachten; keine schreibenden Produktionsaktionen ausführen."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-QA-08",
+      "module": "core",
+      "statement": "Der öffentliche Ressourcenlauf erfasst neben HTML auch tatsächlich angeforderte CSS-, JavaScript-, Schrift-, Bild- und Downloadressourcen mit Status und MIME-Typ; dynamische Pfade und erst nach Interaktion geladene Ressourcen werden zusätzlich im Browser geprüft.",
+      "criteria": [
+        {
+          "id": "CORE-QA-08/C1",
+          "statement": "Die vom Crawl entdeckten und mit GET abgerufenen internen Seitenressourcen besitzen erfolgreiche Statuscodes und passende MIME-Typen.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.resources.status-valid", "crawl.resources.mime-valid"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-QA-08/C2",
+          "statement": "Dynamische, browserabhängige und erst nach vereinbarter Interaktion geladene Ressourcen wurden zusätzlich geprüft oder mit ihrer Grenze dokumentiert.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Browsernetzwerk für dynamische und interaktionsabhängige Ressourcen prüfen, ohne schreibende Produktionsaktionen auszuführen; serverseitiger HTML-/CSS-Crawl allein genügt nicht."
           }
         }
       ]

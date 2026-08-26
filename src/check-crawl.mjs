@@ -173,6 +173,8 @@ function addAssertion(result, assertionId, outcome, message) {
     outcome,
     subject: {
       checkedPages: result.pages.length,
+      checkedResources: result.resources.length,
+      checkedSitemaps: result.sitemaps.length,
       skippedNavigations: result.skippedLinks.length,
       url: result.finalUrl || result.requestedUrl,
     },
@@ -185,6 +187,7 @@ const incompletePageCrawlIssueCodes = new Set([
   'page-fetch-failed',
   'page-http-status',
   'page-limit-reached',
+  'sitemap-page-http-status',
 ])
 
 function crawlAssertionOutcome(result, failureCodes, dependencyCodes = []) {
@@ -199,7 +202,168 @@ function crawlAssertionOutcome(result, failureCodes, dependencyCodes = []) {
   return 'pass'
 }
 
-function addCrawlAssertions(result) {
+function resultIssueCodes(result) {
+  return new Set(result.issues.map(issue => issue.code))
+}
+
+function outcomeFromIssueCodes(result, { failureCodes = [], inconclusiveCodes = [] }) {
+  const codes = resultIssueCodes(result)
+  if (failureCodes.some(code => codes.has(code))) {
+    return 'fail'
+  }
+  if (inconclusiveCodes.some(code => codes.has(code))) {
+    return 'inconclusive'
+  }
+  return 'pass'
+}
+
+function sitemapPageInvalid(page) {
+  if (!page.sources.includes('sitemap') || page.status < 200 || page.status >= 300 || page.redirects.length > 0 || !page.indexable || page.canonical.length !== 1) {
+    return page.sources.includes('sitemap')
+  }
+  const canonical = resolveWebUrl(page.canonical[0], page.finalUrl)
+  return !canonical || page.canonical[0] !== canonical.href || normalizedComparableUrl(canonical.href) !== normalizedComparableUrl(page.finalUrl)
+}
+
+function addExtendedCrawlAssertions(result, options) {
+  const incompletePageCodes = [...incompletePageCrawlIssueCodes]
+  const sitemapEnabled = Boolean(options.sitemap)
+  const sitemapFilesObserved = result.sitemaps.length > 0
+  const sitemapPageLocations = result.sitemaps
+    .filter(sitemap => sitemap.kind === 'urlset')
+    .reduce((sum, sitemap) => sum + sitemap.locations, 0)
+
+  let outcome = sitemapEnabled
+    ? outcomeFromIssueCodes(result, {
+        failureCodes: ['sitemap-content-type', 'sitemap-http-status', 'sitemap-redirect', 'sitemap-xml-invalid'],
+        inconclusiveCodes: ['sitemap-fetch-failed', 'sitemap-limit'],
+      })
+    : 'inconclusive'
+  if (outcome === 'pass' && !sitemapFilesObserved) {
+    outcome = 'inconclusive'
+  }
+  addAssertion(result, 'crawl.sitemap.file-valid', outcome, {
+    fail: 'Mindestens eine geprüfte Sitemap ist nicht direkt als erfolgreiche, gültige XML-Antwort mit passendem Medientyp verfügbar.',
+    inconclusive: sitemapEnabled
+      ? 'Die Sitemap-Dateien konnten nicht vollständig und abschließend geprüft werden.'
+      : 'Der Crawl wurde ohne Sitemap-Modus ausgeführt; Sitemap-Dateien wurden nicht geprüft.',
+    pass: 'Alle geprüften Sitemap-Dateien sind direkt als erfolgreiche, gültige XML-Antworten mit passendem Medientyp verfügbar.',
+  }[outcome])
+
+  outcome = sitemapEnabled
+    ? outcomeFromIssueCodes(result, {
+        failureCodes: ['robots-http-status', 'robots-sitemap-reference-missing'],
+        inconclusiveCodes: ['robots-fetch-failed', 'sitemap-fetch-failed'],
+      })
+    : 'inconclusive'
+  addAssertion(result, 'crawl.sitemap.robots-reference-present', outcome, {
+    fail: 'robots.txt ist für den Sitemap-Abgleich technisch abweichend oder referenziert die geprüfte Sitemap nicht.',
+    inconclusive: sitemapEnabled
+      ? 'Der Sitemap-Verweis in robots.txt konnte nicht abschließend geprüft werden.'
+      : 'Der Crawl wurde ohne Sitemap-Modus ausgeführt; der robots.txt-Verweis wurde nicht geprüft.',
+    pass: 'robots.txt referenziert die geprüfte Sitemap.',
+  }[outcome])
+
+  outcome = sitemapEnabled
+    ? outcomeFromIssueCodes(result, {
+        failureCodes: ['sitemap-location-duplicate', 'sitemap-location-external', 'sitemap-location-invalid'],
+        inconclusiveCodes: ['sitemap-coverage-incomplete', 'sitemap-fetch-failed', 'sitemap-http-status', 'sitemap-limit', 'sitemap-xml-invalid'],
+      })
+    : 'inconclusive'
+  if (outcome === 'pass' && (resultIssueCodes(result).has('indexable-page-not-in-sitemap') || sitemapPageLocations === 0 || result.pages.some(sitemapPageInvalid))) {
+    outcome = 'fail'
+  }
+  addAssertion(result, 'crawl.sitemap.entries-valid', outcome, {
+    fail: 'Mindestens ein Sitemap-Eintrag ist ungültig, doppelt, fremd, nicht kanonisch, nicht indexierbar, weitergeleitet oder keine erfolgreiche 200-Seite.',
+    inconclusive: sitemapEnabled
+      ? 'Die Sitemap-Einträge konnten wegen eines unvollständigen Sitemap- oder Seitenlaufs nicht abschließend geprüft werden.'
+      : 'Der Crawl wurde ohne Sitemap-Modus ausgeführt; Sitemap-Einträge wurden nicht geprüft.',
+    pass: 'Die geprüfte Sitemap enthält ausschließlich eindeutige, absolute, kanonische, indexierbare 200-URLs des Zielorigins.',
+  }[outcome])
+
+  outcome = sitemapEnabled
+    ? outcomeFromIssueCodes(result, {
+        inconclusiveCodes: ['page-limit-reached', 'sitemap-coverage-incomplete', 'sitemap-fetch-failed', 'sitemap-http-status', 'sitemap-limit', 'sitemap-xml-invalid'],
+      })
+    : 'inconclusive'
+  if (outcome === 'pass' && !sitemapFilesObserved) {
+    outcome = 'inconclusive'
+  }
+  addAssertion(result, 'crawl.sitemap.coverage-complete', outcome, {
+    inconclusive: sitemapEnabled
+      ? 'Die Sitemap-Abdeckung ist wegen fehlender Dateien, Abruffehlern oder erreichter Limits nicht vollständig.'
+      : 'Der Crawl wurde ohne Sitemap-Modus ausgeführt; die Sitemap-Abdeckung wurde nicht geprüft.',
+    pass: 'Alle gültig erfassten Sitemap-URLs wurden innerhalb der dokumentierten Limits geprüft.',
+  }[outcome])
+
+  outcome = crawlAssertionOutcome(
+    result,
+    ['internal-fragment-missing', 'page-fetch-failed', 'page-http-status', 'sitemap-page-http-status'],
+  )
+  addAssertion(result, 'crawl.navigation.internal-valid', outcome, {
+    fail: 'Mindestens ein geprüftes internes Seiten- oder Fragmentziel ist nicht erfolgreich erreichbar.',
+    inconclusive: 'Interne Seiten- und Fragmentziele konnten wegen eines unvollständigen oder sicherheitsbedingt begrenzten Laufs nicht abschließend geprüft werden.',
+    pass: 'Alle geprüften internen Seiten- und Fragmentziele sind erfolgreich erreichbar.',
+  }[outcome])
+
+  outcome = crawlAssertionOutcome(
+    result,
+    ['internal-page-redirect', 'sitemap-page-redirect'],
+  )
+  addAssertion(result, 'crawl.navigation.internal-direct', outcome, {
+    fail: 'Mindestens ein geprüftes internes Seitenziel benötigt eine Weiterleitung.',
+    inconclusive: 'Interne Weiterleitungen konnten wegen eines unvollständigen oder sicherheitsbedingt begrenzten Laufs nicht abschließend geprüft werden.',
+    pass: 'Alle geprüften internen Seitenziele sind ohne Weiterleitung direkt erreichbar.',
+  }[outcome])
+
+  outcome = outcomeFromIssueCodes(result, {
+    failureCodes: ['resource-http-status'],
+    inconclusiveCodes: [...incompletePageCodes, 'resource-fetch-failed', 'resource-limit-reached'],
+  })
+  if (outcome === 'pass' && result.resources.length === 0) {
+    outcome = 'notApplicable'
+  }
+  addAssertion(result, 'crawl.resources.status-valid', outcome, {
+    fail: 'Mindestens eine geprüfte interne Ressource antwortet nicht erfolgreich.',
+    inconclusive: 'Interne Ressourcenstatus konnten wegen eines unvollständigen oder begrenzten Laufs nicht abschließend geprüft werden.',
+    notApplicable: 'Im vollständig geprüften Seitenumfang wurden keine gesonderten internen Ressourcen entdeckt.',
+    pass: 'Alle geprüften internen Ressourcen antworten erfolgreich.',
+  }[outcome])
+
+  outcome = outcomeFromIssueCodes(result, {
+    failureCodes: ['resource-content-type'],
+    inconclusiveCodes: [...incompletePageCodes, 'resource-fetch-failed', 'resource-http-status', 'resource-limit-reached'],
+  })
+  if (outcome === 'pass' && result.resources.length === 0) {
+    outcome = 'notApplicable'
+  }
+  addAssertion(result, 'crawl.resources.mime-valid', outcome, {
+    fail: 'Mindestens eine geprüfte interne Ressource verwendet keinen zum Einbindungszweck passenden MIME-Typ.',
+    inconclusive: 'Die MIME-Typen interner Ressourcen konnten wegen fehlender Antworten oder eines unvollständigen Laufs nicht abschließend geprüft werden.',
+    notApplicable: 'Im vollständig geprüften Seitenumfang wurden keine gesonderten internen Ressourcen entdeckt.',
+    pass: 'Alle geprüften internen Ressourcen verwenden zum Einbindungszweck passende MIME-Typen.',
+  }[outcome])
+
+  const coverageCodes = [
+    'initial-fetch-failed',
+    'navigation-skipped-read-only',
+    'page-fetch-failed',
+    'page-limit-reached',
+    'resource-fetch-failed',
+    'resource-limit-reached',
+    ...(sitemapEnabled ? ['sitemap-coverage-incomplete', 'sitemap-fetch-failed', 'sitemap-http-status', 'sitemap-limit', 'sitemap-xml-invalid'] : []),
+  ]
+  outcome = outcomeFromIssueCodes(result, { inconclusiveCodes: coverageCodes })
+  if (outcome === 'pass' && result.pages.length === 0) {
+    outcome = 'inconclusive'
+  }
+  addAssertion(result, 'crawl.run.coverage-complete', outcome, {
+    inconclusive: 'Der Crawl ist wegen Abruffehlern, Limits oder sicherheitsbedingt ausgelassenen Navigationen nicht vollständig.',
+    pass: 'Der ausschließlich lesende Crawl blieb innerhalb der dokumentierten Seiten-, Ressourcen- und Sitemapgrenzen und musste keine Navigation aus Sicherheitsgründen auslassen.',
+  }[outcome])
+}
+
+function addCrawlAssertions(result, options) {
   const definitions = [
     {
       failureCodes: ['page-canonical-missing', 'page-canonical-multiple', 'page-canonical-not-absolute'],
@@ -271,6 +435,7 @@ function addCrawlAssertions(result) {
     const outcome = crawlAssertionOutcome(result, definition.failureCodes, definition.dependencyCodes)
     addAssertion(result, definition.id, outcome, definition.messages[outcome])
   }
+  addExtendedCrawlAssertions(result, options)
 }
 
 function normalizedComparableUrl(value) {
@@ -824,7 +989,14 @@ async function fetchSitemaps(state) {
         addIssue(state.result, 'warning', 'sitemap-redirect', 'Sitemap-URL wird weitergeleitet.', ['CORE-MAP-02'], sitemapUrl)
       }
 
-      const parsed = parseSitemapXml(response.body.toString('utf8'))
+      let parsed
+      try {
+        parsed = parseSitemapXml(response.body.toString('utf8'))
+      }
+      catch (error) {
+        addIssue(state.result, 'error', 'sitemap-xml-invalid', `Sitemap enthält ungültiges XML: ${error.message}`, ['CORE-MAP-01', 'CORE-MAP-02'], sitemapUrl)
+        continue
+      }
       sitemap.kind = parsed.kind
       sitemap.locations = parsed.locations.length
       for (const location of parsed.locations) {
@@ -939,7 +1111,15 @@ async function processPage(state, entry, suppliedResponse) {
   state.pagesByRequestedUrl.set(page.requestedUrl, page)
 
   if (response.status < 200 || response.status >= 300) {
-    addIssue(state.result, 'error', 'page-http-status', `Internes HTML-Ziel antwortet mit HTTP ${response.status}.`, ['CORE-SEO-04', 'CORE-QA-03'], entry.url)
+    const sitemapSource = entry.sources.has('sitemap')
+    addIssue(
+      state.result,
+      'error',
+      sitemapSource ? 'sitemap-page-http-status' : 'page-http-status',
+      `Internes HTML-Ziel antwortet mit HTTP ${response.status}.`,
+      sitemapSource ? ['CORE-MAP-01', 'CORE-SEO-04'] : ['CORE-SEO-04', 'CORE-QA-03'],
+      entry.url,
+    )
     return
   }
   if (response.redirects.length > 0) {
@@ -1109,7 +1289,7 @@ async function inspectSite(inputUrl, options) {
   }
   catch (error) {
     addIssue(result, 'error', 'initial-fetch-failed', `Start-URL konnte nicht abgerufen werden: ${error.message}`, ['CORE-SEO-04'], inputUrl)
-    addCrawlAssertions(result)
+    addCrawlAssertions(result, options)
     delete result.externalLinkKeys
     return result
   }
@@ -1159,7 +1339,7 @@ async function inspectSite(inputUrl, options) {
   checkFragments(state)
   checkSitemapCoverage(state)
   checkDuplicateMetadata(result)
-  addCrawlAssertions(result)
+  addCrawlAssertions(result, options)
   delete result.externalLinkKeys
   return result
 }

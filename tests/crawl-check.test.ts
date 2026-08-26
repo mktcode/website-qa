@@ -207,7 +207,11 @@ describe('crawl checker', () => {
       strict: true,
     })
     const result = report.results[0] as unknown as {
-      assertions: Array<{ assertionId: string, outcome: string }>
+      assertions: Array<{
+        assertionId: string
+        outcome: string
+        subject: { checkedPages: number, checkedResources: number, checkedSitemaps: number }
+      }>
       externalLinks: unknown[]
       forms: Array<{ action: string, requested: boolean }>
       pages: unknown[]
@@ -229,7 +233,7 @@ describe('crawl checker', () => {
     expect(jsonReport).toMatchObject({
       checklistCoverage: {
         summary: {
-          checklistItems: { pass: 0, partial: 3, total: 3 },
+          checklistItems: { pass: 0, partial: 9, total: 9 },
         },
       },
       readOnlyGuarantees: {
@@ -252,11 +256,36 @@ describe('crawl checker', () => {
       action: `${origin}submit`,
       requested: false,
     })])
-    expect(result.assertions).toHaveLength(7)
+    expect(result.assertions).toHaveLength(16)
     expect(result.assertions.every(assertion => assertion.outcome === 'pass')).toBe(true)
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.run.coverage-complete')?.subject).toMatchObject({
+      checkedPages: 3,
+      checkedResources: 5,
+      checkedSitemaps: 2,
+    })
     expect(requests.every(request => request.method === 'GET')).toBe(true)
     expect(requests.some(request => request.url?.startsWith('/submit'))).toBe(false)
     expect(requests.some(request => request.url?.includes('external.example'))).toBe(false)
+  })
+
+  it('does not treat an omitted sitemap mode as a positive sitemap observation', async () => {
+    let origin = ''
+    const server = createServer((request, response) => {
+      response.writeHead(200, { 'content-type': 'text/html' })
+      response.end(htmlPage(origin, '/', { title: 'Startseite' }))
+    })
+    origin = await listen(server)
+
+    const report = await runCrawlCheck([origin], {
+      allowHttp: true,
+      allowPrivate: true,
+    })
+    const assertions = report.results[0].assertions as Array<{ assertionId: string, outcome: string }>
+
+    expect(assertions.find(assertion => assertion.assertionId === 'crawl.sitemap.file-valid')?.outcome).toBe('inconclusive')
+    expect(assertions.find(assertion => assertion.assertionId === 'crawl.sitemap.entries-valid')?.outcome).toBe('inconclusive')
+    expect(assertions.find(assertion => assertion.assertionId === 'crawl.resources.status-valid')?.outcome).toBe('notApplicable')
+    expect(assertions.find(assertion => assertion.assertionId === 'crawl.run.coverage-complete')?.outcome).toBe('pass')
   })
 
   it('skips suspicious GET navigation before it can cause a side effect', async () => {
@@ -290,6 +319,39 @@ describe('crawl checker', () => {
     expect(result.skippedLinks).toHaveLength(2)
     expect(result.assertions.every(assertion => assertion.outcome === 'inconclusive')).toBe(true)
     expect(requestedPaths).toEqual(['/'])
+  })
+
+  it('marks resource-limit-dependent assertions inconclusive', async () => {
+    let origin = ''
+    const server = createServer((request, response) => {
+      if (request.url === '/first.css') {
+        response.writeHead(200, { 'content-type': 'text/css' })
+        response.end('body { color: black; }')
+        return
+      }
+      response.writeHead(200, { 'content-type': 'text/html' })
+      response.end(htmlPage(origin, '/', {
+        body: '<link rel="stylesheet" href="/first.css"><script src="/second.js"></script>',
+        title: 'Startseite',
+      }))
+    })
+    origin = await listen(server)
+
+    const report = await runCrawlCheck([origin], {
+      allowHttp: true,
+      allowPrivate: true,
+      maxResources: 1,
+      strict: true,
+    })
+    const result = report.results[0] as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
+      issues: Array<{ code: string }>
+    }
+
+    expect(result.issues.map(issue => issue.code)).toContain('resource-limit-reached')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.resources.status-valid')?.outcome).toBe('inconclusive')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.resources.mime-valid')?.outcome).toBe('inconclusive')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.run.coverage-complete')?.outcome).toBe('inconclusive')
   })
 
   it('reports sitemap, canonical, redirect, noindex and status errors', async () => {
@@ -329,8 +391,19 @@ describe('crawl checker', () => {
         response.end(htmlPage(origin, '/about', { title: 'Zielseite' }))
         return
       }
+      if (path === '/missing.js') {
+        response.writeHead(404, { 'content-type': 'text/plain' })
+        response.end('fehlt')
+        return
+      }
+      if (path === '/wrong.css') {
+        response.writeHead(200, { 'content-type': 'text/html' })
+        response.end('<!doctype html><title>Kein CSS</title>')
+        return
+      }
       response.writeHead(200, { 'content-type': 'text/html' })
       response.end(htmlPage(origin, '/', {
+        body: '<script src="/missing.js"></script><link rel="stylesheet" href="/wrong.css">',
         canonical: `${origin}wrong`,
         title: 'Startseite',
       }))
@@ -352,13 +425,58 @@ describe('crawl checker', () => {
     expect(report.summary.failed).toBe(true)
     expect(issueCodes).toEqual(expect.arrayContaining([
       'page-canonical-mismatch',
-      'page-http-status',
+      'resource-content-type',
+      'resource-http-status',
       'sitemap-location-duplicate',
+      'sitemap-page-http-status',
       'sitemap-page-noindex',
       'sitemap-page-redirect',
     ]))
     expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.canonical.matches-final-url')?.outcome).toBe('fail')
     expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.metadata.title-present')?.outcome).toBe('inconclusive')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.sitemap.file-valid')?.outcome).toBe('pass')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.sitemap.entries-valid')?.outcome).toBe('fail')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.navigation.internal-valid')?.outcome).toBe('fail')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.navigation.internal-direct')?.outcome).toBe('fail')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.resources.status-valid')?.outcome).toBe('fail')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.resources.mime-valid')?.outcome).toBe('fail')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.run.coverage-complete')?.outcome).toBe('pass')
+  })
+
+  it('marks malformed sitemap observations and dependent assertions conservatively', async () => {
+    let origin = ''
+    const server = createServer((request, response) => {
+      if (request.url === '/sitemap.xml') {
+        response.writeHead(200, { 'content-type': 'application/xml' })
+        response.end('<urlset><url></urlset>')
+        return
+      }
+      if (request.url === '/robots.txt') {
+        response.writeHead(200, { 'content-type': 'text/plain' })
+        response.end(`Sitemap: ${origin}sitemap.xml`)
+        return
+      }
+      response.writeHead(200, { 'content-type': 'text/html' })
+      response.end(htmlPage(origin, '/', { title: 'Startseite' }))
+    })
+    origin = await listen(server)
+
+    const report = await runCrawlCheck([origin], {
+      allowHttp: true,
+      allowPrivate: true,
+      sitemap: true,
+      strict: true,
+    })
+    const result = report.results[0] as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
+      issues: Array<{ code: string }>
+    }
+
+    expect(result.issues.map(issue => issue.code)).toContain('sitemap-xml-invalid')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.sitemap.file-valid')?.outcome).toBe('fail')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.sitemap.entries-valid')?.outcome).toBe('inconclusive')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.sitemap.coverage-complete')?.outcome).toBe('inconclusive')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.run.coverage-complete')?.outcome).toBe('inconclusive')
   })
 
   it('rejects private targets unless explicitly allowed', async () => {

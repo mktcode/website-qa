@@ -1,6 +1,6 @@
 # Abgeschlossener Plan: einfache Projektintegration und lokale Website-QA-Berichte
 
-> **Status:** Der Workflow wurde mit Paketversion `0.2.0` eingeführt, mit `0.3.0` um strukturierte Social-Nachweise ergänzt, in einem echten Websiteprojekt erprobt und als `v0.2.0` beziehungsweise `v0.3.0` veröffentlicht.
+> **Status:** Der Workflow wurde mit Paketversion `0.2.0` eingeführt, mit `0.3.0` um strukturierte Social-Nachweise und mit `0.4.0` um vorhandene Sitemap-, Crawl- und Ressourcenbeobachtungen ergänzt. Die Funktionsstände wurden jeweils lokal und in installierten Verbraucherprojekten geprüft.
 >
 > Dieses Dokument bewahrt Planung, Entscheidungen, Sicherheitsanforderungen und Abnahmekriterien des frameworkunabhängigen Refactorings von `@mktcode/website-qa`. Es enthält keine ausgefüllten Nachweise oder Vorgaben für eine bestimmte Website. Zukunftsformulierungen in den historischen Planungsabschnitten beschreiben den damaligen Implementierungsweg und keine noch offene Zusage.
 >
@@ -572,12 +572,14 @@ Die folgende Definition of Done wurde mit `v0.2.0` für den Bundle-Workflow und 
 - ein neuer echter Projektpilot den Ablauf ohne Sonderbehandlung bestätigt hat;
 - README, Paketversion und geprüfter Release-Tag konsistent sind.
 
-## 20. Möglicher nächster Ausbau
+## 20. Sitemap-, Crawl- und Ressourcenausbau mit 0.4.0
 
-Ein weiterer Ausbau ist nicht für den Abschluss von `v0.3.0` erforderlich. Falls eine neue Funktionsrunde bewusst begonnen wird, bieten sich zuerst atomare Crawl-, Sitemap- und Ressourcenassertions für bereits vorhandene Beobachtungen an, insbesondere zu:
+Die nächste Funktionsrunde ergänzt atomare Assertions für bereits vorhandene Beobachtungen zu:
 
-- `CORE-MAP-01` und `CORE-MAP-02` für Sitemapabruf, XML-Struktur, Referenz, Einträge und vollständige Abdeckung innerhalb der Limits;
-- `CORE-SEO-04` für den begrenzten allgemeinen GET-Crawl;
+- `CORE-MAP-01` und `CORE-MAP-02` für Sitemapabruf, XML-Struktur, robots.txt-Referenz, Einträge und vollständige Abdeckung innerhalb der Limits;
+- `CORE-SEO-04` für interne Seiten- und Fragmentziele sowie den begrenzten allgemeinen GET-Crawl;
 - `CORE-QA-05`, `CORE-QA-08` und `CORE-ERR-03` für interne Ressourcenstatus und MIME-Typen.
 
-Dieser Ausbau soll keine neuen Netzwerkpfade eröffnen. Externe Links bleiben ausschließlich inventarisiert, Formulare und Bedienelemente bleiben unangetastet und limitierte beziehungsweise sicherheitsbedingt ausgelassene Beobachtungen führen weiterhin zu `inconclusive`. Erst danach kommen atomare Aussagen zu bereits geprüften HTTP-Sicherheitsheadern oder technischen Datenschutzbeobachtungen in Betracht. Manuelle, rechtliche, administrative und projektspezifische Kriterien bleiben davon getrennt.
+Dieser Ausbau öffnet keine neuen Netzwerkpfade. Externe Links bleiben ausschließlich inventarisiert, Formulare und Bedienelemente bleiben unangetastet und limitierte beziehungsweise sicherheitsbedingt ausgelassene Beobachtungen führen weiterhin zu `inconclusive`. Projektinventar, API- und Content-Negotiation-Fehler, optionale Sitemap-Metadaten und XSL, externe Links sowie dynamische oder interaktionsabhängige Ressourcen bleiben nicht automatisch belegbar.
+
+Als spätere, getrennt zu entscheidende Ausbaustufe kommen atomare Aussagen zu bereits geprüften HTTP-Sicherheitsheadern oder technischen Datenschutzbeobachtungen in Betracht. Manuelle, rechtliche, administrative und projektspezifische Kriterien bleiben davon unabhängig.

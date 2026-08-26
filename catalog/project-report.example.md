@@ -7,7 +7,7 @@
 | Feld | Wert |
 |---|---|
 | Erstellt | 2026-08-24T12:30:00.000Z |
-| Katalog | website-qa-pilot 1.0.0-pilot.4 (pilot) |
+| Katalog | website-qa-pilot 1.0.0-pilot.5 (pilot) |
 | Auswertungsumgebung | production |
 | Bevorzugte URL | https://example.com/ |
 | Quellstand | PROJEKT-COMMIT |
@@ -20,27 +20,27 @@
 |---|---:|
 | Vollständig nachgewiesen | 3 |
 | Fehlgeschlagen | 0 |
-| Teilweise nachgewiesen | 12 |
+| Teilweise nachgewiesen | 18 |
 | Offen | 7 |
 | Unklar | 0 |
 | Nicht zutreffend | 0 |
 | Externer Nachweis offen | 1 |
 | Zurückgestellt | 0 |
 | Akzeptierte Abweichung (offen) | 0 |
-| **Ausgewählte Pilotpunkte** | **23** |
+| **Ausgewählte Pilotpunkte** | **29** |
 
-Automatische Kriterien: 23 bestanden, 0 fehlgeschlagen, 0 unklar, 14 ohne Nachweis.
+Automatische Kriterien: 33 bestanden, 0 fehlgeschlagen, 0 unklar, 14 ohne Nachweis.
 
-Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 23 ohne Nachweis.
+Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 29 ohne Nachweis.
 
 ## Technische Läufe
 
 | Werkzeug | Ziel | Umgebung | Verwendet | Assertions | Befehl |
 |---|---|---|---:|---:|---|
-| http-check 0.3.0 | https://example.com/ | production | ja | 2 | <code>website-qa-http https://example.com/ --strict --json</code> |
-| crawl-check 0.3.0 | https://example.com/ | production | ja | 7 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
-| browser-check 0.3.0 | https://example.com/ | production | ja | 5 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
-| social-preview-check 0.3.0 | https://example.com/ | production | ja | 10 | <code>website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json</code> |
+| http-check 0.4.0 | https://example.com/ | production | ja | 2 | <code>website-qa-http https://example.com/ --strict --json</code> |
+| crawl-check 0.4.0 | https://example.com/ | production | ja | 16 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
+| browser-check 0.4.0 | https://example.com/ | production | ja | 5 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
+| social-preview-check 0.4.0 | https://example.com/ | production | ja | 10 | <code>website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json</code> |
 
 ## Checklistenpunkte
 
@@ -53,6 +53,7 @@ Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 23 ohne Nachweis.
 | CORE-DOM-08 | core | Offen | 0/2 | 0/2 |
 | CORE-ERR-01 | core | Offen | 0/2 | 0/1 |
 | CORE-ERR-02 | core | Vollständig nachgewiesen | 2/2 | 0/0 |
+| CORE-ERR-03 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-SEO-01 | core | Teilweise nachgewiesen | 3/3 | 0/1 |
 | CORE-SEO-02 | core | Teilweise nachgewiesen | 2/2 | 0/1 |
 | CORE-SOC-01 | core | Teilweise nachgewiesen | 2/2 | 0/1 |
@@ -61,11 +62,16 @@ Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 23 ohne Nachweis.
 | CORE-ROB-01 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-ROB-02 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-ROB-04 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
+| CORE-MAP-01 | core | Teilweise nachgewiesen | 2/2 | 0/1 |
+| CORE-MAP-02 | core | Teilweise nachgewiesen | 2/2 | 0/1 |
+| CORE-SEO-04 | core | Teilweise nachgewiesen | 3/3 | 0/1 |
 | CORE-A11Y-01 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-A11Y-10 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-A11Y-13 | core | Teilweise nachgewiesen | 1/1 | 0/3 |
 | CORE-QA-02 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
+| CORE-QA-05 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-QA-07 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
+| CORE-QA-08 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-PERF-01 | core | Offen | 0/3 | 0/1 |
 | CORE-PERF-05 | core | Offen | 0/2 | 0/1 |
 | GOV-RGT-02 | auftrag-recht-uebergabe | Vollständig nachgewiesen | 0/0 | 1/1 |
@@ -133,6 +139,14 @@ Nicht indexierbare Fehlerseiten senden `noindex` und enthalten weder einen irref
 
 - [x] `CORE-ERR-02/C1` Die geprüfte 404-Antwort enthält eine noindex-Anweisung. — automatic, pass
 - [x] `CORE-ERR-02/C2` Die geprüfte 404-Antwort enthält weder Canonical noch og:url. — automatic, pass
+
+### CORE-ERR-03: Teilweise nachgewiesen
+
+API-, Asset- und Content-Negotiation-Fehler liefern passende Statuscodes und Medientypen statt einer scheinbar erfolgreichen HTML-Antwort.
+
+- [x] `CORE-ERR-03/C1` Alle vom Crawl geprüften internen Seitenressourcen antworten erfolgreich und verwenden einen zum Einbindungszweck passenden MIME-Typ. — automatic, pass
+- [ ] `CORE-ERR-03/C2` API- und projektspezifische Content-Negotiation-Fehler liefern die vorgesehenen Statuscodes und Medientypen statt einer scheinbar erfolgreichen HTML-Antwort. — manual, noEvidence
+  - Erforderlicher Nachweis: Einschlägige API- und Content-Negotiation-Fehler mit nebenwirkungsfreien Anfragen prüfen oder ihre begründete Nichtanwendbarkeit dokumentieren; der Ressourcenlauf allein genügt nicht.
 
 ### CORE-SEO-01: Teilweise nachgewiesen
 
@@ -202,6 +216,34 @@ Die automatisierte Prüfung warnt vor jedem ohne dokumentiertes Opt-in erlaubten
 - [ ] `CORE-ROB-04/C2` Die projektspezifische Opt-out- beziehungsweise Opt-in-Entscheidung ist mit zuständiger Stelle, Umfang und Datum dokumentiert. — manual, noEvidence
   - Erforderlicher Nachweis: Standardmäßiges Opt-out oder ausdrückliche Trainingsfreigabe dokumentieren; die CLI-Option allein gilt nicht als Betreiber- beziehungsweise Kundenfreigabe.
 
+### CORE-MAP-01: Teilweise nachgewiesen
+
+Soweit sinnvoll, ist eine Sitemap vorhanden und in `robots.txt` referenziert. Sie enthält ausschließlich absolute, kanonische, indexierbare 200-URLs und keine Fehler-, Redirect- oder `noindex`-Ziele.
+
+- [x] `CORE-MAP-01/C1` Die geprüften Sitemap-Dateien sind als gültiges XML erreichbar und die Einstiegssitemap ist in robots.txt referenziert. — automatic, pass
+- [x] `CORE-MAP-01/C2` Die geprüfte Sitemap enthält ausschließlich eindeutige, absolute, kanonische, indexierbare 200-URLs des Zielorigins. — automatic, pass
+- [ ] `CORE-MAP-01/C3` Vorhandensein und erwarteter Seitenumfang der Sitemap entsprechen dem projektspezifischen Routen- und Indexierungsinventar. — manual, noEvidence
+  - Erforderlicher Nachweis: Sinnhaftigkeit der Sitemap und erwartete indexierbare Routen mit dem Projektinventar abgleichen; der begrenzte Crawl kennt nicht selbständig alle vorgesehenen Seiten.
+
+### CORE-MAP-02: Teilweise nachgewiesen
+
+Die öffentlich erzeugte Sitemap wurde als XML geparst, auf Medientyp, Hosts, Duplikate und Canonical-Abgleich geprüft. Nicht belastbare `lastmod`-, `changefreq`- oder `priority`-Werte werden nicht künstlich gesetzt; eine vorhandene XSL-Darstellung enthält keine Platzhalter oder sichtbaren Fehler.
+
+- [x] `CORE-MAP-02/C1` Sitemap-XML, Medientyp, Zielorigin, eindeutige Einträge und Canonical-Abgleich sind technisch unauffällig. — automatic, pass
+- [x] `CORE-MAP-02/C2` Alle gültig erfassten Sitemap-URLs wurden innerhalb der dokumentierten Limits vollständig geprüft. — automatic, pass
+- [ ] `CORE-MAP-02/C3` Optionale lastmod-, changefreq-, priority- und XSL-Angaben wurden auf tatsächliche Belastbarkeit beziehungsweise sichtbare Fehler geprüft oder begründet als nicht anwendbar dokumentiert. — manual, noEvidence
+  - Erforderlicher Nachweis: Optionale Sitemap-Metadaten und eine vorhandene XSL-Ausgabe fachlich prüfen; fehlen alle optionalen Angaben, ihre Nichtanwendbarkeit ausdrücklich dokumentieren.
+
+### CORE-SEO-04: Teilweise nachgewiesen
+
+Statuscodes, Weiterleitungen, Canonicals, Robots-Angaben, interne Links, Downloads und notwendige Seitenressourcen wurden mit einem technischen Crawl und echten GET-Abrufen kontrolliert. Standardverfahren mit lokal eingebundenem `@mktcode/website-qa`: `npm run ops:crawl:check -- https://[DOMAIN]/ --sitemap --max-pages=50 --max-resources=500 --strict`; Paket-/Werkzeugcommit und Bericht werden protokolliert. Der zentrale Social-Check ersetzt diesen allgemeinen Crawl nicht.
+
+- [x] `CORE-SEO-04/C1` Die geprüften internen Seiten- und Fragmentziele sind erfolgreich und ohne Weiterleitung erreichbar. — automatic, pass
+- [x] `CORE-SEO-04/C2` Die geprüften internen Seitenressourcen antworten erfolgreich und mit passendem MIME-Typ. — automatic, pass
+- [x] `CORE-SEO-04/C3` Der ausschließlich lesende Crawl blieb innerhalb seiner dokumentierten Grenzen und ließ keine Navigation aus Sicherheitsgründen aus. — automatic, pass
+- [ ] `CORE-SEO-04/C4` Der geprüfte Seiten-, Download- und Ressourcenumfang entspricht dem projektspezifisch vorgesehenen öffentlichen Inventar; bewusst ausgelassene Pfade sind bewertet. — manual, noEvidence
+  - Erforderlicher Nachweis: Crawlbericht und ausgelassene Navigationen gegen das Projektinventar abgleichen; externe Links, dynamische Interaktionspfade und sicherheitsbedingt übersprungene Ziele getrennt bewerten.
+
 ### CORE-A11Y-01: Teilweise nachgewiesen
 
 Semantische HTML-Elemente werden passend eingesetzt; Navigation, Hauptinhalt, ergänzende Bereiche und Footer sind sinnvoll ausgezeichnet.
@@ -238,6 +280,14 @@ Browserengine, Headless-Emulation und reale Browser beziehungsweise Geräte werd
 - [ ] `CORE-QA-02/C2` Der Projektnachweis unterscheidet Headless-Emulationen, Browserengines und reale Browser beziehungsweise Geräte und benennt nicht geprüfte Plattformen. — manual, noEvidence
   - Erforderlicher Nachweis: Ausgeführte und nicht ausgeführte Browser-/Geräteprüfungen korrekt deklarieren; Chromium nicht als Safari und Emulation nicht als reales Gerät bezeichnen.
 
+### CORE-QA-05: Teilweise nachgewiesen
+
+Bilder, Videos, Dokumente und externe Einbettungen laden wie erwartet; defekte interne und externe Links wurden automatisiert oder manuell gesucht.
+
+- [x] `CORE-QA-05/C1` Die geprüften internen Seiten-, Fragment- und Ressourcenziele sind technisch erfolgreich erreichbar. — automatic, pass
+- [ ] `CORE-QA-05/C2` Darstellung von Medien und Einbettungen sowie nur inventarisierte externe Links wurden risikogerecht zusätzlich geprüft. — manual, noEvidence
+  - Erforderlicher Nachweis: Medien und Einbettungen visuell prüfen und externe Links mit einem gesondert freigegebenen Verfahren bewerten; der allgemeine Crawler ruft externe Ziele bewusst nicht ab.
+
 ### CORE-QA-07: Teilweise nachgewiesen
 
 Die Seiten wurden ohne sichtbare JavaScript-, Netzwerk- oder Hydrationsfehler in der Browserkonsole geprüft.
@@ -245,6 +295,14 @@ Die Seiten wurden ohne sichtbare JavaScript-, Netzwerk- oder Hydrationsfehler in
 - [x] `CORE-QA-07/C1` In den automatisch geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet. — automatic, pass
 - [ ] `CORE-QA-07/C2` Interaktionsabhängige und vom beobachtenden Browserlauf nicht erreichte Zustände wurden zusätzlich auf Konsolen-, Netzwerk- und Hydrationsfehler geprüft. — manual, noEvidence
   - Erforderlicher Nachweis: Vereinbarte interaktive Zustände manuell aufrufen und Browserkonsole sowie Netzwerkprotokoll beobachten; keine schreibenden Produktionsaktionen ausführen.
+
+### CORE-QA-08: Teilweise nachgewiesen
+
+Der öffentliche Ressourcenlauf erfasst neben HTML auch tatsächlich angeforderte CSS-, JavaScript-, Schrift-, Bild- und Downloadressourcen mit Status und MIME-Typ; dynamische Pfade und erst nach Interaktion geladene Ressourcen werden zusätzlich im Browser geprüft.
+
+- [x] `CORE-QA-08/C1` Die vom Crawl entdeckten und mit GET abgerufenen internen Seitenressourcen besitzen erfolgreiche Statuscodes und passende MIME-Typen. — automatic, pass
+- [ ] `CORE-QA-08/C2` Dynamische, browserabhängige und erst nach vereinbarter Interaktion geladene Ressourcen wurden zusätzlich geprüft oder mit ihrer Grenze dokumentiert. — manual, noEvidence
+  - Erforderlicher Nachweis: Browsernetzwerk für dynamische und interaktionsabhängige Ressourcen prüfen, ohne schreibende Produktionsaktionen auszuführen; serverseitiger HTML-/CSS-Crawl allein genügt nicht.
 
 ### CORE-PERF-01: Offen
 
