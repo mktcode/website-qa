@@ -1,6 +1,6 @@
 # Abgeschlossener Plan: einfache Projektintegration und lokale Website-QA-Berichte
 
-> **Status:** Der Workflow wurde mit Paketversion `0.2.0` eingeführt, mit `0.3.0` um strukturierte Social-Nachweise, mit `0.4.0` um vorhandene Sitemap-, Crawl- und Ressourcenbeobachtungen und mit `0.5.0` um öffentlich beobachtbare Sicherheitsheadernachweise ergänzt. Die Funktionsstände wurden jeweils lokal und in installierten Verbraucherprojekten geprüft.
+> **Status:** Der Workflow wurde mit Paketversion `0.2.0` eingeführt, mit `0.3.0` um strukturierte Social-Nachweise, mit `0.4.0` um vorhandene Sitemap-, Crawl- und Ressourcenbeobachtungen, mit `0.5.0` um öffentlich beobachtbare Sicherheitsheadernachweise und mit `0.6.0` um passive technische Datenschutzbeobachtungen ergänzt. Die Funktionsstände werden jeweils lokal und in installierten Verbraucherprojekten geprüft.
 >
 > Dieses Dokument bewahrt Planung, Entscheidungen, Sicherheitsanforderungen und Abnahmekriterien des frameworkunabhängigen Refactorings von `@mktcode/website-qa`. Es enthält keine ausgefüllten Nachweise oder Vorgaben für eine bestimmte Website. Zukunftsformulierungen in den historischen Planungsabschnitten beschreiben den damaligen Implementierungsweg und keine noch offene Zusage.
 >
@@ -597,4 +597,21 @@ Die folgende Funktionsrunde strukturiert bereits vorhandene Beobachtungen des HT
 
 Der Prüfer verwendet dafür ausschließlich die ohnehin abgerufenen Antworten für reguläres HTML, die nebenwirkungsfreie 404-Probe und je eine bereits ausgewählte CSS-/JavaScript-Ressource. Abruffehler führen bei der Abdeckung zu `inconclusive`, ausdrücklich zugelassene HTTP-Antworten bei HSTS zu `notApplicable`. Es werden keine weiteren Hosts, Redirectziele, APIs oder Ressourcenklassen angefordert.
 
-Bloße Headerpräsenz ist kein Vollschutz. Inhalt und Widerspruchsfreiheit von Richtlinien, projektspezifische Risiken, weitere öffentliche Antwortklassen, alternative Hosts, app- und proxyseitige Redirectheader sowie die tatsächliche Anwendung-/Proxygrenze bleiben manuelle oder infrastrukturelle Nachweise. Technische Datenschutzbeobachtungen werden weiterhin nur in einer späteren, getrennt zu entscheidenden Runde erwogen.
+Bloße Headerpräsenz ist kein Vollschutz. Inhalt und Widerspruchsfreiheit von Richtlinien, projektspezifische Risiken, weitere öffentliche Antwortklassen, alternative Hosts, app- und proxyseitige Redirectheader sowie die tatsächliche Anwendung-/Proxygrenze bleiben manuelle oder infrastrukturelle Nachweise. Der anschließende passive Datenschutzbeobachtungsausbau ist in Abschnitt 22 eigenständig abgegrenzt.
+
+## 22. Passive technische Datenschutzbeobachtungen mit 0.6.0
+
+Die folgende Funktionsrunde strukturiert bereits vorhandene Browserbeobachtungen für `CORE-PRIV-02` und `CORE-PRIV-04`. Das Ziel ist ein ausführlicher technischer Befundbericht für die anschließende Bewertung durch kompetente Entwicklerinnen und Entwickler, keine automatische Datenschutz-, Einwilligungs- oder Rechtsfreigabe.
+
+Zwei atomare Assertions belegen ausschließlich:
+
+- dass externe Requestversuche innerhalb der deklarierten passiven, isolierten Seiten-/Profilumgebung vollständig inventarisiert und weiterhin blockiert wurden;
+- dass Cookies, Local Storage, Session Storage und IndexedDB im Initialzustand frischer Browserkontexte vollständig und ohne ihre Werte inventarisiert wurden.
+
+Die normalisierte Beobachtung dokumentiert Seiten, Profile, Chromium-Kontext, Beobachtungszeit, blockierte Netzwerk- und Browseraktionsversuche sowie aggregierte Cookie- und Storagezahlen. Vollständige lokale Browserberichte behalten redigierte technische Bezeichner und Cookieattribute für die manuelle Zuordnung; Werte werden nie in den Bericht übernommen. Ein festes Limit von 100 Bezeichnern je Art und Seiten-/Profil-Lauf begrenzt die Ausgabe. Überschreitungen, unvollständige Seiten-/Profilläufe, Seiten- oder Requestlimits und relevante Sicherheitsauslassungen führen beim abhängigen Nachweis zu `inconclusive`.
+
+Ein blockierter externer Versuch ist ein sichtbarer Befund und zugleich eine vollständig beobachtete, aber nicht ausgeführte Anfrage. Seine Existenz macht die Beobachtungsassertion deshalb nicht automatisch negativ; Zulässigkeit, Zweck, Quell- und Konfigurationszuordnung sowie mögliche Einwilligung werden manuell bewertet. Ebenso ist das Fehlen von Cookies oder Storage im isolierten Lauf kein Beweis für interaktionsabhängige Zustände. Blockierte Drittanbieter können in dieser Umgebung keine eigenen Speicherwerte setzen.
+
+`CORE-PRIV-02` verbindet den automatischen Beobachtungsnachweis mit einem manuellen Abgleich gegen Quellcode, Build-/Laufzeitkonfiguration und dokumentierte Dienste. `CORE-PRIV-04` verbindet das technische Initialinventar mit manueller Dokumentations-/Einwilligungsprüfung und der fachlichen Bewertung von `Secure`, `HttpOnly` und `SameSite` für sicherheitsrelevante Cookies.
+
+Es werden keine neuen Requests, externen Freigaben, Klicks, Consent-Interaktionen, Formulare oder persistenten Browserprofile eingeführt. Automatische Retries transienter Browserfehler gehören nicht zu dieser Runde; unvollständige Läufe bleiben sichtbar.

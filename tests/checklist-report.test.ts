@@ -23,10 +23,10 @@ describe('structured checklist pilot', () => {
     const registry = loadAssertionRegistry()
 
     expect(validateChecklistCatalog(catalog, registry)).toBe(true)
-    expect(catalog).toMatchObject({ catalogVersion: '1.0.0-pilot.6' })
-    expect(catalog.items).toHaveLength(32)
-    expect(catalog.items.flatMap((item: { criteria: unknown[] }) => item.criteria)).toHaveLength(88)
-    expect(registry.assertions).toHaveLength(54)
+    expect(catalog).toMatchObject({ catalogVersion: '1.0.0-pilot.7' })
+    expect(catalog.items).toHaveLength(34)
+    expect(catalog.items.flatMap((item: { criteria: unknown[] }) => item.criteria)).toHaveLength(93)
+    expect(registry.assertions).toHaveLength(56)
     expect(checklistItemIdsForTool('http-check', catalog, registry)).toEqual([
       'CORE-DOM-02',
       'CORE-DOM-07',
@@ -56,6 +56,8 @@ describe('structured checklist pilot', () => {
       'CORE-A11Y-13',
       'CORE-QA-02',
       'CORE-QA-07',
+      'CORE-PRIV-02',
+      'CORE-PRIV-04',
     ])
     expect(checklistItemIdsForTool('social-preview-check', catalog, registry)).toEqual([
       'CORE-SOC-01',
@@ -118,7 +120,7 @@ describe('structured checklist pilot', () => {
     })).toThrow(/gültiges Datum/)
 
     const evidenceExample = JSON.parse(readFileSync(new URL('../catalog/project-evidence.example.json', import.meta.url), 'utf8'))
-    expect(evidenceExample.catalog).toEqual({ id: 'website-qa-pilot', version: '1.0.0-pilot.6' })
+    expect(evidenceExample.catalog).toEqual({ id: 'website-qa-pilot', version: '1.0.0-pilot.7' })
     const evidencedRights = evaluatePilotChecklist({
       evidence: evidenceExample.evidence,
       itemIds: ['GOV-RGT-02'],
@@ -175,6 +177,23 @@ describe('structured checklist pilot', () => {
     expect(report.summary).toMatchObject({
       automaticCriteria: { pass: 8, total: 8 },
       checklistItems: { pass: 0, partial: 3, total: 3 },
+      nonAutomaticCriteria: { noEvidence: 3, total: 3 },
+    })
+  })
+
+  it('keeps privacy interpretation and consent review open after complete passive observations', () => {
+    const report = evaluatePilotChecklist({
+      assertions: [
+        assertion('browser.privacy.external-request-observation-complete'),
+        assertion('browser.privacy.initial-storage-observation-complete'),
+      ],
+      itemIds: ['CORE-PRIV-02', 'CORE-PRIV-04'],
+    })
+
+    expect(report.items.every((item: { outcome: string }) => item.outcome === 'partial')).toBe(true)
+    expect(report.summary).toMatchObject({
+      automaticCriteria: { pass: 2, total: 2 },
+      checklistItems: { pass: 0, partial: 2, total: 2 },
       nonAutomaticCriteria: { noEvidence: 3, total: 3 },
     })
   })

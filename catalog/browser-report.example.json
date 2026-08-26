@@ -4,19 +4,20 @@
   "tool": "browser-check",
   "toolPackage": {
     "name": "@mktcode/website-qa",
-    "version": "0.5.0"
+    "version": "0.6.0"
   },
   "checklistCoverage": {
     "catalog": {
       "id": "website-qa-pilot",
       "status": "pilot",
-      "version": "1.0.0-pilot.6"
+      "version": "1.0.0-pilot.7"
     }
   },
   "options": {
     "maxPages": 10,
     "maxRequests": 300,
     "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"],
+    "settleMilliseconds": 750,
     "sitemap": false,
     "strict": true,
     "timeoutMilliseconds": 20000
@@ -32,6 +33,8 @@
   },
   "result": {
     "requestedUrl": "https://example.com/",
+    "requestedProfiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"],
+    "settleMilliseconds": 750,
     "finalUrl": "https://example.com/",
     "browser": {
       "product": "Chromium",
@@ -72,10 +75,53 @@
         "outcome": "pass",
         "message": "In den geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet.",
         "subject": { "url": "https://example.com/", "checkedPages": 1, "profileRuns": 5, "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"], "browserProduct": "Chromium", "browserVersion": "Chrome/140.0.0.0" }
+      },
+      {
+        "assertionId": "browser.privacy.external-request-observation-complete",
+        "assertionVersion": 1,
+        "outcome": "pass",
+        "message": "Externe Requestversuche wurden innerhalb der deklarierten passiven Prüfumgebung vollständig inventarisiert und weiterhin blockiert.",
+        "subject": { "url": "https://example.com/", "checkedPages": 1, "profileRuns": 5, "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"], "browserProduct": "Chromium", "browserVersion": "Chrome/140.0.0.0", "observationMode": "passive-initial-load-isolated", "observedExternalRequestAttempts": 0, "settleMilliseconds": 750 }
+      },
+      {
+        "assertionId": "browser.privacy.initial-storage-observation-complete",
+        "assertionVersion": 1,
+        "outcome": "pass",
+        "message": "Cookies und Browser-Storage wurden im passiven Initialzustand ohne Werte vollständig inventarisiert.",
+        "subject": { "url": "https://example.com/", "checkedPages": 1, "profileRuns": 5, "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"], "browserProduct": "Chromium", "browserVersion": "Chrome/140.0.0.0", "cookieObservations": 0, "indexedDatabaseObservations": 0, "localStorageObservations": 0, "observationMode": "passive-initial-load-isolated", "sessionStorageObservations": 0, "settleMilliseconds": 750, "valuesRecorded": false }
       }
     ],
     "blockedRequests": [],
     "issues": [],
+    "privacyObservations": {
+      "coverage": {
+        "checkedPages": 1,
+        "externalDataRecorded": true,
+        "identifierLimitPerKindAndProfile": 100,
+        "profileRuns": 5,
+        "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"],
+        "requestedProfiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"],
+        "settleMilliseconds": 750,
+        "storageDataRecorded": true
+      },
+      "externalRequestAttempts": {
+        "blockedActions": 0,
+        "blockedNetworkRequests": 0,
+        "externalBlockedActions": 0,
+        "originCount": 0,
+        "origins": [],
+        "originsTruncated": false,
+        "total": 0
+      },
+      "initialStorage": {
+        "cookies": { "observations": 0, "recordedIdentifiers": 0, "truncated": false },
+        "indexedDatabases": { "observations": 0, "recordedIdentifiers": 0, "truncated": false },
+        "localStorage": { "observations": 0, "recordedIdentifiers": 0, "truncated": false },
+        "sessionStorage": { "observations": 0, "recordedIdentifiers": 0, "truncated": false }
+      },
+      "observationMode": "passive-initial-load-isolated",
+      "valuesRecorded": false
+    },
     "profiles": [
       { "profile": "desktop", "url": "https://example.com/" },
       { "profile": "mobile", "url": "https://example.com/" },

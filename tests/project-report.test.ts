@@ -27,7 +27,7 @@ function assertion(assertionId: string, outcome: 'fail' | 'inconclusive' | 'notA
 function technicalReport(assertions: ReturnType<typeof assertion>[]) {
   return {
     checklistCoverage: {
-      catalog: { id: 'website-qa-pilot', status: 'pilot', version: '1.0.0-pilot.6' },
+      catalog: { id: 'website-qa-pilot', status: 'pilot', version: '1.0.0-pilot.7' },
     },
     generatedAt: '2026-08-24T12:00:00.000Z',
     results: [{ assertions, requestedUrl: 'https://example.com/' }],
@@ -40,7 +40,7 @@ function technicalReport(assertions: ReturnType<typeof assertion>[]) {
 
 function projectConfig() {
   return {
-    catalog: { id: 'website-qa-pilot', version: '1.0.0-pilot.6' },
+    catalog: { id: 'website-qa-pilot', version: '1.0.0-pilot.7' },
     itemStates: [],
     project: {
       deploymentId: 'deployment-1',
@@ -89,8 +89,8 @@ describe('project report pilot', () => {
 
     expect(report.summary.checklistItems).toMatchObject({
       complete: 1,
-      open: 29,
-      total: 31,
+      open: 31,
+      total: 33,
     })
     expect(report.items.find((item: { id: string }) => item.id === 'CORE-ERR-02')).toMatchObject({
       evidenceOutcome: 'pass',
@@ -110,10 +110,12 @@ describe('project report pilot', () => {
       'browser.accessibility.axe-no-detected-violations',
       'browser.context.chromium-headless-recorded',
       'browser.runtime.no-observed-errors',
+      'browser.privacy.external-request-observation-complete',
+      'browser.privacy.initial-storage-observation-complete',
     ].map(assertionId => assertion(assertionId))
     const browserReport = {
       checklistCoverage: {
-        catalog: { id: 'website-qa-pilot', status: 'pilot', version: '1.0.0-pilot.6' },
+        catalog: { id: 'website-qa-pilot', status: 'pilot', version: '1.0.0-pilot.7' },
       },
       generatedAt: '2026-08-24T12:05:00.000Z',
       result: { assertions: browserAssertions, requestedUrl: 'https://example.com/' },
@@ -131,12 +133,12 @@ describe('project report pilot', () => {
       }],
     })
 
-    expect(report.summary.checklistItems).toMatchObject({ open: 26, partial: 5, total: 31 })
+    expect(report.summary.checklistItems).toMatchObject({ open: 26, partial: 7, total: 33 })
     expect(report.items.find((item: { id: string }) => item.id === 'CORE-A11Y-13')).toMatchObject({
       evidenceOutcome: 'partial',
       projectStatus: 'partial',
     })
-    expect(report.technicalRuns[0]).toMatchObject({ assertionCount: 5, tool: 'browser-check', usedForEvaluation: true })
+    expect(report.technicalRuns[0]).toMatchObject({ assertionCount: 7, tool: 'browser-check', usedForEvaluation: true })
   })
 
   it('includes communication evidence and explicit external workflow states', () => {
@@ -153,7 +155,7 @@ describe('project report pilot', () => {
     const report = createPilotProjectReport({
       config,
       evidenceDocument: {
-        catalog: { id: 'website-qa-pilot', version: '1.0.0-pilot.6' },
+        catalog: { id: 'website-qa-pilot', version: '1.0.0-pilot.7' },
         evidence: [{
           checkedAt: '2026-08-24',
           checkedBy: 'inhaltlich verantwortliche Stelle',
@@ -172,7 +174,7 @@ describe('project report pilot', () => {
     expect(report.items.find((item: { id: string }) => item.id === 'CORE-DOM-04')).toMatchObject({
       projectStatus: 'external',
     })
-    expect(report.summary.checklistItems).toMatchObject({ complete: 2, external: 1, open: 28, total: 32 })
+    expect(report.summary.checklistItems).toMatchObject({ complete: 2, external: 1, open: 30, total: 34 })
   })
 
   it('binds query targets without retaining their values', () => {

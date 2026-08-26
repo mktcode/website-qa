@@ -7,7 +7,7 @@
 | Feld | Wert |
 |---|---|
 | Erstellt | 2026-08-24T12:30:00.000Z |
-| Katalog | website-qa-pilot 1.0.0-pilot.6 (pilot) |
+| Katalog | website-qa-pilot 1.0.0-pilot.7 (pilot) |
 | Auswertungsumgebung | production |
 | Bevorzugte URL | https://example.com/ |
 | Quellstand | PROJEKT-COMMIT |
@@ -20,27 +20,27 @@
 |---|---:|
 | Vollständig nachgewiesen | 3 |
 | Fehlgeschlagen | 0 |
-| Teilweise nachgewiesen | 23 |
+| Teilweise nachgewiesen | 25 |
 | Offen | 5 |
 | Unklar | 0 |
 | Nicht zutreffend | 0 |
 | Externer Nachweis offen | 1 |
 | Zurückgestellt | 0 |
 | Akzeptierte Abweichung (offen) | 0 |
-| **Ausgewählte Pilotpunkte** | **32** |
+| **Ausgewählte Pilotpunkte** | **34** |
 
-Automatische Kriterien: 44 bestanden, 0 fehlgeschlagen, 0 unklar, 11 ohne Nachweis.
+Automatische Kriterien: 46 bestanden, 0 fehlgeschlagen, 0 unklar, 11 ohne Nachweis.
 
-Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 32 ohne Nachweis.
+Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 35 ohne Nachweis.
 
 ## Technische Läufe
 
 | Werkzeug | Ziel | Umgebung | Verwendet | Assertions | Befehl |
 |---|---|---|---:|---:|---|
-| http-check 0.5.0 | https://example.com/ | production | ja | 12 | <code>website-qa-http https://example.com/ --strict --json</code> |
-| crawl-check 0.5.0 | https://example.com/ | production | ja | 16 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
-| browser-check 0.5.0 | https://example.com/ | production | ja | 5 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
-| social-preview-check 0.5.0 | https://example.com/ | production | ja | 10 | <code>website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json</code> |
+| http-check 0.6.0 | https://example.com/ | production | ja | 12 | <code>website-qa-http https://example.com/ --strict --json</code> |
+| crawl-check 0.6.0 | https://example.com/ | production | ja | 16 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
+| browser-check 0.6.0 | https://example.com/ | production | ja | 7 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
+| social-preview-check 0.6.0 | https://example.com/ | production | ja | 10 | <code>website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json</code> |
 
 ## Checklistenpunkte
 
@@ -75,6 +75,8 @@ Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 32 ohne Nachweis.
 | CORE-QA-08 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-PERF-01 | core | Offen | 0/3 | 0/1 |
 | CORE-PERF-05 | core | Teilweise nachgewiesen | 1/2 | 0/1 |
+| CORE-PRIV-02 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
+| CORE-PRIV-04 | core | Teilweise nachgewiesen | 1/1 | 0/2 |
 | CORE-SEC-04 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-SEC-05 | core | Teilweise nachgewiesen | 6/6 | 0/1 |
 | GOV-RGT-02 | auftrag-recht-uebergabe | Vollständig nachgewiesen | 0/0 | 1/1 |
@@ -333,6 +335,24 @@ Cacheheader passen zur Ressource: versionierte unveränderliche Assets dürfen l
 - [x] `CORE-PERF-05/C2` Die geprüfte 404-Antwort ist nicht ausdrücklich langfristig öffentlich cachebar. — automatic, pass
 - [ ] `CORE-PERF-05/C3` Die Cachepolitik für veränderliche, sensible und weitere projektspezifische Antwortklassen wurde bewertet. — manual, noEvidence
   - Erforderlicher Nachweis: Antwortklassen, erwartete Cachepolitik und tatsächliche Header dokumentieren.
+
+### CORE-PRIV-02: Teilweise nachgewiesen
+
+Tatsächliche externe Schriftarten, CDNs, Karten, Videos, Tracker, Analyse-, Fehlertracking- und sonstige Drittanbieteranfragen wurden per Quellprüfung und Browsernetzwerk kontrolliert.
+
+- [x] `CORE-PRIV-02/C1` Externe Requestversuche wurden innerhalb der deklarierten passiven und isolierten Browserprüfumgebung vollständig inventarisiert und weiterhin blockiert. — automatic, pass
+- [ ] `CORE-PRIV-02/C2` Das technische Browserinventar wurde mit Quellcode, Build- und Laufzeitkonfiguration sowie der projektspezifisch dokumentierten Liste externer Dienste abgeglichen. — manual, noEvidence
+  - Erforderlicher Nachweis: Blockierte Requestversuche und Browseraktionen mit Quellcode, Konfiguration und dokumentierten Drittanbietern vergleichen; externe Links nicht mit tatsächlich initiierten Requests verwechseln und rechtliche Eignung getrennt bewerten.
+
+### CORE-PRIV-04: Teilweise nachgewiesen
+
+Cookies sowie Local- und Session-Storage stimmen mit Dokumentation und Einwilligungslogik überein. Sicherheitsrelevante Cookies verwenden soweit einschlägig `Secure`, `HttpOnly` und eine passende `SameSite`-Richtlinie.
+
+- [x] `CORE-PRIV-04/C1` Cookies, Local Storage, Session Storage und IndexedDB wurden im passiven Initialzustand frischer isolierter Browserkontexte ohne Speicherung ihrer Werte vollständig inventarisiert. — automatic, pass
+- [ ] `CORE-PRIV-04/C2` Das technische Initialinventar stimmt mit Dokumentation und Einwilligungslogik überein; interaktionsabhängige Zustände wurden gesondert bewertet. — manual, noEvidence
+  - Erforderlicher Nachweis: Cookie- und Storage-Bezeichner sowie Setzzeitpunkt mit Dokumentation und Einwilligungslogik vergleichen; notwendige reale Interaktionszustände in einem gesondert freigegebenen manuellen Verfahren prüfen.
+- [ ] `CORE-PRIV-04/C3` Für sicherheitsrelevante Cookies wurde projektspezifisch bewertet, ob `Secure`, `HttpOnly` und die beobachtete `SameSite`-Richtlinie angemessen sind. — manual, noEvidence
+  - Erforderlicher Nachweis: Zweck und Zugriffspfad jedes sicherheitsrelevanten Cookies bestimmen und die beobachteten Attribute fachlich bewerten; bloße Attributpräsenz oder -abwesenheit genügt nicht.
 
 ### CORE-SEC-04: Teilweise nachgewiesen
 

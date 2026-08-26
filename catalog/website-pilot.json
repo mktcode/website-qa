@@ -2,7 +2,7 @@
   "$schema": "./website-catalog.schema.json",
   "schemaVersion": 1,
   "catalogId": "website-qa-pilot",
-  "catalogVersion": "1.0.0-pilot.6",
+  "catalogVersion": "1.0.0-pilot.7",
   "status": "pilot",
   "description": "Strukturierter Pilotkatalog für HTTP-, Crawl-, Browser- und Social-bezogene sowie bewusst nicht automatisierbare Website-Prüfnachweise.",
   "items": [
@@ -918,6 +918,65 @@
             "mode": "manual",
             "evidenceClass": "project-review",
             "instructions": "Antwortklassen, erwartete Cachepolitik und tatsächliche Header dokumentieren."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-PRIV-02",
+      "module": "core",
+      "statement": "Tatsächliche externe Schriftarten, CDNs, Karten, Videos, Tracker, Analyse-, Fehlertracking- und sonstige Drittanbieteranfragen wurden per Quellprüfung und Browsernetzwerk kontrolliert.",
+      "criteria": [
+        {
+          "id": "CORE-PRIV-02/C1",
+          "statement": "Externe Requestversuche wurden innerhalb der deklarierten passiven und isolierten Browserprüfumgebung vollständig inventarisiert und weiterhin blockiert.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["browser.privacy.external-request-observation-complete"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-PRIV-02/C2",
+          "statement": "Das technische Browserinventar wurde mit Quellcode, Build- und Laufzeitkonfiguration sowie der projektspezifisch dokumentierten Liste externer Dienste abgeglichen.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Blockierte Requestversuche und Browseraktionen mit Quellcode, Konfiguration und dokumentierten Drittanbietern vergleichen; externe Links nicht mit tatsächlich initiierten Requests verwechseln und rechtliche Eignung getrennt bewerten."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-PRIV-04",
+      "module": "core",
+      "statement": "Cookies sowie Local- und Session-Storage stimmen mit Dokumentation und Einwilligungslogik überein. Sicherheitsrelevante Cookies verwenden soweit einschlägig `Secure`, `HttpOnly` und eine passende `SameSite`-Richtlinie.",
+      "criteria": [
+        {
+          "id": "CORE-PRIV-04/C1",
+          "statement": "Cookies, Local Storage, Session Storage und IndexedDB wurden im passiven Initialzustand frischer isolierter Browserkontexte ohne Speicherung ihrer Werte vollständig inventarisiert.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["browser.privacy.initial-storage-observation-complete"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-PRIV-04/C2",
+          "statement": "Das technische Initialinventar stimmt mit Dokumentation und Einwilligungslogik überein; interaktionsabhängige Zustände wurden gesondert bewertet.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Cookie- und Storage-Bezeichner sowie Setzzeitpunkt mit Dokumentation und Einwilligungslogik vergleichen; notwendige reale Interaktionszustände in einem gesondert freigegebenen manuellen Verfahren prüfen."
+          }
+        },
+        {
+          "id": "CORE-PRIV-04/C3",
+          "statement": "Für sicherheitsrelevante Cookies wurde projektspezifisch bewertet, ob `Secure`, `HttpOnly` und die beobachtete `SameSite`-Richtlinie angemessen sind.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Zweck und Zugriffspfad jedes sicherheitsrelevanten Cookies bestimmen und die beobachteten Attribute fachlich bewerten; bloße Attributpräsenz oder -abwesenheit genügt nicht."
           }
         }
       ]

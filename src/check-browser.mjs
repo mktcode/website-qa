@@ -13,6 +13,8 @@ import { writeJsonOutput } from './lib/json-output.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
 
 const defaultProfiles = ['desktop', 'mobile', 'narrow', 'reduced-motion', 'zoom-200']
+const maxPrivacyIdentifiersPerProfile = 100
+const maxPrivacyOrigins = 100
 const profileDefinitions = {
   'desktop': { height: 900, label: 'Desktop 1280 px', reducedMotion: false, width: 1280 },
   'mobile': { height: 844, label: 'Mobil 390 px', mobile: true, reducedMotion: false, width: 390 },
@@ -63,7 +65,8 @@ Optionen:
 
 Sicherheitsgrenze: Das Werkzeug klickt nie, sendet keine Formulare und lädt keine
 Dateien hoch. Nicht-GET-Anfragen, externe Requests, Popups und unerwartete
-Navigationen werden blockiert und protokolliert.`
+Navigationen werden blockiert und protokolliert. Passive Datenschutzbeobachtungen
+inventarisieren nur Bezeichner und Cookieattribute, niemals gespeicherte Werte.`
 }
 
 function positiveInteger(value, optionName) {
@@ -251,6 +254,114 @@ function profilesCoverEveryPage(result, requiredProfiles) {
     && [...profilesByUrl.values()].every(profiles => requiredProfiles.every(profile => profiles.has(profile)))
 }
 
+const incompletePrivacyObservationIssueCodes = new Set([
+  'browser-http-error',
+  'browser-page-failed',
+  'console-error',
+  'external-sitemap-page-skipped',
+  'external-sitemap-skipped',
+  'invalid-sitemap-page',
+  'navigation-skipped-read-only',
+  'page-error',
+  'page-limit',
+  'page-probe-failed',
+  'page-probe-status',
+  'request-failed',
+  'request-limit',
+  'sitemap-fetch',
+  'sitemap-limit',
+  'start-mime',
+  'start-status',
+  'unexpected-navigation-blocked',
+  'unsafe-request-blocked',
+])
+
+function observationCount(profile, kind) {
+  const recorded = profile.privacyObservation?.[kind]
+  return {
+    recorded: recorded?.recorded ?? 0,
+    total: recorded?.total ?? 0,
+    truncated: Boolean(recorded?.truncated),
+  }
+}
+
+function createPrivacyObservations(result, options = {}) {
+  const profiles = result.profiles || []
+  const requestedProfiles = result.requestedProfiles || options.profiles || [...new Set(profiles.map(profile => profile.profile))]
+  const externalNetworkRequests = (result.blockedRequests || []).filter(request => request.external)
+  const blockedActions = profiles.flatMap(profile => profile.blockedActions || [])
+  const externalBlockedActions = blockedActions.filter(action => action.external)
+  const origins = [...new Set([
+    ...externalNetworkRequests.map(request => request.origin),
+    ...externalBlockedActions.map(action => action.origin),
+  ].filter(Boolean))].toSorted()
+  const storageKinds = ['cookies', 'indexedDatabases', 'localStorage', 'sessionStorage']
+  const storage = Object.fromEntries(storageKinds.map((kind) => {
+    const counts = profiles.map(profile => observationCount(profile, kind))
+    return [kind, {
+      observations: counts.reduce((sum, count) => sum + count.total, 0),
+      recordedIdentifiers: counts.reduce((sum, count) => sum + count.recorded, 0),
+      truncated: counts.some(count => count.truncated),
+    }]
+  }))
+  const externalDataRecorded = Array.isArray(result.blockedRequests)
+    && profiles.every(profile => Array.isArray(profile.blockedActions))
+    && (result.blockedRequests || []).every(request => typeof request.external === 'boolean')
+    && profiles.every(profile => profile.blockedActions.every(action => typeof action.external === 'boolean'))
+  const storageDataRecorded = profiles.every(profile => profile.privacyObservation
+    && storageKinds.every(kind => profile.privacyObservation[kind]
+      && Number.isSafeInteger(profile.privacyObservation[kind].recorded)
+      && Number.isSafeInteger(profile.privacyObservation[kind].total)))
+
+  return {
+    coverage: {
+      checkedPages: new Set(profiles.map(profile => profile.url)).size,
+      externalDataRecorded,
+      identifierLimitPerKindAndProfile: maxPrivacyIdentifiersPerProfile,
+      profileRuns: profiles.length,
+      profiles: [...new Set(profiles.map(profile => profile.profile))],
+      requestedProfiles,
+      settleMilliseconds: result.settleMilliseconds ?? options.settleMilliseconds,
+      storageDataRecorded,
+    },
+    externalRequestAttempts: {
+      blockedActions: blockedActions.length,
+      blockedNetworkRequests: externalNetworkRequests.length,
+      externalBlockedActions: externalBlockedActions.length,
+      originCount: origins.length,
+      origins: origins.slice(0, maxPrivacyOrigins),
+      originsTruncated: origins.length > maxPrivacyOrigins,
+      total: externalNetworkRequests.length + externalBlockedActions.length,
+    },
+    initialStorage: storage,
+    observationMode: 'passive-initial-load-isolated',
+    valuesRecorded: false,
+  }
+}
+
+function privacyObservationOutcome(result, area) {
+  const observations = result.privacyObservations
+  const requiredProfiles = observations?.coverage?.requestedProfiles || []
+  if (!observations
+    || result.profiles.length === 0
+    || requiredProfiles.length === 0
+    || !Number.isSafeInteger(observations.coverage.settleMilliseconds)
+    || observations.coverage.settleMilliseconds < 0
+    || !profilesCoverEveryPage(result, requiredProfiles)
+    || result.issues.some(issue => incompletePrivacyObservationIssueCodes.has(issue.code))) {
+    return 'inconclusive'
+  }
+  if (area === 'external') {
+    return observations.coverage.externalDataRecorded && !observations.externalRequestAttempts.originsTruncated
+      ? 'pass'
+      : 'inconclusive'
+  }
+  return observations.coverage.storageDataRecorded
+    && Object.values(observations.initialStorage).every(observation => !observation.truncated)
+    ? 'pass'
+    : 'inconclusive'
+}
+
 function createBrowserAssertions(result) {
   const subject = {
     browserProduct: result.browser?.product,
@@ -261,12 +372,12 @@ function createBrowserAssertions(result) {
     url: reportUrl(result.finalUrl || result.requestedUrl).url,
   }
   const assertions = []
-  const add = (assertionId, outcome, message) => assertions.push({
+  const add = (assertionId, outcome, message, assertionSubject = subject) => assertions.push({
     assertionId,
     assertionVersion: 1,
     message,
     outcome,
-    subject,
+    subject: assertionSubject,
   })
 
   let outcome = browserAssertionOutcome(result, issue => issue.code === 'main-landmark-count')
@@ -313,6 +424,32 @@ function createBrowserAssertions(result) {
     pass: 'In den geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet.',
   }[outcome])
 
+  outcome = privacyObservationOutcome(result, 'external')
+  add('browser.privacy.external-request-observation-complete', outcome, {
+    inconclusive: 'Externe Requestversuche konnten innerhalb der deklarierten passiven Prüfumgebung nicht vollständig inventarisiert werden.',
+    pass: 'Externe Requestversuche wurden innerhalb der deklarierten passiven Prüfumgebung vollständig inventarisiert und weiterhin blockiert.',
+  }[outcome], {
+    ...subject,
+    observationMode: result.privacyObservations?.observationMode,
+    observedExternalRequestAttempts: result.privacyObservations?.externalRequestAttempts?.total,
+    settleMilliseconds: result.privacyObservations?.coverage?.settleMilliseconds,
+  })
+
+  outcome = privacyObservationOutcome(result, 'storage')
+  add('browser.privacy.initial-storage-observation-complete', outcome, {
+    inconclusive: 'Cookies und Browser-Storage konnten im passiven Initialzustand nicht vollständig inventarisiert werden.',
+    pass: 'Cookies und Browser-Storage wurden im passiven Initialzustand ohne Werte vollständig inventarisiert.',
+  }[outcome], {
+    ...subject,
+    cookieObservations: result.privacyObservations?.initialStorage?.cookies?.observations,
+    indexedDatabaseObservations: result.privacyObservations?.initialStorage?.indexedDatabases?.observations,
+    localStorageObservations: result.privacyObservations?.initialStorage?.localStorage?.observations,
+    observationMode: result.privacyObservations?.observationMode,
+    sessionStorageObservations: result.privacyObservations?.initialStorage?.sessionStorage?.observations,
+    settleMilliseconds: result.privacyObservations?.coverage?.settleMilliseconds,
+    valuesRecorded: result.privacyObservations?.valuesRecorded,
+  })
+
   return assertions
 }
 
@@ -323,10 +460,14 @@ function checklistCoverage(result) {
   })
 }
 
-function addBlockedRequest(result, profile, request, reason, code, severity = 'warning') {
+function addBlockedRequest(result, pageUrl, profile, request, reason, code, severity = 'warning') {
+  const requestUrl = new URL(request.url())
   const reported = reportUrl(request.url())
   const entry = {
+    external: requestUrl.origin !== result.origin,
     method: request.method(),
+    origin: reportUrl(requestUrl.origin).url,
+    pageUrl: reportUrl(pageUrl).url,
     parameterNames: reported.parameterNames,
     profile,
     reason,
@@ -427,7 +568,7 @@ async function sitemapPages(result, options, origin, defaultSitemapUrl) {
 }
 
 async function pageFacts(page) {
-  return page.evaluate(() => {
+  return page.evaluate((privacyIdentifierLimit) => {
     // Die Funktion muss im serialisierten Browser-Kontext definiert sein.
     // oxlint-disable-next-line unicorn/consistent-function-scoping
     const selectorFor = (element) => {
@@ -457,9 +598,13 @@ async function pageFacts(page) {
       download: link.hasAttribute('download'),
       href: link.href,
     }))
+    const localStorageKeys = Object.keys(localStorage)
+    const sessionStorageKeys = Object.keys(sessionStorage)
     const storage = {
-      localStorage: Object.keys(localStorage),
-      sessionStorage: Object.keys(sessionStorage),
+      localStorage: localStorageKeys.slice(0, privacyIdentifierLimit),
+      localStorageTotal: localStorageKeys.length,
+      sessionStorage: sessionStorageKeys.slice(0, privacyIdentifierLimit),
+      sessionStorageTotal: sessionStorageKeys.length,
     }
     return {
       buttons: document.querySelectorAll('button, input[type="button"], input[type="submit"], input[type="reset"]').length,
@@ -479,7 +624,7 @@ async function pageFacts(page) {
       storage,
       title: document.title,
     }
-  })
+  }, maxPrivacyIdentifiersPerProfile)
 }
 
 async function accessibilityAudit(page) {
@@ -500,7 +645,7 @@ async function accessibilityAudit(page) {
   })
 }
 
-function recordFactsIssues(result, url, profile, facts, violations, cookies, indexedDatabases) {
+function recordFactsIssues(result, url, profile, facts, violations, privacyObservation) {
   if (!facts.title.trim()) {
     addIssue(result, 'error', 'missing-title', 'Dokument besitzt keinen Titel.', ['CORE-A11Y-02', 'CORE-SEO-01'], url, profile)
   }
@@ -516,12 +661,15 @@ function recordFactsIssues(result, url, profile, facts, violations, cookies, ind
   if (facts.overflow.scrollWidth > facts.overflow.clientWidth + 1) {
     addIssue(result, 'error', 'horizontal-overflow', `Horizontaler Overflow: ${facts.overflow.scrollWidth}px Inhalt bei ${facts.overflow.clientWidth}px Viewport.`, ['CORE-A11Y-07', 'CORE-QA-01'], url, profile)
   }
-  if (cookies.length > 0) {
-    addIssue(result, 'warning', 'cookies-before-interaction', `${cookies.length} Cookie(s) wurden ohne Interaktion gesetzt.`, ['CORE-PRIV-02', 'CORE-PRIV-03'], url, profile)
+  if (privacyObservation.cookies.total > 0) {
+    addIssue(result, 'warning', 'cookies-before-interaction', `${privacyObservation.cookies.total} Cookie(s) wurden ohne Interaktion gesetzt.`, ['CORE-PRIV-03', 'CORE-PRIV-04'], url, profile)
   }
-  const storageCount = facts.storage.localStorage.length + facts.storage.sessionStorage.length + indexedDatabases.length
+  const storageCount = privacyObservation.localStorage.total + privacyObservation.sessionStorage.total + privacyObservation.indexedDatabases.total
   if (storageCount > 0) {
-    addIssue(result, 'warning', 'storage-before-interaction', `${storageCount} Browser-Speichereintrag/-träge wurden ohne Interaktion angelegt.`, ['CORE-PRIV-02', 'CORE-PRIV-03'], url, profile)
+    addIssue(result, 'warning', 'storage-before-interaction', `${storageCount} Browser-Speichereintrag/-träge wurden ohne Interaktion angelegt.`, ['CORE-PRIV-03', 'CORE-PRIV-04'], url, profile)
+  }
+  if (Object.values(privacyObservation).some(observation => observation.truncated)) {
+    addIssue(result, 'warning', 'privacy-observation-limit', `Mindestens ein Cookie- oder Storage-Inventar überschreitet das Berichtslimit von ${maxPrivacyIdentifiersPerProfile} Bezeichnern je Art und Seiten-/Profil-Lauf.`, ['CORE-PRIV-02', 'CORE-PRIV-04'], url, profile)
   }
   for (const violation of violations) {
     const severity = ['critical', 'serious'].includes(violation.impact) ? 'error' : 'warning'
@@ -557,7 +705,19 @@ async function inspectProfile(browser, result, options, url, profileName, discov
     page.setDefaultNavigationTimeout(options.timeoutMilliseconds)
     page.setDefaultTimeout(options.timeoutMilliseconds)
     await page.exposeFunction('websiteQaRecordBlockedAction', (kind, value) => {
-      blockedActions.push({ kind: String(kind), url: reportUrl(String(value || url)).url })
+      let actionUrl
+      try {
+        actionUrl = new URL(String(value || url), url)
+      }
+      catch {
+        actionUrl = new URL(url)
+      }
+      blockedActions.push({
+        external: actionUrl.origin !== result.origin,
+        kind: String(kind),
+        origin: reportUrl(actionUrl.origin).url,
+        url: reportUrl(actionUrl.href).url,
+      })
     })
     await page.evaluateOnNewDocument(() => {
       // Die Hilfsfunktion muss im serialisierten Browser-Kontext definiert sein.
@@ -633,7 +793,7 @@ async function inspectProfile(browser, result, options, url, profileName, discov
           origin: result.origin,
         })
         if (decision.action === 'block') {
-          addBlockedRequest(result, profileName, request, decision.reason, decision.code, decision.severity)
+          addBlockedRequest(result, url, profileName, request, decision.reason, decision.code, decision.severity)
           await request.abort('blockedbyclient')
           return
         }
@@ -647,7 +807,7 @@ async function inspectProfile(browser, result, options, url, profileName, discov
         await request.continue()
       }
       catch (error) {
-        addBlockedRequest(result, profileName, request, `Browser-Request wurde durch die URL-Sicherheitsprüfung blockiert: ${redactText(error.message)}`, 'unsafe-request-blocked', 'error')
+        addBlockedRequest(result, url, profileName, request, `Browser-Request wurde durch die URL-Sicherheitsprüfung blockiert: ${redactText(error.message)}`, 'unsafe-request-blocked', 'error')
         await request.abort('blockedbyclient').catch(() => {})
       }
     })
@@ -683,6 +843,8 @@ async function inspectProfile(browser, result, options, url, profileName, discov
     }
 
     const facts = await pageFacts(page)
+    facts.storage.localStorage = facts.storage.localStorage.map(identifier => redactText(identifier, 200))
+    facts.storage.sessionStorage = facts.storage.sessionStorage.map(identifier => redactText(identifier, 200))
     let violations = []
     try {
       violations = await accessibilityAudit(page)
@@ -690,16 +852,42 @@ async function inspectProfile(browser, result, options, url, profileName, discov
     catch (error) {
       addIssue(result, 'error', 'axe-runtime', `Accessibility-Audit fehlgeschlagen: ${redactText(error.message)}`, ['CORE-A11Y-13'], url, profileName)
     }
-    const cookies = (await context.cookies()).map(cookie => ({
-      domain: cookie.domain,
+    const observedCookies = await context.cookies()
+    const cookies = observedCookies.slice(0, maxPrivacyIdentifiersPerProfile).map(cookie => ({
+      domain: redactText(cookie.domain, 200),
       httpOnly: cookie.httpOnly,
-      name: cookie.name,
+      name: redactText(cookie.name, 200),
       sameSite: cookie.sameSite,
       secure: cookie.secure,
     }))
-    const indexedDatabases = await page.evaluate(async () => typeof indexedDB.databases === 'function'
+    const observedIndexedDatabases = await page.evaluate(async () => typeof indexedDB.databases === 'function'
       ? (await indexedDB.databases()).map(database => database.name || '(ohne Namen)')
       : [])
+    const indexedDatabases = observedIndexedDatabases
+      .slice(0, maxPrivacyIdentifiersPerProfile)
+      .map(identifier => redactText(identifier, 200))
+    const privacyObservation = {
+      cookies: {
+        recorded: cookies.length,
+        total: observedCookies.length,
+        truncated: observedCookies.length > maxPrivacyIdentifiersPerProfile,
+      },
+      indexedDatabases: {
+        recorded: indexedDatabases.length,
+        total: observedIndexedDatabases.length,
+        truncated: observedIndexedDatabases.length > maxPrivacyIdentifiersPerProfile,
+      },
+      localStorage: {
+        recorded: facts.storage.localStorage.length,
+        total: facts.storage.localStorageTotal,
+        truncated: facts.storage.localStorageTotal > maxPrivacyIdentifiersPerProfile,
+      },
+      sessionStorage: {
+        recorded: facts.storage.sessionStorage.length,
+        total: facts.storage.sessionStorageTotal,
+        truncated: facts.storage.sessionStorageTotal > maxPrivacyIdentifiersPerProfile,
+      },
+    }
 
     for (const consoleMessage of consoleMessages.filter(item => item.type === 'error')) {
       if (!consoleMessage.text.includes('ERR_BLOCKED_BY_CLIENT')) {
@@ -733,7 +921,7 @@ async function inspectProfile(browser, result, options, url, profileName, discov
       addIssue(result, actionDetails[0], actionDetails[1], actionDetails[2], ['CORE-PRIV-02', 'CORE-SEC-07', 'FORM-TEST-04'], action.url, profileName)
     }
 
-    recordFactsIssues(result, url, profileName, facts, violations, cookies, indexedDatabases)
+    recordFactsIssues(result, url, profileName, facts, violations, privacyObservation)
     result.profiles.push({
       accessibilityViolations: violations,
       blockedActions,
@@ -743,6 +931,7 @@ async function inspectProfile(browser, result, options, url, profileName, discov
       indexedDatabases,
       pageErrors,
       popupUrls,
+      privacyObservation,
       profile: profileName,
       requests: requestNumber,
       url,
@@ -840,7 +1029,9 @@ export async function runBrowserCheck(input, suppliedOptions = {}) {
     omittedPages: 0,
     origin: finalUrl.origin,
     profiles: [],
+    requestedProfiles: [...options.profiles],
     requestedUrl: requestedUrl.href,
+    settleMilliseconds: options.settleMilliseconds,
     sitemaps: [],
   }
   if (preflight.status !== 200) {
@@ -902,6 +1093,7 @@ export async function runBrowserCheck(input, suppliedOptions = {}) {
     await browser.close()
   }
 
+  result.privacyObservations = createPrivacyObservations(result, options)
   result.assertions = createBrowserAssertions(result)
   delete result.blockedRequestKeys
   delete result.issueMap
@@ -910,9 +1102,12 @@ export async function runBrowserCheck(input, suppliedOptions = {}) {
 }
 
 export function createJsonReport(inputResult, options) {
-  const assertionResult = Array.isArray(inputResult.assertions)
+  const preparedResult = inputResult.privacyObservations
     ? inputResult
-    : { ...inputResult, assertions: createBrowserAssertions(inputResult) }
+    : { ...inputResult, privacyObservations: createPrivacyObservations(inputResult, options) }
+  const assertionResult = Array.isArray(preparedResult.assertions)
+    ? preparedResult
+    : { ...preparedResult, assertions: createBrowserAssertions(preparedResult) }
   const result = redactReportData(assertionResult, '', { hideHosts: options.allowPrivate })
   const parameterNames = reportUrl(assertionResult.requestedUrl).parameterNames
   if (parameterNames.length > 0) {
@@ -929,6 +1124,7 @@ export function createJsonReport(inputResult, options) {
       maxRequests: options.maxRequests,
       privateTargetsRedacted: Boolean(options.allowPrivate),
       profiles: options.profiles,
+      settleMilliseconds: options.settleMilliseconds,
       sitemap: options.sitemap,
       strict: options.strict,
       timeoutMilliseconds: options.timeoutMilliseconds,
@@ -964,6 +1160,11 @@ function printReport(report) {
   console.log(`Browser: ${result.browser.version}`)
   console.log(`Geprüft: ${summary.pages} Seite(n), ${summary.profileRuns} Seiten-/Profil-Läufe.`)
   console.log(`Blockiert: ${summary.blockedRequests} Request(s); kein Button betätigt und kein Formular abgesendet.`)
+  const privacy = result.privacyObservations
+  if (privacy) {
+    const storage = privacy.initialStorage
+    console.log(`Passive Datenschutzbeobachtung: ${privacy.externalRequestAttempts.total} externe(r) Request-/Aktionsversuch(e), ${storage.cookies.observations} Cookie-, ${storage.localStorage.observations} Local-Storage-, ${storage.sessionStorage.observations} Session-Storage- und ${storage.indexedDatabases.observations} IndexedDB-Beobachtung(en); keine Werte erfasst.`)
+  }
   for (const issue of result.issues) {
     const marker = issue.severity === 'error' ? 'FEHLER' : 'WARNUNG'
     const profiles = issue.profiles.length > 0 ? ` [${issue.profiles.join(', ')}]` : ''

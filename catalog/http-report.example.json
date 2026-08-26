@@ -4,13 +4,13 @@
   "tool": "http-check",
   "toolPackage": {
     "name": "@mktcode/website-qa",
-    "version": "0.5.0"
+    "version": "0.6.0"
   },
   "checklistCoverage": {
     "catalog": {
       "id": "website-qa-pilot",
       "status": "pilot",
-      "version": "1.0.0-pilot.6"
+      "version": "1.0.0-pilot.7"
     }
   },
   "results": [

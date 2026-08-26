@@ -28,6 +28,30 @@ afterEach(async () => {
   })))
 })
 
+function emptyPrivacyObservation() {
+  return {
+    cookies: { recorded: 0, total: 0, truncated: false },
+    indexedDatabases: { recorded: 0, total: 0, truncated: false },
+    localStorage: { recorded: 0, total: 0, truncated: false },
+    sessionStorage: { recorded: 0, total: 0, truncated: false },
+  }
+}
+
+function completeProfile(profile: string, width: number) {
+  return {
+    blockedActions: [],
+    cookies: [],
+    facts: {
+      overflow: { clientWidth: width, scrollWidth: width },
+      storage: { localStorage: [], localStorageTotal: 0, sessionStorage: [], sessionStorageTotal: 0 },
+    },
+    indexedDatabases: [],
+    privacyObservation: emptyPrivacyObservation(),
+    profile,
+    url: 'https://example.com/',
+  }
+}
+
 describe('browser check', () => {
   it('parses reusable URL and browser limits', () => {
     const parsed = parseArguments([
@@ -87,15 +111,16 @@ describe('browser check', () => {
       finalUrl: 'https://example.com/',
       issues: [],
       profiles: [
-        { facts: { overflow: { clientWidth: 320, scrollWidth: 320 } }, profile: 'narrow', url: 'https://example.com/' },
-        { facts: { overflow: { clientWidth: 640, scrollWidth: 640 } }, profile: 'zoom-200', url: 'https://example.com/' },
+        completeProfile('narrow', 320),
+        completeProfile('zoom-200', 640),
       ],
       requestedUrl: 'https://example.com/?session=private-value',
     }
     const report = createJsonReport(result, {
       maxPages: 10,
       maxRequests: 300,
-      profiles: ['desktop'],
+      profiles: ['narrow', 'zoom-200'],
+      settleMilliseconds: 750,
       sitemap: false,
       strict: true,
       timeoutMilliseconds: 20_000,
@@ -112,7 +137,7 @@ describe('browser check', () => {
     })
     expect(report).toMatchObject({
       checklistCoverage: {
-        summary: { checklistItems: { partial: 5, total: 5 } },
+        summary: { checklistItems: { partial: 7, total: 7 } },
       },
       schemaVersion: 1,
       summary: { errors: 0, failed: false, pages: 1, warnings: 0 },
@@ -122,8 +147,37 @@ describe('browser check', () => {
       requestedUrlParameterNames: ['session'],
     })
     expect(JSON.stringify(report)).not.toContain('private-value')
-    expect(report.result.assertions).toHaveLength(5)
+    expect(report.result.assertions).toHaveLength(7)
     expect(report.result.assertions.every((assertion: { outcome: string }) => assertion.outcome === 'pass')).toBe(true)
+  })
+
+  it('marks bounded storage inventories as inconclusive when identifiers are truncated', () => {
+    const profile = completeProfile('desktop', 1280)
+    profile.privacyObservation.cookies = { recorded: 100, total: 101, truncated: true }
+    const report = createJsonReport({
+      blockedRequests: [],
+      browser: { product: 'Chromium', version: 'Chromium 140.0' },
+      finalUrl: 'https://example.com/',
+      issues: [],
+      profiles: [profile],
+      requestedUrl: 'https://example.com/',
+    }, {
+      maxPages: 10,
+      maxRequests: 300,
+      profiles: ['desktop'],
+      settleMilliseconds: 750,
+      sitemap: false,
+      strict: true,
+      timeoutMilliseconds: 20_000,
+    })
+
+    const outcomes = new Map(report.result.assertions.map((assertion: { assertionId: string, outcome: string }) => [assertion.assertionId, assertion.outcome]))
+    expect(outcomes.get('browser.privacy.external-request-observation-complete')).toBe('pass')
+    expect(outcomes.get('browser.privacy.initial-storage-observation-complete')).toBe('inconclusive')
+    expect(report.result.privacyObservations).toMatchObject({
+      coverage: { identifierLimitPerKindAndProfile: 100, storageDataRecorded: true },
+      valuesRecorded: false,
+    })
   })
 
   it('reports observed browser defects as failed structured assertions', () => {
@@ -157,24 +211,39 @@ describe('browser check', () => {
     expect(outcomes.get('browser.viewport.narrow-zoom-no-horizontal-overflow')).toBe('fail')
     expect(outcomes.get('browser.accessibility.axe-no-detected-violations')).toBe('fail')
     expect(outcomes.get('browser.runtime.no-observed-errors')).toBe('fail')
-    expect(report.checklistCoverage.summary.checklistItems).toMatchObject({ fail: 4, partial: 1, total: 5 })
+    expect(outcomes.get('browser.privacy.external-request-observation-complete')).toBe('inconclusive')
+    expect(outcomes.get('browser.privacy.initial-storage-observation-complete')).toBe('inconclusive')
+    expect(report.checklistCoverage.summary.checklistItems).toMatchObject({ fail: 4, partial: 1, total: 7 })
   })
 
   const chromiumPath = ['/usr/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'].find(existsSync)
   const chromiumIt = chromiumPath ? it : it.skip
 
-  chromiumIt('blocks automatic form submissions, POST, external requests and popups before side effects', async () => {
+  chromiumIt('blocks side effects while inventorying external attempts, cookies and storage without values', async () => {
+    const externalRequests: Array<{ method: string, url: string }> = []
+    const externalOrigin = await listen(createServer((request, response) => {
+      externalRequests.push({ method: request.method || '', url: request.url || '' })
+      response.writeHead(200, { 'content-type': 'text/plain' })
+      response.end('darf nicht erreicht werden')
+    }))
     const receivedRequests: Array<{ method: string, url: string }> = []
     let origin = ''
     const server = createServer((request, response) => {
       receivedRequests.push({ method: request.method || '', url: request.url || '' })
-      response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+      response.writeHead(200, {
+        'content-type': 'text/html; charset=utf-8',
+        'set-cookie': 'qa_session=private-cookie-value; HttpOnly; SameSite=Strict',
+      })
       response.end(`<!doctype html>
 <html lang="de"><head><title>Sicherer Browsertest</title></head>
 <body><main><h1>Testseite</h1><form action="/submit" method="post"><button>Absenden</button></form></main>
 <script>
+  document.title = localStorage.getItem('contact:user@example.com') ? 'Persistierter Kontext' : 'Frischer Kontext'
+  localStorage.setItem('contact:user@example.com', 'private-local-value')
+  sessionStorage.setItem('qa-session-key', 'private-session-value')
+  indexedDB.open('qa-private-database')
   fetch('/mutate', { method: 'POST', body: 'nicht senden' }).catch(() => {})
-  fetch('https://example.com/tracker').catch(() => {})
+  fetch('${externalOrigin}/tracker?token=private-query-value').catch(() => {})
   document.querySelector('form').requestSubmit()
   window.open('/popup')
 </script></body></html>`)
@@ -186,35 +255,69 @@ describe('browser check', () => {
       allowPrivate: true,
       chromiumPath,
       maxPages: 1,
-      profiles: ['desktop'],
-      settleMilliseconds: 100,
+      profiles: ['desktop', 'mobile'],
+      settleMilliseconds: 200,
     })
     const typedResult = result as unknown as {
       assertions: Array<{ assertionId: string, outcome: string }>
       issues: Array<{ code: string }>
-      profiles: Array<{ facts: { forms: Array<{ action: string, method: string }> } }>
+      privacyObservations: {
+        externalRequestAttempts: { total: number }
+        initialStorage: Record<string, { observations: number }>
+        valuesRecorded: boolean
+      }
+      profiles: Array<{
+        cookies: Array<{ httpOnly: boolean, name: string }>
+        facts: { forms: Array<{ action: string, method: string }>, storage: { localStorage: string[], sessionStorage: string[] }, title: string }
+        indexedDatabases: string[]
+      }>
     }
     const issueCodes = typedResult.issues.map(issue => issue.code)
+    const outcomes = new Map(typedResult.assertions.map(assertion => [assertion.assertionId, assertion.outcome]))
 
     expect(receivedRequests.every(request => request.method === 'GET')).toBe(true)
     expect(receivedRequests.some(request => ['/mutate', '/submit', '/popup'].includes(request.url))).toBe(false)
+    expect(externalRequests).toEqual([])
     expect(issueCodes).toContain('non-get-blocked')
     expect(issueCodes).toContain('external-request-blocked')
     expect(issueCodes).toContain('form-submission-blocked')
     expect(issueCodes).toContain('popup-blocked')
-    expect(typedResult.assertions.find(assertion => assertion.assertionId === 'browser.context.chromium-headless-recorded')?.outcome).toBe('pass')
-    expect(typedResult.assertions.filter(assertion => assertion.assertionId !== 'browser.context.chromium-headless-recorded').every(assertion => assertion.outcome === 'inconclusive')).toBe(true)
+    expect(outcomes.get('browser.context.chromium-headless-recorded')).toBe('pass')
+    expect(outcomes.get('browser.privacy.external-request-observation-complete')).toBe('pass')
+    expect(outcomes.get('browser.privacy.initial-storage-observation-complete')).toBe('pass')
+    expect(typedResult.assertions.filter(assertion => !assertion.assertionId.startsWith('browser.privacy.') && assertion.assertionId !== 'browser.context.chromium-headless-recorded').every(assertion => assertion.outcome === 'inconclusive')).toBe(true)
+    expect(typedResult.privacyObservations).toMatchObject({
+      externalRequestAttempts: { total: 2 },
+      initialStorage: {
+        cookies: { observations: 2 },
+        indexedDatabases: { observations: 2 },
+        localStorage: { observations: 2 },
+        sessionStorage: { observations: 2 },
+      },
+      valuesRecorded: false,
+    })
+    expect(typedResult.profiles.every(profile => profile.cookies.some(cookie => cookie.httpOnly && cookie.name === 'qa_session'))).toBe(true)
+    expect(typedResult.profiles.every(profile => profile.facts.title === 'Frischer Kontext')).toBe(true)
     expect(typedResult.profiles[0]?.facts.forms).toEqual([{ action: `${origin}/submit`, method: 'POST' }])
+    expect(typedResult.profiles[0]?.facts.storage).toMatchObject({ localStorage: ['contact:[REDACTED_EMAIL]'], sessionStorage: ['qa-session-key'] })
+    expect(typedResult.profiles[0]?.indexedDatabases).toEqual(['qa-private-database'])
     const jsonReport = createJsonReport(result, {
       allowPrivate: true,
       maxPages: 1,
       maxRequests: 300,
-      profiles: ['desktop'],
+      profiles: ['desktop', 'mobile'],
+      settleMilliseconds: 200,
       sitemap: false,
       strict: false,
       timeoutMilliseconds: 20_000,
     })
-    expect(JSON.stringify(jsonReport)).not.toContain('127.0.0.1')
-    expect(JSON.stringify(jsonReport)).toContain('(privates/lokales Ziel)')
+    const serialized = JSON.stringify(jsonReport)
+    expect(serialized).not.toContain('127.0.0.1')
+    expect(serialized).not.toContain('private-cookie-value')
+    expect(serialized).not.toContain('private-local-value')
+    expect(serialized).not.toContain('private-session-value')
+    expect(serialized).not.toContain('private-query-value')
+    expect(serialized).not.toContain('user@example.com')
+    expect(serialized).toContain('(privates/lokales Ziel)')
   }, 30_000)
 })

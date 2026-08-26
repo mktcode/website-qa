@@ -57,6 +57,8 @@ website-qa-http https://example.com/ \
 
 Die umfangreichen Netzwerk- und Browserprüfungen sind primär für bewusst gestartete lokale beziehungsweise operative Prüfserien gedacht, nicht als automatisch bei jedem Commit laufender CI-Schritt. Typische Zeitpunkte sind vor oder nach einem Deployment, nach wesentlichen Websiteänderungen oder bei einer periodischen Projektprüfung.
 
+Die Werkzeuge erzeugen ausführliche technische Befunde und strukturierte Teilnachweise für die anschließende Bewertung durch kompetente Entwicklerinnen und Entwickler. Sie automatisieren belastbar beobachtbare Teile, treffen aber keine vollständige Qualitäts-, Rechts-, Datenschutz-, Sicherheits- oder Freigabeentscheidung.
+
 Die Werkzeuge:
 
 - laufen nicht bei Installation, Commit oder Push automatisch;
@@ -98,7 +100,7 @@ Eine kopierbare Minimalintegration liegt unter [`examples/project-integration/`]
 
 ## Strukturierter Projektnachweis
 
-HTTP, Crawl, Browser und Social geben neben Befunden positive, negative, nicht anwendbare und unklare atomare Prüfaussagen aus. Der HTTP-Prüfer bildet die deklarierte Sicherheitsheaderbasis und ihre Beobachtungsabdeckung auf ausgewähltem HTML, 404, CSS und JavaScript ab. Der Crawl erfasst zusätzlich Sitemap-Dateien und -Einträge, robots.txt-Referenz, vollständige Sitemap-Abdeckung, interne Navigationen, Ressourcenstatus und MIME-Typen sowie erreichte Sicherheits- und Umfangsgrenzen atomar. Grundlage ist der mitgelieferte [Pilotkatalog](catalog/README.md). Er unterscheidet:
+HTTP, Crawl, Browser und Social geben neben Befunden positive, negative, nicht anwendbare und unklare atomare Prüfaussagen aus. Der HTTP-Prüfer bildet die deklarierte Sicherheitsheaderbasis und ihre Beobachtungsabdeckung auf ausgewähltem HTML, 404, CSS und JavaScript ab. Der Crawl erfasst zusätzlich Sitemap-Dateien und -Einträge, robots.txt-Referenz, vollständige Sitemap-Abdeckung, interne Navigationen, Ressourcenstatus und MIME-Typen sowie erreichte Sicherheits- und Umfangsgrenzen atomar. Der Browser strukturiert außerdem die vollständige passive Beobachtung externer Requestversuche sowie des initialen Cookie- und Browser-Storage-Inventars, ohne daraus eine rechtliche oder fachliche Freigabe abzuleiten. Grundlage ist der mitgelieferte [Pilotkatalog](catalog/README.md). Er unterscheidet:
 
 - automatisch belegbare Kriterien;
 - manuell beziehungsweise redaktionell zu prüfende Kriterien;
@@ -236,6 +238,15 @@ const files = writePilotProjectReportBundle({
 ```
 
 Schemas und Beispiele liegen unter [`catalog/`](catalog/). `report.json` verwendet Ausgabeschema 2, weil berichtete Ziel-URLs ohne Querywerte gebunden werden; bei Queryzielen werden zusätzlich nur die Parameternamen verglichen. Der Pilot umfasst noch nicht die vollständige Website-Checkliste und verändert keine Projektcheckliste automatisch.
+
+### Migration von 0.5.x
+
+- Der Browser-Prüfer liefert zwei zusätzliche atomare Assertions für die vollständige passive Beobachtung externer Requestversuche sowie des initialen Cookie-, Local-/Session-Storage- und IndexedDB-Inventars.
+- Der Pilotkatalog `1.0.0-pilot.7` ergänzt `CORE-PRIV-02` und `CORE-PRIV-04`. Projektkonfigurationen und Evidence-Dateien müssen diese Katalogversion ausdrücklich übernehmen.
+- Technische Berichte aller vier Werkzeuge weisen die aktuelle Katalogversion aus. Für einen gemeinsamen Projektbericht müssen deshalb alle eingebundenen Berichte mit einem einheitlichen `0.6.x`-Werkzeugstand neu erzeugt werden.
+- Ein automatisches `pass` bestätigt nur, dass die Beobachtung innerhalb der deklarierten passiven, isolierten Seiten-/Profilumgebung vollständig war. Quell- und Konfigurationsabgleich, Zulässigkeit externer Dienste, Dokumentation, Einwilligungslogik sowie die Angemessenheit von `Secure`, `HttpOnly` und `SameSite` bleiben manuell.
+- Externe Requests bleiben blockiert. Es werden keine Consent-Auswahl, Klicks, Formulare oder zusätzlichen Netzwerkpfade eingeführt. Blockierte Versuche bleiben als Befund sichtbar und werden nicht als tatsächlich ausgeführte Drittanbieteranfrage dargestellt.
+- Cookie- und Storagewerte werden nie in den Bericht übernommen. Bezeichner sind auf 100 Einträge je Art und Seiten-/Profil-Lauf begrenzt; eine Überschreitung führt beim abhängigen Nachweis zu `inconclusive`. Die Beobachtungszeit nach `DOMContentLoaded` wird im Bericht dokumentiert.
 
 ### Migration von 0.4.x
 
