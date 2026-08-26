@@ -1,6 +1,6 @@
-# Abgeschlossener Plan: einfache Projektintegration und lokale Website-QA-Berichte
+# Website-QA: abgeschlossene Umsetzung und nächste Konsolidierungsphase
 
-> **Status:** Der Workflow wurde mit Paketversion `0.2.0` eingeführt, mit `0.3.0` um strukturierte Social-Nachweise, mit `0.4.0` um vorhandene Sitemap-, Crawl- und Ressourcenbeobachtungen, mit `0.5.0` um öffentlich beobachtbare Sicherheitsheadernachweise und mit `0.6.0` um passive technische Datenschutzbeobachtungen ergänzt. Die Funktionsstände werden jeweils lokal und in installierten Verbraucherprojekten geprüft.
+> **Status:** Der Workflow wurde mit Paketversion `0.2.0` eingeführt, mit `0.3.0` um strukturierte Social-Nachweise, mit `0.4.0` um vorhandene Sitemap-, Crawl- und Ressourcenbeobachtungen, mit `0.5.0` um öffentlich beobachtbare Sicherheitsheadernachweise und mit `0.6.0` um passive technische Datenschutzbeobachtungen ergänzt. Die Funktionsstände werden jeweils lokal und in installierten Verbraucherprojekten geprüft. Nach `0.6.0` folgt bewusst zuerst eine reale Pilotmigration und Konsolidierung; neue Assertions werden erst aus den dabei belegten Lücken priorisiert.
 >
 > Dieses Dokument bewahrt Planung, Entscheidungen, Sicherheitsanforderungen und Abnahmekriterien des frameworkunabhängigen Refactorings von `@mktcode/website-qa`. Es enthält keine ausgefüllten Nachweise oder Vorgaben für eine bestimmte Website. Zukunftsformulierungen in den historischen Planungsabschnitten beschreiben den damaligen Implementierungsweg und keine noch offene Zusage.
 >
@@ -615,3 +615,60 @@ Ein blockierter externer Versuch ist ein sichtbarer Befund und zugleich eine vol
 `CORE-PRIV-02` verbindet den automatischen Beobachtungsnachweis mit einem manuellen Abgleich gegen Quellcode, Build-/Laufzeitkonfiguration und dokumentierte Dienste. `CORE-PRIV-04` verbindet das technische Initialinventar mit manueller Dokumentations-/Einwilligungsprüfung und der fachlichen Bewertung von `Secure`, `HttpOnly` und `SameSite` für sicherheitsrelevante Cookies.
 
 Es werden keine neuen Requests, externen Freigaben, Klicks, Consent-Interaktionen, Formulare oder persistenten Browserprofile eingeführt. Automatische Retries transienter Browserfehler gehören nicht zu dieser Runde; unvollständige Läufe bleiben sichtbar.
+
+## 23. Nächste Konsolidierungs- und Reifephase nach 0.6.0
+
+`0.6.0` ist für den erklärten Umfang technisch belastbar und lokal, als installierter Tarball sowie gegen ein öffentliches Regressionstestziel geprüft. Der Katalog bleibt dennoch ein Pilot: Die vollständige Website-QS enthält zahlreiche manuelle, externe, administrative, rechtliche, betriebliche und projektspezifische Punkte, die nicht durch zusätzliche URL-Assertions ersetzt werden dürfen. Die nächste Phase optimiert deshalb nicht auf eine möglichst hohe Checkzahl.
+
+### Phase G – Bestehenden Praxispiloten kontrolliert migrieren
+
+1. Das bestehende Verbraucherprojekt auf den unveränderlichen Werkzeugstand `0.6.0` aktualisieren.
+2. Projektkonfiguration und Evidence-Datei ausdrücklich auf Katalog `1.0.0-pilot.7` umstellen.
+3. Alle vier technischen Läufe mit demselben Werkzeug- und Katalogstand neu erzeugen; alte Berichte werden nicht mit neuen Katalogen vermischt.
+4. Bestehende manuelle oder externe Nachweise nur anhand unveränderter Kriterienkennungen und tatsächlich passender Aussagen übernehmen.
+5. Seit `0.3.0` neu hinzugekommene Sitemap-, Ressourcen-, Sicherheitsheader- und Datenschutzkriterien fachlich bewerten; fehlende Nachweise bleiben offen.
+6. Ein neues ignoriertes Vollbundle und eine getrennte Whitelist-Zusammenfassung erzeugen und auf Redaktion, Bytegleichheit und Manifestkonsistenz prüfen.
+7. Projektcheckliste und Prüfprotokoll nur aufgrund der tatsächlich ausgeführten technischen und manuellen Prüfung fortschreiben; die Berichtserzeugung selbst hakt nichts ab.
+
+**Abnahmekriterium:** Der vollständige Upgradepfad von `0.3.0` auf `0.6.0` ist in einem realen Verbraucherprojekt ohne Sonderformat, Nachweissimulation oder Lockerung der Nur-Lese-Grenzen nachvollzogen.
+
+### Phase H – Stabilisierungsfenster
+
+Nach der Pilotmigration werden zunächst Praxisbefunde gesammelt:
+
+- Verständlichkeit der neuen `pass`-, `fail`- und `inconclusive`-Aussagen;
+- Größe, Redundanz und Redaktionsgrenzen vollständiger Berichte;
+- praktische Pflege manueller und externer Kriterien;
+- Aussagekraft von Abdeckungs-, Limit- und Umgebungsangaben;
+- Upgradeaufwand für Konfiguration, Evidence-Datei und sichere Zusammenfassung.
+
+Korrekturen an Fehlern, Redaktion oder Dokumentation sind in dieser Phase gegenüber neuen fachlichen Assertions vorrangig. Ein reiner Dokumentationsabschluss oder eine fehlerkompatible Wartung erzwingt nicht automatisch eine neue Funktionsversion.
+
+### Phase I – Verträge für eine spätere 1.0 stabilisieren
+
+Vor einer möglichen `1.0.0` werden mindestens folgende Entscheidungen vorbereitet:
+
+1. Maschinenlesbare JSON-Schemas für die technischen HTTP-, Crawl-, Browser- und Social-Berichte.
+2. Dokumentierte Kompatibilitäts- und Deprecation-Regeln für CLIs, Exitcodes, Assertions, Schemas und Reporting-API.
+3. Entscheidung, welche bislang mit `Pilot` bezeichneten Katalog- und API-Verträge einen stabilen allgemeinen Namen erhalten und welche experimentell bleiben.
+4. Nachweis in mindestens einem weiteren unabhängigen Verbraucherprojekt mit anderer Seiten- und Auslieferungsstruktur.
+5. Prüfung eines künftigen Node-LTS-Bereichs zusätzlich zum derzeit festgelegten Node-22-Bereich.
+6. Kompakte, versionierte Releasehistorie und weiterhin reproduzierbare manuelle Releaseabnahme ohne automatische Registry-, Token- oder CI-Infrastruktur.
+
+Eine `1.0.0` setzt weder die Automatisierung aller Checklistenpunkte noch eine vollständige Qualitätsfreigabe voraus. Sie setzt einen klar abgegrenzten, stabilen und praktisch mehrfach bestätigten öffentlichen Vertrag voraus.
+
+### Phase J – Nächste fachliche Automatisierung erst nach einer Abdeckungsmatrix
+
+Vor einer weiteren Funktionsrunde werden die Punkte der vollständigen modularen Checkliste klassifiziert als:
+
+- sicher und frameworkunabhängig automatisch prüfbar;
+- nur als technische Beobachtung ohne normative Bewertung modellierbar;
+- manuell, extern oder administrativ nachzuweisen;
+- nur bei bestimmten Modulen oder Projektmanifesten einschlägig;
+- grundsätzlich ungeeignet für die allgemeinen Nur-Lese-Werkzeuge.
+
+Neue Assertions werden danach anhand von fachlichem Nutzen, Wiederverwendung vorhandener GET-Beobachtungen, Sicherheitsgrenzen, Fehlinterpretationsrisiko und lokal testbaren Nebenwirkungsnachweisen priorisiert. Denkbare Themen wie strukturierte Daten, weitere Indexierungsbeobachtungen oder atomarere Accessibility-Befunde sind Kandidaten, aber noch keine Zusage für eine bestimmte Version.
+
+### Unveränderte Grenzen
+
+Auch in den nächsten Phasen gibt es keinen allgemeinen Sammelprüfer, keine automatische Checklistenänderung, keine Consent-Simulation, keine Formular- oder Produktionsmutation, keine stillen Browser-Retries und keine Behauptung einer vollständigen WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe.
