@@ -1,10 +1,10 @@
-# Planung: einfache Projektintegration und lokale Website-QA-Berichte
+# Abgeschlossener Plan: einfache Projektintegration und lokale Website-QA-Berichte
 
-> **Status:** Der geplante Workflow wurde mit Paketversion `0.2.0` implementiert, in einem echten Websiteprojekt erprobt und als `v0.2.0` veröffentlicht. Die gesonderte Social-Assertion-Integration wird für `0.3.0` ergänzt.
+> **Status:** Der Workflow wurde mit Paketversion `0.2.0` eingeführt, mit `0.3.0` um strukturierte Social-Nachweise ergänzt, in einem echten Websiteprojekt erprobt und als `v0.2.0` beziehungsweise `v0.3.0` veröffentlicht.
 >
-> Diese Planung beschreibt ein frameworkunabhängiges Refactoring von `@mktcode/website-qa`. Sie enthält keine ausgefüllten Nachweise oder Vorgaben für eine bestimmte Website.
+> Dieses Dokument bewahrt Planung, Entscheidungen, Sicherheitsanforderungen und Abnahmekriterien des frameworkunabhängigen Refactorings von `@mktcode/website-qa`. Es enthält keine ausgefüllten Nachweise oder Vorgaben für eine bestimmte Website. Zukunftsformulierungen in den historischen Planungsabschnitten beschreiben den damaligen Implementierungsweg und keine noch offene Zusage.
 >
-> Implementiert sind die gemeinsame Berichtsredaktion, `--json-file`, automatisch datierte lokale Bundles, bytegleiche technische Rohberichte, das Prüfsummenmanifest, der getrennte Whitelist-Markdownrenderer und kopierbare Projektvorlagen. Die bisherige programmatische Reporting-API bleibt erhalten. Praxisumstellung, installierter Verbrauchertest und Release-Tag wurden erfolgreich abgeschlossen.
+> Implementiert sind die gemeinsame Berichtsredaktion, `--json-file`, automatisch datierte lokale Bundles, bytegleiche technische Rohberichte für alle vier Prüfer, das Prüfsummenmanifest, der getrennte Whitelist-Markdownrenderer, kopierbare Projektvorlagen und die programmatische Reporting-API. Praxisumstellung, Social-Integration, installierter Verbrauchertest und beide Release-Tags wurden erfolgreich abgeschlossen.
 
 ## 1. Ausgangslage
 
@@ -25,7 +25,7 @@ Der erste Praxispilot hat die fachliche Trennung erfolgreich bestätigt:
 - Quell- und Deploymentzuordnungen werden nicht als technisch bestätigt ausgegeben;
 - der Berichtsgenerator führt selbst keine Netzwerkprüfung aus.
 
-Die bisherige Projektintegration ist jedoch noch zu aufwendig:
+Vor dem Refactoring war die Projektintegration noch zu aufwendig:
 
 - das Beispielskript schreibt Ausgaben in einen vorher manuell festgelegten Ordner;
 - technische Rohberichte, Projektkonfiguration und Berichtsausgaben sind nicht als klarer Lebenszyklus beschrieben;
@@ -89,7 +89,7 @@ Dieses Refactoring führt ausdrücklich nicht ein:
 - keine automatische Produktionsfreigabe;
 - keine vollständige WCAG-, Rechts-, Datenschutz- oder Sicherheitsbewertung;
 - keine GitHub Actions, Registry-Tokens oder automatische Release-Infrastruktur;
-- im ursprünglichen 0.2.0-Refactoring keine Social-Assertions im strukturierten Projektbericht; diese gesonderte Integration folgt mit 0.3.0;
+- im ursprünglichen `0.2.0`-Refactoring keine Social-Assertions im strukturierten Projektbericht; diese gesonderte Integration wurde mit `0.3.0` abgeschlossen;
 - keine Formulareingaben, Klicks oder andere mutierende Websiteinteraktionen;
 - keine automatische Ermittlung eines ausgelieferten Quellcommits aus einer URL-Prüfung.
 
@@ -109,7 +109,8 @@ Ein Berichtslauf erzeugt standardmäßig einen neuen, nicht überschriebenen Ord
         └── technical/
             ├── http.json
             ├── crawl.json
-            └── browser.json
+            ├── browser.json
+            └── social.json
 ```
 
 Der Ordnername verwendet UTC und ein dateisystemtaugliches ISO-Format. Falls derselbe Name bereits existiert, wird geschlossen abgebrochen oder ein eindeutig dokumentierter Suffix vergeben; ein vorhandener Bericht wird niemals überschrieben.
@@ -121,6 +122,7 @@ Bedeutung der Dateien:
 | `technical/http.json` | vollständige JSON-Ausgabe des HTTP-Prüfers | nein |
 | `technical/crawl.json` | vollständige JSON-Ausgabe des Crawl-Prüfers | nein |
 | `technical/browser.json` | vollständige JSON-Ausgabe des Browser-Prüfers | nein |
+| `technical/social.json` | vollständige JSON-Ausgabe des Social-Prüfers | nein |
 | `report.json` | strukturierte Gesamtauswertung mit atomaren Nachweisen | nein |
 | `report.md` | vollständige menschenlesbare Gesamtauswertung | nein |
 | `manifest.json` | Laufzeiten, Werkzeugstände, relative Dateipfade, Größen und Prüfsummen | nein |
@@ -195,10 +197,11 @@ Ein transparenter Ablauf lautet:
 npm run qa:http
 npm run qa:crawl
 npm run qa:browser
+npm run qa:social
 npm run qa:report
 ```
 
-- `qa:http`, `qa:crawl` und `qa:browser` starten die jeweiligen Netzwerkprüfer.
+- `qa:http`, `qa:crawl`, `qa:browser` und `qa:social` starten die jeweiligen Netzwerkprüfer.
 - `qa:report` liest bereits erzeugte technische JSON-Dateien und Projektnachweise.
 - `qa:report` erzeugt das automatisch datierte Bundle und die getrennte Zusammenfassung.
 
@@ -222,6 +225,7 @@ Die bestehende Konfiguration kann grundsätzlich weiterverwendet werden. Für ei
 .website-qa/current/http.json
 .website-qa/current/crawl.json
 .website-qa/current/browser.json
+.website-qa/current/social.json
 ```
 
 Eine Projektkonfiguration legt weiterhin fest:
@@ -245,15 +249,15 @@ Der vollständige `report.json` übernimmt die tatsächlich für die Auswertung 
 
 Relative Nachweisreferenzen benötigen eine eindeutig dokumentierte Basis. Beim Bundling dürfen sie nicht durch blindes Kopieren in einen anderen Ordner semantisch verändert werden. Für die erste Bundle-Version werden Eingabedateien daher nicht automatisch an einen neuen Ort umgeschrieben. Der vollständige Bericht enthält die ausgewerteten Records; das Manifest kann Quellpfad und Prüfsumme der Eingabedatei dokumentieren, ohne ihren vertraulichen Inhalt zusätzlich zu kopieren.
 
-## 9. Geplante öffentliche Reporting-API
+## 9. Öffentliche Reporting-API
 
-Die vorhandenen Funktionen bleiben erhalten:
+Die vorhandenen Funktionen sind erhalten geblieben:
 
 - `createPilotProjectReport`
 - `createPilotProjectReportFromFiles`
 - `renderPilotProjectReportMarkdown`
 
-Ergänzend wird eine Bundle-Funktion geplant. Der endgültige Name wird vor Implementierung festgelegt, beispielsweise:
+Ergänzend wurde die Bundle-Funktion unter dem festgelegten Namen `writePilotProjectReportBundle` implementiert:
 
 ```js
 import { writePilotProjectReportBundle } from '@mktcode/website-qa/report'
@@ -287,7 +291,7 @@ Dateischreibende Schritte sollten zunächst in einem temporären Nachbarordner e
 
 ## 10. Projektlokales Berichtsskript
 
-Ein kopierbares Beispielskript soll möglichst klein bleiben:
+Das implementierte kopierbare Beispielskript bleibt bewusst klein:
 
 ```js
 #!/usr/bin/env node
@@ -309,6 +313,7 @@ Beispiel für `package.json`:
     "qa:http": "website-qa-http https://example.com/ --strict --json",
     "qa:crawl": "website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json",
     "qa:browser": "website-qa-browser https://example.com/ --sitemap --max-pages=10 --max-requests=300 --strict --json",
+    "qa:social": "website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json",
     "qa:report": "node scripts/website-qa-report.mjs"
   }
 }
@@ -429,7 +434,7 @@ Die Beispiele dürfen keine reale Domain, projektspezifische Route, Seitenzahl, 
 - Neue optionale Felder dürfen alte Konfigurationen nicht stillschweigend inhaltlich umdeuten.
 - Eine Katalogversion wird nur geändert, wenn Kriterien oder fachliche Bedeutungen geändert werden; reine Bundle- und Rendererfunktionen erhalten keine neue fachliche Checklistenbedeutung.
 
-## 16. Implementierungsphasen
+## 16. Umgesetzte Implementierungsphasen
 
 ### Phase A – Verträge und Redaktion
 
@@ -550,7 +555,7 @@ Die Beispiele dürfen keine reale Domain, projektspezifische Route, Seitenzahl, 
 
 ## 19. Definition of Done
 
-Das Refactoring ist abgeschlossen, wenn:
+Die folgende Definition of Done wurde mit `v0.2.0` für den Bundle-Workflow und abschließend mit `v0.3.0` für die strukturierte Social-Integration erfüllt:
 
 - ein klarer README-Schnellstart für technische Einzelprüfungen existiert;
 - eine wiederkehrende Projektintegration mit wenigen npm-Skripten dokumentiert ist;
@@ -566,3 +571,13 @@ Das Refactoring ist abgeschlossen, wenn:
 - Sicherheits-, Schema-, Bundle-, Renderer- und Installationsprüfungen bestanden sind;
 - ein neuer echter Projektpilot den Ablauf ohne Sonderbehandlung bestätigt hat;
 - README, Paketversion und geprüfter Release-Tag konsistent sind.
+
+## 20. Möglicher nächster Ausbau
+
+Ein weiterer Ausbau ist nicht für den Abschluss von `v0.3.0` erforderlich. Falls eine neue Funktionsrunde bewusst begonnen wird, bieten sich zuerst atomare Crawl-, Sitemap- und Ressourcenassertions für bereits vorhandene Beobachtungen an, insbesondere zu:
+
+- `CORE-MAP-01` und `CORE-MAP-02` für Sitemapabruf, XML-Struktur, Referenz, Einträge und vollständige Abdeckung innerhalb der Limits;
+- `CORE-SEO-04` für den begrenzten allgemeinen GET-Crawl;
+- `CORE-QA-05`, `CORE-QA-08` und `CORE-ERR-03` für interne Ressourcenstatus und MIME-Typen.
+
+Dieser Ausbau soll keine neuen Netzwerkpfade eröffnen. Externe Links bleiben ausschließlich inventarisiert, Formulare und Bedienelemente bleiben unangetastet und limitierte beziehungsweise sicherheitsbedingt ausgelassene Beobachtungen führen weiterhin zu `inconclusive`. Erst danach kommen atomare Aussagen zu bereits geprüften HTTP-Sicherheitsheadern oder technischen Datenschutzbeobachtungen in Betracht. Manuelle, rechtliche, administrative und projektspezifische Kriterien bleiben davon getrennt.
