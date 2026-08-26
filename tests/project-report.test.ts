@@ -27,7 +27,7 @@ function assertion(assertionId: string, outcome: 'fail' | 'inconclusive' | 'notA
 function technicalReport(assertions: ReturnType<typeof assertion>[]) {
   return {
     checklistCoverage: {
-      catalog: { id: 'website-qa-pilot', status: 'pilot', version: '1.0.0-pilot.5' },
+      catalog: { id: 'website-qa-pilot', status: 'pilot', version: '1.0.0-pilot.6' },
     },
     generatedAt: '2026-08-24T12:00:00.000Z',
     results: [{ assertions, requestedUrl: 'https://example.com/' }],
@@ -40,7 +40,7 @@ function technicalReport(assertions: ReturnType<typeof assertion>[]) {
 
 function projectConfig() {
   return {
-    catalog: { id: 'website-qa-pilot', version: '1.0.0-pilot.5' },
+    catalog: { id: 'website-qa-pilot', version: '1.0.0-pilot.6' },
     itemStates: [],
     project: {
       deploymentId: 'deployment-1',
@@ -89,8 +89,8 @@ describe('project report pilot', () => {
 
     expect(report.summary.checklistItems).toMatchObject({
       complete: 1,
-      open: 27,
-      total: 28,
+      open: 29,
+      total: 31,
     })
     expect(report.items.find((item: { id: string }) => item.id === 'CORE-ERR-02')).toMatchObject({
       evidenceOutcome: 'pass',
@@ -113,7 +113,7 @@ describe('project report pilot', () => {
     ].map(assertionId => assertion(assertionId))
     const browserReport = {
       checklistCoverage: {
-        catalog: { id: 'website-qa-pilot', status: 'pilot', version: '1.0.0-pilot.5' },
+        catalog: { id: 'website-qa-pilot', status: 'pilot', version: '1.0.0-pilot.6' },
       },
       generatedAt: '2026-08-24T12:05:00.000Z',
       result: { assertions: browserAssertions, requestedUrl: 'https://example.com/' },
@@ -131,7 +131,7 @@ describe('project report pilot', () => {
       }],
     })
 
-    expect(report.summary.checklistItems).toMatchObject({ open: 23, partial: 5, total: 28 })
+    expect(report.summary.checklistItems).toMatchObject({ open: 26, partial: 5, total: 31 })
     expect(report.items.find((item: { id: string }) => item.id === 'CORE-A11Y-13')).toMatchObject({
       evidenceOutcome: 'partial',
       projectStatus: 'partial',
@@ -153,7 +153,7 @@ describe('project report pilot', () => {
     const report = createPilotProjectReport({
       config,
       evidenceDocument: {
-        catalog: { id: 'website-qa-pilot', version: '1.0.0-pilot.5' },
+        catalog: { id: 'website-qa-pilot', version: '1.0.0-pilot.6' },
         evidence: [{
           checkedAt: '2026-08-24',
           checkedBy: 'inhaltlich verantwortliche Stelle',
@@ -172,7 +172,7 @@ describe('project report pilot', () => {
     expect(report.items.find((item: { id: string }) => item.id === 'CORE-DOM-04')).toMatchObject({
       projectStatus: 'external',
     })
-    expect(report.summary.checklistItems).toMatchObject({ complete: 2, external: 1, open: 26, total: 29 })
+    expect(report.summary.checklistItems).toMatchObject({ complete: 2, external: 1, open: 28, total: 32 })
   })
 
   it('binds query targets without retaining their values', () => {

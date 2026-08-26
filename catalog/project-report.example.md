@@ -7,7 +7,7 @@
 | Feld | Wert |
 |---|---|
 | Erstellt | 2026-08-24T12:30:00.000Z |
-| Katalog | website-qa-pilot 1.0.0-pilot.5 (pilot) |
+| Katalog | website-qa-pilot 1.0.0-pilot.6 (pilot) |
 | Auswertungsumgebung | production |
 | Bevorzugte URL | https://example.com/ |
 | Quellstand | PROJEKT-COMMIT |
@@ -20,27 +20,27 @@
 |---|---:|
 | Vollständig nachgewiesen | 3 |
 | Fehlgeschlagen | 0 |
-| Teilweise nachgewiesen | 18 |
-| Offen | 7 |
+| Teilweise nachgewiesen | 23 |
+| Offen | 5 |
 | Unklar | 0 |
 | Nicht zutreffend | 0 |
 | Externer Nachweis offen | 1 |
 | Zurückgestellt | 0 |
 | Akzeptierte Abweichung (offen) | 0 |
-| **Ausgewählte Pilotpunkte** | **29** |
+| **Ausgewählte Pilotpunkte** | **32** |
 
-Automatische Kriterien: 33 bestanden, 0 fehlgeschlagen, 0 unklar, 14 ohne Nachweis.
+Automatische Kriterien: 44 bestanden, 0 fehlgeschlagen, 0 unklar, 11 ohne Nachweis.
 
-Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 29 ohne Nachweis.
+Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 32 ohne Nachweis.
 
 ## Technische Läufe
 
 | Werkzeug | Ziel | Umgebung | Verwendet | Assertions | Befehl |
 |---|---|---|---:|---:|---|
-| http-check 0.4.0 | https://example.com/ | production | ja | 2 | <code>website-qa-http https://example.com/ --strict --json</code> |
-| crawl-check 0.4.0 | https://example.com/ | production | ja | 16 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
-| browser-check 0.4.0 | https://example.com/ | production | ja | 5 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
-| social-preview-check 0.4.0 | https://example.com/ | production | ja | 10 | <code>website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json</code> |
+| http-check 0.5.0 | https://example.com/ | production | ja | 12 | <code>website-qa-http https://example.com/ --strict --json</code> |
+| crawl-check 0.5.0 | https://example.com/ | production | ja | 16 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
+| browser-check 0.5.0 | https://example.com/ | production | ja | 5 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
+| social-preview-check 0.5.0 | https://example.com/ | production | ja | 10 | <code>website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json</code> |
 
 ## Checklistenpunkte
 
@@ -50,10 +50,11 @@ Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 29 ohne Nachweis.
 | CORE-DOM-04 | core | Externer Nachweis offen | 0/0 | 0/2 |
 | CORE-DOM-05 | core | Teilweise nachgewiesen | 2/2 | 0/1 |
 | CORE-DOM-07 | core | Offen | 0/3 | 0/1 |
-| CORE-DOM-08 | core | Offen | 0/2 | 0/2 |
+| CORE-DOM-08 | core | Teilweise nachgewiesen | 2/2 | 0/2 |
 | CORE-ERR-01 | core | Offen | 0/2 | 0/1 |
 | CORE-ERR-02 | core | Vollständig nachgewiesen | 2/2 | 0/0 |
 | CORE-ERR-03 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
+| CORE-ERR-04 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-SEO-01 | core | Teilweise nachgewiesen | 3/3 | 0/1 |
 | CORE-SEO-02 | core | Teilweise nachgewiesen | 2/2 | 0/1 |
 | CORE-SOC-01 | core | Teilweise nachgewiesen | 2/2 | 0/1 |
@@ -73,7 +74,9 @@ Nicht automatische Kriterien: 1 belegt, 0 fehlgeschlagen, 29 ohne Nachweis.
 | CORE-QA-07 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-QA-08 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-PERF-01 | core | Offen | 0/3 | 0/1 |
-| CORE-PERF-05 | core | Offen | 0/2 | 0/1 |
+| CORE-PERF-05 | core | Teilweise nachgewiesen | 1/2 | 0/1 |
+| CORE-SEC-04 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
+| CORE-SEC-05 | core | Teilweise nachgewiesen | 6/6 | 0/1 |
 | GOV-RGT-02 | auftrag-recht-uebergabe | Vollständig nachgewiesen | 0/0 | 1/1 |
 
 ### CORE-DOM-02: Offen
@@ -113,12 +116,12 @@ Weiterleitungen wurden auf Statuscode, Pfad- und Queryerhalt, Schleifen und unn�
 - [ ] `CORE-DOM-07/C4` Alle veröffentlichten Host- und Routenvarianten, die zum Projektumfang gehören, wurden inventarisiert und geprüft. — manual, noEvidence
   - Erforderlicher Nachweis: Geprüfte Hosts und projektspezifische Redirectrouten mit Ergebnis dokumentieren.
 
-### CORE-DOM-08: Offen
+### CORE-DOM-08: Teilweise nachgewiesen
 
 HSTS-Wert und Reichweite sind bewusst gewählt und auf allen relevanten HTTPS-Antworten einschließlich vorgeschalteter Weiterleitungshosts geprüft. `includeSubDomains` und `preload` werden nur nach Prüfung aller betroffenen Subdomains aktiviert.
 
-- [ ] `CORE-DOM-08/C1` HSTS ist auf allen vom HTTP-Prüfer untersuchten HTTPS-Antwortklassen vorhanden. — automatic, noEvidence
-- [ ] `CORE-DOM-08/C2` Der HSTS-max-age ist syntaktisch gültig und beträgt mindestens 180 Tage. — automatic, noEvidence
+- [x] `CORE-DOM-08/C1` HSTS ist auf allen vom HTTP-Prüfer untersuchten HTTPS-Antwortklassen vorhanden. — automatic, pass
+- [x] `CORE-DOM-08/C2` Der HSTS-max-age ist syntaktisch gültig und beträgt mindestens 180 Tage. — automatic, pass
 - [ ] `CORE-DOM-08/C3` Relevante HTTPS-Antwortklassen und vorgeschaltete Weiterleitungshosts wurden projektspezifisch bestimmt. — manual, noEvidence
   - Erforderlicher Nachweis: Antwortklassen, Hosts und nicht erreichbare Infrastrukturgrenzen dokumentieren.
 - [ ] `CORE-DOM-08/C4` includeSubDomains und preload wurden anhand aller betroffenen Subdomains bewusst entschieden. — manual, noEvidence
@@ -147,6 +150,14 @@ API-, Asset- und Content-Negotiation-Fehler liefern passende Statuscodes und Med
 - [x] `CORE-ERR-03/C1` Alle vom Crawl geprüften internen Seitenressourcen antworten erfolgreich und verwenden einen zum Einbindungszweck passenden MIME-Typ. — automatic, pass
 - [ ] `CORE-ERR-03/C2` API- und projektspezifische Content-Negotiation-Fehler liefern die vorgesehenen Statuscodes und Medientypen statt einer scheinbar erfolgreichen HTML-Antwort. — manual, noEvidence
   - Erforderlicher Nachweis: Einschlägige API- und Content-Negotiation-Fehler mit nebenwirkungsfreien Anfragen prüfen oder ihre begründete Nichtanwendbarkeit dokumentieren; der Ressourcenlauf allein genügt nicht.
+
+### CORE-ERR-04: Teilweise nachgewiesen
+
+Sicherheits-, Indexierungs- und Cacheheader wurden auch auf Fehlerantworten und app- sowie proxyseitigen Weiterleitungen geprüft.
+
+- [x] `CORE-ERR-04/C1` Die geprüfte 404-Antwort enthält noindex und ist nicht ausdrücklich öffentlich cachebar; alle automatisch ausgewählten Antworten besitzen ihre einschlägige beobachtbare Sicherheitsheaderbasis. — automatic, pass
+- [ ] `CORE-ERR-04/C2` Sicherheits-, Indexierungs- und Cacheheader auf projektspezifischen app- und proxyseitigen Weiterleitungen wurden vollständig bewertet. — manual, noEvidence
+  - Erforderlicher Nachweis: App- und proxyseitige Redirectklassen, alternative Hosts und erwartete Sicherheits-, Indexierungs- und Cacheheader mit Infrastrukturbezug dokumentieren; die öffentliche 404-/Seitenstichprobe allein genügt nicht.
 
 ### CORE-SEO-01: Teilweise nachgewiesen
 
@@ -314,14 +325,35 @@ Geeignete textbasierte Antworten wie HTML, CSS, JavaScript, JSON und größere S
 - [ ] `CORE-PERF-01/C4` Die Kompressionszuständigkeit der produktiven Anwendung beziehungsweise des Reverse Proxys wurde bestätigt. — manual, noEvidence
   - Erforderlicher Nachweis: Produktive Router-/Proxyzuordnung oder begründete Nichtanwendbarkeit dokumentieren.
 
-### CORE-PERF-05: Offen
+### CORE-PERF-05: Teilweise nachgewiesen
 
 Cacheheader passen zur Ressource: versionierte unveränderliche Assets dürfen langfristig cachen, veränderliche öffentliche Dateien bleiben aktualisierbar und sensible Antworten werden nicht öffentlich gespeichert.
 
 - [ ] `CORE-PERF-05/C1` Vom HTTP-Prüfer ausgewählte versioniert wirkende Assets besitzen einen langfristigen unveränderlichen Cache. — automatic, noEvidence
-- [ ] `CORE-PERF-05/C2` Die geprüfte 404-Antwort ist nicht ausdrücklich langfristig öffentlich cachebar. — automatic, noEvidence
+- [x] `CORE-PERF-05/C2` Die geprüfte 404-Antwort ist nicht ausdrücklich langfristig öffentlich cachebar. — automatic, pass
 - [ ] `CORE-PERF-05/C3` Die Cachepolitik für veränderliche, sensible und weitere projektspezifische Antwortklassen wurde bewertet. — manual, noEvidence
   - Erforderlicher Nachweis: Antwortklassen, erwartete Cachepolitik und tatsächliche Header dokumentieren.
+
+### CORE-SEC-04: Teilweise nachgewiesen
+
+Sicherheitsheader und Proxygrenzen wurden passend zum Projekt für HTML, statische Assets, APIs, Fehler, appseitige sowie proxyseitige Weiterleitungen geprüft. Anwendung und Proxy entfernen oder widersprechen sich nicht unbeabsichtigt.
+
+- [x] `CORE-SEC-04/C1` Die automatisch ausgewählten HTML-, CSS-, JavaScript- und 404-Antworten wurden vollständig auf die jeweils einschlägige öffentlich beobachtbare Sicherheitsheaderbasis geprüft. — automatic, pass
+- [ ] `CORE-SEC-04/C2` Projektspezifische APIs, weitere Assets, sensible Antworten, alternative Hosts, app- und proxyseitige Weiterleitungen sowie die tatsächlichen Proxygrenzen wurden zusätzlich bewertet. — manual, noEvidence
+  - Erforderlicher Nachweis: Vollständige projektspezifische Antwortklassen und Proxyzuständigkeiten inventarisieren, öffentliche Headerstichproben gegen Anwendung und Proxy abgleichen und Abweichungen dokumentieren.
+
+### CORE-SEC-05: Teilweise nachgewiesen
+
+CSP, Framing-Schutz, MIME-Sniffing-Schutz, Referrer Policy, Permissions Policy und HSTS wurden risikogerecht bewertet; eine bewusst begrenzte Richtlinie wird nicht als Vollschutz ausgegeben.
+
+- [x] `CORE-SEC-05/C1` Content-Security-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert. — automatic, pass
+- [x] `CORE-SEC-05/C2` CSP frame-ancestors oder X-Frame-Options begrenzt Framing auf den ausgewählten dokumentartigen Antworten. — automatic, pass
+- [x] `CORE-SEC-05/C3` X-Content-Type-Options ist auf allen ausgewählten Antworten wirksam als nosniff deklariert. — automatic, pass
+- [x] `CORE-SEC-05/C4` Referrer-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert. — automatic, pass
+- [x] `CORE-SEC-05/C5` Permissions-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert. — automatic, pass
+- [x] `CORE-SEC-05/C6` HSTS ist auf den ausgewählten HTTPS-Antworten vorhanden und besitzt einen gültigen max-age von mindestens 180 Tagen. — automatic, pass
+- [ ] `CORE-SEC-05/C7` Inhalt, Reichweite, Widerspruchsfreiheit und risikogerechte Eignung der Richtlinien wurden für das Projekt bewertet, ohne eine begrenzte Richtlinie als Vollschutz auszugeben. — manual, noEvidence
+  - Erforderlicher Nachweis: CSP-Direktiven, erlaubte Quellen, Framingbedarf, Referrer- und Featureanforderungen sowie HSTS-Reichweite einschließlich includeSubDomains/preload risikogerecht bewerten; bloße Headerpräsenz genügt nicht.
 
 ### GOV-RGT-02: Vollständig nachgewiesen
 

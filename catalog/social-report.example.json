@@ -4,7 +4,7 @@
     "catalog": {
       "id": "website-qa-pilot",
       "status": "pilot",
-      "version": "1.0.0-pilot.5"
+      "version": "1.0.0-pilot.6"
     },
     "items": [
       {
@@ -886,6 +886,6 @@
   "tool": "social-preview-check",
   "toolPackage": {
     "name": "@mktcode/website-qa",
-    "version": "0.4.0"
+    "version": "0.5.0"
   }
 }

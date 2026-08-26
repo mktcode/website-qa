@@ -232,7 +232,7 @@ describe('social preview checker', () => {
     const jsonReport = createJsonReport(report.results, report.options)
     expect(jsonReport).toMatchObject({
       checklistCoverage: {
-        catalog: { version: '1.0.0-pilot.5' },
+        catalog: { version: '1.0.0-pilot.6' },
         summary: { checklistItems: { total: 5 } },
       },
       readOnlyGuarantees: {

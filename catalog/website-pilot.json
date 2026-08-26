@@ -2,7 +2,7 @@
   "$schema": "./website-catalog.schema.json",
   "schemaVersion": 1,
   "catalogId": "website-qa-pilot",
-  "catalogVersion": "1.0.0-pilot.5",
+  "catalogVersion": "1.0.0-pilot.6",
   "status": "pilot",
   "description": "Strukturierter Pilotkatalog für HTTP-, Crawl-, Browser- und Social-bezogene sowie bewusst nicht automatisierbare Website-Prüfnachweise.",
   "items": [
@@ -143,7 +143,7 @@
           "statement": "HSTS ist auf allen vom HTTP-Prüfer untersuchten HTTPS-Antwortklassen vorhanden.",
           "verification": {
             "mode": "automatic",
-            "assertions": ["http.hsts.present"],
+            "assertions": ["http.security.selected-response-coverage-complete", "http.hsts.present"],
             "aggregation": "all"
           }
         },
@@ -152,7 +152,7 @@
           "statement": "Der HSTS-max-age ist syntaktisch gültig und beträgt mindestens 180 Tage.",
           "verification": {
             "mode": "automatic",
-            "assertions": ["http.hsts.max-age-adequate"],
+            "assertions": ["http.security.selected-response-coverage-complete", "http.hsts.max-age-adequate"],
             "aggregation": "all"
           }
         },
@@ -256,6 +256,42 @@
             "mode": "manual",
             "evidenceClass": "project-review",
             "instructions": "Einschlägige API- und Content-Negotiation-Fehler mit nebenwirkungsfreien Anfragen prüfen oder ihre begründete Nichtanwendbarkeit dokumentieren; der Ressourcenlauf allein genügt nicht."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-ERR-04",
+      "module": "core",
+      "statement": "Sicherheits-, Indexierungs- und Cacheheader wurden auch auf Fehlerantworten und app- sowie proxyseitigen Weiterleitungen geprüft.",
+      "criteria": [
+        {
+          "id": "CORE-ERR-04/C1",
+          "statement": "Die geprüfte 404-Antwort enthält noindex und ist nicht ausdrücklich öffentlich cachebar; alle automatisch ausgewählten Antworten besitzen ihre einschlägige beobachtbare Sicherheitsheaderbasis.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": [
+              "http.security.selected-response-coverage-complete",
+              "error.not-found.noindex",
+              "cache.not-found.not-publicly-cacheable",
+              "http.hsts.present",
+              "http.hsts.max-age-adequate",
+              "http.security.csp-declared",
+              "http.security.framing-protection-present",
+              "http.security.nosniff-valid",
+              "http.security.referrer-policy-declared",
+              "http.security.permissions-policy-declared"
+            ],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-ERR-04/C2",
+          "statement": "Sicherheits-, Indexierungs- und Cacheheader auf projektspezifischen app- und proxyseitigen Weiterleitungen wurden vollständig bewertet.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "infrastructure-access",
+            "instructions": "App- und proxyseitige Redirectklassen, alternative Hosts und erwartete Sicherheits-, Indexierungs- und Cacheheader mit Infrastrukturbezug dokumentieren; die öffentliche 404-/Seitenstichprobe allein genügt nicht."
           }
         }
       ]
@@ -882,6 +918,110 @@
             "mode": "manual",
             "evidenceClass": "project-review",
             "instructions": "Antwortklassen, erwartete Cachepolitik und tatsächliche Header dokumentieren."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-SEC-04",
+      "module": "core",
+      "statement": "Sicherheitsheader und Proxygrenzen wurden passend zum Projekt für HTML, statische Assets, APIs, Fehler, appseitige sowie proxyseitige Weiterleitungen geprüft. Anwendung und Proxy entfernen oder widersprechen sich nicht unbeabsichtigt.",
+      "criteria": [
+        {
+          "id": "CORE-SEC-04/C1",
+          "statement": "Die automatisch ausgewählten HTML-, CSS-, JavaScript- und 404-Antworten wurden vollständig auf die jeweils einschlägige öffentlich beobachtbare Sicherheitsheaderbasis geprüft.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": [
+              "http.security.selected-response-coverage-complete",
+              "http.hsts.present",
+              "http.hsts.max-age-adequate",
+              "http.security.csp-declared",
+              "http.security.framing-protection-present",
+              "http.security.nosniff-valid",
+              "http.security.referrer-policy-declared",
+              "http.security.permissions-policy-declared"
+            ],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SEC-04/C2",
+          "statement": "Projektspezifische APIs, weitere Assets, sensible Antworten, alternative Hosts, app- und proxyseitige Weiterleitungen sowie die tatsächlichen Proxygrenzen wurden zusätzlich bewertet.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "infrastructure-access",
+            "instructions": "Vollständige projektspezifische Antwortklassen und Proxyzuständigkeiten inventarisieren, öffentliche Headerstichproben gegen Anwendung und Proxy abgleichen und Abweichungen dokumentieren."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-SEC-05",
+      "module": "core",
+      "statement": "CSP, Framing-Schutz, MIME-Sniffing-Schutz, Referrer Policy, Permissions Policy und HSTS wurden risikogerecht bewertet; eine bewusst begrenzte Richtlinie wird nicht als Vollschutz ausgegeben.",
+      "criteria": [
+        {
+          "id": "CORE-SEC-05/C1",
+          "statement": "Content-Security-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["http.security.document-response-coverage-complete", "http.security.csp-declared"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SEC-05/C2",
+          "statement": "CSP frame-ancestors oder X-Frame-Options begrenzt Framing auf den ausgewählten dokumentartigen Antworten.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["http.security.document-response-coverage-complete", "http.security.framing-protection-present"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SEC-05/C3",
+          "statement": "X-Content-Type-Options ist auf allen ausgewählten Antworten wirksam als nosniff deklariert.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["http.security.selected-response-coverage-complete", "http.security.nosniff-valid"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SEC-05/C4",
+          "statement": "Referrer-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["http.security.document-response-coverage-complete", "http.security.referrer-policy-declared"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SEC-05/C5",
+          "statement": "Permissions-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["http.security.document-response-coverage-complete", "http.security.permissions-policy-declared"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SEC-05/C6",
+          "statement": "HSTS ist auf den ausgewählten HTTPS-Antworten vorhanden und besitzt einen gültigen max-age von mindestens 180 Tagen.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["http.security.selected-response-coverage-complete", "http.hsts.present", "http.hsts.max-age-adequate"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SEC-05/C7",
+          "statement": "Inhalt, Reichweite, Widerspruchsfreiheit und risikogerechte Eignung der Richtlinien wurden für das Projekt bewertet, ohne eine begrenzte Richtlinie als Vollschutz auszugeben.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "security-review",
+            "instructions": "CSP-Direktiven, erlaubte Quellen, Framingbedarf, Referrer- und Featureanforderungen sowie HSTS-Reichweite einschließlich includeSubDomains/preload risikogerecht bewerten; bloße Headerpräsenz genügt nicht."
           }
         }
       ]

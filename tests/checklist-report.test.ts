@@ -23,14 +23,21 @@ describe('structured checklist pilot', () => {
     const registry = loadAssertionRegistry()
 
     expect(validateChecklistCatalog(catalog, registry)).toBe(true)
+    expect(catalog).toMatchObject({ catalogVersion: '1.0.0-pilot.6' })
+    expect(catalog.items).toHaveLength(32)
+    expect(catalog.items.flatMap((item: { criteria: unknown[] }) => item.criteria)).toHaveLength(88)
+    expect(registry.assertions).toHaveLength(54)
     expect(checklistItemIdsForTool('http-check', catalog, registry)).toEqual([
       'CORE-DOM-02',
       'CORE-DOM-07',
       'CORE-DOM-08',
       'CORE-ERR-01',
       'CORE-ERR-02',
+      'CORE-ERR-04',
       'CORE-PERF-01',
       'CORE-PERF-05',
+      'CORE-SEC-04',
+      'CORE-SEC-05',
     ])
     expect(checklistItemIdsForTool('crawl-check', catalog, registry)).toEqual([
       'CORE-DOM-05',
@@ -111,7 +118,7 @@ describe('structured checklist pilot', () => {
     })).toThrow(/gültiges Datum/)
 
     const evidenceExample = JSON.parse(readFileSync(new URL('../catalog/project-evidence.example.json', import.meta.url), 'utf8'))
-    expect(evidenceExample.catalog).toEqual({ id: 'website-qa-pilot', version: '1.0.0-pilot.5' })
+    expect(evidenceExample.catalog).toEqual({ id: 'website-qa-pilot', version: '1.0.0-pilot.6' })
     const evidencedRights = evaluatePilotChecklist({
       evidence: evidenceExample.evidence,
       itemIds: ['GOV-RGT-02'],
@@ -142,6 +149,33 @@ describe('structured checklist pilot', () => {
       automaticCriteria: { pass: 10, total: 10 },
       checklistItems: { pass: 0, partial: 6, total: 6 },
       nonAutomaticCriteria: { noEvidence: 6, total: 6 },
+    })
+  })
+
+  it('keeps policy suitability and proxy boundaries open after complete public header observations', () => {
+    const securityAssertions = [
+      'http.hsts.present',
+      'http.hsts.max-age-adequate',
+      'http.security.csp-declared',
+      'http.security.framing-protection-present',
+      'http.security.nosniff-valid',
+      'http.security.referrer-policy-declared',
+      'http.security.permissions-policy-declared',
+      'http.security.document-response-coverage-complete',
+      'http.security.selected-response-coverage-complete',
+      'error.not-found.noindex',
+      'cache.not-found.not-publicly-cacheable',
+    ].map(assertionId => assertion(assertionId))
+    const report = evaluatePilotChecklist({
+      assertions: securityAssertions,
+      itemIds: ['CORE-ERR-04', 'CORE-SEC-04', 'CORE-SEC-05'],
+    })
+
+    expect(report.items.every((item: { outcome: string }) => item.outcome === 'partial')).toBe(true)
+    expect(report.summary).toMatchObject({
+      automaticCriteria: { pass: 8, total: 8 },
+      checklistItems: { pass: 0, partial: 3, total: 3 },
+      nonAutomaticCriteria: { noEvidence: 3, total: 3 },
     })
   })
 

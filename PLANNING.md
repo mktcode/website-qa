@@ -1,6 +1,6 @@
 # Abgeschlossener Plan: einfache Projektintegration und lokale Website-QA-Berichte
 
-> **Status:** Der Workflow wurde mit Paketversion `0.2.0` eingeführt, mit `0.3.0` um strukturierte Social-Nachweise und mit `0.4.0` um vorhandene Sitemap-, Crawl- und Ressourcenbeobachtungen ergänzt. Die Funktionsstände wurden jeweils lokal und in installierten Verbraucherprojekten geprüft.
+> **Status:** Der Workflow wurde mit Paketversion `0.2.0` eingeführt, mit `0.3.0` um strukturierte Social-Nachweise, mit `0.4.0` um vorhandene Sitemap-, Crawl- und Ressourcenbeobachtungen und mit `0.5.0` um öffentlich beobachtbare Sicherheitsheadernachweise ergänzt. Die Funktionsstände wurden jeweils lokal und in installierten Verbraucherprojekten geprüft.
 >
 > Dieses Dokument bewahrt Planung, Entscheidungen, Sicherheitsanforderungen und Abnahmekriterien des frameworkunabhängigen Refactorings von `@mktcode/website-qa`. Es enthält keine ausgefüllten Nachweise oder Vorgaben für eine bestimmte Website. Zukunftsformulierungen in den historischen Planungsabschnitten beschreiben den damaligen Implementierungsweg und keine noch offene Zusage.
 >
@@ -582,4 +582,19 @@ Die nächste Funktionsrunde ergänzt atomare Assertions für bereits vorhandene 
 
 Dieser Ausbau öffnet keine neuen Netzwerkpfade. Externe Links bleiben ausschließlich inventarisiert, Formulare und Bedienelemente bleiben unangetastet und limitierte beziehungsweise sicherheitsbedingt ausgelassene Beobachtungen führen weiterhin zu `inconclusive`. Projektinventar, API- und Content-Negotiation-Fehler, optionale Sitemap-Metadaten und XSL, externe Links sowie dynamische oder interaktionsabhängige Ressourcen bleiben nicht automatisch belegbar.
 
-Als spätere, getrennt zu entscheidende Ausbaustufe kommen atomare Aussagen zu bereits geprüften HTTP-Sicherheitsheadern oder technischen Datenschutzbeobachtungen in Betracht. Manuelle, rechtliche, administrative und projektspezifische Kriterien bleiben davon unabhängig.
+Der unmittelbar anschließende Sicherheitsheaderausbau ist in Abschnitt 21 getrennt abgegrenzt. Technische Datenschutzbeobachtungen bleiben eine erst später zu entscheidende Ausbaustufe; manuelle, rechtliche, administrative und projektspezifische Kriterien bleiben davon unabhängig.
+
+## 21. Sicherheitsheadernachweise mit 0.5.0
+
+Die folgende Funktionsrunde strukturiert bereits vorhandene Beobachtungen des HTTP-Prüfers für `CORE-ERR-04`, `CORE-SEC-04` und `CORE-SEC-05`. Atomare Assertions unterscheiden:
+
+- deklarierte Content-Security-Policy;
+- syntaktisch erkennbaren Framing-Schutz über CSP `frame-ancestors` oder `X-Frame-Options`;
+- wirksames `X-Content-Type-Options: nosniff`;
+- deklarierte Referrer Policy und Permissions Policy;
+- HSTS-Präsenz und Mindestlaufzeit;
+- vollständige Beobachtung aller automatisch ausgewählten Antwortklassen.
+
+Der Prüfer verwendet dafür ausschließlich die ohnehin abgerufenen Antworten für reguläres HTML, die nebenwirkungsfreie 404-Probe und je eine bereits ausgewählte CSS-/JavaScript-Ressource. Abruffehler führen bei der Abdeckung zu `inconclusive`, ausdrücklich zugelassene HTTP-Antworten bei HSTS zu `notApplicable`. Es werden keine weiteren Hosts, Redirectziele, APIs oder Ressourcenklassen angefordert.
+
+Bloße Headerpräsenz ist kein Vollschutz. Inhalt und Widerspruchsfreiheit von Richtlinien, projektspezifische Risiken, weitere öffentliche Antwortklassen, alternative Hosts, app- und proxyseitige Redirectheader sowie die tatsächliche Anwendung-/Proxygrenze bleiben manuelle oder infrastrukturelle Nachweise. Technische Datenschutzbeobachtungen werden weiterhin nur in einer späteren, getrennt zu entscheidenden Runde erwogen.

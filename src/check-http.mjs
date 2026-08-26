@@ -165,14 +165,20 @@ function headerSnapshot(headers) {
     .map(name => [name, headers[name]]))
 }
 
-function hasDirective(value, directive) {
-  return value?.toLowerCase().split(';').some(part => part.trim().startsWith(directive)) || false
+function directiveValues(value, directive) {
+  const matching = value
+    ?.toLowerCase()
+    .split(';')
+    .map(part => part.trim().split(/\s+/).filter(Boolean))
+    .find(([name]) => name === directive)
+  return matching?.slice(1)
 }
 
-function checkSecurityHeaders(result, response, label) {
+function checkSecurityHeaders(result, response, label, documentLike = true) {
   const headers = response.headers
   const finalUrl = new URL(response.finalUrl)
-  const checklistIds = ['CORE-DOM-08', 'CORE-SEC-04', 'CORE-SEC-05']
+  const checklistIds = ['CORE-DOM-08', 'CORE-ERR-04', 'CORE-SEC-04', 'CORE-SEC-05']
+  result.securityHeaderCoverage.checkedResponseClasses.push(label)
 
   if (finalUrl.protocol === 'https:') {
     const hsts = headers['strict-transport-security']
@@ -197,27 +203,114 @@ function checkSecurityHeaders(result, response, label) {
       }
     }
   }
+  else {
+    addAssertion(result, 'http.hsts.present', 'notApplicable', `${label}: HSTS ist auf der ausdrücklich zugelassenen HTTP-Antwort nicht anwendbar.`, response.finalUrl, { responseClass: label })
+    addAssertion(result, 'http.hsts.max-age-adequate', 'notApplicable', `${label}: HSTS max-age ist auf der ausdrücklich zugelassenen HTTP-Antwort nicht anwendbar.`, response.finalUrl, { responseClass: label })
+  }
 
-  if (headers['x-content-type-options']?.toLowerCase() !== 'nosniff') {
+  const nosniff = headers['x-content-type-options']?.trim().toLowerCase() === 'nosniff'
+  addAssertion(
+    result,
+    'http.security.nosniff-valid',
+    nosniff ? 'pass' : 'fail',
+    nosniff ? `${label}: X-Content-Type-Options ist wirksam als nosniff deklariert.` : `${label}: X-Content-Type-Options: nosniff fehlt oder ist ungültig.`,
+    response.finalUrl,
+    { responseClass: label },
+  )
+  if (!nosniff) {
     addIssue(result, 'warning', 'nosniff-missing', `${label}: X-Content-Type-Options: nosniff fehlt.`, checklistIds, response.finalUrl)
   }
-  if (!headers['referrer-policy']) {
+
+  if (!documentLike) {
+    return
+  }
+
+  const referrerPolicyDeclared = Boolean(headers['referrer-policy']?.trim())
+  addAssertion(
+    result,
+    'http.security.referrer-policy-declared',
+    referrerPolicyDeclared ? 'pass' : 'fail',
+    referrerPolicyDeclared ? `${label}: Referrer-Policy ist deklariert.` : `${label}: Referrer-Policy fehlt.`,
+    response.finalUrl,
+    { responseClass: label },
+  )
+  if (!referrerPolicyDeclared) {
     addIssue(result, 'warning', 'referrer-policy-missing', `${label}: Referrer-Policy fehlt.`, checklistIds, response.finalUrl)
   }
-  if (!headers['permissions-policy']) {
+
+  const permissionsPolicyDeclared = Boolean(headers['permissions-policy']?.trim())
+  addAssertion(
+    result,
+    'http.security.permissions-policy-declared',
+    permissionsPolicyDeclared ? 'pass' : 'fail',
+    permissionsPolicyDeclared ? `${label}: Permissions-Policy ist deklariert.` : `${label}: Permissions-Policy fehlt.`,
+    response.finalUrl,
+    { responseClass: label },
+  )
+  if (!permissionsPolicyDeclared) {
     addIssue(result, 'warning', 'permissions-policy-missing', `${label}: Permissions-Policy fehlt.`, checklistIds, response.finalUrl)
   }
 
-  const contentSecurityPolicy = headers['content-security-policy']
-  if (!contentSecurityPolicy) {
+  const contentSecurityPolicy = headers['content-security-policy']?.trim()
+  const cspDeclared = Boolean(contentSecurityPolicy)
+  addAssertion(
+    result,
+    'http.security.csp-declared',
+    cspDeclared ? 'pass' : 'fail',
+    cspDeclared ? `${label}: Content-Security-Policy ist deklariert.` : `${label}: Content-Security-Policy fehlt.`,
+    response.finalUrl,
+    { responseClass: label },
+  )
+  if (!cspDeclared) {
     addIssue(result, 'warning', 'csp-missing', `${label}: Content-Security-Policy fehlt.`, checklistIds, response.finalUrl)
   }
 
-  const frameAncestors = hasDirective(contentSecurityPolicy, 'frame-ancestors')
-  const frameOptions = headers['x-frame-options']?.toLowerCase()
-  if (!frameAncestors && !['deny', 'sameorigin'].includes(frameOptions)) {
+  const frameAncestors = directiveValues(contentSecurityPolicy, 'frame-ancestors')
+  const frameAncestorsProtects = Boolean(frameAncestors?.length)
+    && !(frameAncestors.length === 1 && frameAncestors[0] === '*')
+  const frameOptions = headers['x-frame-options']?.trim().toLowerCase()
+  const framingProtected = frameAncestorsProtects || ['deny', 'sameorigin'].includes(frameOptions)
+  addAssertion(
+    result,
+    'http.security.framing-protection-present',
+    framingProtected ? 'pass' : 'fail',
+    framingProtected ? `${label}: CSP frame-ancestors oder X-Frame-Options begrenzt Framing.` : `${label}: Kein wirksamer deklarierter Framing-Schutz erkannt.`,
+    response.finalUrl,
+    { responseClass: label },
+  )
+  if (!framingProtected) {
     addIssue(result, 'warning', 'framing-protection-missing', `${label}: Weder CSP frame-ancestors noch ein wirksames X-Frame-Options schützt vor Framing.`, checklistIds, response.finalUrl)
   }
+}
+
+function addSecurityHeaderCoverageAssertions(result) {
+  const expected = [...new Set(result.securityHeaderCoverage.expectedResponseClasses)]
+  const checked = new Set(result.securityHeaderCoverage.checkedResponseClasses)
+
+  function addCoverageAssertion(assertionId, expectedResponseClasses, description) {
+    const missing = expectedResponseClasses.filter(responseClass => !checked.has(responseClass))
+    addAssertion(
+      result,
+      assertionId,
+      missing.length === 0 ? 'pass' : 'inconclusive',
+      missing.length === 0
+        ? `${description} wurden vollständig beobachtet.`
+        : `${description} konnten nicht vollständig beobachtet werden; offen: ${missing.join(', ')}.`,
+      result.finalUrl || result.requestedUrl,
+      { checkedResponseClasses: [...checked], expectedResponseClasses },
+    )
+  }
+
+  addCoverageAssertion(
+    'http.security.document-response-coverage-complete',
+    expected.filter(responseClass => ['HTML', '404-Antwort'].includes(responseClass)),
+    'Die dokumentartigen Sicherheitsheaderantworten',
+  )
+  addCoverageAssertion(
+    'http.security.selected-response-coverage-complete',
+    expected,
+    'Die ausgewählten Sicherheitsheaderantworten',
+  )
 }
 
 function attribute(node, name) {
@@ -386,6 +479,7 @@ async function checkCompression(result, resource, options) {
         contentType: normalizeMimeType(response.headers['content-type']),
         decodable: true,
         finalUrl: response.finalUrl,
+        headers: headerSnapshot(response.headers),
         status: response.status,
         vary: response.headers.vary,
       }
@@ -584,6 +678,10 @@ async function inspectTarget(inputUrl, options) {
     issues: [],
     requestedUrl: inputUrl,
     resources: [],
+    securityHeaderCoverage: {
+      checkedResponseClasses: [],
+      expectedResponseClasses: ['HTML', '404-Antwort'],
+    },
   }
 
   try {
@@ -615,6 +713,7 @@ async function inspectTarget(inputUrl, options) {
 
     if (page.status < 200 || page.status >= 300) {
       addIssue(result, 'error', 'page-http-status', `Die Zielseite antwortet mit HTTP ${page.status}.`, ['CORE-DOM-01'], page.finalUrl)
+      addSecurityHeaderCoverageAssertions(result)
       return result
     }
     if (!hasDirectChain) {
@@ -634,21 +733,26 @@ async function inspectTarget(inputUrl, options) {
     const script = facts.resources.find(resource => resource.type === 'javascript')
     if (stylesheet) {
       selectedResources.push({ label: 'CSS', type: stylesheet.type, url: stylesheet.url })
+      result.securityHeaderCoverage.expectedResponseClasses.push('CSS')
     }
     if (script) {
       selectedResources.push({ label: 'JavaScript', type: script.type, url: script.url })
+      result.securityHeaderCoverage.expectedResponseClasses.push('JavaScript')
     }
 
     for (const resource of selectedResources) {
       const variants = await checkCompression(result, resource, options)
       result.resources.push({ ...resource, variants })
 
-      const identityResponse = await fetchResource(resource.url, options, {
-        headers: { 'accept-encoding': 'identity' },
-        maximumBytes: options.maxHtmlBytes,
-      })
-      checkMimeType(result, identityResponse, resource.type, resource.label)
-      checkCacheHeaders(result, identityResponse, resource.type, resource.label)
+      const identity = variants.identity
+      if (identity) {
+        const identityResponse = { finalUrl: identity.finalUrl, headers: identity.headers }
+        checkMimeType(result, identityResponse, resource.type, resource.label)
+        checkCacheHeaders(result, identityResponse, resource.type, resource.label)
+        if (resource.type !== 'html') {
+          checkSecurityHeaders(result, identityResponse, resource.label, false)
+        }
+      }
     }
 
     if (options.checkHttpRedirect && new URL(page.finalUrl).protocol === 'https:') {
@@ -664,6 +768,7 @@ async function inspectTarget(inputUrl, options) {
     }
   }
 
+  addSecurityHeaderCoverageAssertions(result)
   return result
 }
 

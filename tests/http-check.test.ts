@@ -133,13 +133,14 @@ describe('http checker', () => {
       notFound: { status: number }
       page: { finalUrl: string, redirects: unknown[] }
       resources: Array<{ variants: Record<string, unknown> }>
+      securityHeaderCoverage: { checkedResponseClasses: string[], expectedResponseClasses: string[] }
     }
 
     expect(report.summary).toEqual({ errors: 0, failed: false, targets: 1, warnings: 0 })
     expect(report.checklistCoverage.summary.checklistItems).toMatchObject({
       automaticallyPassed: 1,
       pass: 1,
-      total: 7,
+      total: 10,
     })
     expect(result.notFound).toMatchObject({ status: 404 })
     expect(result.page).toMatchObject({
@@ -147,6 +148,10 @@ describe('http checker', () => {
       redirects: [expect.objectContaining({ status: 301 })],
     })
     expect(result.resources).toHaveLength(3)
+    expect(result.securityHeaderCoverage).toEqual({
+      checkedResponseClasses: ['HTML', 'CSS', 'JavaScript', '404-Antwort'],
+      expectedResponseClasses: ['HTML', '404-Antwort', 'CSS', 'JavaScript'],
+    })
     expect(result.resources[0]?.variants).toMatchObject({
       br: { contentEncoding: 'br', status: 200 },
       gzip: { contentEncoding: 'gzip', status: 200 },
@@ -157,6 +162,13 @@ describe('http checker', () => {
       expect.objectContaining({ assertionId: 'error.not-found.noindex', outcome: 'pass' }),
       expect.objectContaining({ assertionId: 'compression.gzip.effective', outcome: 'pass' }),
       expect.objectContaining({ assertionId: 'cache.versioned-asset.immutable', outcome: 'pass' }),
+      expect.objectContaining({ assertionId: 'http.security.csp-declared', outcome: 'pass' }),
+      expect.objectContaining({ assertionId: 'http.security.framing-protection-present', outcome: 'pass' }),
+      expect.objectContaining({ assertionId: 'http.security.nosniff-valid', outcome: 'pass' }),
+      expect.objectContaining({ assertionId: 'http.security.referrer-policy-declared', outcome: 'pass' }),
+      expect.objectContaining({ assertionId: 'http.security.permissions-policy-declared', outcome: 'pass' }),
+      expect.objectContaining({ assertionId: 'http.security.document-response-coverage-complete', outcome: 'pass' }),
+      expect.objectContaining({ assertionId: 'http.security.selected-response-coverage-complete', outcome: 'pass' }),
     ]))
 
     const json = createJsonReport(report.results, report.options)
@@ -198,6 +210,96 @@ describe('http checker', () => {
     expect(result.assertions).toEqual(expect.arrayContaining([
       expect.objectContaining({ assertionId: 'error.not-found.status-404', outcome: 'fail' }),
       expect.objectContaining({ assertionId: 'compression.gzip.effective', outcome: 'fail' }),
+      expect.objectContaining({ assertionId: 'http.security.csp-declared', outcome: 'fail' }),
+      expect.objectContaining({ assertionId: 'http.security.framing-protection-present', outcome: 'fail' }),
+      expect.objectContaining({ assertionId: 'http.security.nosniff-valid', outcome: 'fail' }),
+      expect.objectContaining({ assertionId: 'http.security.referrer-policy-declared', outcome: 'fail' }),
+      expect.objectContaining({ assertionId: 'http.security.permissions-policy-declared', outcome: 'fail' }),
+      expect.objectContaining({ assertionId: 'http.security.document-response-coverage-complete', outcome: 'pass' }),
+      expect.objectContaining({ assertionId: 'http.security.selected-response-coverage-complete', outcome: 'pass' }),
+    ]))
+  })
+
+  it('distinguishes declared CSP from effective framing protection and checks selected assets', async () => {
+    const documentHeaders = {
+      'content-security-policy': 'default-src \'self\'; frame-ancestors *',
+      'permissions-policy': 'camera=()',
+      'referrer-policy': 'no-referrer',
+      'x-content-type-options': 'nosniff',
+    }
+    const server = createServer((request, response) => {
+      if (request.url === '/style.css') {
+        response.writeHead(200, { 'content-type': 'text/css' })
+        response.end('body { color: black; }')
+        return
+      }
+      if (request.url === '/.well-known/ops-http-check-not-found') {
+        response.writeHead(404, { ...documentHeaders, 'content-type': 'text/html' })
+        response.end('<meta name="robots" content="noindex"><h1>Nicht gefunden</h1>')
+        return
+      }
+      response.writeHead(200, { ...documentHeaders, 'content-type': 'text/html' })
+      response.end('<link rel="stylesheet" href="/style.css"><h1>Start</h1>')
+    })
+    const url = await listen(server)
+
+    const report = await runHttpCheck([url], { allowHttp: true, allowPrivate: true })
+    const result = report.results[0] as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
+    }
+
+    expect(result.assertions.filter(assertion => assertion.assertionId === 'http.security.csp-declared').every(assertion => assertion.outcome === 'pass')).toBe(true)
+    expect(result.assertions.filter(assertion => assertion.assertionId === 'http.security.framing-protection-present').every(assertion => assertion.outcome === 'fail')).toBe(true)
+    expect(result.assertions.filter(assertion => assertion.assertionId === 'http.security.nosniff-valid').map(assertion => assertion.outcome)).toEqual(['pass', 'fail', 'pass'])
+    expect(result.assertions).toContainEqual(expect.objectContaining({ assertionId: 'http.security.selected-response-coverage-complete', outcome: 'pass' }))
+  })
+
+  it('keeps document coverage conclusive when only a selected asset cannot be fetched', async () => {
+    const server = createServer((request, response) => {
+      if (request.url === '/style.css') {
+        response.destroy()
+        return
+      }
+      if (request.url === '/.well-known/ops-http-check-not-found') {
+        response.writeHead(404, { ...securityHeaders, 'cache-control': 'no-store', 'content-type': 'text/html' })
+        response.end('<meta name="robots" content="noindex"><h1>Nicht gefunden</h1>')
+        return
+      }
+      response.writeHead(200, { ...securityHeaders, 'content-type': 'text/html' })
+      response.end('<link rel="stylesheet" href="/style.css"><h1>Start</h1>')
+    })
+    const url = await listen(server)
+
+    const report = await runHttpCheck([url], { allowHttp: true, allowPrivate: true })
+    const result = report.results[0] as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
+    }
+
+    expect(result.assertions).toEqual(expect.arrayContaining([
+      expect.objectContaining({ assertionId: 'http.security.document-response-coverage-complete', outcome: 'pass' }),
+      expect.objectContaining({ assertionId: 'http.security.selected-response-coverage-complete', outcome: 'inconclusive' }),
+    ]))
+  })
+
+  it('marks header coverage inconclusive when the 404 response cannot be fetched', async () => {
+    const server = createServer((request, response) => {
+      if (request.url === '/.well-known/ops-http-check-not-found') {
+        response.destroy()
+        return
+      }
+      response.writeHead(200, { ...securityHeaders, 'content-type': 'text/html' })
+      response.end('<h1>Start</h1>')
+    })
+    const url = await listen(server)
+
+    const report = await runHttpCheck([url], { allowHttp: true, allowPrivate: true })
+    const result = report.results[0] as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
+    }
+
+    expect(result.assertions).toEqual(expect.arrayContaining([
+      expect.objectContaining({ assertionId: 'http.security.document-response-coverage-complete', outcome: 'inconclusive' }),
+      expect.objectContaining({ assertionId: 'http.security.selected-response-coverage-complete', outcome: 'inconclusive' }),
     ]))
   })
 

@@ -4,13 +4,13 @@
   "tool": "http-check",
   "toolPackage": {
     "name": "@mktcode/website-qa",
-    "version": "0.4.0"
+    "version": "0.5.0"
   },
   "checklistCoverage": {
     "catalog": {
       "id": "website-qa-pilot",
       "status": "pilot",
-      "version": "1.0.0-pilot.5"
+      "version": "1.0.0-pilot.6"
     }
   },
   "results": [
@@ -33,6 +33,108 @@
           "message": "404-Antwort enthält weder Canonical noch og:url.",
           "subject": {
             "url": "https://example.com/.well-known/ops-http-check-not-found"
+          }
+        },
+        {
+          "assertionId": "cache.not-found.not-publicly-cacheable",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "404-Antwort ist nicht ausdrücklich öffentlich cachebar.",
+          "subject": {
+            "responseClass": "404-Antwort",
+            "url": "https://example.com/.well-known/ops-http-check-not-found"
+          }
+        },
+        {
+          "assertionId": "http.hsts.present",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "HSTS ist auf den ausgewählten HTTPS-Antworten vorhanden.",
+          "subject": {
+            "responseClass": "ausgewählte HTTPS-Antworten",
+            "url": "https://example.com/"
+          }
+        },
+        {
+          "assertionId": "http.hsts.max-age-adequate",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "HSTS max-age beträgt mindestens 180 Tage.",
+          "subject": {
+            "responseClass": "ausgewählte HTTPS-Antworten",
+            "url": "https://example.com/"
+          }
+        },
+        {
+          "assertionId": "http.security.csp-declared",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Content-Security-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
+          "subject": {
+            "responseClass": "HTML und 404-Antwort",
+            "url": "https://example.com/"
+          }
+        },
+        {
+          "assertionId": "http.security.framing-protection-present",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "CSP frame-ancestors oder X-Frame-Options begrenzt Framing.",
+          "subject": {
+            "responseClass": "HTML und 404-Antwort",
+            "url": "https://example.com/"
+          }
+        },
+        {
+          "assertionId": "http.security.nosniff-valid",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "X-Content-Type-Options ist auf den ausgewählten Antworten wirksam als nosniff deklariert.",
+          "subject": {
+            "responseClass": "ausgewählte Antworten",
+            "url": "https://example.com/"
+          }
+        },
+        {
+          "assertionId": "http.security.referrer-policy-declared",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Referrer-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
+          "subject": {
+            "responseClass": "HTML und 404-Antwort",
+            "url": "https://example.com/"
+          }
+        },
+        {
+          "assertionId": "http.security.permissions-policy-declared",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Permissions-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
+          "subject": {
+            "responseClass": "HTML und 404-Antwort",
+            "url": "https://example.com/"
+          }
+        },
+        {
+          "assertionId": "http.security.document-response-coverage-complete",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Die dokumentartigen Sicherheitsheaderantworten wurden vollständig beobachtet.",
+          "subject": {
+            "checkedResponseClasses": ["HTML", "CSS", "JavaScript", "404-Antwort"],
+            "expectedResponseClasses": ["HTML", "404-Antwort"],
+            "url": "https://example.com/"
+          }
+        },
+        {
+          "assertionId": "http.security.selected-response-coverage-complete",
+          "assertionVersion": 1,
+          "outcome": "pass",
+          "message": "Die relevanten Sicherheitsheader wurden auf allen ausgewählten Antwortklassen beobachtet.",
+          "subject": {
+            "checkedResponseClasses": ["HTML", "CSS", "JavaScript", "404-Antwort"],
+            "expectedResponseClasses": ["HTML", "404-Antwort", "CSS", "JavaScript"],
+            "url": "https://example.com/"
           }
         }
       ],

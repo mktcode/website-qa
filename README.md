@@ -98,7 +98,7 @@ Eine kopierbare Minimalintegration liegt unter [`examples/project-integration/`]
 
 ## Strukturierter Projektnachweis
 
-HTTP, Crawl, Browser und Social geben neben Befunden positive, negative, nicht anwendbare und unklare atomare Prüfaussagen aus. Der Crawl bildet zusätzlich Sitemap-Dateien und -Einträge, robots.txt-Referenz, vollständige Sitemap-Abdeckung, interne Navigationen, Ressourcenstatus und MIME-Typen sowie erreichte Sicherheits- und Umfangsgrenzen atomar ab. Grundlage ist der mitgelieferte [Pilotkatalog](catalog/README.md). Er unterscheidet:
+HTTP, Crawl, Browser und Social geben neben Befunden positive, negative, nicht anwendbare und unklare atomare Prüfaussagen aus. Der HTTP-Prüfer bildet die deklarierte Sicherheitsheaderbasis und ihre Beobachtungsabdeckung auf ausgewähltem HTML, 404, CSS und JavaScript ab. Der Crawl erfasst zusätzlich Sitemap-Dateien und -Einträge, robots.txt-Referenz, vollständige Sitemap-Abdeckung, interne Navigationen, Ressourcenstatus und MIME-Typen sowie erreichte Sicherheits- und Umfangsgrenzen atomar. Grundlage ist der mitgelieferte [Pilotkatalog](catalog/README.md). Er unterscheidet:
 
 - automatisch belegbare Kriterien;
 - manuell beziehungsweise redaktionell zu prüfende Kriterien;
@@ -236,6 +236,15 @@ const files = writePilotProjectReportBundle({
 ```
 
 Schemas und Beispiele liegen unter [`catalog/`](catalog/). `report.json` verwendet Ausgabeschema 2, weil berichtete Ziel-URLs ohne Querywerte gebunden werden; bei Queryzielen werden zusätzlich nur die Parameternamen verglichen. Der Pilot umfasst noch nicht die vollständige Website-Checkliste und verändert keine Projektcheckliste automatisch.
+
+### Migration von 0.4.x
+
+- Der HTTP-Prüfer liefert sieben zusätzliche atomare Assertions für deklarierte CSP, Framing-Schutz, `X-Content-Type-Options: nosniff`, Referrer Policy sowie Permissions Policy und unterscheidet vollständige Dokument- von vollständiger Gesamtbeobachtung der ausgewählten Antwortklassen. Bereits vorhandene HSTS-Assertions umfassen nun auch die ohnehin abgerufene CSS-/JavaScript-Stichprobe.
+- Der Pilotkatalog `1.0.0-pilot.6` ergänzt `CORE-ERR-04`, `CORE-SEC-04` und `CORE-SEC-05`. Projektkonfigurationen und Evidence-Dateien müssen diese Katalogversion ausdrücklich übernehmen.
+- Technische Berichte aller vier Werkzeuge weisen die aktuelle Katalogversion aus. Für einen gemeinsamen Projektbericht müssen deshalb alle eingebundenen Berichte mit einem einheitlichen `0.5.x`-Werkzeugstand neu erzeugt werden.
+- Es entstehen keine zusätzlichen HTTP-Anfragen: ausgewertet werden reguläres HTML, die bestehende 404-Probe sowie die bereits für MIME-, Cache- und Kompressionsprüfungen ausgewählten CSS-/JavaScript-Antworten.
+- Deklarierte Header und ein syntaktisch erkennbarer Framing-Schutz belegen weder die inhaltliche Stärke einer CSP noch widerspruchsfreie Anwendung-/Proxykonfiguration oder risikogerechte Projekteignung. APIs, weitere Antwortklassen, alternative Hosts sowie app- und proxyseitige Redirectheader bleiben manuell zu prüfen.
+- Fehlt eine ausgewählte Antwort wegen eines Abruffehlers, wird die Headerabdeckung `inconclusive`. HSTS ist bei ausdrücklich zugelassenen HTTP-Zielen `notApplicable` statt ein positiver HTTPS-Nachweis.
 
 ### Migration von 0.3.x
 
