@@ -2,9 +2,9 @@
 
 Dieses Changelog dokumentiert veröffentlichte Paketstände von `@mktcode/website-qa`. Planungs- und reine Dokumentationscommits ohne Paketveröffentlichung erscheinen nicht als eigene Version.
 
-## Unveröffentlicht – 1.0.0 vorbereitet
+## 1.0.0 – 2026-08-27
 
-- Bewussten inkompatiblen 1.0-Vertragsschnitt umgesetzt; noch nicht veröffentlicht.
+- Bewussten inkompatiblen 1.0-Vertragsschnitt umgesetzt.
 - Den begrenzten Bestand ohne neue Assertions als `website-qa-baseline` 1.0.0 stabilisiert. Stabilität bezeichnet IDs und Versionsregeln, nicht vollständige Checklistenabdeckung oder Freigabe.
 - Projektkonfiguration und Berichtsschema eindeutig als `project-report.config.schema.json` beziehungsweise `project-report.schema.json` benannt.
 - Genau ein normalisiertes Projektberichtsausgabeformat beibehalten: `schemaVersion: 3` mit deterministischen berichtslokalen Referenzen, Deduplizierung und semantischer Katalog-, Scope-, Referenz- und Aggregationsvalidierung.
