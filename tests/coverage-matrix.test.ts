@@ -104,7 +104,7 @@ describe('website checklist coverage matrix', () => {
       .map((item: any) => item.id)
 
     expect(new Set(flaggedIds)).toEqual(new Set(baselineItems.keys()))
-    expect(flaggedIds).toHaveLength(34)
+    expect(flaggedIds).toHaveLength(37)
 
     for (const item of matrix.items) {
       const baselineItem: any = baselineItems.get(item.id)
@@ -143,11 +143,23 @@ describe('website checklist coverage matrix', () => {
     const shortlistIds = matrix.v1_1Shortlist.map((candidate: any) => candidate.id)
     expect(shortlistIds).toHaveLength(6)
     expect(new Set(shortlistIds).size).toBe(shortlistIds.length)
+    expect(matrix.v1_1Shortlist.filter(
+      (candidate: any) => candidate.stage === 'v1.1-implemented-unreleased',
+    )).toHaveLength(3)
     for (const candidate of matrix.v1_1Shortlist) {
       const item = matrix.items.find((entry: any) => entry.id === candidate.id)
       expect(item).toBeDefined()
-      expect(['direct-get-candidate', 'observation-candidate']).toContain(item.classification)
-      expect(item.v1_1Priority).not.toBe('none')
+      if (candidate.stage === 'v1.1-implemented-unreleased') {
+        expect(item).toMatchObject({
+          classification: 'existing-baseline',
+          existingCatalog: true,
+          v1_1Priority: 'none',
+        })
+      }
+      else {
+        expect(['direct-get-candidate', 'observation-candidate']).toContain(item.classification)
+        expect(item.v1_1Priority).not.toBe('none')
+      }
       expect(candidate.requestImpact).toMatch(/vorhanden|keine neuen/i)
       expect(candidate.manualRemainder.length).toBeGreaterThan(20)
     }

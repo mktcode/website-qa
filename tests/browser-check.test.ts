@@ -39,6 +39,7 @@ function emptyPrivacyObservation() {
 
 function completeProfile(profile: string, width: number) {
   return {
+    accessibilityIncompleteRuleIds: [],
     blockedActions: [],
     cookies: [],
     facts: {
@@ -137,7 +138,7 @@ describe('browser check', () => {
     })
     expect(report).toMatchObject({
       checklistCoverage: {
-        summary: { checklistItems: { partial: 7, total: 7 } },
+        summary: { checklistItems: { partial: 10, total: 10 } },
       },
       schemaVersion: 1,
       summary: { errors: 0, failed: false, pages: 1, warnings: 0 },
@@ -147,7 +148,7 @@ describe('browser check', () => {
       requestedUrlParameterNames: ['session'],
     })
     expect(JSON.stringify(report)).not.toContain('private-value')
-    expect(report.result.assertions).toHaveLength(7)
+    expect(report.result.assertions).toHaveLength(11)
     expect(report.result.assertions.every((assertion: { outcome: string }) => assertion.outcome === 'pass')).toBe(true)
   })
 
@@ -193,8 +194,8 @@ describe('browser check', () => {
         { code: 'console-error', severity: 'error' },
       ],
       profiles: [
-        { facts: { overflow: { clientWidth: 320, scrollWidth: 500 } }, profile: 'narrow', url },
-        { facts: { overflow: { clientWidth: 640, scrollWidth: 800 } }, profile: 'zoom-200', url },
+        { accessibilityIncompleteRuleIds: [], facts: { overflow: { clientWidth: 320, scrollWidth: 500 } }, profile: 'narrow', url },
+        { accessibilityIncompleteRuleIds: [], facts: { overflow: { clientWidth: 640, scrollWidth: 800 } }, profile: 'zoom-200', url },
       ],
       requestedUrl: url,
     }, {
@@ -213,11 +214,207 @@ describe('browser check', () => {
     expect(outcomes.get('browser.runtime.no-observed-errors')).toBe('fail')
     expect(outcomes.get('browser.privacy.external-request-observation-complete')).toBe('inconclusive')
     expect(outcomes.get('browser.privacy.initial-storage-observation-complete')).toBe('inconclusive')
-    expect(report.checklistCoverage.summary.checklistItems).toMatchObject({ fail: 4, partial: 1, total: 7 })
+    expect(report.checklistCoverage.summary.checklistItems).toMatchObject({ fail: 4, partial: 4, total: 10 })
+  })
+
+  it('maps bounded Axe rule families to atomic accessibility assertions', () => {
+    const profile = completeProfile('desktop', 1280)
+    const report = createJsonReport({
+      blockedRequests: [],
+      browser: { product: 'Chromium', version: 'Chromium 140.0' },
+      finalUrl: 'https://example.com/',
+      issues: [
+        { code: 'axe-button-name', severity: 'error' },
+        { code: 'axe-link-in-text-block', severity: 'error' },
+        { code: 'axe-image-alt', severity: 'error' },
+        { code: 'axe-color-contrast', severity: 'error' },
+      ],
+      profiles: [profile],
+      requestedUrl: 'https://example.com/',
+    }, {
+      maxPages: 10,
+      maxRequests: 300,
+      profiles: ['desktop'],
+      settleMilliseconds: 750,
+      sitemap: false,
+      strict: true,
+      timeoutMilliseconds: 20_000,
+    })
+    const outcomes = new Map(report.result.assertions.map(
+      (assertion: { assertionId: string, outcome: string }) => [assertion.assertionId, assertion.outcome],
+    ))
+
+    expect(outcomes.get('browser.accessibility.control-names-no-detected-violations')).toBe('fail')
+    expect(outcomes.get('browser.accessibility.links-not-color-only-no-detected-violations')).toBe('fail')
+    expect(outcomes.get('browser.accessibility.image-alternatives-no-detected-violations')).toBe('fail')
+    expect(outcomes.get('browser.accessibility.text-contrast-no-detected-violations')).toBe('fail')
+
+    const incompleteProfile = {
+      ...profile,
+      accessibilityIncompleteRuleIds: ['color-contrast'],
+    }
+    const incompleteReport = createJsonReport({
+      blockedRequests: [],
+      browser: { product: 'Chromium', version: 'Chromium 140.0' },
+      finalUrl: 'https://example.com/',
+      issues: [],
+      profiles: [incompleteProfile],
+      requestedUrl: 'https://example.com/',
+    }, {
+      maxPages: 10,
+      maxRequests: 300,
+      profiles: ['desktop'],
+      settleMilliseconds: 750,
+      sitemap: false,
+      strict: true,
+      timeoutMilliseconds: 20_000,
+    })
+    const incompleteOutcomes = new Map(incompleteReport.result.assertions.map(
+      (assertion: { assertionId: string, outcome: string }) => [assertion.assertionId, assertion.outcome],
+    ))
+    expect(incompleteOutcomes.get('browser.accessibility.text-contrast-no-detected-violations')).toBe('inconclusive')
+    expect(incompleteOutcomes.get('browser.accessibility.control-names-no-detected-violations')).toBe('pass')
+
+    for (const ruleId of ['area-alt', 'input-image-alt']) {
+      const overlappingReport = createJsonReport({
+        blockedRequests: [],
+        browser: { product: 'Chromium', version: 'Chromium 140.0' },
+        finalUrl: 'https://example.com/',
+        issues: [{ code: `axe-${ruleId}`, severity: 'error' }],
+        profiles: [profile],
+        requestedUrl: 'https://example.com/',
+      }, {
+        maxPages: 10,
+        maxRequests: 300,
+        profiles: ['desktop'],
+        settleMilliseconds: 750,
+        sitemap: false,
+        strict: true,
+        timeoutMilliseconds: 20_000,
+      })
+      const overlappingOutcomes = new Map(overlappingReport.result.assertions.map(
+        (assertion: { assertionId: string, outcome: string }) => [assertion.assertionId, assertion.outcome],
+      ))
+      expect(overlappingOutcomes.get('browser.accessibility.control-names-no-detected-violations')).toBe('fail')
+      expect(overlappingOutcomes.get('browser.accessibility.image-alternatives-no-detected-violations')).toBe('fail')
+    }
   })
 
   const chromiumPath = ['/usr/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'].find(existsSync)
   const chromiumIt = chromiumPath ? it : it.skip
+
+  chromiumIt('propagates relevant real Axe incomplete results as inconclusive', async () => {
+    const server = createServer((_request, response) => {
+      response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+      response.end(`<!doctype html>
+<html lang="de"><head><title>Unvollständiger Kontrastbefund</title></head>
+<body><main><h1>Testseite</h1>
+<p style="color:#777;background-image:linear-gradient(#fff,#000)">Nicht eindeutig automatisch auswertbar</p>
+</main></body></html>`)
+    })
+    const origin = await listen(server)
+    const result = await runBrowserCheck(origin, {
+      allowHttp: true,
+      allowPrivate: true,
+      chromiumPath,
+      maxPages: 1,
+      profiles: ['desktop'],
+      settleMilliseconds: 0,
+    }) as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
+      profiles: Array<{ accessibilityIncompleteRuleIds: string[] }>
+    }
+    const outcomes = new Map(result.assertions.map(assertion => [assertion.assertionId, assertion.outcome]))
+
+    expect(result.profiles[0]?.accessibilityIncompleteRuleIds).toContain('color-contrast')
+    expect(outcomes.get('browser.accessibility.text-contrast-no-detected-violations')).toBe('inconclusive')
+  }, 30_000)
+
+  chromiumIt('maps overlapping real Axe rules to both atomic accessibility assertions', async () => {
+    const pixel = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=='
+    const fixtures = [
+      {
+        body: `<img src="${pixel}" usemap="#map" alt="Navigation"><map name="map"><area shape="rect" coords="0,0,1,1" href="/target"></map>`,
+        ruleId: 'area-alt',
+      },
+      {
+        body: `<input type="image" src="${pixel}">`,
+        ruleId: 'input-image-alt',
+      },
+    ]
+
+    const results = await Promise.all(fixtures.map(async (fixture) => {
+      const server = createServer((_request, response) => {
+        response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+        response.end(`<!doctype html><html lang="de"><head><title>Überlappende Axe-Regel</title></head><body><main><h1>Testseite</h1>${fixture.body}</main></body></html>`)
+      })
+      const origin = await listen(server)
+      const result = await runBrowserCheck(origin, {
+        allowHttp: true,
+        allowPrivate: true,
+        chromiumPath,
+        maxPages: 1,
+        profiles: ['desktop'],
+        settleMilliseconds: 0,
+      }) as unknown as {
+        assertions: Array<{ assertionId: string, outcome: string }>
+        issues: Array<{ checklistIds: string[], code: string }>
+      }
+      return { fixture, result }
+    }))
+
+    for (const { fixture, result } of results) {
+      const outcomes = new Map(result.assertions.map(assertion => [assertion.assertionId, assertion.outcome]))
+      const issue = result.issues.find(entry => entry.code === `axe-${fixture.ruleId}`)
+
+      expect(outcomes.get('browser.accessibility.control-names-no-detected-violations')).toBe('fail')
+      expect(outcomes.get('browser.accessibility.image-alternatives-no-detected-violations')).toBe('fail')
+      expect(issue?.checklistIds).toEqual(expect.arrayContaining(['CORE-A11Y-03', 'CORE-A11Y-08']))
+    }
+  }, 30_000)
+
+  chromiumIt('derives the atomic accessibility assertions from real Axe findings', async () => {
+    const receivedMethods: string[] = []
+    const server = createServer((request, response) => {
+      receivedMethods.push(request.method || '')
+      response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+      response.end(`<!doctype html>
+<html lang="de"><head><title>Accessibility-Regelfamilien</title><style>a, a:hover, a:focus { color:#555; text-decoration:none; }</style></head>
+<body><main><h1>Testseite</h1>
+<button><span aria-hidden="true">×</span></button>
+<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==">
+<p style="color:#aaa;background:#fff">Zu geringer Kontrast</p>
+<p style="color:#000">Dies ist ein <a href="/target">nur farblich markierter Link</a> im längeren umgebenden Fließtext.</p>
+</main></body></html>`)
+    })
+    const origin = await listen(server)
+    const result = await runBrowserCheck(origin, {
+      allowHttp: true,
+      allowPrivate: true,
+      chromiumPath,
+      maxPages: 1,
+      profiles: ['desktop'],
+      settleMilliseconds: 0,
+    }) as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
+      issues: Array<{ checklistIds: string[], code: string }>
+    }
+    const issueCodes = result.issues.map(issue => issue.code)
+    const outcomes = new Map(result.assertions.map(assertion => [assertion.assertionId, assertion.outcome]))
+
+    expect(receivedMethods.every(method => method === 'GET')).toBe(true)
+    expect(issueCodes).toContain('axe-button-name')
+    expect(issueCodes).toContain('axe-image-alt')
+    expect(issueCodes).toContain('axe-color-contrast')
+    expect(issueCodes).toContain('axe-link-in-text-block')
+    expect(outcomes.get('browser.accessibility.control-names-no-detected-violations')).toBe('fail')
+    expect(outcomes.get('browser.accessibility.links-not-color-only-no-detected-violations')).toBe('fail')
+    expect(outcomes.get('browser.accessibility.image-alternatives-no-detected-violations')).toBe('fail')
+    expect(outcomes.get('browser.accessibility.text-contrast-no-detected-violations')).toBe('fail')
+    expect(result.issues.find(issue => issue.code === 'axe-button-name')?.checklistIds).toContain('CORE-A11Y-03')
+    expect(result.issues.find(issue => issue.code === 'axe-image-alt')?.checklistIds).toContain('CORE-A11Y-08')
+    expect(result.issues.find(issue => issue.code === 'axe-color-contrast')?.checklistIds).toContain('CORE-A11Y-09')
+  }, 30_000)
 
   chromiumIt('blocks side effects while inventorying external attempts, cookies and storage without values', async () => {
     const externalRequests: Array<{ method: string, url: string }> = []

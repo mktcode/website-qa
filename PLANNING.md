@@ -1,6 +1,6 @@
 # Website-QA: abgeschlossene Umsetzung und nächste Konsolidierungsphase
 
-> **Status:** Die Pilotreihe `0.2.0` bis `0.6.2` wurde mit `v1.0.0` in einen einzigen stabilen Berichtsvertrag, den begrenzten Basiskatalog `website-qa-baseline` 1.0.0 und allgemeine APIs überführt. v1.0.0 wurde lokal, als installierter Tarball, im ersten Nuxt-Verbraucher und anschließend in einem temporären zweiten Verbraucher gegen die öffentlich erreichbare WordPress-Version von `handpanzauber.de` geprüft. Die systematische Abdeckungsmatrix aller 215 Checklistenpunkte ist abgeschlossen; neue Assertions bleiben bis zur Einzelabnahme der begrenzten v1.1-Kandidaten zurückgestellt.
+> **Status:** Die Pilotreihe `0.2.0` bis `0.6.2` wurde mit `v1.0.0` in einen einzigen stabilen Berichtsvertrag, den begrenzten Basiskatalog `website-qa-baseline` 1.0.0 und allgemeine APIs überführt. v1.0.0 wurde lokal, als installierter Tarball, im ersten Nuxt-Verbraucher und anschließend in einem temporären zweiten Verbraucher gegen die öffentlich erreichbare WordPress-Version von `handpanzauber.de` geprüft. Die systematische Abdeckungsmatrix aller 215 Checklistenpunkte ist abgeschlossen; die erste begrenzte v1.1-Scheibe für drei Accessibility-Punkte ist implementiert, aber noch nicht veröffentlicht oder im Verbraucher geprüft.
 >
 > Dieses Dokument bewahrt Planung, Entscheidungen, Sicherheitsanforderungen und Abnahmekriterien des frameworkunabhängigen Refactorings von `@mktcode/website-qa`. Es enthält keine ausgefüllten Nachweise oder Vorgaben für eine bestimmte Website. Zukunftsformulierungen in den historischen Planungsabschnitten beschreiben den damaligen Implementierungsweg und keine noch offene Zusage.
 >
@@ -678,18 +678,18 @@ Releasecommit `cd105c834d2f27f4a065ed67aca6622b0d90ef22` und Tag `v1.0.0` wurden
 
 ### Phase J – Abdeckungsmatrix und begrenzte v1.1-Kandidaten
 
-**Status 27. August 2026: Klassifikation abgeschlossen, Umsetzung nicht begonnen.** Die vollständige Einzelmatrix liegt unter [`planning/website-coverage-matrix.json`](https://github.com/mktcode/website-qa/blob/main/planning/website-coverage-matrix.json); die [Kurzfassung](https://github.com/mktcode/website-qa/blob/main/planning/website-coverage-matrix.md) erläutert Ergebnis, Grenzen und Auswahlregeln.
+**Status 27. August 2026: Klassifikation abgeschlossen, erste Accessibility-Scheibe implementiert und noch unveröffentlicht.** Die vollständige Einzelmatrix liegt unter [`planning/website-coverage-matrix.json`](https://github.com/mktcode/website-qa/blob/main/planning/website-coverage-matrix.json); die [Kurzfassung](https://github.com/mktcode/website-qa/blob/main/planning/website-coverage-matrix.md) erläutert Ergebnis, Grenzen und Auswahlregeln.
 
 Alle 215 Punkte wurden genau einmal klassifiziert:
 
-- 31 besitzen bereits mindestens ein automatisches Kriterium im stabilen Basiskatalog;
-- 25 sind direkte GET-/Passivkandidaten für einen technischen Teilnachweis;
+- 34 besitzen bereits mindestens ein automatisches Kriterium im stabilen Basiskatalog;
+- 22 sind weitere direkte GET-/Passivkandidaten für einen technischen Teilnachweis;
 - 19 sind nur als technische Beobachtung ohne normative Gesamtbewertung geeignet;
 - 79 benötigen Projektquellcode, Build, Manifest oder projektspezifische Sollvorgaben;
 - 41 bleiben überwiegend manuell, extern oder administrativ;
 - 20 würden einen gesondert freizugebenden mutierenden, authentifizierten oder sensiblen Betriebsnachweis erfordern und bleiben außerhalb der Standardwerkzeuge.
 
-Von 44 möglichen neuen technischen Teilbeobachtungen wurden nur sechs zur v1.1-Einzelprüfung vorgemerkt: `CORE-DOM-06`, `CORE-SEO-03`, `CORE-ROB-03`, `CORE-A11Y-03`, `CORE-A11Y-08` und `CORE-A11Y-09`. Diese Auswahl bevorzugt vorhandene HTML-, Crawl-, Social-, Browser- und Axe-Daten und öffnet keine neue Zielklasse. Sie ist noch keine Implementierungszusage. Jeder Kandidat benötigt vor Umsetzung einen Kriterienentwurf, eine klare manuelle Restgrenze, Redaktionsprüfung, Abhängigkeitsregeln für `inconclusive` sowie Positiv-, Negativ-, Limit- und Nebenwirkungstests.
+Von ursprünglich 44 möglichen neuen technischen Teilbeobachtungen wurden nur sechs zur v1.1-Einzelprüfung vorgemerkt: `CORE-DOM-06`, `CORE-SEO-03`, `CORE-ROB-03`, `CORE-A11Y-03`, `CORE-A11Y-08` und `CORE-A11Y-09`. Die drei Accessibility-Punkte sind mit vier passiven Axe-Assertions und fünf ausdrücklich manuellen Restkriterien implementiert. Uneindeutige Regelauswertungen bleiben `inconclusive`; zusätzliche Requests, Klicks oder Zustandswechsel wurden nicht eingeführt. Die übrigen drei Kandidaten bleiben ohne Implementierungszusage.
 
 ### Unveränderte Grenzen
 

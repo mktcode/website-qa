@@ -2,7 +2,7 @@
   "catalog": {
     "id": "website-qa-baseline",
     "status": "stable",
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "generatedAt": "2026-08-24T12:30:00.000Z",
   "items": [
@@ -852,11 +852,131 @@
     {
       "criteria": [
         {
-          "id": "CORE-A11Y-10/C1",
+          "id": "CORE-A11Y-03/C1",
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
             "R000039"
+          ],
+          "statement": "Axe erkennt auf den geprüften Seiten-/Profil-Läufen keine Links, Schaltflächen oder vergleichbaren Bedienelemente ohne zugänglichen Namen.",
+          "requiredAssertionIds": [
+            "browser.accessibility.control-names-no-detected-violations"
+          ]
+        },
+        {
+          "id": "CORE-A11Y-03/C2",
+          "mode": "automatic",
+          "outcome": "pass",
+          "recordRefs": [
+            "R000040"
+          ],
+          "statement": "Axe erkennt im passiven Zustand keine Links, die sich vom umgebenden Text ausschließlich durch Farbe unterscheiden.",
+          "requiredAssertionIds": [
+            "browser.accessibility.links-not-color-only-no-detected-violations"
+          ]
+        },
+        {
+          "evidenceClass": "project-review",
+          "evidenceInstructions": "Links, Schaltflächen, reine Icons und ihre dynamischen Zustände im DOM und Accessibility Tree auf verständliche, kontextgerechte Namen prüfen; bloße technische Namenspräsenz genügt nicht.",
+          "id": "CORE-A11Y-03/C3",
+          "mode": "manual",
+          "outcome": "noEvidence",
+          "recordRefs": [],
+          "statement": "Die zugänglichen Namen sind im jeweiligen Kontext verständlich und bilden auch dynamische Zustände passend ab."
+        },
+        {
+          "evidenceClass": "project-review",
+          "evidenceInstructions": "Repräsentative Normal-, Fokus-, Hover-, Aktiv-, Fehler- und Erfolgszustände visuell sowie soweit erforderlich mit unterstützender Technik prüfen; der passive Axe-Teilnachweis deckt diese Zustände nicht vollständig ab.",
+          "id": "CORE-A11Y-03/C4",
+          "mode": "manual",
+          "outcome": "noEvidence",
+          "recordRefs": [],
+          "statement": "Zustände und Informationen werden auch außerhalb der automatisiert erkannten Linkfälle nicht ausschließlich über Farbe vermittelt."
+        }
+      ],
+      "evidenceOutcome": "partial",
+      "id": "CORE-A11Y-03",
+      "module": "core",
+      "projectStatus": "partial",
+      "statement": "Links, Schaltflächen und reine Icons besitzen verständliche zugängliche Namen; Zustände und Informationen werden nicht ausschließlich über Farbe vermittelt."
+    },
+    {
+      "criteria": [
+        {
+          "id": "CORE-A11Y-08/C1",
+          "mode": "automatic",
+          "outcome": "pass",
+          "recordRefs": [
+            "R000041"
+          ],
+          "statement": "Axe erkennt auf den geprüften Seiten-/Profil-Läufen keine technisch fehlenden Textalternativen für Bilder, Bildobjekte oder als Bild ausgezeichnete Elemente.",
+          "requiredAssertionIds": [
+            "browser.accessibility.image-alternatives-no-detected-violations"
+          ]
+        },
+        {
+          "evidenceClass": "project-review",
+          "evidenceInstructions": "Bedeutungstragende Bilder auf repräsentativen Seitentypen gegen sichtbaren Inhalt, Funktion und Kontext prüfen; vorhandene oder technisch akzeptierte Alternativtexte nicht automatisch als inhaltlich geeignet behandeln.",
+          "id": "CORE-A11Y-08/C2",
+          "mode": "manual",
+          "outcome": "noEvidence",
+          "recordRefs": [],
+          "statement": "Alternativtexte bedeutungstragender Bilder sind im jeweiligen Seitenkontext redaktionell passend."
+        },
+        {
+          "evidenceClass": "project-review",
+          "evidenceInstructions": "Dekorative Absicht fachlich bestätigen und DOM sowie Accessibility Tree einschließlich CSS-Hintergründen stichprobenartig prüfen; ein leerer Alternativtext allein beweist die dekorative Funktion nicht.",
+          "id": "CORE-A11Y-08/C3",
+          "mode": "manual",
+          "outcome": "noEvidence",
+          "recordRefs": [],
+          "statement": "Dekorative Bilder und Hintergründe sind entsprechend ihrer redaktionell bestätigten Funktion vor assistiver Ausgabe verborgen."
+        }
+      ],
+      "evidenceOutcome": "partial",
+      "id": "CORE-A11Y-08",
+      "module": "core",
+      "projectStatus": "partial",
+      "statement": "Bilder besitzen redaktionell passende Alternativtexte; dekorative Bilder und Hintergründe werden nicht unnötig vorgelesen."
+    },
+    {
+      "criteria": [
+        {
+          "id": "CORE-A11Y-09/C1",
+          "mode": "automatic",
+          "outcome": "pass",
+          "recordRefs": [
+            "R000042"
+          ],
+          "statement": "Axe erkennt im passiven Zustand der geprüften Seiten-/Profil-Läufe keine Textkontrastverstöße unter den geprüften WCAG-AA-Schwellenwerten.",
+          "requiredAssertionIds": [
+            "browser.accessibility.text-contrast-no-detected-violations"
+          ]
+        },
+        {
+          "evidenceClass": "project-review",
+          "evidenceInstructions": "Repräsentative Bedienelemente und Zustände einschließlich sichtbarer Fokusanzeige in realen Browsern prüfen; der passive Textkontrastbefund ersetzt weder Zustandswechsel noch bildbasierte oder manuell zu bewertende Sonderfälle.",
+          "id": "CORE-A11Y-09/C2",
+          "mode": "manual",
+          "outcome": "noEvidence",
+          "recordRefs": [],
+          "statement": "Bedienelemente, Fokus sowie wichtige Hover-, Aktiv-, Fehler-, Erfolgs- und dynamische Zustände besitzen ausreichenden Kontrast."
+        }
+      ],
+      "evidenceOutcome": "partial",
+      "id": "CORE-A11Y-09",
+      "module": "core",
+      "projectStatus": "partial",
+      "statement": "Text, Bedienelemente, Fokus und wichtige Zustände besitzen ausreichenden Kontrast."
+    },
+    {
+      "criteria": [
+        {
+          "id": "CORE-A11Y-10/C1",
+          "mode": "automatic",
+          "outcome": "pass",
+          "recordRefs": [
+            "R000043"
           ],
           "statement": "Die technischen 320-Pixel- und 200-%-Näherungsprofile erkennen auf den geprüften Seiten keinen horizontalen Dokumentüberlauf.",
           "requiredAssertionIds": [
@@ -886,7 +1006,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000040"
+            "R000044"
           ],
           "statement": "Der Axe-Audit wurde auf allen vorgesehenen Seiten-/Profil-Läufen ausgeführt und hat keine automatisiert erkennbaren Verstöße gemeldet.",
           "requiredAssertionIds": [
@@ -934,7 +1054,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000041"
+            "R000045"
           ],
           "statement": "Der technische Browserbericht dokumentiert Chromium-Version und ausgeführte Headless-Emulationsprofile.",
           "requiredAssertionIds": [
@@ -996,7 +1116,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000042"
+            "R000046"
           ],
           "statement": "In den automatisch geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet.",
           "requiredAssertionIds": [
@@ -1146,7 +1266,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000043"
+            "R000047"
           ],
           "statement": "Externe Requestversuche wurden innerhalb der deklarierten passiven und isolierten Browserprüfumgebung vollständig inventarisiert und weiterhin blockiert.",
           "requiredAssertionIds": [
@@ -1176,7 +1296,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000044"
+            "R000048"
           ],
           "statement": "Cookies, Local Storage, Session Storage und IndexedDB wurden im passiven Initialzustand frischer isolierter Browserkontexte ohne Speicherung ihrer Werte vollständig inventarisiert.",
           "requiredAssertionIds": [
@@ -1259,7 +1379,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000045",
+            "R000049",
             "R000011"
           ],
           "statement": "Content-Security-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
@@ -1273,7 +1393,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000045",
+            "R000049",
             "R000012"
           ],
           "statement": "CSP frame-ancestors oder X-Frame-Options begrenzt Framing auf den ausgewählten dokumentartigen Antworten.",
@@ -1301,7 +1421,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000045",
+            "R000049",
             "R000014"
           ],
           "statement": "Referrer-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
@@ -1315,7 +1435,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000045",
+            "R000049",
             "R000015"
           ],
           "statement": "Permissions-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
@@ -1365,7 +1485,7 @@
           "mode": "external",
           "outcome": "pass",
           "recordRefs": [
-            "R000046"
+            "R000050"
           ],
           "statement": "Die zuständige Stelle hat die Nutzungs- und Veröffentlichungsrechte der eingesetzten Materialien bestätigt oder dokumentiert."
         }
@@ -2226,6 +2346,122 @@
     {
       "id": "R000039",
       "record": {
+        "assertionId": "browser.accessibility.control-names-no-detected-violations",
+        "assertionVersion": 1,
+        "outcome": "pass",
+        "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine fehlenden zugänglichen Namen für Links und Schaltflächen erkannt.",
+        "subject": {
+          "url": "https://example.com/",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "deploymentId": "DEPLOYMENT-ARTEFAKT",
+          "environment": "production",
+          "sourceRevision": "PROJEKT-COMMIT",
+          "tool": "browser-check"
+        },
+        "tool": "browser-check"
+      },
+      "type": "assertion"
+    },
+    {
+      "id": "R000040",
+      "record": {
+        "assertionId": "browser.accessibility.links-not-color-only-no-detected-violations",
+        "assertionVersion": 1,
+        "outcome": "pass",
+        "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine ausschließlich durch Farbe unterscheidbaren Links erkannt.",
+        "subject": {
+          "url": "https://example.com/",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "deploymentId": "DEPLOYMENT-ARTEFAKT",
+          "environment": "production",
+          "sourceRevision": "PROJEKT-COMMIT",
+          "tool": "browser-check"
+        },
+        "tool": "browser-check"
+      },
+      "type": "assertion"
+    },
+    {
+      "id": "R000041",
+      "record": {
+        "assertionId": "browser.accessibility.image-alternatives-no-detected-violations",
+        "assertionVersion": 1,
+        "outcome": "pass",
+        "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine technisch fehlenden Bildalternativen erkannt.",
+        "subject": {
+          "url": "https://example.com/",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "deploymentId": "DEPLOYMENT-ARTEFAKT",
+          "environment": "production",
+          "sourceRevision": "PROJEKT-COMMIT",
+          "tool": "browser-check"
+        },
+        "tool": "browser-check"
+      },
+      "type": "assertion"
+    },
+    {
+      "id": "R000042",
+      "record": {
+        "assertionId": "browser.accessibility.text-contrast-no-detected-violations",
+        "assertionVersion": 1,
+        "outcome": "pass",
+        "message": "Axe hat im passiven Zustand der geprüften Seiten-/Profil-Läufe keine Textkontrastverstöße erkannt.",
+        "subject": {
+          "url": "https://example.com/",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "deploymentId": "DEPLOYMENT-ARTEFAKT",
+          "environment": "production",
+          "sourceRevision": "PROJEKT-COMMIT",
+          "tool": "browser-check"
+        },
+        "tool": "browser-check"
+      },
+      "type": "assertion"
+    },
+    {
+      "id": "R000043",
+      "record": {
         "assertionId": "browser.viewport.narrow-zoom-no-horizontal-overflow",
         "assertionVersion": 1,
         "outcome": "pass",
@@ -2253,7 +2489,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000040",
+      "id": "R000044",
       "record": {
         "assertionId": "browser.accessibility.axe-no-detected-violations",
         "assertionVersion": 1,
@@ -2282,7 +2518,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000041",
+      "id": "R000045",
       "record": {
         "assertionId": "browser.context.chromium-headless-recorded",
         "assertionVersion": 1,
@@ -2311,7 +2547,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000042",
+      "id": "R000046",
       "record": {
         "assertionId": "browser.runtime.no-observed-errors",
         "assertionVersion": 1,
@@ -2340,7 +2576,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000043",
+      "id": "R000047",
       "record": {
         "assertionId": "browser.privacy.external-request-observation-complete",
         "assertionVersion": 1,
@@ -2372,7 +2608,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000044",
+      "id": "R000048",
       "record": {
         "assertionId": "browser.privacy.initial-storage-observation-complete",
         "assertionVersion": 1,
@@ -2408,7 +2644,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000045",
+      "id": "R000049",
       "record": {
         "assertionId": "http.security.document-response-coverage-complete",
         "assertionVersion": 1,
@@ -2436,7 +2672,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000046",
+      "id": "R000050",
       "record": {
         "criterionId": "GOV-RGT-02/C1",
         "outcome": "pass",
@@ -2472,6 +2708,9 @@
       "CORE-MAP-02",
       "CORE-SEO-04",
       "CORE-A11Y-01",
+      "CORE-A11Y-03",
+      "CORE-A11Y-08",
+      "CORE-A11Y-09",
       "CORE-A11Y-10",
       "CORE-A11Y-13",
       "CORE-QA-02",
@@ -2493,32 +2732,32 @@
   },
   "summary": {
     "automaticCriteria": {
-      "pass": 46,
+      "pass": 50,
       "fail": 0,
       "inconclusive": 0,
       "notApplicable": 0,
       "noEvidence": 11,
-      "total": 57
+      "total": 61
     },
     "checklistItems": {
       "complete": 3,
       "failed": 0,
-      "partial": 25,
+      "partial": 28,
       "open": 5,
       "inconclusive": 0,
       "notApplicable": 0,
       "external": 1,
       "deferred": 0,
       "acceptedDeviation": 0,
-      "total": 34
+      "total": 37
     },
     "nonAutomaticCriteria": {
       "pass": 1,
       "fail": 0,
       "inconclusive": 0,
       "notApplicable": 0,
-      "noEvidence": 35,
-      "total": 36
+      "noEvidence": 40,
+      "total": 41
     }
   },
   "technicalRuns": [
@@ -2545,7 +2784,7 @@
       "tool": "http-check",
       "toolPackage": {
         "name": "@mktcode/website-qa",
-        "version": "1.0.0"
+        "version": "1.1.0"
       },
       "usedForEvaluation": true
     },
@@ -2576,12 +2815,12 @@
       "tool": "crawl-check",
       "toolPackage": {
         "name": "@mktcode/website-qa",
-        "version": "1.0.0"
+        "version": "1.1.0"
       },
       "usedForEvaluation": true
     },
     {
-      "assertionCount": 7,
+      "assertionCount": 11,
       "command": "website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json",
       "contextProvenance": {
         "deploymentId": "projectDeclared",
@@ -2605,7 +2844,7 @@
       "tool": "browser-check",
       "toolPackage": {
         "name": "@mktcode/website-qa",
-        "version": "1.0.0"
+        "version": "1.1.0"
       },
       "usedForEvaluation": true
     },
@@ -2632,7 +2871,7 @@
       "tool": "social-preview-check",
       "toolPackage": {
         "name": "@mktcode/website-qa",
-        "version": "1.0.0"
+        "version": "1.1.0"
       },
       "usedForEvaluation": true
     }

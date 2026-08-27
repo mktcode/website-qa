@@ -2,6 +2,12 @@
 
 Dieses Changelog dokumentiert veröffentlichte Paketstände von `@mktcode/website-qa`. Planungs- und reine Dokumentationscommits ohne Paketveröffentlichung erscheinen nicht als eigene Version.
 
+## Unveröffentlicht
+
+- Basiskatalog 1.1.0 um `CORE-A11Y-03`, `CORE-A11Y-08` und `CORE-A11Y-09` mit neun getrennten automatischen und manuellen Kriterien erweitert.
+- Vier passive Axe-Assertions für zugängliche Namen, farbunabhängige Linkerkennung, technische Bildalternativen und Textkontrast ergänzt.
+- Uneindeutige Axe-Auswertungen der neuen Regelfamilien werden als `inconclusive` behandelt; GET-only-, Browserinteraktions- und Redaktionsgrenzen bleiben unverändert.
+
 ## 1.0.0 – 2026-08-27
 
 - Bewussten inkompatiblen 1.0-Vertragsschnitt umgesetzt.

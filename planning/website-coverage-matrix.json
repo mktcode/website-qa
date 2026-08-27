@@ -5,7 +5,7 @@
   "checklistRevision": "cd105c834d2f27f4a065ed67aca6622b0d90ef22",
   "catalogReference": {
     "id": "website-qa-baseline",
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "scope": {
     "sources": [
@@ -41,27 +41,27 @@
   },
   "summary": {
     "total": 215,
-    "existingCatalogItems": 34,
+    "existingCatalogItems": 37,
     "byClassification": {
-      "existing-baseline": 31,
-      "direct-get-candidate": 25,
+      "existing-baseline": 34,
+      "direct-get-candidate": 22,
       "observation-candidate": 19,
       "project-local-or-manifest": 79,
       "manual-external-administrative": 41,
       "unsafe-or-mutating": 20
     },
     "byCandidatePriority": {
-      "high": 17,
+      "high": 14,
       "medium": 23,
       "low": 4,
-      "none": 171
+      "none": 174
     },
     "byModule": {
       "core": {
         "total": 98,
         "byClassification": {
-          "existing-baseline": 31,
-          "direct-get-candidate": 14,
+          "existing-baseline": 34,
+          "direct-get-candidate": 11,
           "observation-candidate": 7,
           "project-local-or-manifest": 27,
           "manual-external-administrative": 15,
@@ -174,7 +174,7 @@
     },
     {
       "id": "CORE-A11Y-03",
-      "stage": "v1.1-evaluate",
+      "stage": "v1.1-implemented-unreleased",
       "proposedEvidence": "Bereits ausgeführte Axe-/DOM-Befunde zu fehlenden zugänglichen Namen als eigene atomare Assertionfamilie zuordnen.",
       "requestImpact": "Vorhandene Browserprofile und Axe-Ausführung wiederverwenden.",
       "manualRemainder": "Verständlichkeit der Namen, dynamische Zustände und ausschließlich visuell vermittelte Bedeutung.",
@@ -182,7 +182,7 @@
     },
     {
       "id": "CORE-A11Y-08",
-      "stage": "v1.1-evaluate",
+      "stage": "v1.1-implemented-unreleased",
       "proposedEvidence": "Bereits beobachtete Axe-/DOM-Befunde zu fehlenden Bildalternativen und technischer Dekorativauszeichnung atomar zuordnen.",
       "requestImpact": "Vorhandene HTML- und Browserbeobachtungen wiederverwenden.",
       "manualRemainder": "Inhaltliche und kontextuelle Eignung des Alternativtexts sowie dekorative Absicht.",
@@ -190,7 +190,7 @@
     },
     {
       "id": "CORE-A11Y-09",
-      "stage": "v1.1-evaluate",
+      "stage": "v1.1-implemented-unreleased",
       "proposedEvidence": "Bereits vorhandene Axe-Kontrastbefunde als eigene atomare Assertionfamilie zuordnen.",
       "requestImpact": "Vorhandene Browserprofile und Axe-Ausführung wiederverwenden.",
       "manualRemainder": "Fokus-, Hover-, Aktiv- und dynamische Zustände sowie bildbasierte Sonderfälle.",
@@ -675,14 +675,14 @@
       "id": "CORE-A11Y-03",
       "source": "docs/checklisten/website/kern.md",
       "module": "core",
-      "classification": "direct-get-candidate",
-      "existingCatalog": false,
+      "classification": "existing-baseline",
+      "existingCatalog": true,
       "contextNeeds": [
         "browser-passive",
         "human-review"
       ],
-      "v1_1Priority": "high",
-      "rationale": "Accessibility-Tree- und Axe-Beobachtungen können fehlende zugängliche Namen und mehrere maschinell erkennbare Farbabhängigkeiten technisch nachweisen. Verständlichkeit, alle Zustände und rein visuelle Bedeutungen bleiben manuell."
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft automatisch erkennbare fehlende Namen sowie ausschließlich farblich unterscheidbare Links. Verständlichkeit, dynamische Zustände und weitere rein visuelle Bedeutungen bleiben manuell."
     },
     {
       "id": "CORE-A11Y-04",
@@ -741,28 +741,28 @@
       "id": "CORE-A11Y-08",
       "source": "docs/checklisten/website/kern.md",
       "module": "core",
-      "classification": "direct-get-candidate",
-      "existingCatalog": false,
+      "classification": "existing-baseline",
+      "existingCatalog": true,
       "contextNeeds": [
         "url-get",
         "browser-passive",
         "human-review"
       ],
-      "v1_1Priority": "high",
-      "rationale": "HTML- und Accessibility-Tree-Prüfung kann fehlende, leere oder widersprüchlich ausgezeichnete Alternativtexte sowie dekorative ARIA-Muster technisch bewerten. Redaktionelle Passung des Alternativtexts bleibt manuell."
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft technisch fehlende Bildalternativen automatisch. Redaktionelle Eignung, dekorative Absicht und CSS-Hintergründe bleiben manuell."
     },
     {
       "id": "CORE-A11Y-09",
       "source": "docs/checklisten/website/kern.md",
       "module": "core",
-      "classification": "direct-get-candidate",
-      "existingCatalog": false,
+      "classification": "existing-baseline",
+      "existingCatalog": true,
       "contextNeeds": [
         "browser-passive",
         "human-review"
       ],
-      "v1_1Priority": "high",
-      "rationale": "Axe und berechnete Styles können viele Kontrastverstöße im passiven Zustand normativ prüfen. Fokus-, Hover-, aktive und dynamisch erzeugte Zustände sowie bildbasierte Sonderfälle bleiben manuell."
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft passiv erkennbare Textkontrastverstöße automatisch. Fokus-, Hover-, Aktiv- und dynamische Zustände sowie bildbasierte Sonderfälle bleiben manuell."
     },
     {
       "id": "CORE-A11Y-10",

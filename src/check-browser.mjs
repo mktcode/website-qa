@@ -203,6 +203,28 @@ function addIssue(result, severity, code, message, checklistIds, url, profile) {
   result.issues.push(issue)
 }
 
+const axeRuleGroups = {
+  controlNames: new Set([
+    'area-alt',
+    'aria-command-name',
+    'button-name',
+    'input-button-name',
+    'input-image-alt',
+    'link-name',
+    'summary-name',
+  ]),
+  imageAlternatives: new Set([
+    'area-alt',
+    'image-alt',
+    'input-image-alt',
+    'object-alt',
+    'role-img-alt',
+    'svg-img-alt',
+  ]),
+  linkColorIndependence: new Set(['link-in-text-block']),
+  textContrast: new Set(['color-contrast']),
+}
+
 const incompleteBrowserIssueCodes = new Set([
   'beacon-blocked',
   'browser-action-blocked',
@@ -241,6 +263,34 @@ function browserAssertionOutcome(result, failure) {
     return 'inconclusive'
   }
   return 'pass'
+}
+
+function axeRuleOutcome(result, ruleIds) {
+  const outcome = browserAssertionOutcome(
+    result,
+    issue => issue.code.startsWith('axe-') && ruleIds.has(issue.code.slice(4)),
+  )
+  if (outcome !== 'pass') {
+    return outcome
+  }
+  const auditIncomplete = result.issues.some(issue => issue.code === 'axe-runtime')
+    || result.profiles.some(profile => !Array.isArray(profile.accessibilityIncompleteRuleIds)
+      || profile.accessibilityIncompleteRuleIds.some(ruleId => ruleIds.has(ruleId)))
+  return auditIncomplete ? 'inconclusive' : 'pass'
+}
+
+function axeViolationChecklistIds(ruleId) {
+  const checklistIds = ['CORE-A11Y-01', 'CORE-A11Y-13']
+  if (axeRuleGroups.controlNames.has(ruleId) || axeRuleGroups.linkColorIndependence.has(ruleId)) {
+    checklistIds.push('CORE-A11Y-03')
+  }
+  if (axeRuleGroups.imageAlternatives.has(ruleId)) {
+    checklistIds.push('CORE-A11Y-08')
+  }
+  if (axeRuleGroups.textContrast.has(ruleId)) {
+    checklistIds.push('CORE-A11Y-09')
+  }
+  return checklistIds
 }
 
 function profilesCoverEveryPage(result, requiredProfiles) {
@@ -405,6 +455,34 @@ function createBrowserAssertions(result) {
     fail: 'Der automatisierte Axe-Audit hat mindestens einen Verstoß auf einer geprüften Seite erkannt.',
     inconclusive: 'Der Axe-Audit konnte nicht für alle vorgesehenen Seiten-/Profil-Läufe belastbar ausgewertet werden.',
     pass: 'Der automatisierte Axe-Audit hat auf den geprüften Seiten-/Profil-Läufen keine Verstöße erkannt.',
+  }[outcome])
+
+  outcome = axeRuleOutcome(result, axeRuleGroups.controlNames)
+  add('browser.accessibility.control-names-no-detected-violations', outcome, {
+    fail: 'Axe hat mindestens einen Link, eine Schaltfläche oder ein vergleichbares Bedienelement ohne zugänglichen Namen erkannt.',
+    inconclusive: 'Die passive Prüfung zugänglicher Namen war nicht für alle Seiten-/Profil-Läufe eindeutig auswertbar.',
+    pass: 'Axe hat auf den geprüften Seiten-/Profil-Läufen keine fehlenden zugänglichen Namen für Links und Schaltflächen erkannt.',
+  }[outcome])
+
+  outcome = axeRuleOutcome(result, axeRuleGroups.linkColorIndependence)
+  add('browser.accessibility.links-not-color-only-no-detected-violations', outcome, {
+    fail: 'Axe hat mindestens einen Link erkannt, der sich im passiven Zustand nur durch Farbe vom umgebenden Text unterscheidet.',
+    inconclusive: 'Die passive Prüfung farbunabhängiger Linkerkennung war nicht für alle Seiten-/Profil-Läufe eindeutig auswertbar.',
+    pass: 'Axe hat auf den geprüften Seiten-/Profil-Läufen keine ausschließlich durch Farbe unterscheidbaren Links erkannt.',
+  }[outcome])
+
+  outcome = axeRuleOutcome(result, axeRuleGroups.imageAlternatives)
+  add('browser.accessibility.image-alternatives-no-detected-violations', outcome, {
+    fail: 'Axe hat mindestens ein Bild, Bildobjekt oder als Bild ausgezeichnetes Element ohne technische Textalternative erkannt.',
+    inconclusive: 'Die passive Prüfung technischer Bildalternativen war nicht für alle Seiten-/Profil-Läufe eindeutig auswertbar.',
+    pass: 'Axe hat auf den geprüften Seiten-/Profil-Läufen keine technisch fehlenden Bildalternativen erkannt.',
+  }[outcome])
+
+  outcome = axeRuleOutcome(result, axeRuleGroups.textContrast)
+  add('browser.accessibility.text-contrast-no-detected-violations', outcome, {
+    fail: 'Axe hat mindestens einen Textkontrast unter den geprüften WCAG-AA-Schwellenwerten erkannt.',
+    inconclusive: 'Die passive Textkontrastprüfung war nicht für alle Seiten-/Profil-Läufe eindeutig auswertbar.',
+    pass: 'Axe hat im passiven Zustand der geprüften Seiten-/Profil-Läufe keine Textkontrastverstöße erkannt.',
   }[outcome])
 
   const browserContextRecorded = result.profiles.length > 0
@@ -631,17 +709,20 @@ async function accessibilityAudit(page) {
   await page.evaluate(axe.source)
   return page.evaluate(async () => {
     const report = await globalThis.axe.run(document, {
-      resultTypes: ['violations'],
+      resultTypes: ['incomplete', 'violations'],
       runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'] },
     })
-    return report.violations.map(violation => ({
-      help: violation.help,
-      helpUrl: violation.helpUrl,
-      id: violation.id,
-      impact: violation.impact,
-      nodes: violation.nodes.slice(0, 20).map(node => ({ target: node.target })),
-      tags: violation.tags,
-    }))
+    return {
+      incompleteRuleIds: report.incomplete.map(result => result.id),
+      violations: report.violations.map(violation => ({
+        help: violation.help,
+        helpUrl: violation.helpUrl,
+        id: violation.id,
+        impact: violation.impact,
+        nodes: violation.nodes.slice(0, 20).map(node => ({ target: node.target })),
+        tags: violation.tags,
+      })),
+    }
   })
 }
 
@@ -673,7 +754,7 @@ function recordFactsIssues(result, url, profile, facts, violations, privacyObser
   }
   for (const violation of violations) {
     const severity = ['critical', 'serious'].includes(violation.impact) ? 'error' : 'warning'
-    addIssue(result, severity, `axe-${violation.id}`, `${violation.help} (${violation.nodes.length} Fundstelle(n)).`, ['CORE-A11Y-01', 'CORE-A11Y-13'], url, profile)
+    addIssue(result, severity, `axe-${violation.id}`, `${violation.help} (${violation.nodes.length} Fundstelle(n)).`, axeViolationChecklistIds(violation.id), url, profile)
   }
 }
 
@@ -845,9 +926,12 @@ async function inspectProfile(browser, result, options, url, profileName, discov
     const facts = await pageFacts(page)
     facts.storage.localStorage = facts.storage.localStorage.map(identifier => redactText(identifier, 200))
     facts.storage.sessionStorage = facts.storage.sessionStorage.map(identifier => redactText(identifier, 200))
+    let accessibilityIncompleteRuleIds = []
     let violations = []
     try {
-      violations = await accessibilityAudit(page)
+      const audit = await accessibilityAudit(page)
+      accessibilityIncompleteRuleIds = audit.incompleteRuleIds
+      violations = audit.violations
     }
     catch (error) {
       addIssue(result, 'error', 'axe-runtime', `Accessibility-Audit fehlgeschlagen: ${redactText(error.message)}`, ['CORE-A11Y-13'], url, profileName)
@@ -923,6 +1007,7 @@ async function inspectProfile(browser, result, options, url, profileName, discov
 
     recordFactsIssues(result, url, profileName, facts, violations, privacyObservation)
     result.profiles.push({
+      accessibilityIncompleteRuleIds,
       accessibilityViolations: violations,
       blockedActions,
       consoleMessages,

@@ -41,7 +41,7 @@ function technicalReport(assertions: ReturnType<typeof assertion>[]) {
 
 function projectConfig() {
   return {
-    catalog: { id: 'website-qa-baseline', version: '1.0.0' },
+    catalog: { id: 'website-qa-baseline', version: '1.1.0' },
     itemStates: [],
     project: {
       deploymentId: 'deployment-1',
@@ -90,8 +90,8 @@ describe('project report', () => {
 
     expect(report.summary.checklistItems).toMatchObject({
       complete: 1,
-      open: 31,
-      total: 33,
+      open: 34,
+      total: 36,
     })
     expect(report.items.find((item: { id: string }) => item.id === 'CORE-ERR-02')).toMatchObject({
       evidenceOutcome: 'pass',
@@ -109,6 +109,10 @@ describe('project report', () => {
       'browser.document.main-landmark-single',
       'browser.viewport.narrow-zoom-no-horizontal-overflow',
       'browser.accessibility.axe-no-detected-violations',
+      'browser.accessibility.control-names-no-detected-violations',
+      'browser.accessibility.links-not-color-only-no-detected-violations',
+      'browser.accessibility.image-alternatives-no-detected-violations',
+      'browser.accessibility.text-contrast-no-detected-violations',
       'browser.context.chromium-headless-recorded',
       'browser.runtime.no-observed-errors',
       'browser.privacy.external-request-observation-complete',
@@ -124,12 +128,12 @@ describe('project report', () => {
       }],
     })
 
-    expect(report.summary.checklistItems).toMatchObject({ open: 26, partial: 7, total: 33 })
+    expect(report.summary.checklistItems).toMatchObject({ open: 26, partial: 10, total: 36 })
     expect(report.items.find((item: { id: string }) => item.id === 'CORE-A11Y-13')).toMatchObject({
       evidenceOutcome: 'partial',
       projectStatus: 'partial',
     })
-    expect(report.technicalRuns[0]).toMatchObject({ assertionCount: 7, tool: 'browser-check', usedForEvaluation: true })
+    expect(report.technicalRuns[0]).toMatchObject({ assertionCount: 11, tool: 'browser-check', usedForEvaluation: true })
   })
 
   it('includes communication evidence and explicit external workflow states', () => {
@@ -146,7 +150,7 @@ describe('project report', () => {
     const report = createProjectReport({
       config,
       evidenceDocument: {
-        catalog: { id: 'website-qa-baseline', version: '1.0.0' },
+        catalog: { id: 'website-qa-baseline', version: '1.1.0' },
         evidence: [{
           checkedAt: '2026-08-24',
           checkedBy: 'inhaltlich verantwortliche Stelle',
@@ -165,7 +169,7 @@ describe('project report', () => {
     expect(report.items.find((item: { id: string }) => item.id === 'CORE-DOM-04')).toMatchObject({
       projectStatus: 'external',
     })
-    expect(report.summary.checklistItems).toMatchObject({ complete: 2, external: 1, open: 30, total: 34 })
+    expect(report.summary.checklistItems).toMatchObject({ complete: 2, external: 1, open: 33, total: 37 })
   })
 
   it('binds query targets without retaining their values', () => {
@@ -280,7 +284,7 @@ describe('project report', () => {
 
     expect(markdown).toContain('# Website-QA-Zusammenfassung: &lt;script&gt;\\[Projekt\\]&lt;/script&gt;')
     expect(markdown).toContain('| Öffentlich freigegebene URL | https://example.com/ |')
-    expect(markdown).toContain('| http-check | 1.0.0 | ja | 2 |')
+    expect(markdown).toContain('| http-check | 1.1.0 | ja | 2 |')
     expect(markdown).toContain('CORE-DOM-04')
     expect(markdown).not.toContain('Vertraulicher Kundenname')
     expect(markdown).not.toContain('top-secret')
@@ -369,7 +373,7 @@ describe('project report', () => {
     expect(() => createProjectReport({
       config: projectConfig(),
       evidenceDocument: {
-        catalog: { id: 'website-qa-baseline', version: '1.0.0' },
+        catalog: { id: 'website-qa-baseline', version: '1.1.0' },
         evidence: [{
           checkedAt: '2026-02-30',
           checkedBy: 'Prüfstelle',
@@ -439,7 +443,7 @@ describe('project report', () => {
     const report = createProjectReport({
       config: projectConfig(),
       evidenceDocument: {
-        catalog: { id: 'website-qa-baseline', version: '1.0.0' },
+        catalog: { id: 'website-qa-baseline', version: '1.1.0' },
         evidence: [{
           checkedAt: '2026-08-26',
           checkedBy: 'PRIVATE-PERSON',
@@ -467,7 +471,7 @@ describe('project report', () => {
     const report = createProjectReport({
       config: projectConfig(),
       evidenceDocument: {
-        catalog: { id: 'website-qa-baseline', version: '1.0.0' },
+        catalog: { id: 'website-qa-baseline', version: '1.1.0' },
         evidence: [{
           checkedAt: '2026-08-26',
           checkedBy: 'technisch verantwortliche Stelle',
@@ -493,8 +497,8 @@ describe('project report', () => {
     const fullMarkdown = renderProjectReportMarkdown(report)
     const summaryMarkdown = renderProjectSummaryMarkdown(report)
 
-    const automaticSummary = 'Automatische Kriterien (57 gesamt): 1 bestanden, 0 fehlgeschlagen, 0 unklar, 0 nicht zutreffend, 56 ohne Nachweis.'
-    const nonAutomaticSummary = 'Nicht automatische Kriterien (35 gesamt): 1 belegt, 0 fehlgeschlagen, 0 unklar, 1 nicht zutreffend, 33 ohne Nachweis.'
+    const automaticSummary = 'Automatische Kriterien (61 gesamt): 1 bestanden, 0 fehlgeschlagen, 0 unklar, 0 nicht zutreffend, 60 ohne Nachweis.'
+    const nonAutomaticSummary = 'Nicht automatische Kriterien (40 gesamt): 1 belegt, 0 fehlgeschlagen, 0 unklar, 1 nicht zutreffend, 38 ohne Nachweis.'
     expect(fullMarkdown).toContain(automaticSummary)
     expect(fullMarkdown).toContain(nonAutomaticSummary)
     expect(summaryMarkdown).toContain(automaticSummary)
@@ -538,7 +542,7 @@ describe('project report', () => {
     const report = createProjectReport({
       config,
       evidenceDocument: {
-        catalog: { id: 'website-qa-baseline', version: '1.0.0' },
+        catalog: { id: 'website-qa-baseline', version: '1.1.0' },
         evidence: [{
           checkedAt: '2026-08-26',
           checkedBy: 'verantwortliche Stelle',

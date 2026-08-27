@@ -46,7 +46,7 @@ Verbraucher wählen nach `tool` und `schemaVersion` und erraten keine Schemavers
 
 Eine Assertion wird durch `assertionId` und `assertionVersion` identifiziert. `message` und `subject` sind redigierte Befunddetails und keine stabilen Vergleichswerte. Eine fachlich geänderte Aussage erhöht die Assertionversion; eine bestehende ID wird nicht mit neuer Bedeutung wiederverwendet.
 
-Der ausgelieferte Katalog heißt `website-qa-baseline`, besitzt Version `1.0.0` und Status `stable`. Stabil sind seine IDs, Bedeutungen und Versionsregeln, nicht eine vollständige Abdeckung der allgemeinen Markdowncheckliste. Der Basiskatalog ist weder vollständige Website-Checkliste noch WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe. Alte technische Berichte mit einer anderen Katalogkennung werden nicht automatisch zugerechnet.
+Der ausgelieferte Katalog heißt `website-qa-baseline`, besitzt Version `1.1.0` und Status `stable`. Stabil sind seine IDs, Bedeutungen und Versionsregeln, nicht eine vollständige Abdeckung der allgemeinen Markdowncheckliste. Der Basiskatalog ist weder vollständige Website-Checkliste noch WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe. Technische Berichte mit einer anderen Katalogversion werden nicht automatisch zugerechnet; für 1.1 müssen alle in der Projektkonfiguration verwendeten technischen Berichte neu erzeugt werden.
 
 Die stabile Checklist-API unter `@mktcode/website-qa/checklist` exportiert:
 

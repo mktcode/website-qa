@@ -1,9 +1,9 @@
 # Stabiler strukturierter Basiskatalog
 
-Dieses Verzeichnis enthält den bewusst begrenzten maschinenlesbaren Basiskatalog `website-qa-baseline` in Version `1.0.0`. Seine stabilen IDs und Versionsregeln behaupten keine vollständige Checklistenabdeckung. Der Basiskatalog ist weder vollständige Website-Checkliste noch WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe.
+Dieses Verzeichnis enthält den bewusst begrenzten maschinenlesbaren Basiskatalog `website-qa-baseline` in Version `1.1.0`. Seine stabilen IDs und Versionsregeln behaupten keine vollständige Checklistenabdeckung. Der Basiskatalog ist weder vollständige Website-Checkliste noch WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe.
 
-- `website-baseline.json` enthält 34 ausgewählte Punkte mit 93 Kriterien. Darunter sind automatische HTTP-, Crawl-, Browser- und Social-Nachweise sowie bewusst manuelle, externe, administrative und kommunikative Kriterien.
-- `assertions.json` registriert 56 atomare Aussagen. `assertionVersion` bleibt unabhängig von Paket-, Schema- und Katalogversion.
+- `website-baseline.json` enthält 37 ausgewählte Punkte mit 102 Kriterien. Darunter sind automatische HTTP-, Crawl-, Browser- und Social-Nachweise sowie bewusst manuelle, externe, administrative und kommunikative Kriterien.
+- `assertions.json` registriert 60 atomare Aussagen. `assertionVersion` bleibt unabhängig von Paket-, Schema- und Katalogversion.
 - `website-catalog.schema.json` beschreibt das Katalogformat; zusätzliche semantische Konsistenzregeln werden durch Tests geprüft.
 - `technical-report.common.schema.json` beschreibt den gemeinsamen Berichtskern. `http-report.schema.json`, `crawl-report.schema.json`, `browser-report.schema.json` und `social-report.schema.json` validieren vollständige technische Berichte der Exitcodes 0 und 1 sowie redigierte Fehlerhüllen des Exitcodes 2. Die technischen Berichte behalten `schemaVersion: 1`.
 - `project-evidence.schema.json` und `project-evidence.example.json` beschreiben projektspezifische manuelle und externe Nachweise.

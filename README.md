@@ -247,6 +247,12 @@ Kriterien verwenden ausschließlich `pass`, `fail`, `inconclusive`, `notApplicab
 
 Alle Records in einer Evidence-Datei gelten als gleichzeitig aktive Nachweise; es gibt kein stilles „neuester Eintrag gewinnt“ und keinen automatischen Ablauf allein aufgrund des Datums. Mehrere Records für dasselbe Kriterium werden konservativ zusammengeführt: Ein aktives `fail` hat Vorrang, ein aktives `inconclusive` verhindert ein eindeutiges Ergebnis, und eine Mischung aus `pass` und `notApplicable` bleibt `pass`. Ersetzte oder fachlich nicht mehr geltende Records müssen deshalb bewusst aus der aktiven Projektkopie entfernt und bei Bedarf über deren Versionshistorie beziehungsweise Projektakte erhalten werden. Freie Notizen und Referenzen werden nur als Nachweisdaten übernommen; das Werkzeug öffnet oder bestätigt referenzierte Unterlagen nicht. Vertrauliche Unterlagen werden weiterhin ausschließlich außerhalb empfohlener Berichte verwahrt und nur redigiert referenziert.
 
+### Migration von 1.0.0 auf 1.1.0
+
+Version 1.1.0 ergänzt drei bewusst begrenzte Accessibility-Punkte mit vier passiven Axe-Assertions. Projektkonfiguration, Evidence, technische Berichte und Projektberichte müssen gemeinsam auf `website-qa-baseline` 1.1.0 umgestellt und neu erzeugt werden. Die technischen Berichte behalten `schemaVersion: 1`; die neuen Assertions behalten davon unabhängig `assertionVersion: 1`.
+
+Automatische Teilnachweise betreffen nur maschinell erkennbare zugängliche Namen, ausschließlich farblich unterscheidbare Links, technisch fehlende Bildalternativen und passiv beobachtbaren Textkontrast. Verständlichkeit, redaktionelle Eignung, dekorative Absicht, Fokus-, Hover-, Aktiv- und dynamische Zustände sowie reale Browser- und Screenreaderprüfungen bleiben ausdrücklich manuell. Daraus folgt keine WCAG-, BFSG- oder BITV-Konformitätsaussage.
+
 ### Migration von 0.6.x auf 1.0.0
 
 Version 1.0.0 ist ein bewusster inkompatibler Vertragsschnitt:

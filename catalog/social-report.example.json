@@ -4,7 +4,7 @@
     "catalog": {
       "id": "website-qa-baseline",
       "status": "stable",
-      "version": "1.0.0"
+      "version": "1.1.0"
     },
     "items": [
       {
@@ -886,6 +886,6 @@
   "tool": "social-preview-check",
   "toolPackage": {
     "name": "@mktcode/website-qa",
-    "version": "1.0.0"
+    "version": "1.1.0"
   }
 }

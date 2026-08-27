@@ -4,20 +4,26 @@
   "tool": "browser-check",
   "toolPackage": {
     "name": "@mktcode/website-qa",
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "checklistCoverage": {
     "catalog": {
       "id": "website-qa-baseline",
       "status": "stable",
-      "version": "1.0.0"
+      "version": "1.1.0"
     }
   },
   "options": {
     "maxPages": 10,
     "maxRequests": 300,
     "privateTargetsRedacted": false,
-    "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"],
+    "profiles": [
+      "desktop",
+      "mobile",
+      "narrow",
+      "reduced-motion",
+      "zoom-200"
+    ],
     "settleMilliseconds": 750,
     "sitemap": false,
     "strict": true,
@@ -29,12 +35,20 @@
     "fileUploads": false,
     "formActionsInvoked": false,
     "formsSubmitted": false,
-    "methodsAllowed": ["GET"],
+    "methodsAllowed": [
+      "GET"
+    ],
     "persistentBrowserProfile": false
   },
   "result": {
     "requestedUrl": "https://example.com/",
-    "requestedProfiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"],
+    "requestedProfiles": [
+      "desktop",
+      "mobile",
+      "narrow",
+      "reduced-motion",
+      "zoom-200"
+    ],
     "settleMilliseconds": 750,
     "finalUrl": "https://example.com/",
     "browser": {
@@ -47,49 +61,230 @@
         "assertionVersion": 1,
         "outcome": "pass",
         "message": "Alle geprüften Seiten-/Profil-Läufe besitzen genau ein Main-Landmark.",
-        "subject": { "url": "https://example.com/", "checkedPages": 1, "profileRuns": 5, "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"], "browserProduct": "Chromium", "browserVersion": "Chrome/140.0.0.0" }
+        "subject": {
+          "url": "https://example.com/",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0"
+        }
       },
       {
         "assertionId": "browser.viewport.narrow-zoom-no-horizontal-overflow",
         "assertionVersion": 1,
         "outcome": "pass",
         "message": "Die schmalen und 200-%-Näherungsprofile weisen auf allen geprüften Seiten keinen horizontalen Dokumentüberlauf auf.",
-        "subject": { "url": "https://example.com/", "checkedPages": 1, "profileRuns": 5, "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"], "browserProduct": "Chromium", "browserVersion": "Chrome/140.0.0.0" }
+        "subject": {
+          "url": "https://example.com/",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0"
+        }
       },
       {
         "assertionId": "browser.accessibility.axe-no-detected-violations",
         "assertionVersion": 1,
         "outcome": "pass",
         "message": "Der automatisierte Axe-Audit hat auf den geprüften Seiten-/Profil-Läufen keine Verstöße erkannt.",
-        "subject": { "url": "https://example.com/", "checkedPages": 1, "profileRuns": 5, "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"], "browserProduct": "Chromium", "browserVersion": "Chrome/140.0.0.0" }
+        "subject": {
+          "url": "https://example.com/",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0"
+        }
+      },
+      {
+        "assertionId": "browser.accessibility.control-names-no-detected-violations",
+        "assertionVersion": 1,
+        "outcome": "pass",
+        "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine fehlenden zugänglichen Namen für Links und Schaltflächen erkannt.",
+        "subject": {
+          "url": "https://example.com/",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0"
+        }
+      },
+      {
+        "assertionId": "browser.accessibility.links-not-color-only-no-detected-violations",
+        "assertionVersion": 1,
+        "outcome": "pass",
+        "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine ausschließlich durch Farbe unterscheidbaren Links erkannt.",
+        "subject": {
+          "url": "https://example.com/",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0"
+        }
+      },
+      {
+        "assertionId": "browser.accessibility.image-alternatives-no-detected-violations",
+        "assertionVersion": 1,
+        "outcome": "pass",
+        "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine technisch fehlenden Bildalternativen erkannt.",
+        "subject": {
+          "url": "https://example.com/",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0"
+        }
+      },
+      {
+        "assertionId": "browser.accessibility.text-contrast-no-detected-violations",
+        "assertionVersion": 1,
+        "outcome": "pass",
+        "message": "Axe hat im passiven Zustand der geprüften Seiten-/Profil-Läufe keine Textkontrastverstöße erkannt.",
+        "subject": {
+          "url": "https://example.com/",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0"
+        }
       },
       {
         "assertionId": "browser.context.chromium-headless-recorded",
         "assertionVersion": 1,
         "outcome": "pass",
         "message": "Chromium-Version und ausgeführte Headless-Emulationsprofile sind dokumentiert.",
-        "subject": { "url": "https://example.com/", "checkedPages": 1, "profileRuns": 5, "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"], "browserProduct": "Chromium", "browserVersion": "Chrome/140.0.0.0" }
+        "subject": {
+          "url": "https://example.com/",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0"
+        }
       },
       {
         "assertionId": "browser.runtime.no-observed-errors",
         "assertionVersion": 1,
         "outcome": "pass",
         "message": "In den geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet.",
-        "subject": { "url": "https://example.com/", "checkedPages": 1, "profileRuns": 5, "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"], "browserProduct": "Chromium", "browserVersion": "Chrome/140.0.0.0" }
+        "subject": {
+          "url": "https://example.com/",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0"
+        }
       },
       {
         "assertionId": "browser.privacy.external-request-observation-complete",
         "assertionVersion": 1,
         "outcome": "pass",
         "message": "Externe Requestversuche wurden innerhalb der deklarierten passiven Prüfumgebung vollständig inventarisiert und weiterhin blockiert.",
-        "subject": { "url": "https://example.com/", "checkedPages": 1, "profileRuns": 5, "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"], "browserProduct": "Chromium", "browserVersion": "Chrome/140.0.0.0", "observationMode": "passive-initial-load-isolated", "observedExternalRequestAttempts": 0, "settleMilliseconds": 750 }
+        "subject": {
+          "url": "https://example.com/",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "observationMode": "passive-initial-load-isolated",
+          "observedExternalRequestAttempts": 0,
+          "settleMilliseconds": 750
+        }
       },
       {
         "assertionId": "browser.privacy.initial-storage-observation-complete",
         "assertionVersion": 1,
         "outcome": "pass",
         "message": "Cookies und Browser-Storage wurden im passiven Initialzustand ohne Werte vollständig inventarisiert.",
-        "subject": { "url": "https://example.com/", "checkedPages": 1, "profileRuns": 5, "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"], "browserProduct": "Chromium", "browserVersion": "Chrome/140.0.0.0", "cookieObservations": 0, "indexedDatabaseObservations": 0, "localStorageObservations": 0, "observationMode": "passive-initial-load-isolated", "sessionStorageObservations": 0, "settleMilliseconds": 750, "valuesRecorded": false }
+        "subject": {
+          "url": "https://example.com/",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "cookieObservations": 0,
+          "indexedDatabaseObservations": 0,
+          "localStorageObservations": 0,
+          "observationMode": "passive-initial-load-isolated",
+          "sessionStorageObservations": 0,
+          "settleMilliseconds": 750,
+          "valuesRecorded": false
+        }
       }
     ],
     "blockedRequests": [],
@@ -100,8 +295,20 @@
         "externalDataRecorded": true,
         "identifierLimitPerKindAndProfile": 100,
         "profileRuns": 5,
-        "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"],
-        "requestedProfiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"],
+        "profiles": [
+          "desktop",
+          "mobile",
+          "narrow",
+          "reduced-motion",
+          "zoom-200"
+        ],
+        "requestedProfiles": [
+          "desktop",
+          "mobile",
+          "narrow",
+          "reduced-motion",
+          "zoom-200"
+        ],
         "settleMilliseconds": 750,
         "storageDataRecorded": true
       },
@@ -115,20 +322,56 @@
         "total": 0
       },
       "initialStorage": {
-        "cookies": { "observations": 0, "recordedIdentifiers": 0, "truncated": false },
-        "indexedDatabases": { "observations": 0, "recordedIdentifiers": 0, "truncated": false },
-        "localStorage": { "observations": 0, "recordedIdentifiers": 0, "truncated": false },
-        "sessionStorage": { "observations": 0, "recordedIdentifiers": 0, "truncated": false }
+        "cookies": {
+          "observations": 0,
+          "recordedIdentifiers": 0,
+          "truncated": false
+        },
+        "indexedDatabases": {
+          "observations": 0,
+          "recordedIdentifiers": 0,
+          "truncated": false
+        },
+        "localStorage": {
+          "observations": 0,
+          "recordedIdentifiers": 0,
+          "truncated": false
+        },
+        "sessionStorage": {
+          "observations": 0,
+          "recordedIdentifiers": 0,
+          "truncated": false
+        }
       },
       "observationMode": "passive-initial-load-isolated",
       "valuesRecorded": false
     },
     "profiles": [
-      { "profile": "desktop", "url": "https://example.com/" },
-      { "profile": "mobile", "url": "https://example.com/" },
-      { "profile": "narrow", "url": "https://example.com/" },
-      { "profile": "reduced-motion", "url": "https://example.com/" },
-      { "profile": "zoom-200", "url": "https://example.com/" }
+      {
+        "accessibilityIncompleteRuleIds": [],
+        "profile": "desktop",
+        "url": "https://example.com/"
+      },
+      {
+        "accessibilityIncompleteRuleIds": [],
+        "profile": "mobile",
+        "url": "https://example.com/"
+      },
+      {
+        "accessibilityIncompleteRuleIds": [],
+        "profile": "narrow",
+        "url": "https://example.com/"
+      },
+      {
+        "accessibilityIncompleteRuleIds": [],
+        "profile": "reduced-motion",
+        "url": "https://example.com/"
+      },
+      {
+        "accessibilityIncompleteRuleIds": [],
+        "profile": "zoom-200",
+        "url": "https://example.com/"
+      }
     ]
   },
   "summary": {

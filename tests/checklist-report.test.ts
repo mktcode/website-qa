@@ -33,10 +33,10 @@ describe('structured baseline checklist', () => {
     const registry = loadAssertionRegistry()
 
     expect(validateChecklistCatalog(catalog, registry)).toBe(true)
-    expect(catalog).toMatchObject({ catalogVersion: '1.0.0' })
-    expect(catalog.items).toHaveLength(34)
-    expect(catalog.items.flatMap((item: { criteria: unknown[] }) => item.criteria)).toHaveLength(93)
-    expect(registry.assertions).toHaveLength(56)
+    expect(catalog).toMatchObject({ catalogVersion: '1.1.0' })
+    expect(catalog.items).toHaveLength(37)
+    expect(catalog.items.flatMap((item: { criteria: unknown[] }) => item.criteria)).toHaveLength(102)
+    expect(registry.assertions).toHaveLength(60)
     expect(checklistItemIdsForTool('http-check', catalog, registry)).toEqual([
       'CORE-DOM-02',
       'CORE-DOM-07',
@@ -62,6 +62,9 @@ describe('structured baseline checklist', () => {
     ])
     expect(checklistItemIdsForTool('browser-check', catalog, registry)).toEqual([
       'CORE-A11Y-01',
+      'CORE-A11Y-03',
+      'CORE-A11Y-08',
+      'CORE-A11Y-09',
       'CORE-A11Y-10',
       'CORE-A11Y-13',
       'CORE-QA-02',
@@ -145,13 +148,32 @@ describe('structured baseline checklist', () => {
     })).toThrow(/gültiges Datum/)
 
     const evidenceExample = JSON.parse(readFileSync(new URL('../catalog/project-evidence.example.json', import.meta.url), 'utf8'))
-    expect(evidenceExample.catalog).toEqual({ id: 'website-qa-baseline', version: '1.0.0' })
+    expect(evidenceExample.catalog).toEqual({ id: 'website-qa-baseline', version: '1.1.0' })
     const evidencedRights = evaluateChecklist({
       evidence: evidenceExample.evidence,
       itemIds: ['GOV-RGT-02'],
     })
     expect(evidencedRights.items[0]?.outcome).toBe('pass')
     expect(evidencedRights.summary.checklistItems.automaticallyPassed).toBe(0)
+  })
+
+  it('keeps editorial accessibility review open after bounded Axe assertions pass', () => {
+    const report = evaluateChecklist({
+      assertions: [
+        'browser.accessibility.control-names-no-detected-violations',
+        'browser.accessibility.links-not-color-only-no-detected-violations',
+        'browser.accessibility.image-alternatives-no-detected-violations',
+        'browser.accessibility.text-contrast-no-detected-violations',
+      ].map(assertionId => assertion(assertionId)),
+      itemIds: ['CORE-A11Y-03', 'CORE-A11Y-08', 'CORE-A11Y-09'],
+    })
+
+    expect(report.items.every((item: { outcome: string }) => item.outcome === 'partial')).toBe(true)
+    expect(report.summary).toMatchObject({
+      automaticCriteria: { pass: 4, total: 4 },
+      checklistItems: { pass: 0, partial: 3, total: 3 },
+      nonAutomaticCriteria: { noEvidence: 5, total: 5 },
+    })
   })
 
   it('keeps project scope, APIs, external links and dynamic resources open after a complete crawl', () => {

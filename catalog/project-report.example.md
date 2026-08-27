@@ -7,7 +7,7 @@
 | Feld | Wert |
 |---|---|
 | Erstellt | 2026-08-24T12:30:00.000Z |
-| Katalog | website-qa-baseline 1.0.0 (stable) |
+| Katalog | website-qa-baseline 1.1.0 (stable) |
 | Auswertungsumgebung | production |
 | Bevorzugte URL | https://example.com/ |
 | Quellstand | PROJEKT-COMMIT |
@@ -20,27 +20,27 @@
 |---|---:|
 | Vollständig nachgewiesen | 3 |
 | Fehlgeschlagen | 0 |
-| Teilweise nachgewiesen | 25 |
+| Teilweise nachgewiesen | 28 |
 | Offen | 5 |
 | Unklar | 0 |
 | Nicht zutreffend | 0 |
 | Externer Nachweis offen | 1 |
 | Zurückgestellt | 0 |
 | Akzeptierte Abweichung (offen) | 0 |
-| **Ausgewählte Basiskatalogpunkte** | **34** |
+| **Ausgewählte Basiskatalogpunkte** | **37** |
 
-Automatische Kriterien (57 gesamt): 46 bestanden, 0 fehlgeschlagen, 0 unklar, 0 nicht zutreffend, 11 ohne Nachweis.
+Automatische Kriterien (61 gesamt): 50 bestanden, 0 fehlgeschlagen, 0 unklar, 0 nicht zutreffend, 11 ohne Nachweis.
 
-Nicht automatische Kriterien (36 gesamt): 1 belegt, 0 fehlgeschlagen, 0 unklar, 0 nicht zutreffend, 35 ohne Nachweis.
+Nicht automatische Kriterien (41 gesamt): 1 belegt, 0 fehlgeschlagen, 0 unklar, 0 nicht zutreffend, 40 ohne Nachweis.
 
 ## Technische Läufe
 
 | Werkzeug | Ziel | Umgebung | Verwendet | Assertions | Befehl |
 |---|---|---|---:|---:|---|
-| http-check 1.0.0 | https://example.com/ | production | ja | 12 | <code>website-qa-http https://example.com/ --strict --json</code> |
-| crawl-check 1.0.0 | https://example.com/ | production | ja | 16 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
-| browser-check 1.0.0 | https://example.com/ | production | ja | 7 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
-| social-preview-check 1.0.0 | https://example.com/ | production | ja | 10 | <code>website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json</code> |
+| http-check 1.1.0 | https://example.com/ | production | ja | 12 | <code>website-qa-http https://example.com/ --strict --json</code> |
+| crawl-check 1.1.0 | https://example.com/ | production | ja | 16 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
+| browser-check 1.1.0 | https://example.com/ | production | ja | 11 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
+| social-preview-check 1.1.0 | https://example.com/ | production | ja | 10 | <code>website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json</code> |
 
 ## Checklistenpunkte
 
@@ -67,6 +67,9 @@ Nicht automatische Kriterien (36 gesamt): 1 belegt, 0 fehlgeschlagen, 0 unklar, 
 | CORE-MAP-02 | core | Teilweise nachgewiesen | 2/2 | 0/1 |
 | CORE-SEO-04 | core | Teilweise nachgewiesen | 3/3 | 0/1 |
 | CORE-A11Y-01 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
+| CORE-A11Y-03 | core | Teilweise nachgewiesen | 2/2 | 0/2 |
+| CORE-A11Y-08 | core | Teilweise nachgewiesen | 1/1 | 0/2 |
+| CORE-A11Y-09 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-A11Y-10 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-A11Y-13 | core | Teilweise nachgewiesen | 1/1 | 0/3 |
 | CORE-QA-02 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
@@ -264,6 +267,35 @@ Semantische HTML-Elemente werden passend eingesetzt; Navigation, Hauptinhalt, er
 - [x] `CORE-A11Y-01/C1` Alle geprüften Seiten-/Profil-Läufe besitzen genau ein Main-Landmark. — automatic, pass
 - [ ] `CORE-A11Y-01/C2` Navigation, Hauptinhalt, ergänzende Bereiche und Footer sind semantisch passend und verständlich ausgezeichnet. — manual, noEvidence
   - Erforderlicher Nachweis: Semantische Struktur auf repräsentativen Seitentypen im DOM und Accessibility Tree fachlich prüfen.
+
+### CORE-A11Y-03: Teilweise nachgewiesen
+
+Links, Schaltflächen und reine Icons besitzen verständliche zugängliche Namen; Zustände und Informationen werden nicht ausschließlich über Farbe vermittelt.
+
+- [x] `CORE-A11Y-03/C1` Axe erkennt auf den geprüften Seiten-/Profil-Läufen keine Links, Schaltflächen oder vergleichbaren Bedienelemente ohne zugänglichen Namen. — automatic, pass
+- [x] `CORE-A11Y-03/C2` Axe erkennt im passiven Zustand keine Links, die sich vom umgebenden Text ausschließlich durch Farbe unterscheiden. — automatic, pass
+- [ ] `CORE-A11Y-03/C3` Die zugänglichen Namen sind im jeweiligen Kontext verständlich und bilden auch dynamische Zustände passend ab. — manual, noEvidence
+  - Erforderlicher Nachweis: Links, Schaltflächen, reine Icons und ihre dynamischen Zustände im DOM und Accessibility Tree auf verständliche, kontextgerechte Namen prüfen; bloße technische Namenspräsenz genügt nicht.
+- [ ] `CORE-A11Y-03/C4` Zustände und Informationen werden auch außerhalb der automatisiert erkannten Linkfälle nicht ausschließlich über Farbe vermittelt. — manual, noEvidence
+  - Erforderlicher Nachweis: Repräsentative Normal-, Fokus-, Hover-, Aktiv-, Fehler- und Erfolgszustände visuell sowie soweit erforderlich mit unterstützender Technik prüfen; der passive Axe-Teilnachweis deckt diese Zustände nicht vollständig ab.
+
+### CORE-A11Y-08: Teilweise nachgewiesen
+
+Bilder besitzen redaktionell passende Alternativtexte; dekorative Bilder und Hintergründe werden nicht unnötig vorgelesen.
+
+- [x] `CORE-A11Y-08/C1` Axe erkennt auf den geprüften Seiten-/Profil-Läufen keine technisch fehlenden Textalternativen für Bilder, Bildobjekte oder als Bild ausgezeichnete Elemente. — automatic, pass
+- [ ] `CORE-A11Y-08/C2` Alternativtexte bedeutungstragender Bilder sind im jeweiligen Seitenkontext redaktionell passend. — manual, noEvidence
+  - Erforderlicher Nachweis: Bedeutungstragende Bilder auf repräsentativen Seitentypen gegen sichtbaren Inhalt, Funktion und Kontext prüfen; vorhandene oder technisch akzeptierte Alternativtexte nicht automatisch als inhaltlich geeignet behandeln.
+- [ ] `CORE-A11Y-08/C3` Dekorative Bilder und Hintergründe sind entsprechend ihrer redaktionell bestätigten Funktion vor assistiver Ausgabe verborgen. — manual, noEvidence
+  - Erforderlicher Nachweis: Dekorative Absicht fachlich bestätigen und DOM sowie Accessibility Tree einschließlich CSS-Hintergründen stichprobenartig prüfen; ein leerer Alternativtext allein beweist die dekorative Funktion nicht.
+
+### CORE-A11Y-09: Teilweise nachgewiesen
+
+Text, Bedienelemente, Fokus und wichtige Zustände besitzen ausreichenden Kontrast.
+
+- [x] `CORE-A11Y-09/C1` Axe erkennt im passiven Zustand der geprüften Seiten-/Profil-Läufe keine Textkontrastverstöße unter den geprüften WCAG-AA-Schwellenwerten. — automatic, pass
+- [ ] `CORE-A11Y-09/C2` Bedienelemente, Fokus sowie wichtige Hover-, Aktiv-, Fehler-, Erfolgs- und dynamische Zustände besitzen ausreichenden Kontrast. — manual, noEvidence
+  - Erforderlicher Nachweis: Repräsentative Bedienelemente und Zustände einschließlich sichtbarer Fokusanzeige in realen Browsern prüfen; der passive Textkontrastbefund ersetzt weder Zustandswechsel noch bildbasierte oder manuell zu bewertende Sonderfälle.
 
 ### CORE-A11Y-10: Teilweise nachgewiesen
 
