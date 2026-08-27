@@ -338,10 +338,56 @@ function requireEqualCounts(actual, expected, label) {
   }
 }
 
+function requireSameSequence(actual, expected, label) {
+  if (!Array.isArray(actual) || actual.length !== expected.length || actual.some((value, index) => value !== expected[index])) {
+    throw new Error(`${label} passt nicht zum Pilotkatalog.`)
+  }
+}
+
+function catalogCriteriaForItem(item, catalogItemsById) {
+  const catalogItem = catalogItemsById.get(item.id)
+  if (!catalogItem) {
+    throw new Error(`Checklistenpunkt ${item.id} ist im Pilotkatalog unbekannt.`)
+  }
+  if (item.module !== catalogItem.module) {
+    throw new Error(`Checklistenpunkt ${item.id} verwendet das Modul ${item.module} statt ${catalogItem.module}.`)
+  }
+  requireSameSequence(item.criteria?.map(criterion => criterion.id), catalogItem.criteria.map(criterion => criterion.id), `Kriterienzuordnung für ${item.id}`)
+  return catalogItem.criteria
+}
+
+function validateReportScopeAgainstCatalog(report, catalog) {
+  validateCatalogReference(report.catalog, catalog, 'Projektbericht')
+  if (!Array.isArray(report.scope?.selectedModules) || !Array.isArray(report.scope?.selectedItemIds)) {
+    throw new TypeError('Projektbericht enthält keinen gültigen Katalogumfang.')
+  }
+  if (!report.scope.selectedModules.includes('core')) {
+    throw new Error('Projektbericht muss das Katalogmodul core auswählen.')
+  }
+  if (new Set(report.scope.selectedModules).size !== report.scope.selectedModules.length
+    || new Set(report.scope.selectedItemIds).size !== report.scope.selectedItemIds.length) {
+    throw new Error('Projektbericht enthält mehrfach ausgewählte Scope-Einträge.')
+  }
+  const knownModules = new Set(catalog.items.map(item => item.module))
+  for (const module of report.scope.selectedModules) {
+    if (!knownModules.has(module)) {
+      throw new Error(`Projektbericht wählt das unbekannte Katalogmodul ${module} aus.`)
+    }
+  }
+  const expectedItemIds = catalog.items
+    .filter(item => report.scope.selectedModules.includes(item.module))
+    .map(item => item.id)
+  requireSameSequence(report.scope.selectedItemIds, expectedItemIds, 'Ausgewählte Checklistenpunkte')
+  requireSameSequence(report.items.map(item => item.id), expectedItemIds, 'Berichtete Checklistenpunkte')
+}
+
 export function validatePilotProjectReportV3(report) {
   if (report?.schemaVersion !== 3 || !Array.isArray(report.records) || !Array.isArray(report.items)) {
     throw new Error('Projektbericht verwendet nicht das normalisierte Pilotschema 3.')
   }
+  const catalog = loadPilotCatalog()
+  validateReportScopeAgainstCatalog(report, catalog)
+  const catalogItemsById = new Map(catalog.items.map(item => [item.id, item]))
   const recordsById = new Map()
   const canonicalRecords = new Set()
   for (const [index, entry] of report.records.entries()) {
@@ -362,7 +408,15 @@ export function validatePilotProjectReportV3(report) {
 
   const referencedRecords = new Set()
   for (const item of report.items) {
-    for (const criterion of item.criteria || []) {
+    const catalogCriteria = catalogCriteriaForItem(item, catalogItemsById)
+    for (const [criterionIndex, criterion] of item.criteria.entries()) {
+      const catalogCriterion = catalogCriteria[criterionIndex]
+      if (criterion.mode !== catalogCriterion.verification.mode) {
+        throw new Error(`Kriterium ${criterion.id} verwendet nicht den Katalogmodus ${catalogCriterion.verification.mode}.`)
+      }
+      if (criterion.mode === 'automatic') {
+        requireSameSequence(criterion.requiredAssertionIds, catalogCriterion.verification.assertions, `Erforderliche Assertions für ${criterion.id}`)
+      }
       if (!Array.isArray(criterion.recordRefs) || new Set(criterion.recordRefs).size !== criterion.recordRefs.length) {
         throw new Error(`Kriterium ${criterion.id} verwendet keine eindeutigen Recordreferenzen.`)
       }
@@ -423,8 +477,8 @@ export function convertPilotProjectReportToV3(inputReport) {
   }
   const report = redactReportData(structuredClone(inputReport))
   const catalog = loadPilotCatalog()
-  validateCatalogReference(report.catalog, catalog, 'Projektbericht')
-  const criteriaById = new Map(catalog.items.flatMap(item => item.criteria).map(criterion => [criterion.id, criterion]))
+  validateReportScopeAgainstCatalog(report, catalog)
+  const catalogItemsById = new Map(catalog.items.map(item => [item.id, item]))
   const records = []
   const referencesByRecord = new Map()
 
@@ -439,24 +493,27 @@ export function convertPilotProjectReportToV3(inputReport) {
     return reference
   }
 
-  const items = report.items.map(item => ({
-    ...item,
-    criteria: item.criteria.map((criterion) => {
-      const catalogCriterion = criteriaById.get(criterion.id)
-      if (!catalogCriterion || catalogCriterion.verification.mode !== criterion.mode) {
-        throw new Error(`Kriterium ${criterion.id} passt nicht zum Pilotkatalog.`)
-      }
-      const normalized = {
-        ...criterion,
-        recordRefs: [...new Set(criterion.records.map(record => recordReference(criterion.mode === 'automatic' ? 'assertion' : 'evidence', record)))],
-      }
-      delete normalized.records
-      if (criterion.mode === 'automatic') {
-        normalized.requiredAssertionIds = [...catalogCriterion.verification.assertions]
-      }
-      return normalized
-    }),
-  }))
+  const items = report.items.map((item) => {
+    const catalogCriteria = catalogCriteriaForItem(item, catalogItemsById)
+    return {
+      ...item,
+      criteria: item.criteria.map((criterion, criterionIndex) => {
+        const catalogCriterion = catalogCriteria[criterionIndex]
+        if (catalogCriterion.verification.mode !== criterion.mode) {
+          throw new Error(`Kriterium ${criterion.id} verwendet nicht den Katalogmodus ${catalogCriterion.verification.mode}.`)
+        }
+        const normalized = {
+          ...criterion,
+          recordRefs: [...new Set(criterion.records.map(record => recordReference(criterion.mode === 'automatic' ? 'assertion' : 'evidence', record)))],
+        }
+        delete normalized.records
+        if (criterion.mode === 'automatic') {
+          normalized.requiredAssertionIds = [...catalogCriterion.verification.assertions]
+        }
+        return normalized
+      }),
+    }
+  })
 
   const normalized = {
     ...report,

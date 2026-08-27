@@ -46,13 +46,22 @@
       "properties": {
         "id": { "$ref": "#/$defs/recordId" },
         "type": { "enum": ["assertion", "evidence"] },
-        "record": {
-          "oneOf": [
-            { "$ref": "#/$defs/assertionRecord" },
-            { "$ref": "#/$defs/evidenceRecord" }
-          ]
-        }
+        "record": { "type": "object" }
       },
+      "oneOf": [
+        {
+          "properties": {
+            "type": { "const": "assertion" },
+            "record": { "$ref": "#/$defs/assertionRecord" }
+          }
+        },
+        {
+          "properties": {
+            "type": { "const": "evidence" },
+            "record": { "$ref": "#/$defs/evidenceRecord" }
+          }
+        }
+      ],
       "additionalProperties": false
     },
     "assertionRecord": {

@@ -5,7 +5,8 @@ Dieses Changelog dokumentiert veröffentlichte Paketstände von `@mktcode/websit
 ## Unveröffentlicht
 
 - Phase I bereitet technische Berichtsschemas sowie Kompatibilitäts-, Deprecation- und API-Verträge für eine spätere 1.0 vor.
-- Experimentelles Projektberichtsschema 3 als opt-in Vorschau ergänzt: Records werden einmalig gespeichert und von Kriterien über semantisch validierte berichtslokale IDs referenziert.
+- Experimentelles Projektberichtsschema 3 als opt-in Vorschau ergänzt: Records werden einmalig gespeichert und von Kriterien über semantisch validierte berichtslokale IDs referenziert; Item-, Kriterien- und Assertion-Zuordnungen sind dabei exakt an den referenzierten Pilotkatalog gebunden.
+- Assertion- und Evidence-Recordtypen im JSON-Schema 3 diskriminiert mit ihrer jeweils zulässigen Recordstruktur gekoppelt.
 - Schema-2-Erzeuger, Renderer und Bundles unverändert gelassen; Kriterienzähler in Schema 3 auf die fünf tatsächlich möglichen atomaren Ergebnisse bereinigt.
 - Katalog-ID-Muster für Kennungen mit zusätzlichen oder alphanumerischen Segmenten korrigiert, Evidence-Klassen und deklarierte `$schema`-Felder mit den Beispielen synchronisiert und die Zielbindungsprovenienz vor URL-Redaktion geschützt.
 

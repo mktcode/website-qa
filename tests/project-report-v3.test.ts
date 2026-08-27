@@ -100,6 +100,14 @@ describe('normalized pilot project report schema 3', () => {
     const convertedLegacy = convertPilotProjectReportToV3(legacy)
     expect(convertedLegacy.technicalRuns[0].contextProvenance.targetUrl).toBe('matchedAgainstRedactedTechnicalReport')
     expect(versionThree(convertedLegacy), JSON.stringify(versionThree.errors, null, 2)).toBe(true)
+
+    const assertionAsEvidence = versionThreeReport()
+    assertionAsEvidence.records.find((entry: { type: string }) => entry.type === 'assertion')!.type = 'evidence'
+    expect(versionThree(assertionAsEvidence), JSON.stringify(versionThree.errors, null, 2)).toBe(false)
+
+    const evidenceAsAssertion = versionThreeReport()
+    evidenceAsAssertion.records.find((entry: { type: string }) => entry.type === 'evidence')!.type = 'assertion'
+    expect(versionThree(evidenceAsAssertion), JSON.stringify(versionThree.errors, null, 2)).toBe(false)
   })
 
   it('redacts sensitive record details before assigning references', () => {
@@ -115,6 +123,72 @@ describe('normalized pilot project report schema 3', () => {
     expect(serialized).not.toContain('secret-token')
     expect(serialized).not.toContain('secret-value')
     expect(serialized).toContain('[REDACTED]')
+  })
+
+  it('rejects catalog and scope mutations', () => {
+    const wrongCatalog = versionThreeReport()
+    wrongCatalog.catalog.version = 'unexpected-version'
+    expect(() => validatePilotProjectReportV3(wrongCatalog)).toThrow(/verwendet nicht/)
+
+    const withoutCore = versionThreeReport()
+    withoutCore.scope.selectedModules = withoutCore.scope.selectedModules.filter((module: string) => module !== 'core')
+    expect(() => validatePilotProjectReportV3(withoutCore)).toThrow(/Katalogmodul core/)
+
+    const duplicateModule = versionThreeReport()
+    duplicateModule.scope.selectedModules.push(duplicateModule.scope.selectedModules[0])
+    expect(() => validatePilotProjectReportV3(duplicateModule)).toThrow(/mehrfach ausgewählte Scope-Einträge/)
+
+    const duplicateItem = versionThreeReport()
+    duplicateItem.scope.selectedItemIds.push(duplicateItem.scope.selectedItemIds[0])
+    expect(() => validatePilotProjectReportV3(duplicateItem)).toThrow(/mehrfach ausgewählte Scope-Einträge/)
+  })
+
+  it('rejects catalog-foreign criteria, item assignments, modes and assertion requirements', () => {
+    const unknownCriterion = versionThreeReport()
+    unknownCriterion.items[0].criteria[0].id = 'CORE-TEST-99/C1'
+    expect(() => validatePilotProjectReportV3(unknownCriterion)).toThrow(/Kriterienzuordnung/)
+
+    const wrongItem = versionThreeReport()
+    wrongItem.items[0].criteria[0] = structuredClone(wrongItem.items[1].criteria[0])
+    expect(() => validatePilotProjectReportV3(wrongItem)).toThrow(/Kriterienzuordnung/)
+
+    const wrongModule = versionThreeReport()
+    wrongModule.items[0].module = 'auftrag-recht-uebergabe'
+    expect(() => validatePilotProjectReportV3(wrongModule)).toThrow(/verwendet das Modul/)
+
+    const wrongVersionTwoItem = versionTwoReport()
+    wrongVersionTwoItem.items[0].criteria[0] = structuredClone(wrongVersionTwoItem.items[1].criteria[0])
+    expect(() => convertPilotProjectReportToV3(wrongVersionTwoItem)).toThrow(/Kriterienzuordnung/)
+
+    const assertionRequirements = versionThreeReport()
+    const automaticCriterion = assertionRequirements.items
+      .flatMap((item: { criteria: Array<{ mode: string, requiredAssertionIds?: string[] }> }) => item.criteria)
+      .find((criterion: { mode: string }) => criterion.mode === 'automatic')!
+    automaticCriterion.requiredAssertionIds = ['unexpected.assertion']
+    expect(() => validatePilotProjectReportV3(assertionRequirements)).toThrow(/Erforderliche Assertions/)
+
+    const wrongMode = versionThreeReport()
+    const criterionWithWrongMode = wrongMode.items
+      .flatMap((item: { criteria: Array<{ mode: string }> }) => item.criteria)
+      .find((criterion: { mode: string }) => criterion.mode === 'automatic')!
+    criterionWithWrongMode.mode = 'manual'
+    expect(() => validatePilotProjectReportV3(wrongMode)).toThrow(/Katalogmodus/)
+
+    const unexpectedAssertion = versionThreeReport()
+    const automaticWithRecord = unexpectedAssertion.items
+      .flatMap((item: { criteria: Array<{ mode: string, recordRefs: string[] }> }) => item.criteria)
+      .find((criterion: { mode: string, recordRefs: string[] }) => criterion.mode === 'automatic' && criterion.recordRefs.length > 0)!
+    const assertionRecord = unexpectedAssertion.records.find((entry: { id: string }) => entry.id === automaticWithRecord.recordRefs[0])!
+    assertionRecord.record.assertionId = 'unexpected.assertion'
+    expect(() => validatePilotProjectReportV3(unexpectedAssertion)).toThrow(/nicht erforderliche Assertion/)
+
+    const foreignEvidence = versionThreeReport()
+    const recordedWithEvidence = foreignEvidence.items
+      .flatMap((item: { criteria: Array<{ mode: string, recordRefs: string[] }> }) => item.criteria)
+      .find((criterion: { mode: string, recordRefs: string[] }) => criterion.mode !== 'automatic' && criterion.recordRefs.length > 0)!
+    const evidenceRecord = foreignEvidence.records.find((entry: { id: string }) => entry.id === recordedWithEvidence.recordRefs[0])!
+    evidenceRecord.record.criterionId = 'CORE-TEST-99/C1'
+    expect(() => validatePilotProjectReportV3(foreignEvidence)).toThrow(/verweist auf Evidence/)
   })
 
   it('rejects broken, duplicate, mistyped and orphaned references', () => {
