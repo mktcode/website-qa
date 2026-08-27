@@ -16,7 +16,7 @@
         "type": "object",
         "required": ["id", "module", "statement", "criteria"],
         "properties": {
-          "id": { "type": "string", "pattern": "^[A-Z]+-[A-Z]+-[0-9]{2}$" },
+          "id": { "type": "string", "pattern": "^[A-Z]+(?:-[A-Z0-9]+)+-[0-9]{2}$" },
           "module": { "type": "string", "minLength": 1 },
           "statement": { "type": "string", "minLength": 1 },
           "criteria": {
@@ -26,7 +26,7 @@
               "type": "object",
               "required": ["id", "statement", "verification"],
               "properties": {
-                "id": { "type": "string", "pattern": "^[A-Z]+-[A-Z]+-[0-9]{2}/C[1-9][0-9]*$" },
+                "id": { "type": "string", "pattern": "^[A-Z]+(?:-[A-Z0-9]+)+-[0-9]{2}/C[1-9][0-9]*$" },
                 "statement": { "type": "string", "minLength": 1 },
                 "verification": {
                   "type": "object",
@@ -35,7 +35,7 @@
                     "mode": { "enum": ["automatic", "manual", "external"] },
                     "assertions": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 },
                     "aggregation": { "enum": ["all"] },
-                    "evidenceClass": { "enum": ["administrative", "communication", "editorial", "infrastructure-access", "project-review"] },
+                    "evidenceClass": { "enum": ["administrative", "communication", "editorial", "external-platform", "infrastructure-access", "project-review", "security-review"] },
                     "instructions": { "type": "string", "minLength": 1 }
                   },
                   "additionalProperties": false

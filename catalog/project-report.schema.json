@@ -5,6 +5,7 @@
   "type": "object",
   "required": ["schemaVersion", "catalog", "project", "selectedModules", "technicalRuns"],
   "properties": {
+    "$schema": { "type": "string", "minLength": 1 },
     "schemaVersion": { "const": 1 },
     "catalog": {
       "type": "object",
@@ -57,7 +58,7 @@
         "type": "object",
         "required": ["itemId", "status", "recordedAt", "recordedBy", "note"],
         "properties": {
-          "itemId": { "type": "string", "pattern": "^[A-Z]+-[A-Z]+-[0-9]{2}$" },
+          "itemId": { "type": "string", "pattern": "^[A-Z]+(?:-[A-Z0-9]+)+-[0-9]{2}$" },
           "status": { "enum": ["notApplicable", "external", "deferred", "acceptedDeviation"] },
           "recordedAt": { "type": "string", "format": "date" },
           "recordedBy": { "type": "string", "minLength": 1 },

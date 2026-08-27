@@ -5,6 +5,7 @@
   "type": "object",
   "required": ["schemaVersion", "catalog", "evidence"],
   "properties": {
+    "$schema": { "type": "string", "minLength": 1 },
     "schemaVersion": { "const": 1 },
     "catalog": {
       "type": "object",
@@ -21,7 +22,7 @@
         "type": "object",
         "required": ["criterionId", "outcome", "checkedAt", "checkedBy", "note"],
         "properties": {
-          "criterionId": { "type": "string", "pattern": "^[A-Z]+-[A-Z]+-[0-9]{2}/C[1-9][0-9]*$" },
+          "criterionId": { "type": "string", "pattern": "^[A-Z]+(?:-[A-Z0-9]+)+-[0-9]{2}/C[1-9][0-9]*$" },
           "outcome": { "enum": ["pass", "fail", "inconclusive", "notApplicable"] },
           "checkedAt": { "type": "string", "format": "date" },
           "checkedBy": { "type": "string", "minLength": 1 },

@@ -14,6 +14,7 @@ import {
 import { dirname, join, relative, resolve, sep } from 'node:path'
 import { evaluatePilotChecklist, loadPilotCatalog } from './checklist-report.mjs'
 import { redactReportData, redactText, reportUrl } from './http-client.mjs'
+import { aggregateEvidenceOutcomes, aggregateItemOutcome } from './outcome-aggregation.mjs'
 import { packageName, packageVersion } from './package-info.mjs'
 
 const allowedItemStates = new Set(['acceptedDeviation', 'deferred', 'external', 'notApplicable'])
@@ -289,6 +290,202 @@ export function createPilotProjectReportFromFiles(configFile) {
     report: readJson(resolve(baseDirectory, run.reportFile)),
   }))
   return createPilotProjectReport({ config, evidenceDocument, technicalRuns })
+}
+
+function canonicalValue(entry) {
+  if (Array.isArray(entry)) {
+    return entry.map(canonicalValue)
+  }
+  if (entry && typeof entry === 'object') {
+    return Object.fromEntries(Object.keys(entry)
+      .filter(key => entry[key] !== undefined)
+      .toSorted()
+      .map(key => [key, canonicalValue(entry[key])]))
+  }
+  return entry
+}
+
+function canonicalJson(value) {
+  return JSON.stringify(canonicalValue(value))
+}
+
+function v3CriterionCounts(counts) {
+  return Object.fromEntries(['pass', 'fail', 'inconclusive', 'notApplicable', 'noEvidence', 'total']
+    .map(key => [key, counts[key]]))
+}
+
+function expectedCriterionOutcome(criterion, recordsById) {
+  const records = criterion.recordRefs.map(reference => recordsById.get(reference)?.record)
+  if (criterion.mode !== 'automatic') {
+    return aggregateEvidenceOutcomes(records.map(record => record?.outcome || 'noEvidence'))
+  }
+  const assertionOutcomes = criterion.requiredAssertionIds.map((assertionId) => {
+    const matching = records.filter(record => record?.assertionId === assertionId)
+    return aggregateEvidenceOutcomes(matching.map(record => record.outcome))
+  })
+  return aggregateEvidenceOutcomes(assertionOutcomes)
+}
+
+function expectedCounts(entries, keys) {
+  return Object.fromEntries([...keys.map(key => [key, entries.filter(entry => entry.outcome === key).length]), ['total', entries.length]])
+}
+
+function requireEqualCounts(actual, expected, label) {
+  for (const [key, value] of Object.entries(expected)) {
+    if (actual?.[key] !== value) {
+      throw new Error(`${label} ist bei ${key} nicht summengleich.`)
+    }
+  }
+}
+
+export function validatePilotProjectReportV3(report) {
+  if (report?.schemaVersion !== 3 || !Array.isArray(report.records) || !Array.isArray(report.items)) {
+    throw new Error('Projektbericht verwendet nicht das normalisierte Pilotschema 3.')
+  }
+  const recordsById = new Map()
+  const canonicalRecords = new Set()
+  for (const [index, entry] of report.records.entries()) {
+    const expectedId = `R${String(index + 1).padStart(6, '0')}`
+    if (entry?.id !== expectedId || !['assertion', 'evidence'].includes(entry.type) || !entry.record || typeof entry.record !== 'object') {
+      throw new Error(`Normalisierter Record ${entry?.id || expectedId} ist unvollständig.`)
+    }
+    if (recordsById.has(entry.id)) {
+      throw new Error(`Normalisierte Record-ID ist mehrfach vergeben: ${entry.id}`)
+    }
+    const canonical = `${entry.type}:${canonicalJson(entry.record)}`
+    if (canonicalRecords.has(canonical)) {
+      throw new Error(`Normalisierter Record ${entry.id} dupliziert einen vorhandenen Record.`)
+    }
+    canonicalRecords.add(canonical)
+    recordsById.set(entry.id, entry)
+  }
+
+  const referencedRecords = new Set()
+  for (const item of report.items) {
+    for (const criterion of item.criteria || []) {
+      if (!Array.isArray(criterion.recordRefs) || new Set(criterion.recordRefs).size !== criterion.recordRefs.length) {
+        throw new Error(`Kriterium ${criterion.id} verwendet keine eindeutigen Recordreferenzen.`)
+      }
+      if (criterion.mode === 'automatic' && (!Array.isArray(criterion.requiredAssertionIds)
+        || criterion.requiredAssertionIds.length === 0
+        || new Set(criterion.requiredAssertionIds).size !== criterion.requiredAssertionIds.length)) {
+        throw new Error(`Automatisches Kriterium ${criterion.id} nennt keine eindeutigen erforderlichen Assertions.`)
+      }
+      if (criterion.mode !== 'automatic' && criterion.requiredAssertionIds !== undefined) {
+        throw new Error(`Nicht automatisches Kriterium ${criterion.id} nennt unerwartete Assertions.`)
+      }
+      for (const reference of criterion.recordRefs) {
+        const entry = recordsById.get(reference)
+        if (!entry) {
+          throw new Error(`Kriterium ${criterion.id} verweist auf den unbekannten Record ${reference}.`)
+        }
+        if ((criterion.mode === 'automatic') !== (entry.type === 'assertion')) {
+          throw new Error(`Kriterium ${criterion.id} verweist auf den ungeeigneten Record ${reference}.`)
+        }
+        if (entry.type === 'assertion' && !criterion.requiredAssertionIds.includes(entry.record.assertionId)) {
+          throw new Error(`Kriterium ${criterion.id} verweist auf die nicht erforderliche Assertion ${entry.record.assertionId}.`)
+        }
+        if (entry.type === 'evidence' && entry.record.criterionId !== criterion.id) {
+          throw new Error(`Kriterium ${criterion.id} verweist auf Evidence für ${entry.record.criterionId}.`)
+        }
+        referencedRecords.add(reference)
+      }
+      const expectedOutcome = expectedCriterionOutcome(criterion, recordsById)
+      if (criterion.outcome !== expectedOutcome) {
+        throw new Error(`Kriterium ${criterion.id} hat ${criterion.outcome} statt ${expectedOutcome}.`)
+      }
+    }
+    const expectedOutcome = aggregateItemOutcome(item.criteria)
+    if (item.evidenceOutcome !== expectedOutcome) {
+      throw new Error(`Checklistenpunkt ${item.id} hat ${item.evidenceOutcome} statt ${expectedOutcome}.`)
+    }
+    const expectedProjectStatus = item.workflow?.status || derivedProjectStatus(expectedOutcome)
+    if (item.projectStatus !== expectedProjectStatus) {
+      throw new Error(`Checklistenpunkt ${item.id} hat den Projektstatus ${item.projectStatus} statt ${expectedProjectStatus}.`)
+    }
+  }
+  if (referencedRecords.size !== report.records.length) {
+    throw new Error('Normalisierter Projektbericht enthält nicht referenzierte Records.')
+  }
+
+  const criteria = report.items.flatMap(item => item.criteria)
+  const criterionKeys = ['pass', 'fail', 'inconclusive', 'notApplicable', 'noEvidence']
+  requireEqualCounts(report.summary?.automaticCriteria, expectedCounts(criteria.filter(criterion => criterion.mode === 'automatic'), criterionKeys), 'Zusammenfassung automatischer Kriterien')
+  requireEqualCounts(report.summary?.nonAutomaticCriteria, expectedCounts(criteria.filter(criterion => criterion.mode !== 'automatic'), criterionKeys), 'Zusammenfassung nicht automatischer Kriterien')
+  const statusEntries = report.items.map(item => ({ outcome: item.projectStatus }))
+  requireEqualCounts(report.summary?.checklistItems, expectedCounts(statusEntries, projectStatusOrder), 'Zusammenfassung der Checklistenpunkte')
+  return true
+}
+
+export function convertPilotProjectReportToV3(inputReport) {
+  if (inputReport?.schemaVersion !== 2) {
+    throw new Error('Nur Pilotprojektberichte des Ausgabeschemas 2 können normalisiert werden.')
+  }
+  const report = redactReportData(structuredClone(inputReport))
+  const catalog = loadPilotCatalog()
+  validateCatalogReference(report.catalog, catalog, 'Projektbericht')
+  const criteriaById = new Map(catalog.items.flatMap(item => item.criteria).map(criterion => [criterion.id, criterion]))
+  const records = []
+  const referencesByRecord = new Map()
+
+  function recordReference(type, record) {
+    const key = `${type}:${canonicalJson(record)}`
+    let reference = referencesByRecord.get(key)
+    if (!reference) {
+      reference = `R${String(records.length + 1).padStart(6, '0')}`
+      referencesByRecord.set(key, reference)
+      records.push({ id: reference, record: structuredClone(record), type })
+    }
+    return reference
+  }
+
+  const items = report.items.map(item => ({
+    ...item,
+    criteria: item.criteria.map((criterion) => {
+      const catalogCriterion = criteriaById.get(criterion.id)
+      if (!catalogCriterion || catalogCriterion.verification.mode !== criterion.mode) {
+        throw new Error(`Kriterium ${criterion.id} passt nicht zum Pilotkatalog.`)
+      }
+      const normalized = {
+        ...criterion,
+        recordRefs: [...new Set(criterion.records.map(record => recordReference(criterion.mode === 'automatic' ? 'assertion' : 'evidence', record)))],
+      }
+      delete normalized.records
+      if (criterion.mode === 'automatic') {
+        normalized.requiredAssertionIds = [...catalogCriterion.verification.assertions]
+      }
+      return normalized
+    }),
+  }))
+
+  const normalized = {
+    ...report,
+    items,
+    records,
+    technicalRuns: report.technicalRuns.map(run => ({
+      ...run,
+      contextProvenance: {
+        ...run.contextProvenance,
+        targetUrl: 'matchedAgainstRedactedTechnicalReport',
+      },
+    })),
+    schemaVersion: 3,
+    summary: {
+      ...report.summary,
+      automaticCriteria: v3CriterionCounts(report.summary.automaticCriteria),
+      nonAutomaticCriteria: v3CriterionCounts(report.summary.nonAutomaticCriteria),
+    },
+  }
+  validatePilotProjectReportV3(normalized)
+  return normalized
+}
+
+export function createPilotProjectReportV3(options) {
+  return convertPilotProjectReportToV3(createPilotProjectReport(options))
+}
+
+export function createPilotProjectReportV3FromFiles(configFile) {
+  return convertPilotProjectReportToV3(createPilotProjectReportFromFiles(configFile))
 }
 
 function markdownText(value) {

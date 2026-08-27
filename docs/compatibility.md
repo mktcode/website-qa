@@ -66,14 +66,14 @@ Der aktuelle Katalog `website-qa-pilot` bleibt ausdrücklich experimentell. Sein
 
 Die Exporte `validateChecklistCatalog`, `evaluateChecklist`, `loadAssertionRegistry` und `loadPilotCatalog` sowie alle Namen mit `Pilot` bleiben bis zur Vertragsbereinigung experimentell. Die vorhandenen `createPilot*`-, `renderPilot*`- und `writePilot*`-Funktionen werden in 0.6.x nicht umbenannt.
 
-Für den stabilen Projektbericht ist vor 1.0 ein neues Ausgabeschema vorgesehen:
+Für den stabilen Projektbericht wird das experimentelle Ausgabeschema 3 als opt-in Vertragsvorschau erprobt. Ausgabe 2 bleibt Standard für bestehende Erzeuger, Renderer und Bundles:
 
-- Assertion- und Evidence-Records werden einmalig auf Berichtsebene gespeichert und von Kriterien über eindeutige Referenzen angesprochen; das heutige Ausgabeschema 2 mit eingebetteten Records bleibt unverändert lesbar.
+- Assertion- und Evidence-Records werden einmalig auf Berichtsebene gespeichert und von Kriterien über eindeutige berichtslokale IDs referenziert. IDs sind deterministisch nach dem ersten Auftreten vergeben, besitzen aber ausdrücklich keine berichtsübergreifende Identität. Inhaltlich gleiche Records werden nur einmal gespeichert; alle fachlichen Zuordnungen bleiben als Referenzen erhalten. Das heutige Ausgabeschema 2 mit eingebetteten Records bleibt unverändert lesbar.
 - Kriterienzähler enthalten nur die fünf tatsächlich möglichen atomaren Ergebnisse. Die stets null bleibenden Felder `partial` und `open` werden nicht in den neuen Kriterienzähler übernommen.
 - Der vollständige lokale Markdownbericht darf für fehlgeschlagene oder unklare automatische Kriterien kurze bereits redigierte Meldungen und Recordreferenzen zeigen. Freie Evidence-Notizen, Subjects und vertrauliche Unterlagen werden nicht zusätzlich vervielfältigt.
-- Stabile allgemeine API-Namen werden erst zusammen mit diesem neuen Schema eingeführt. Die bisherigen Pilotnamen bleiben für einen dokumentierten Übergang als Aliase erhalten.
+- Die opt-in Funktionen `convertPilotProjectReportToV3`, `createPilotProjectReportV3`, `createPilotProjectReportV3FromFiles` und `validatePilotProjectReportV3` bleiben vorerst experimentell. Stabile allgemeine API-Namen werden erst nach Praxisvalidierung dieses Schemas eingeführt. Die bisherigen Pilotnamen bleiben für einen dokumentierten Übergang als Aliase erhalten.
 
-Damit ist die Normalisierung eine bewusste neue Vertragsversion und keine rückwirkende Änderung bestehender 0.6.x-Berichte.
+Referenzintegrität, Recordtyp, erforderliche Assertion-IDs, Kriterienergebnisse, Punktzustände und alle Summen werden semantisch validiert. Der Konverter erkennt außerdem die in historischen 0.6.x-Projektberichten durch eine zu breite URL-Redaktion entstandene Provenienzdarstellung `(ungültige URL)` und stellt dafür ausschließlich den fest definierten Provenienzwert wieder her. Damit ist die Normalisierung eine bewusste neue Vertragsversion und keine rückwirkende Änderung bestehender 0.6.x-Berichte.
 
 ## Deprecation und Entfernung
 

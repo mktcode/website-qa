@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mktcode/website-qa/catalog/project-report.v3.schema.json",
+  "title": "Normalisierter Website-QA-Pilotbericht (experimentelles Ausgabeschema 3)",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "generatedAt",
+    "catalog",
+    "project",
+    "provenance",
+    "scope",
+    "technicalRuns",
+    "records",
+    "items",
+    "summary",
+    "warnings",
+    "limitations"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 3 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "catalog": { "$ref": "project-report.output.schema.json#/$defs/catalog" },
+    "project": { "$ref": "project-report.output.schema.json#/properties/project" },
+    "provenance": { "$ref": "project-report.output.schema.json#/properties/provenance" },
+    "scope": { "$ref": "project-report.output.schema.json#/properties/scope" },
+    "technicalRuns": { "$ref": "project-report.output.schema.json#/properties/technicalRuns" },
+    "records": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/record" }
+    },
+    "items": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/item" }
+    },
+    "summary": { "$ref": "#/$defs/summary" },
+    "warnings": { "$ref": "project-report.output.schema.json#/properties/warnings" },
+    "limitations": { "$ref": "project-report.output.schema.json#/properties/limitations" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "recordId": { "type": "string", "pattern": "^R[0-9]{6}$" },
+    "record": {
+      "type": "object",
+      "required": ["id", "type", "record"],
+      "properties": {
+        "id": { "$ref": "#/$defs/recordId" },
+        "type": { "enum": ["assertion", "evidence"] },
+        "record": {
+          "oneOf": [
+            { "$ref": "#/$defs/assertionRecord" },
+            { "$ref": "#/$defs/evidenceRecord" }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "assertionRecord": {
+      "type": "object",
+      "required": ["assertionId", "assertionVersion", "outcome", "message", "subject"],
+      "properties": {
+        "assertionId": { "type": "string", "minLength": 1 },
+        "assertionVersion": { "type": "integer", "minimum": 1 },
+        "outcome": { "enum": ["pass", "fail", "inconclusive", "notApplicable"] },
+        "message": { "type": "string", "minLength": 1 },
+        "subject": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+    "evidenceRecord": {
+      "type": "object",
+      "required": ["criterionId", "outcome", "checkedAt", "checkedBy", "note"],
+      "properties": {
+        "criterionId": { "type": "string", "pattern": "^[A-Z]+(?:-[A-Z0-9]+)+-[0-9]{2}/C[1-9][0-9]*$" },
+        "outcome": { "enum": ["pass", "fail", "inconclusive", "notApplicable"] },
+        "checkedAt": { "type": "string", "format": "date" },
+        "checkedBy": { "type": "string", "minLength": 1 },
+        "note": { "type": "string", "minLength": 1 },
+        "reference": { "type": "string", "minLength": 1 },
+        "environment": { "type": "string", "minLength": 1 },
+        "sourceRevision": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "criterion": {
+      "type": "object",
+      "required": ["id", "statement", "mode", "outcome", "recordRefs"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Z]+(?:-[A-Z0-9]+)+-[0-9]{2}/C[1-9][0-9]*$" },
+        "statement": { "type": "string", "minLength": 1 },
+        "mode": { "enum": ["automatic", "manual", "external"] },
+        "outcome": { "enum": ["pass", "fail", "inconclusive", "notApplicable", "noEvidence"] },
+        "evidenceClass": { "type": "string", "minLength": 1 },
+        "evidenceInstructions": { "type": "string", "minLength": 1 },
+        "requiredAssertionIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "recordRefs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/recordId" },
+          "uniqueItems": true
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "mode": { "const": "automatic" } }, "required": ["mode"] },
+          "then": {
+            "properties": { "requiredAssertionIds": true },
+            "required": ["requiredAssertionIds"]
+          },
+          "else": {
+            "not": {
+              "properties": { "requiredAssertionIds": true },
+              "required": ["requiredAssertionIds"]
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "item": {
+      "type": "object",
+      "required": ["id", "module", "statement", "evidenceOutcome", "projectStatus", "criteria"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Z]+(?:-[A-Z0-9]+)+-[0-9]{2}$" },
+        "module": { "type": "string", "minLength": 1 },
+        "statement": { "type": "string", "minLength": 1 },
+        "evidenceOutcome": { "enum": ["pass", "fail", "partial", "open", "inconclusive", "notApplicable"] },
+        "projectStatus": {
+          "enum": ["complete", "failed", "partial", "open", "inconclusive", "notApplicable", "external", "deferred", "acceptedDeviation"]
+        },
+        "workflow": { "$ref": "project-report.output.schema.json#/$defs/workflow" },
+        "criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/criterion" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "criterionCounts": {
+      "type": "object",
+      "required": ["pass", "fail", "inconclusive", "notApplicable", "noEvidence", "total"],
+      "properties": {
+        "pass": { "type": "integer", "minimum": 0 },
+        "fail": { "type": "integer", "minimum": 0 },
+        "inconclusive": { "type": "integer", "minimum": 0 },
+        "notApplicable": { "type": "integer", "minimum": 0 },
+        "noEvidence": { "type": "integer", "minimum": 0 },
+        "total": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "summary": {
+      "type": "object",
+      "required": ["automaticCriteria", "nonAutomaticCriteria", "checklistItems"],
+      "properties": {
+        "automaticCriteria": { "$ref": "#/$defs/criterionCounts" },
+        "nonAutomaticCriteria": { "$ref": "#/$defs/criterionCounts" },
+        "checklistItems": { "$ref": "project-report.output.schema.json#/$defs/summary/properties/checklistItems" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { aggregateEvidenceOutcomes, aggregateItemOutcome } from './outcome-aggregation.mjs'
 
 const catalogUrl = new URL('../../catalog/website-pilot.json', import.meta.url)
 const assertionRegistryUrl = new URL('../../catalog/assertions.json', import.meta.url)
@@ -80,25 +81,6 @@ export function validateChecklistCatalog(catalog = pilotCatalog, registry = asse
   return true
 }
 
-function aggregateOutcomes(outcomes) {
-  if (outcomes.every(outcome => outcome === 'noEvidence')) {
-    return 'noEvidence'
-  }
-  if (outcomes.includes('fail')) {
-    return 'fail'
-  }
-  if (outcomes.includes('inconclusive') || outcomes.includes('noEvidence')) {
-    return 'inconclusive'
-  }
-  if (outcomes.every(outcome => outcome === 'notApplicable')) {
-    return 'notApplicable'
-  }
-  if (outcomes.every(outcome => ['notApplicable', 'pass'].includes(outcome))) {
-    return 'pass'
-  }
-  return 'inconclusive'
-}
-
 function evaluateAutomaticCriterion(criterion, assertions) {
   const outcomes = []
   const matchedAssertions = []
@@ -106,12 +88,12 @@ function evaluateAutomaticCriterion(criterion, assertions) {
   for (const assertionId of criterion.verification.assertions) {
     const matching = assertions.filter(assertion => assertion.assertionId === assertionId)
     matchedAssertions.push(...matching)
-    outcomes.push(aggregateOutcomes(matching.map(assertion => assertion.outcome)))
+    outcomes.push(aggregateEvidenceOutcomes(matching.map(assertion => assertion.outcome)))
   }
 
   return {
     matchedAssertions,
-    outcome: aggregateOutcomes(outcomes),
+    outcome: aggregateEvidenceOutcomes(outcomes),
   }
 }
 
@@ -119,28 +101,8 @@ function evaluateRecordedCriterion(criterion, evidence) {
   const matching = evidence.filter(entry => entry.criterionId === criterion.id)
   return {
     evidence: matching,
-    outcome: aggregateOutcomes(matching.map(entry => entry.outcome)),
+    outcome: aggregateEvidenceOutcomes(matching.map(entry => entry.outcome)),
   }
-}
-
-function itemOutcome(criteria) {
-  const outcomes = criteria.map(criterion => criterion.outcome)
-  if (outcomes.includes('fail')) {
-    return 'fail'
-  }
-  if (outcomes.every(outcome => outcome === 'notApplicable')) {
-    return 'notApplicable'
-  }
-  if (outcomes.every(outcome => ['notApplicable', 'pass'].includes(outcome))) {
-    return 'pass'
-  }
-  if (outcomes.some(outcome => ['notApplicable', 'pass'].includes(outcome))) {
-    return 'partial'
-  }
-  if (outcomes.includes('inconclusive')) {
-    return 'inconclusive'
-  }
-  return 'open'
 }
 
 function countOutcomes(entries) {
@@ -217,7 +179,7 @@ export function evaluateChecklist(catalog, registry, options = {}) {
         criteria,
         id: item.id,
         module: item.module,
-        outcome: itemOutcome(criteria),
+        outcome: aggregateItemOutcome(criteria),
         statement: item.statement,
       }
     })

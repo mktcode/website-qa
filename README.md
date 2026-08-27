@@ -239,7 +239,7 @@ const files = writePilotProjectReportBundle({
 })
 ```
 
-Schemas und Beispiele liegen unter [`catalog/`](catalog/). `report.json` verwendet Ausgabeschema 2, weil berichtete Ziel-URLs ohne Querywerte gebunden werden; bei Queryzielen werden zusätzlich nur die Parameternamen verglichen. Der Pilot umfasst noch nicht die vollständige Website-Checkliste und verändert keine Projektcheckliste automatisch.
+Schemas und Beispiele liegen unter [`catalog/`](catalog/). `report.json` verwendet standardmäßig weiterhin Ausgabeschema 2, weil berichtete Ziel-URLs ohne Querywerte gebunden werden; bei Queryzielen werden zusätzlich nur die Parameternamen verglichen. Das experimentelle Ausgabeschema 3 normalisiert eingebettete Assertion- und Evidence-Records als opt-in Vorschau über `convertPilotProjectReportToV3`, `createPilotProjectReportV3`, `createPilotProjectReportV3FromFiles` und `validatePilotProjectReportV3`; bestehende Renderer und Bundles wechseln nicht automatisch. Der Pilot umfasst noch nicht die vollständige Website-Checkliste und verändert keine Projektcheckliste automatisch.
 
 ### Nachweis- und Statuspflege
 

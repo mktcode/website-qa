@@ -132,6 +132,9 @@ function redactString(value, key, options) {
     return value
   }
   const normalizedKey = String(key || '').toLowerCase()
+  if (normalizedKey === 'targeturl' && value === 'matchedAgainstRedactedTechnicalReport') {
+    return value
+  }
   if (urlFieldNames.has(normalizedKey) || normalizedKey.endsWith('url')) {
     const path = redactPath(value)
     return path || reportUrl(value, options).url

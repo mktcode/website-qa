@@ -269,6 +269,7 @@ describe('project report pilot', () => {
       deploymentAndSourceContext: 'projectDeclared',
       targetUrlBinding: 'matchedAgainstRedactedTechnicalReport',
     })
+    expect(report.technicalRuns.every((run: { contextProvenance: { targetUrl: string } }) => run.contextProvenance.targetUrl === 'matchedAgainstRedactedTechnicalReport')).toBe(true)
   })
 
   it('renders a data-minimized public summary without project evidence details', () => {

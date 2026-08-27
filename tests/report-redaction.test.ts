@@ -36,6 +36,7 @@ describe('report redaction', () => {
     const output = redactReportData({
       action: '/submit?csrf=secret',
       issue: { message: 'Weiter zu https://example.com/?code=secret', severity: 'warning' },
+      provenance: { targetUrl: 'matchedAgainstRedactedTechnicalReport' },
       requestedUrl: 'https://example.com/?email=private%40example.com',
       status: 200,
     })
@@ -43,6 +44,7 @@ describe('report redaction', () => {
     expect(output).toEqual({
       action: '/submit',
       issue: { message: 'Weiter zu https://example.com/', severity: 'warning' },
+      provenance: { targetUrl: 'matchedAgainstRedactedTechnicalReport' },
       requestedUrl: 'https://example.com/',
       status: 200,
     })
