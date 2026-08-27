@@ -886,6 +886,6 @@
   "tool": "social-preview-check",
   "toolPackage": {
     "name": "@mktcode/website-qa",
-    "version": "0.6.1"
+    "version": "0.6.2"
   }
 }

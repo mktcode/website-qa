@@ -1,6 +1,6 @@
 {
   "name": "@mktcode/website-qa",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Read-only HTTP, crawl, browser and social-preview checks for public websites",
   "license": "MIT",
   "type": "module",

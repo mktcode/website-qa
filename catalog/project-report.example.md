@@ -37,10 +37,10 @@ Nicht automatische Kriterien (36 gesamt): 1 belegt, 0 fehlgeschlagen, 0 unklar, 
 
 | Werkzeug | Ziel | Umgebung | Verwendet | Assertions | Befehl |
 |---|---|---|---:|---:|---|
-| http-check 0.6.1 | https://example.com/ | production | ja | 12 | <code>website-qa-http https://example.com/ --strict --json</code> |
-| crawl-check 0.6.1 | https://example.com/ | production | ja | 16 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
-| browser-check 0.6.1 | https://example.com/ | production | ja | 7 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
-| social-preview-check 0.6.1 | https://example.com/ | production | ja | 10 | <code>website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json</code> |
+| http-check 0.6.2 | https://example.com/ | production | ja | 12 | <code>website-qa-http https://example.com/ --strict --json</code> |
+| crawl-check 0.6.2 | https://example.com/ | production | ja | 16 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
+| browser-check 0.6.2 | https://example.com/ | production | ja | 7 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
+| social-preview-check 0.6.2 | https://example.com/ | production | ja | 10 | <code>website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json</code> |
 
 ## Checklistenpunkte
 

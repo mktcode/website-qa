@@ -245,6 +245,12 @@ Kriterien verwenden ausschließlich `pass`, `fail`, `inconclusive`, `notApplicab
 
 Alle Records in einer Evidence-Datei gelten als gleichzeitig aktive Nachweise; es gibt kein stilles „neuester Eintrag gewinnt“ und keinen automatischen Ablauf allein aufgrund des Datums. Mehrere Records für dasselbe Kriterium werden konservativ zusammengeführt: Ein aktives `fail` hat Vorrang, ein aktives `inconclusive` verhindert ein eindeutiges Ergebnis, und eine Mischung aus `pass` und `notApplicable` bleibt `pass`. Ersetzte oder fachlich nicht mehr geltende Records müssen deshalb bewusst aus der aktiven Projektkopie entfernt und bei Bedarf über deren Versionshistorie beziehungsweise Projektakte erhalten werden. Freie Notizen und Referenzen werden nur als Nachweisdaten übernommen; das Werkzeug öffnet oder bestätigt referenzierte Unterlagen nicht. Vertrauliche Unterlagen werden weiterhin ausschließlich außerhalb empfohlener Berichte verwahrt und nur redigiert referenziert.
 
+### Migration von 0.6.1
+
+- Eine ausdrücklich dokumentierte Nichtanwendbarkeit des gesamten Checklistenpunkts verändert weiterhin nur dessen Projektstatus. Sie markiert fehlende, unklare oder negative Kriterien im vollständigen Markdownbericht nicht mehr fälschlich als abgehakt.
+- Kriteriencheckboxen folgen damit wie die Kriterienzähler ausschließlich dem jeweiligen Kriterienergebnis: `pass` und `notApplicable` gelten als geklärt; `fail`, `inconclusive` und `noEvidence` bleiben sichtbar offen.
+- JSON-Schemas, Auswertung, Pilotkatalog, Assertions und technische Prüfergebnisse ändern sich nicht. Vorhandene technische 0.6.x-Berichte und Evidence-Dateien können ohne neue Netzwerkprüfung verarbeitet werden.
+
 ### Migration von 0.6.0
 
 - Die vollständige und die datenarme Markdowndarstellung nennen für automatische und nicht automatische Kriterien nun jeweils Gesamtzahl, bestandene beziehungsweise belegte, fehlgeschlagene, unklare, nicht zutreffende und nicht belegte Kriterien. Die Kurzzeilen sind damit summengleich.
