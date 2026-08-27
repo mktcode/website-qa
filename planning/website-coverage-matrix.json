@@ -1,0 +1,3122 @@
+{
+  "schemaVersion": 1,
+  "status": "planning",
+  "title": "Abdeckungsmatrix der modularen Website-QA-Checkliste",
+  "checklistRevision": "cd105c834d2f27f4a065ed67aca6622b0d90ef22",
+  "catalogReference": {
+    "id": "website-qa-baseline",
+    "version": "1.0.0"
+  },
+  "scope": {
+    "sources": [
+      "docs/checklisten/website/kern.md",
+      "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "docs/checklisten/website/module/formulare-api-daten.md",
+      "docs/checklisten/website/module/medien-animationen.md",
+      "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "docs/checklisten/website/module/container-deployment.md",
+      "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "docs/checklisten/website/abschluss.md"
+    ],
+    "itemCount": 215,
+    "note": "Die Matrix klassifiziert allgemeine Automatisierungsnähte. Sie ist weder Katalog noch Projektbericht und ändert keine Checklistenbedeutung oder Projektbewertung."
+  },
+  "classificationDefinitions": {
+    "existing-baseline": "Der stabile Basiskatalog enthält bereits mindestens ein automatisches Kriterium für den Punkt; manuelle oder externe Reste können weiterhin erforderlich sein.",
+    "direct-get-candidate": "Ein allgemeiner begrenzter GET- oder passiver Browserlauf kann einen normativen technischen Teilnachweis liefern, ohne den Gesamtpunkt automatisch abzuschließen.",
+    "observation-candidate": "Ein allgemeiner begrenzter GET- oder passiver Browserlauf kann hilfreiche technische Beobachtungen sammeln; die normative Bewertung bleibt manuell.",
+    "project-local-or-manifest": "Sinnvolle Automatisierung benötigt Projektquellcode, Build, lokales Manifest oder projektspezifische Sollvorgaben statt eines alleinigen URL-Laufs.",
+    "manual-external-administrative": "Der Nachweis ist überwiegend redaktionell, rechtlich, organisatorisch, plattformspezifisch, infrastrukturell oder menschlich zu erbringen.",
+    "unsafe-or-mutating": "Ein belastbarer Nachweis würde Authentifizierung, Zustandsänderung, gültige Formulare, sensible Betriebszugriffe oder andere für Standardwerkzeuge ausgeschlossene Aktionen erfordern."
+  },
+  "contextDefinitions": {
+    "url-get": "Öffentlicher, SSRF- und limitgeschützter HTTP-GET.",
+    "browser-passive": "Isolierter beobachtender Browserlauf ohne Klicks, Formulare oder externe Requests.",
+    "project-manifest": "Explizite projektseitige Sollwerte, Routen, Hosts, Module oder Deploymentzuordnung.",
+    "project-local": "Lokaler Quellcode, Build, Tests, Lockdatei oder nicht öffentliche Projektartefakte.",
+    "infrastructure-access": "Begrenzter administrativer oder infrastruktureller Lesezugriff.",
+    "human-review": "Redaktionelle, visuelle, fachliche, rechtliche oder organisatorische Bewertung.",
+    "external-platform": "Echter externer Plattform-, Konto-, Provider- oder Freigabenachweis.",
+    "mutating-test": "Ausdrücklich freigegebener zustandsverändernder Test außerhalb der Standardwerkzeuge."
+  },
+  "summary": {
+    "total": 215,
+    "existingCatalogItems": 34,
+    "byClassification": {
+      "existing-baseline": 31,
+      "direct-get-candidate": 25,
+      "observation-candidate": 19,
+      "project-local-or-manifest": 79,
+      "manual-external-administrative": 41,
+      "unsafe-or-mutating": 20
+    },
+    "byCandidatePriority": {
+      "high": 17,
+      "medium": 23,
+      "low": 4,
+      "none": 171
+    },
+    "byModule": {
+      "core": {
+        "total": 98,
+        "byClassification": {
+          "existing-baseline": 31,
+          "direct-get-candidate": 14,
+          "observation-candidate": 7,
+          "project-local-or-manifest": 27,
+          "manual-external-administrative": 15,
+          "unsafe-or-mutating": 4
+        }
+      },
+      "auftrag-recht-uebergabe": {
+        "total": 16,
+        "byClassification": {
+          "existing-baseline": 0,
+          "direct-get-candidate": 0,
+          "observation-candidate": 3,
+          "project-local-or-manifest": 0,
+          "manual-external-administrative": 13,
+          "unsafe-or-mutating": 0
+        }
+      },
+      "formulare-api-daten": {
+        "total": 30,
+        "byClassification": {
+          "existing-baseline": 0,
+          "direct-get-candidate": 2,
+          "observation-candidate": 3,
+          "project-local-or-manifest": 16,
+          "manual-external-administrative": 1,
+          "unsafe-or-mutating": 8
+        }
+      },
+      "medien-animationen": {
+        "total": 20,
+        "byClassification": {
+          "existing-baseline": 0,
+          "direct-get-candidate": 6,
+          "observation-candidate": 6,
+          "project-local-or-manifest": 6,
+          "manual-external-administrative": 0,
+          "unsafe-or-mutating": 2
+        }
+      },
+      "umgebungen-domainmigration": {
+        "total": 11,
+        "byClassification": {
+          "existing-baseline": 0,
+          "direct-get-candidate": 3,
+          "observation-candidate": 0,
+          "project-local-or-manifest": 6,
+          "manual-external-administrative": 2,
+          "unsafe-or-mutating": 0
+        }
+      },
+      "container-deployment": {
+        "total": 22,
+        "byClassification": {
+          "existing-baseline": 0,
+          "direct-get-candidate": 0,
+          "observation-candidate": 0,
+          "project-local-or-manifest": 16,
+          "manual-external-administrative": 5,
+          "unsafe-or-mutating": 1
+        }
+      },
+      "datenbetrieb-wiederherstellung": {
+        "total": 15,
+        "byClassification": {
+          "existing-baseline": 0,
+          "direct-get-candidate": 0,
+          "observation-candidate": 0,
+          "project-local-or-manifest": 5,
+          "manual-external-administrative": 5,
+          "unsafe-or-mutating": 5
+        }
+      },
+      "abschluss": {
+        "total": 3,
+        "byClassification": {
+          "existing-baseline": 0,
+          "direct-get-candidate": 0,
+          "observation-candidate": 0,
+          "project-local-or-manifest": 3,
+          "manual-external-administrative": 0,
+          "unsafe-or-mutating": 0
+        }
+      }
+    }
+  },
+  "v1_1Shortlist": [
+    {
+      "id": "CORE-DOM-06",
+      "stage": "v1.1-evaluate",
+      "proposedEvidence": "Atomare, werkzeuggebundene Beobachtungen zur Konsistenz von finaler URL, Canonical, internen Links, Sitemap- und OpenGraph-URLs gegen den deklarierten öffentlichen Origin.",
+      "requestImpact": "Vorhandene HTTP-, Crawl- und Social-Abrufe wiederverwenden; keine neuen Zielklassen.",
+      "manualRemainder": "Vollständigkeit des projektspezifischen Host-, Routen- und Migrationsinventars.",
+      "reason": "Hoher generischer Nutzen und durch den WordPress-Verbraucher praktisch belegte Inkonsistenzklasse."
+    },
+    {
+      "id": "CORE-SEO-03",
+      "stage": "v1.1-evaluate",
+      "proposedEvidence": "Strukturierte Daten aus bereits geladenem HTML syntaktisch parsen und erkennbare Typ- und Pflichtfeldprobleme atomar berichten.",
+      "requestImpact": "Vorhandene HTML-GETs wiederverwenden; keine externen Validatoren automatisch aufrufen.",
+      "manualRemainder": "Übereinstimmung mit sichtbarem Inhalt, redaktionelle Vollständigkeit und offizieller Validatornachweis.",
+      "reason": "Frameworkunabhängige technische Lücke mit klarer GET-Grenze und ohne neue Browserinteraktion."
+    },
+    {
+      "id": "CORE-ROB-03",
+      "stage": "v1.1-evaluate",
+      "proposedEvidence": "Tatsächlich ausgelieferte robots.txt getrennt nach Trainings-/Datennutzungstokens, Suche und nutzerinitiiertem Abruf auswerten.",
+      "requestImpact": "Vorhandenen Social-robots-Abruf und die bestehende Policy-Matrix wiederverwenden.",
+      "manualRemainder": "Betreiberentscheidung, Rechtsbewertung, Freigabe und Aktualitätsprüfung der Quellen.",
+      "reason": "Schließt eine erkennbare fachliche Zuordnungslücke ohne zusätzliche Requests; darf nicht mit der CLI-Opt-in-Deklaration gleichgesetzt werden."
+    },
+    {
+      "id": "CORE-A11Y-03",
+      "stage": "v1.1-evaluate",
+      "proposedEvidence": "Bereits ausgeführte Axe-/DOM-Befunde zu fehlenden zugänglichen Namen als eigene atomare Assertionfamilie zuordnen.",
+      "requestImpact": "Vorhandene Browserprofile und Axe-Ausführung wiederverwenden.",
+      "manualRemainder": "Verständlichkeit der Namen, dynamische Zustände und ausschließlich visuell vermittelte Bedeutung.",
+      "reason": "Der zweite Verbraucher zeigte konkrete Button-Name-Befunde, die derzeit nur im allgemeinen Axe-Gesamtergebnis aufgehen."
+    },
+    {
+      "id": "CORE-A11Y-08",
+      "stage": "v1.1-evaluate",
+      "proposedEvidence": "Bereits beobachtete Axe-/DOM-Befunde zu fehlenden Bildalternativen und technischer Dekorativauszeichnung atomar zuordnen.",
+      "requestImpact": "Vorhandene HTML- und Browserbeobachtungen wiederverwenden.",
+      "manualRemainder": "Inhaltliche und kontextuelle Eignung des Alternativtexts sowie dekorative Absicht.",
+      "reason": "Hoher allgemeiner Nutzen bei klarer Trennung zwischen technischer Existenz und redaktioneller Qualität."
+    },
+    {
+      "id": "CORE-A11Y-09",
+      "stage": "v1.1-evaluate",
+      "proposedEvidence": "Bereits vorhandene Axe-Kontrastbefunde als eigene atomare Assertionfamilie zuordnen.",
+      "requestImpact": "Vorhandene Browserprofile und Axe-Ausführung wiederverwenden.",
+      "manualRemainder": "Fokus-, Hover-, Aktiv- und dynamische Zustände sowie bildbasierte Sonderfälle.",
+      "reason": "Der zweite Verbraucher belegte die praktische Relevanz; die Aussage bleibt ein technischer Teilnachweis und keine WCAG-Freigabe."
+    }
+  ],
+  "items": [
+    {
+      "id": "CORE-SCP-01",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Prüfumfang, Rollen und Ausschlüsse sind projektspezifische Vereinbarungen. Ein URL-Lauf kann weder Vollständigkeit noch Verantwortlichkeit feststellen."
+    },
+    {
+      "id": "CORE-SCP-02",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Betreiber, Verantwortliche und Ansprechpartner sind organisatorische Angaben, die nicht aus öffentlichen Antworten abgeleitet werden dürfen."
+    },
+    {
+      "id": "CORE-SCP-03",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Ein vollständiges Funktions-, Datenfluss- und Integrationsinventar benötigt Projektwissen und die lokale Modulauswahl. Ein Crawl kann öffentliche Routen beitragen, aber keine administrativen Wege oder fehlenden PROJ-Punkte erkennen."
+    },
+    {
+      "id": "CORE-CNT-01",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Die Übereinstimmung veröffentlichter Inhalte mit einem freigegebenen Stand ist eine redaktionelle und organisatorische Bewertung."
+    },
+    {
+      "id": "CORE-CNT-02",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Die Abfrage und Abgrenzung rechtlicher, branchenspezifischer, barrierefreier und sicherheitstechnischer Pflichten ist vertraglich und fachlich, nicht URL-basiert."
+    },
+    {
+      "id": "CORE-CNT-03",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "GET kann serverseitige Zugänglichkeit, Überschriftenstruktur und erkennbare Quellenverweise technisch belegen. Informationsgehalt, Aktualität, Eindeutigkeit und sachliche Belegbarkeit bleiben redaktionell offen."
+    },
+    {
+      "id": "CORE-DOM-01",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Bevorzugte URL, Host und Slash-Strategie sind projektspezifische Sollvorgaben. Öffentliches Verhalten kann sie nicht selbständig definieren."
+    },
+    {
+      "id": "CORE-DOM-02",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der stabile Katalog prüft permanente HTTP-zu-HTTPS-Weiterleitung sowie Pfad- und Queryerhalt automatisch."
+    },
+    {
+      "id": "CORE-DOM-03",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest"
+      ],
+      "v1_1Priority": "high",
+      "rationale": "Deklarierte öffentliche Hostvarianten können mit begrenzten GETs auf permanente, direkte sowie pfad- und queryerhaltende Weiterleitung geprüft werden. Welche Varianten vorgesehen sind, muss das Projektmanifest liefern."
+    },
+    {
+      "id": "CORE-DOM-04",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "manual-external-administrative",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog enthält nur externe beziehungsweise manuelle Kriterien. TLS-Kette und Versionen benötigen ein geeignetes Nicht-GET-Werkzeug; automatische Verlängerung benötigt Infrastrukturkonfiguration oder Erneuerungsnachweis."
+    },
+    {
+      "id": "CORE-DOM-05",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft einzelne absolute Canonicals und ihren Abgleich mit finalen URLs automatisch. Die Übereinstimmung mit der projektspezifischen URL-Strategie bleibt manuell."
+    },
+    {
+      "id": "CORE-DOM-06",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest"
+      ],
+      "v1_1Priority": "high",
+      "rationale": "Ein begrenzter Crawl kann Canonicals, interne Links, Sitemap- und OpenGraph-URLs sowie beobachtete Redirectziele gegen einen deklarierten öffentlichen Origin abgleichen. Nicht entdeckte Routen und Hosts bleiben offen."
+    },
+    {
+      "id": "CORE-DOM-07",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft Downgrades und unnötige HTTP-/HTTPS-Weiterleitungsketten automatisch. Die Vollständigkeit aller veröffentlichten Hosts und Routen benötigt ein Projektinventar."
+    },
+    {
+      "id": "CORE-DOM-08",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft HSTS-Präsenz und Mindestdauer auf ausgewählten Antworten. Vollständige Antwortklassen, Weiterleitungshosts sowie includeSubDomains- und preload-Entscheidungen bleiben infrastrukturell und administrativ offen."
+    },
+    {
+      "id": "CORE-DOM-09",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "DNS-Einträge, IPv4/IPv6 und Altziele erfordern DNS- beziehungsweise Infrastrukturprüfung außerhalb einer allgemeinen URL-GET-Naht sowie ein Sollinventar."
+    },
+    {
+      "id": "CORE-ERR-01",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft 404-Status und typische technische Detaillecks automatisch. Verständlichkeit und projektspezifisch sensible Inhalte bleiben redaktionell offen."
+    },
+    {
+      "id": "CORE-ERR-02",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft noindex sowie das Fehlen irreführender Canonical- und og:url-Angaben auf der 404-Probe automatisch."
+    },
+    {
+      "id": "CORE-ERR-03",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft Status und MIME-Typ entdeckter interner Ressourcen automatisch. API- und projektspezifische Content-Negotiation-Fehler benötigen ein lokales Endpunkt- und Erwartungsinventar."
+    },
+    {
+      "id": "CORE-ERR-04",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft ausgewählte 404-, Cache-, Indexierungs- und Sicherheitsheader automatisch. App- und proxyseitige Redirectklassen sowie alternative Hosts bleiben infrastrukturell offen."
+    },
+    {
+      "id": "CORE-SEO-01",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft Vorhandensein, Eindeutigkeit und Duplikate von Titel und Meta-Beschreibung. Inhaltliche Passung bleibt redaktionell."
+    },
+    {
+      "id": "CORE-SEO-02",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft lang-Präsenz und genau eine H1. Sprachpassung, Hierarchie und Verständlichkeit bleiben fachlich offen."
+    },
+    {
+      "id": "CORE-SEO-03",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "human-review",
+        "external-platform"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "GET kann strukturierte Daten extrahieren und Syntax, Typen sowie erkennbare Pflichtfelder technisch validieren. Übereinstimmung mit sichtbarem Inhalt, Vollständigkeit und Ergebnisse offizieller Validatoren bleiben manuell beziehungsweise extern."
+    },
+    {
+      "id": "CORE-SOC-01",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft OpenGraph-Pflichtfelder, HTTPS-URLs und X-/Twitter-Fallbacks automatisch. Redaktionelle Eignung von Text, Bild und Zuschnitt bleibt offen."
+    },
+    {
+      "id": "CORE-SOC-02",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der stabile Katalog modelliert User-Agent-Konsistenz, Canonical-/OpenGraph-Abgleich, Vorschaubildtechnik und strikten Lauf bereits automatisch."
+    },
+    {
+      "id": "CORE-SOC-03",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "manual-external-administrative",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "external-platform",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog enthält ausschließlich ein manuelles External-Platform-Kriterium. Echte Vorschau, Zuschnitt und Plattformcache können nicht durch lokale User-Agent-GETs belegt werden."
+    },
+    {
+      "id": "CORE-ROB-01",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft Abruf und Social-Crawler-Regeln automatisch. Ob notwendige Projektseiten und Ressourcen gemäß gewünschter Indexierung zugelassen sind, bleibt projektbezogen."
+    },
+    {
+      "id": "CORE-ROB-02",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "external-platform",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog dokumentiert Kennungen, Kategorien, Quellen und Quellenstand automatisch. Aktualität, Anbieteränderungen und projektspezifische Relevanz bleiben manuell."
+    },
+    {
+      "id": "CORE-ROB-03",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "human-review"
+      ],
+      "v1_1Priority": "high",
+      "rationale": "Die bereits abgerufene robots.txt kann automatisch auf bekannte Trainings- und Datennutzungstokens sowie wirksame Ausschlussregeln geprüft werden. Betreiberzustimmung und unabhängige Entscheidungen für Suche oder Nutzerabruf bleiben administrativ."
+    },
+    {
+      "id": "CORE-ROB-04",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft blockierte oder deklarierte Trainingszugriffe und strikten Modus. Die tatsächliche Opt-in-/Opt-out-Entscheidung bleibt administrativ."
+    },
+    {
+      "id": "CORE-ROB-05",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "external-platform",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Bericht kann einen eingebetteten Quellenstand ausweisen, aber ausreichende Aktualität und Anbieteränderungen erfordern Prüfung offizieller externer Quellen."
+    },
+    {
+      "id": "CORE-MAP-01",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft Sitemap-XML, robots-Referenz und gültige kanonische 200-Einträge. Sinnhaftigkeit und Vollständigkeit gegenüber dem Routeninventar bleiben projektbezogen."
+    },
+    {
+      "id": "CORE-MAP-02",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft XML, Medientyp, Origin, Duplikate, Canonicals und Abdeckung automatisch. Belastbarkeit optionaler Metadaten und sichtbare XSL-Qualität bleiben manuell."
+    },
+    {
+      "id": "CORE-SEO-04",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft interne Navigation, Fragmente, Ressourcenstatus, MIME-Typen und sichere Laufabdeckung. Inventarvollständigkeit, externe und interaktionsabhängige Ziele bleiben offen."
+    },
+    {
+      "id": "CORE-SEO-05",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "external-platform",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Search-Console-Eigentum, Konten, Properties und Verifizierungswege sind externe administrative Nachweise und können vertrauliche Kontoinformationen betreffen."
+    },
+    {
+      "id": "CORE-A11Y-01",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft genau ein Main-Landmark automatisch. Semantische Angemessenheit weiterer Bereiche bleibt fachlich zu bewerten."
+    },
+    {
+      "id": "CORE-A11Y-02",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Ein passiver Browser kann Fokusierbarkeitsindikatoren, DOM-Reihenfolge und verdächtige tabindex-Werte sammeln. Tatsächliche Tastaturreihenfolge, sichtbarer Fokus und Fokusfallen erfordern eine manuelle Interaktion und bleiben offen."
+    },
+    {
+      "id": "CORE-A11Y-03",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "high",
+      "rationale": "Accessibility-Tree- und Axe-Beobachtungen können fehlende zugängliche Namen und mehrere maschinell erkennbare Farbabhängigkeiten technisch nachweisen. Verständlichkeit, alle Zustände und rein visuelle Bedeutungen bleiben manuell."
+    },
+    {
+      "id": "CORE-A11Y-04",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Im passiven Initialzustand lassen sich visuell versteckte, dennoch fokussierbare oder im Accessibility Tree vorhandene Elemente technisch erkennen. Erst nach Interaktion entstehende Sichtbarkeitszustände bleiben offen."
+    },
+    {
+      "id": "CORE-A11Y-05",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "mutating-test",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Ein belastbarer Dialogtest muss Auslöser und Schließwege betätigen sowie Fokus vorwärts und rückwärts verändern. Solche Browserinteraktionen sind für die allgemeinen Standardwerkzeuge verboten und gehören in ein gesondertes Verfahren."
+    },
+    {
+      "id": "CORE-A11Y-06",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "browser-passive",
+        "human-review",
+        "mutating-test"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Passives DOM und Axe können Labelzuordnung, required-Markierung und statisch vorhandene Beschreibungen technisch prüfen. Fehler- und Erfolgszustände erfordern Formularinteraktion und bleiben einem gesonderten Test vorbehalten."
+    },
+    {
+      "id": "CORE-A11Y-07",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "mutating-test",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Dynamische Formularfehler und Statusmeldungen müssen durch Eingabe oder Absenden ausgelöst werden. Das ist in den ausschließlich beobachtenden Standardwerkzeugen verboten."
+    },
+    {
+      "id": "CORE-A11Y-08",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "high",
+      "rationale": "HTML- und Accessibility-Tree-Prüfung kann fehlende, leere oder widersprüchlich ausgezeichnete Alternativtexte sowie dekorative ARIA-Muster technisch bewerten. Redaktionelle Passung des Alternativtexts bleibt manuell."
+    },
+    {
+      "id": "CORE-A11Y-09",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "high",
+      "rationale": "Axe und berechnete Styles können viele Kontrastverstöße im passiven Zustand normativ prüfen. Fokus-, Hover-, aktive und dynamisch erzeugte Zustände sowie bildbasierte Sonderfälle bleiben manuell."
+    },
+    {
+      "id": "CORE-A11Y-10",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft horizontalen Überlauf in 320-Pixel- und 200-Prozent-Näherungsprofilen. Echte reine Textvergrößerung und sinnvolle Bedienbarkeit bleiben manuell."
+    },
+    {
+      "id": "CORE-A11Y-11",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Ein passiver Reduced-Motion-Lauf kann sichtbare Inhalte, ausgeblendete Bereiche und technische Bewegungsindikatoren beobachten. Vollständige Bedienbarkeit ohne Maus erfordert Interaktion und bleibt offen."
+    },
+    {
+      "id": "CORE-A11Y-12",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "high",
+      "rationale": "Ein passiver Reduced-Motion-Kontext kann laufende CSS-Animationen, Übergänge, Smooth-Scroll-Deklarationen und Autoplay-Medien technisch erfassen. Interaktionsabhängige JavaScript-Bewegungen und fachliche Ablenkungsbewertung bleiben manuell."
+    },
+    {
+      "id": "CORE-A11Y-13",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "browser-passive",
+        "external-platform",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog modelliert den Axe-Teilnachweis automatisch. Tastatur, reales Mobilgerät und risikogerechter Screenreader bleiben getrennte manuelle Nachweise."
+    },
+    {
+      "id": "CORE-A11Y-14",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Geschuldete Konformität, Umfang, Verfahren und Abweichungen sind rechtliche beziehungsweise fachliche Festlegungen. Automatische Audits dürfen keine Konformität behaupten."
+    },
+    {
+      "id": "CORE-PERF-01",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft Identity, Gzip, Brotli, Vary und Wirksamkeit auf ausgewählten HTML-, CSS- und JavaScript-Antworten. JSON, SVG und produktive Proxyzuordnung bleiben offen."
+    },
+    {
+      "id": "CORE-PERF-02",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Bereits entdeckte Bilder, Archive und Schriftdateien können mit Accept-Encoding-GETs auf unnötige zusätzliche HTTP-Kompression geprüft werden. Nicht entdeckte Ressourcen bleiben außerhalb der Abdeckung."
+    },
+    {
+      "id": "CORE-PERF-03",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "browser-passive",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "high",
+      "rationale": "Ein passiver Browser kann Navigationstiming, LCP-Kandidat, CLS, Long Tasks und Renderwarnungen sammeln. Reproduzierbare Leistungsbewertung, lokale Produktionsbuild-Messung und Interpretation der Tracewarnungen bleiben projektbezogen."
+    },
+    {
+      "id": "CORE-PERF-04",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Ein passiver Initiallauf kann unsichtbare Above-the-fold-Elemente, verspätete Sichtbarkeit und verdächtige Duplikate beobachten. Absicht, Wesentlichkeit und künstliche Metrikmanipulation bleiben manuell zu bewerten."
+    },
+    {
+      "id": "CORE-PERF-05",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft langfristig unveränderliche, versioniert wirkende Assets und die 404-Cachepolitik. Veränderliche, sensible und weitere Antwortklassen benötigen Projektkontext."
+    },
+    {
+      "id": "CORE-PRIV-01",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Ein Crawl kann dauerhafte interne Links zu Impressum und Datenschutzerklärung sowie erfolgreiche HTML-Antworten technisch prüfen. Rechtliche Vollständigkeit und Übereinstimmung mit tatsächlich eingesetzten Diensten bleiben menschlich."
+    },
+    {
+      "id": "CORE-PRIV-02",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "browser-passive",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog inventarisiert und blockiert externe Requestversuche automatisch. Quellcode-, Build- und Konfigurationsabgleich sowie rechtliche Bewertung bleiben projektlokal."
+    },
+    {
+      "id": "CORE-PRIV-03",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "browser-passive",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Passive Netzwerkbeobachtung kann erkennen, welche externen Dienste im Initialzustand aktiviert werden oder versucht werden. Zweck, Rechtsgrundlage, Einwilligungsbedarf und unbeabsichtigte Beispielkonfigurationen bleiben lokal und rechtlich zu prüfen."
+    },
+    {
+      "id": "CORE-PRIV-04",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "browser-passive",
+        "human-review",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog inventarisiert Cookies und Storage im passiven Initialzustand ohne Werte. Dokumentationsabgleich, Einwilligungszustände und fachliche Angemessenheit der Cookieattribute bleiben offen."
+    },
+    {
+      "id": "CORE-PRIV-05",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "mutating-test",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Die technische Wirkung einer Einwilligung erfordert das Betätigen von Einwilligungselementen und die Beobachtung veränderter Speicher- oder Requestzustände. Diese Interaktionen sind im Standardwerkzeug verboten; rechtliche Erforderlichkeit bleibt zusätzlich manuell."
+    },
+    {
+      "id": "CORE-SEC-01",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "low",
+      "rationale": "Bereits abgerufene öffentliche Antworten könnten mit streng redigierenden Hochkonfidenzmustern auf mögliche Secrets beobachtet werden. Ein negativer URL-Befund beweist weder Repository- noch Artefaktfreiheit; Treffer dürfen nie ausgegeben und müssen lokal fachlich bewertet werden."
+    },
+    {
+      "id": "CORE-SEC-02",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Abhängigkeiten, Lockdatei, Build und Produktionskonfiguration sind URL-only nicht zuverlässig zugänglich. Erreichbarkeit und reale Laufzeitpfade benötigen lokale Projektanalyse."
+    },
+    {
+      "id": "CORE-SEC-03",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "project-manifest",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Unterstützte Laufzeiten, Architektur, Frameworkversionen und native Artefakte benötigen Projekt- und Deploymentinformationen. Öffentliche Fingerprints wären unvollständig und nicht belastbar."
+    },
+    {
+      "id": "CORE-SEC-04",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft die Sicherheitsheaderbasis ausgewählter HTML-, CSS-, JavaScript- und 404-Antworten. APIs, sensible Antworten, alternative Hosts und tatsächliche Proxygrenzen bleiben infrastrukturell."
+    },
+    {
+      "id": "CORE-SEC-05",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft deklarierte CSP, Framing-Schutz, nosniff, Referrer Policy, Permissions Policy und HSTS. Inhaltliche Stärke, Reichweite und Widerspruchsfreiheit bleiben fachlich offen."
+    },
+    {
+      "id": "CORE-SEC-06",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "low",
+      "rationale": "Ein sicherer Crawl könnte öffentliche Antworten auf Secret-, Debug-, interne Pfad- und Source-Map-Signaturen beobachten, ohne Werte auszugeben. Vollständige Verzeichnis- und Artefaktabdeckung ist URL-basiert unmöglich und bleibt projektlokal; wegen Redaktions- und Fehlinterpretationsrisiko ist dies kein früher v1.1-Kandidat."
+    },
+    {
+      "id": "CORE-SEC-07",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Sichere GETs und passive Browserläufe können deklarierte zentrale Seiten und Fehlerproben auf HTTP-, Netzwerk-, JavaScript- und Konsolenfehler prüfen. Funktionsspezifische Erwartungen und interaktionsabhängige Nutzerpfade bleiben offen."
+    },
+    {
+      "id": "CORE-SEC-08",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Secretdateien, Skripte, umask, Dateimodi, Bereinigung und Ignore-Regeln sind ausschließlich im privaten Projektkontext prüfbar."
+    },
+    {
+      "id": "CORE-SEC-09",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Laufzeitvariablen, Beispieldokumentation, ungenutzte Variablen und Fallbacks erfordern lokale Konfigurations- und Quellcodeanalyse."
+    },
+    {
+      "id": "CORE-SEC-10",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Zuständigkeit, Übergabe, Rotation und Wiederbeschaffung produktiver Zugangsdaten sind vertrauliche organisatorische und infrastrukturelle Nachweise."
+    },
+    {
+      "id": "CORE-VAL-01",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Unterstützte und tatsächlich verwendete Laufzeit-, Architektur- und Paketmanagerversionen stammen aus Projektkonfiguration und Ausführungsprotokoll."
+    },
+    {
+      "id": "CORE-VAL-02",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Saubere Lockdateiinstallation, Warnungen und plattformspezifische Artefakte müssen lokal ausgeführt und bewertet werden."
+    },
+    {
+      "id": "CORE-VAL-03",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Vorhandene Skripte und einschlägige Lint-, Typ-, Test-, Migrations- und Buildprüfungen sind projektspezifisch."
+    },
+    {
+      "id": "CORE-VAL-04",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "url-get",
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Produktionsbuild muss lokal mit dem projektspezifischen Startkommando gestartet werden. URL- und Browser-Smoke-Tests sind erst danach Teil dieses lokalen Nachweises."
+    },
+    {
+      "id": "CORE-VAL-05",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Git-Diff-Prüfung, relative Dokumentationslinks und generierte Dokumente benötigen Zugriff auf den lokalen Repositorybestand."
+    },
+    {
+      "id": "CORE-VAL-06",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Getrennte Entwicklungs- und Produktionsaudits sowie Bewertung von Laufzeitpfad und Erreichbarkeit basieren auf lokalen Abhängigkeitsdaten."
+    },
+    {
+      "id": "CORE-VAL-07",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Versionierte Dateien und relevante Artefakte müssen lokal mit redigierenden Secretmustern geprüft werden; URL-Abrufe decken diesen Bestand nicht ab."
+    },
+    {
+      "id": "CORE-VAL-08",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Befehle, Versionen, Zielumgebungen, Ergebnisse und Auslassungen gehören in das projektspezifische Prüfprotokoll."
+    },
+    {
+      "id": "CORE-QA-01",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "external-platform",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Risikogerechte Prüfung aktueller realer Desktop- und Mobilbrowser sowie Geräte ist ein externer manueller Plattformnachweis."
+    },
+    {
+      "id": "CORE-QA-02",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "browser-passive",
+        "external-platform",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog dokumentiert Chromium-Version und Headless-Profile automatisch. Korrekte Abgrenzung gegenüber realen Browsern, Geräten und Safari bleibt im Projektnachweis."
+    },
+    {
+      "id": "CORE-QA-03",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Ein Crawl kann sichere Navigationen, Kontaktlinks und Downloads beitragen. Der Punkt verlangt jedoch alle vereinbarten nebenwirkungsfreien Funktionen und damit ein projektspezifisches Inventar sowie manuelle Funktionsprüfung; ein allgemeiner URL-Lauf darf keine Vollständigkeit behaupten."
+    },
+    {
+      "id": "CORE-QA-04",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Tippfehler, Verständlichkeit und sachliche Richtigkeit von Kontakt- und Öffnungsdaten benötigen eigenständige redaktionelle Prüfung."
+    },
+    {
+      "id": "CORE-QA-05",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft interne Seiten-, Fragment- und Ressourcenziele automatisch. Visuelle Medienqualität, Einbettungen und externe Links bleiben gesondert zu prüfen."
+    },
+    {
+      "id": "CORE-QA-06",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "mutating-test",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Dynamische Zustandswechsel und wiederholte Vorwärts-/Rückwärtsinteraktionen erfordern das Betätigen von Bedienelementen. Diese Aktionen sind in den allgemeinen passiven Standardwerkzeugen verboten."
+    },
+    {
+      "id": "CORE-QA-07",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft beobachtete Konsolen-, JavaScript-, Netzwerk- und HTTP-Fehler in passiven Läufen. Interaktionsabhängige Zustände bleiben manuell."
+    },
+    {
+      "id": "CORE-QA-08",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "existing-baseline",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Katalog prüft Status und MIME-Typ entdeckter interner Ressourcen. Dynamische und erst nach Interaktion geladene Ressourcen bleiben außerhalb des passiven Abrufumfangs."
+    },
+    {
+      "id": "CORE-REP-01",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "README-Inhalt zu Aufbau, Laufzeit, Installation, Build, Tests und Produktionsstart ist nur im Zielrepository belastbar prüfbar."
+    },
+    {
+      "id": "CORE-REP-02",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Versionierte Artefakte und Ausschlussdateien erfordern lokalen Repository- und Werkzeugkontext."
+    },
+    {
+      "id": "CORE-REP-03",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Nicht referenzierte Komponenten, Beispieldaten und Altdateien können nur im lokalen Quellbestand gesucht und fachlich bewertet werden."
+    },
+    {
+      "id": "CORE-REP-04",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Dynamische Pfade, Buildskripte, Löschungen und anschließende Builds, Tests und Links benötigen lokalen Projektkontext."
+    },
+    {
+      "id": "CORE-REP-05",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Verwendung direkter Abhängigkeiten, Skripte, Komponenten und Konfigurationen sowie Lockdateikonsistenz sind lokale Quell- und Paketanalysen."
+    },
+    {
+      "id": "CORE-REP-06",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Große Dateien, Repositorygröße und Deploymentkontext benötigen lokalen Bestand und plattformspezifische Buildinformationen."
+    },
+    {
+      "id": "CORE-REP-07",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Historische oder revisionsdienliche Dokumente lassen sich lokal inventarisieren; rechtliche Relevanz und bewusste Aufbewahrung bleiben menschlich zu entscheiden."
+    },
+    {
+      "id": "CORE-REL-01",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Implementierung, Commit, Push, Plattformdeployment, Artefakt und öffentliche Verifikation sind projektspezifische Zustände, die ein Manifest getrennt dokumentieren muss."
+    },
+    {
+      "id": "CORE-REL-02",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Die Identität des tatsächlich laufenden Commits, Images oder Artefakts benötigt belastbare Deployment- oder Plattforminformationen; eine öffentliche GET-Antwort bestätigt sie nicht allgemein."
+    },
+    {
+      "id": "CORE-REL-03",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Die vorhandenen Prüfer können die genannten öffentlichen Beobachtungen nach einem Deployment erneut liefern. Ob der Lauf tatsächlich nach dem richtigen Deployment erfolgte und alle zentralen Nutzerpfade umfasst, benötigt jedoch eine projektseitige Deploymentzuordnung und Freigabe statt einer neuen URL-Assertion."
+    },
+    {
+      "id": "CORE-REL-04",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Technische sowie getrennte inhaltliche und visuelle Freigaben durch zuständige Personen sind administrative Entscheidungen."
+    },
+    {
+      "id": "CORE-REL-05",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Ein Projektmanifest kann Pflichtfelder für Priorität, Verantwortung, Termin, Risiko und Wiedervorlage validieren. Inhaltliche Angemessenheit der Entscheidungen bleibt manuell."
+    },
+    {
+      "id": "CORE-REL-06",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Das fortlaufende Prüfprotokoll und seine Trennung von Checkboxzuständen sind projektspezifische Dokumentationsartefakte."
+    },
+    {
+      "id": "CORE-REL-07",
+      "source": "docs/checklisten/website/kern.md",
+      "module": "core",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Deploymentweg, Infrastrukturgrenzen und Rollback- beziehungsweise Neuaufbaufähigkeit benötigen vertraulichen Infrastruktur- und Betriebsnachweis."
+    },
+    {
+      "id": "GOV-CON-01",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "module": "auftrag-recht-uebergabe",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Annahme, Zeitpunkt, Vertragsfassung und Anlagen sind administrative Vertragsnachweise. Ein öffentlicher GET kann weder Annahme noch Einbeziehung belegen; vertrauliche Vertragsunterlagen bleiben außerhalb des Standardwerkzeugs."
+    },
+    {
+      "id": "GOV-CON-02",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "module": "auftrag-recht-uebergabe",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Abgleich von Leistungsbeschreibung, Zusatzaufträgen und tatsächlicher Umsetzung benötigt vertrauliche Vertragsfassungen und fachliche Projektkenntnis. Technische Projektbefunde können den manuellen Abgleich unterstützen, ersetzen ihn aber nicht."
+    },
+    {
+      "id": "GOV-CON-03",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "module": "auftrag-recht-uebergabe",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Rechnung, Zahlung und Vertragsperiode müssen durch eine zuständige Stelle bestätigt werden. Öffentliche Website-Abrufe liefern dafür keinen belastbaren Nachweis."
+    },
+    {
+      "id": "GOV-CON-04",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "module": "auftrag-recht-uebergabe",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Rollen, Verantwortlichkeiten und Nachweiszuordnung sind organisatorische Festlegungen. Öffentlich erkennbare Anbieterinformationen beweisen die interne Verantwortungsverteilung nicht."
+    },
+    {
+      "id": "GOV-RGT-01",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "module": "auftrag-recht-uebergabe",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Inhaberschaft, Registrar-, DNS-Verantwortung und Übergabeplanung benötigen administrative oder infrastrukturelle Nachweise. Öffentliche DNS-Beobachtungen können weder Inhaberschaft noch spätere Übergabe bestätigen."
+    },
+    {
+      "id": "GOV-RGT-02",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "module": "auftrag-recht-uebergabe",
+      "classification": "manual-external-administrative",
+      "existingCatalog": true,
+      "contextNeeds": [
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der stabile Katalog enthält GOV-RGT-02, jedoch ausschließlich als externen Kommunikationsnachweis und ohne automatisches Kriterium. Rechte und Freigaben müssen zuständig bestätigt werden; ausgelieferte Materialien beweisen ihre Nutzungsrechte nicht."
+    },
+    {
+      "id": "GOV-RGT-03",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "module": "auftrag-recht-uebergabe",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Ein lesender Crawl kann öffentlich dargestellte Impressumsdaten, Kontaktwege, Öffnungszeiten und Geschäftsangaben inventarisieren und Inkonsistenzen sichtbar machen. Richtigkeit, Vollständigkeit und Bestätigung durch die zuständige Person bleiben manuell."
+    },
+    {
+      "id": "GOV-RGT-04",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "module": "auftrag-recht-uebergabe",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "human-review"
+      ],
+      "v1_1Priority": "low",
+      "rationale": "GET-Abrufe können vorhandene Rechtstextseiten, sichtbare Quellenhinweise und Versionierungsangaben inventarisieren. Herkunft, Freigabe und juristische Eignung lassen sich daraus nicht ableiten und bleiben vollständig fachlich zu bestätigen."
+    },
+    {
+      "id": "GOV-RGT-05",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "module": "auftrag-recht-uebergabe",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "human-review"
+      ],
+      "v1_1Priority": "low",
+      "rationale": "Ein Crawl kann sichtbare Kontaktadressen, mailto-Verweise und öffentliche Kontaktseiten sammeln. Einrichtung, Weiterleitung und tatsächliche Erreichbarkeit von E-Mail-Adressen erfordern externe beziehungsweise organisatorische Nachweise; es werden keine Testnachrichten gesendet."
+    },
+    {
+      "id": "GOV-DPA-01",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "module": "auftrag-recht-uebergabe",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Die Zuordnung tatsächlicher Datenflüsse zu AVV-Modulen und Vertragsanlagen ist eine rechtlich-organisatorische Bewertung. Passive technische Beobachtungen können Datenflüsse nur teilweise erfassen und die Vertragszuordnung nicht vornehmen."
+    },
+    {
+      "id": "GOV-DPA-02",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "module": "auftrag-recht-uebergabe",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Aktualität und Übereinstimmung von AVV-, TOM-, Fristen- und Unterauftragsunterlagen benötigen vertrauliche Vertragsdokumente. Diese dürfen vom allgemeinen Website-Werkzeug weder geöffnet noch bestätigt werden."
+    },
+    {
+      "id": "GOV-DPA-03",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "module": "auftrag-recht-uebergabe",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Verantwortlichenrolle und Nichtanwendbarkeit einer Unterauftragsakte sind rechtlich-organisatorisch zu begründen. URL-only-Beobachtungen reichen dafür nicht aus."
+    },
+    {
+      "id": "GOV-HO-01",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "module": "auftrag-recht-uebergabe",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Die sichere Übergabe kundenspezifischer Zugänge ist ein vertraulicher administrativer Vorgang. Zugangsdaten dürfen nicht in Prüfnachweise oder allgemeine Werkzeuge gelangen; bestätigt wird nur ein geeigneter Übergabenachweis."
+    },
+    {
+      "id": "GOV-HO-02",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "module": "auftrag-recht-uebergabe",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Backup-, Wiederherstellungs-, Betriebs- und Supportgrenzen beruhen auf Vertrag und tatsächlicher Infrastruktur. Öffentliche GET-Abrufe können diese Grenzen nicht nachweisen."
+    },
+    {
+      "id": "GOV-HO-03",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "module": "auftrag-recht-uebergabe",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Getrennte technische, inhaltliche und rechtliche Freigaben sowie Veröffentlichungserlaubnis sind personenbezogene administrative Nachweise mit Zuständigkeit und Zeitpunkt. Sie sind nicht aus der veröffentlichten Website ableitbar."
+    },
+    {
+      "id": "GOV-HO-04",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "module": "auftrag-recht-uebergabe",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Vollständigkeit von Übergabedokumenten, Abweichungen, offenen Nachweisen und Folgeterminen ist eine administrative Abschlussprüfung. Ein URL-only-Werkzeug besitzt weder das vorgesehene Dokumentinventar noch die Freigaben."
+    },
+    {
+      "id": "FORM-GOV-01",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Zusatzauftrag, Weisung, Berechtigungsmodell und Verarbeitungsbeschreibung sind projektbezogene administrative Unterlagen. Sichtbare Formulare oder Administrationsrouten beweisen deren Vorliegen und Angemessenheit nicht."
+    },
+    {
+      "id": "FORM-FLOW-01",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "high",
+      "rationale": "GET und passives DOM-/Netzwerk-Inventar können Formulare, Feldnamen, sichtbare Zwecke, Actions und blockierte externe Requestversuche strukturiert erfassen. Empfänger, serverseitige Verarbeitung, Speicherorte und Fristen bleiben mit Manifest und Projektprüfung abzugleichen; Formulare werden nicht abgesendet."
+    },
+    {
+      "id": "FORM-FLOW-02",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "high",
+      "rationale": "Ein passiver Lauf kann abgefragte Felder, Pflichtkennzeichnungen, Zwecktexte, Datenschutzhinweise und Einwilligungsbezeichnungen inventarisieren. Erforderlichkeit und Verständlichkeit sind kontextabhängig und bleiben menschlich zu bewerten."
+    },
+    {
+      "id": "FORM-FLOW-03",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Empfänger, Versand und fehlende dauerhafte Speicherung können durch URL-only-Beobachtung nicht bewiesen werden. Ein Produktionsnachweis würde ein Formular absenden und E-Mail- oder Speichernebenwirkungen erzeugen; stattdessen sind freigegebene lokale Tests und Infrastrukturbelege nötig."
+    },
+    {
+      "id": "FORM-FLOW-04",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Passives DOM-Rendering kann sichtbare Formulare, deaktivierte Controls, Erfolgsbehauptungen und alternative Kontaktwege beobachten. Es beweist ohne verbotenen Absendeversuch nicht die Nebenwirkungsfreiheit; Verständlichkeit und tatsächliches Serververhalten bleiben offen."
+    },
+    {
+      "id": "FORM-FLOW-05",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Erfolgs-, Validierungs-, Missbrauchs- und technische Fehlerzustände entstehen überwiegend erst durch Interaktion oder Serverantworten. Sie sollten in lokalen Komponenten- und Integrationstests erzeugt werden; Verständlichkeit, Zugänglichkeit und Informationsangemessenheit bleiben manuell."
+    },
+    {
+      "id": "FORM-SEC-01",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Serverseitiges Validierungsschema und seine Abgrenzung zur Clientvalidierung benötigen Quellcode, Schema oder lokale Integrationstests. Die öffentliche Formularansicht belegt keine serverseitige Durchsetzung."
+    },
+    {
+      "id": "FORM-SEC-02",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Methoden-, Content-Type-, Body-, Feldlängen- und Zeichensatzgrenzen werden sinnvoll anhand von API-Schema, Serverkonfiguration und lokalen Negativtests geprüft. Ein ausschließlich lesender GET darf die erforderlichen unerwarteten Bodies und Methoden nicht gegen Produktion senden."
+    },
+    {
+      "id": "FORM-SEC-03",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "CSRF-, Origin-, CORS-, Cookie- und Proxyvertrauen hängen vom konkreten Aufrufmodell ab. Quellcode, Konfiguration und lokale nebenwirkungsfreie Integrationstests sind erforderlich; fremde Origins werden nicht gegen zustandsverändernde Produktionendpunkte erprobt."
+    },
+    {
+      "id": "FORM-SEC-04",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Missbrauchsschutz und Datenschutzangemessenheit benötigen Risikomodell, Konfiguration und lokale Tests legitimer sowie missbräuchlicher Eingaben. Ein allgemeiner Produktionscrawler darf weder Rate-Limits reizen noch Formulare absenden."
+    },
+    {
+      "id": "FORM-SEC-05",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "IP-Pseudonymisierung, Ablauf, Bereinigung und vertrauenswürdige Proxyketten liegen in Anwendungszustand und Infrastruktur. Sie erfordern lokale Tests und Infrastrukturprüfung; vollständige IP-Adressen oder manipulierte Produktionsheader dürfen nicht in allgemeine Nachweise übernommen werden."
+    },
+    {
+      "id": "FORM-SEC-06",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Bereits sicher per GET erreichte öffentliche API- und Fehlerantworten können direkt auf typische Secrets, Stacktraces, Dateipfade und Datenbankdetails geprüft werden. Nicht-GET-Fehlerpfade, Logs und die kontextabhängige Bewertung personenbezogener Inhalte bleiben lokalen Tests und menschlicher Prüfung vorbehalten."
+    },
+    {
+      "id": "FORM-SEC-07",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "SSRF-Schutz serverseitiger Abrufe und Proxys benötigt Endpunktinventar, Quellcode sowie lokale Tests gegen kontrollierte Ziele. Nutzerkontrollierte Produktionsparameter werden nicht verwendet, um interne oder private Ziele zu provozieren."
+    },
+    {
+      "id": "FORM-AUTH-01",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Durchgängige Authentifizierung, Autorisierung und IDOR-Schutz lassen sich ohne freigegebene Konten, Rollen und geschützte Anfragen nicht beweisen. Das allgemeine Werkzeug meldet sich nicht an und versucht keinen unberechtigten Zugriff."
+    },
+    {
+      "id": "FORM-AUTH-02",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Anmeldung, Fehlversuche, Wiederherstellung, Rotation, Widerruf und Logout benötigen Authentifizierung und zustandsverändernde Abläufe. Cookieattribute eines passiven Initialzustands wären nur ein Randbefund und kein Nachweis des zusammengesetzten Prüfpunkts."
+    },
+    {
+      "id": "FORM-AUTH-03",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Rollenprüfung sowie Nachweise administrativer Änderungen, Exporte, Löschungen und Auditlogs benötigen autorisierte Zugriffe und potenziell mutierende Aktionen. Diese gehören nicht in allgemeine öffentliche Standardprüfer."
+    },
+    {
+      "id": "FORM-SIDE-01",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Reihenfolge, Verantwortlichkeit und Fehlersemantik von Datenbank-, Storage-, Nachrichten- und Webhookwirkungen benötigen Architekturmanifest, Quellcode und fachliche Prüfung. Die öffentliche Oberfläche offenbart die tatsächliche Orchestrierung nicht zuverlässig."
+    },
+    {
+      "id": "FORM-SIDE-02",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Teilfehler, Wiederholungen, Idempotenz, Rollback und Kompensation müssen mit kontrollierten lokalen Integrations- oder Komponententests geprüft werden. Produktionsfehler und Duplikate werden nicht absichtlich ausgelöst."
+    },
+    {
+      "id": "FORM-SIDE-03",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Fehlkonfigurierte oder deaktivierte Integrationen lassen sich sicher durch lokale Konfigurations- und Fehlerpfadtests prüfen. Ein passiver öffentlicher GET kann weder die zugesagte Wirkung noch einen falschen Erfolg zuverlässig feststellen."
+    },
+    {
+      "id": "FORM-SIDE-04",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Absender, Envelope-From, Reply-To, Empfänger und Transportverschlüsselung benötigen Versandkonfiguration oder kontrollierte Mailnachweise; SPF, DKIM und DMARC allein belegen den Versandweg nicht. Es werden keine Testmails versendet."
+    },
+    {
+      "id": "FORM-SIDE-05",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Signatur-, Secret-, Berechtigungs- und Replay-Prüfungen erfordern speziell erzeugte Webhook- oder Administrationsanfragen und häufig vertrauliche Schlüssel. Das allgemeine Werkzeug darf solche Endpunkte weder authentifizieren noch auslösen."
+    },
+    {
+      "id": "FORM-DATA-01",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Speicherfrist und technische Löschung benötigen projektspezifische Fristvorgabe, kontrollierte Testdaten und Einsicht in Speicher- oder Bereinigungsprozesse. Öffentliche GETs können weder Speicherung noch spätere Löschung belegen."
+    },
+    {
+      "id": "FORM-DATA-02",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Zufälligkeit, Ablauf, Cacheheader und Objektlöschung sollten mit kontrolliert erzeugten lokalen Testlinks geprüft werden. Sensible Produktionslinks werden nicht geöffnet oder erraten; Ablauf des Links und Löschung des Objekts bleiben getrennte Projektnachweise."
+    },
+    {
+      "id": "FORM-UP-01",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Größen-, Typ-, Inhalts-, Pfad- und Ablagegrenzen benötigen Uploadschema, Quellcode und kontrollierte lokale Dateien. Der öffentliche Standardprüfer lädt keine Dateien hoch; Produktionsverhalten bleibt ohne gesonderte Freigabe ungeprüft."
+    },
+    {
+      "id": "FORM-UP-02",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Speicherung, Berechtigung, Lifecycle, Löschung, Malwarebehandlung und Redeploymentverhalten sind projektspezifische Infrastruktur- und Integrationseigenschaften. Sie müssen mit kontrollierten lokalen Testobjekten statt öffentlichen Uploads geprüft werden."
+    },
+    {
+      "id": "FORM-TEST-01",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Vorhandensein und Abdeckung von Unit- und Integrationstests sind nur im Projektquellcode und Testbericht erkennbar. URL-only-Werkzeuge können Testabdeckung nicht verlässlich ableiten."
+    },
+    {
+      "id": "FORM-TEST-02",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Auch ungültige öffentliche Stichproben würden typischerweise POST-, Upload- oder API-Anfragen auslösen. Nebenwirkungsfreiheit kann vorab nicht garantiert werden; solche Negativtests gehören in eine kontrollierte lokale Umgebung."
+    },
+    {
+      "id": "FORM-TEST-03",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Prüfpunkt verlangt ausdrücklich einen gültigen End-to-end-Ablauf mit Nebenwirkungen oder eine dokumentierte bewusste Auslassung. Durchführung erfordert Freigabe, kontrollierte Empfänger, Testdaten und Bereinigung und ist für Standardwerkzeuge verboten."
+    },
+    {
+      "id": "FORM-TEST-04",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive"
+      ],
+      "v1_1Priority": "high",
+      "rationale": "Ein passiver Browserlauf kann direkt nachweisen, dass Navigation nur per GET erfolgt, Nicht-GET-Anfragen, Formularaktionen, Popups und externe Requests blockiert wurden und kein Absenden simuliert wurde. Die Aussage gilt nur für den dokumentierten begrenzten Lauf, nicht für fremde oder projektspezifische Skripte."
+    },
+    {
+      "id": "FORM-TEST-05",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "module": "formulare-api-daten",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Manipulierte Origin- und Proxyheader sowie absichtliches Erreichen öffentlicher Rate-Limits können Serverzustand, Sperrfenster oder legitime Nutzung beeinflussen. Die erforderliche Nebenwirkungsfreiheit ist URL-only nicht garantiert; Prüfung erfolgt kontrolliert lokal oder gesondert freigegeben."
+    },
+    {
+      "id": "MEDIA-INV-01",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Ein URL-Crawl kann öffentliche Medien, Abrufgrößen und Referenzen teilweise inventarisieren. Darstellungszweck, Rechte, externe Originale, Archivbestand und Behalten-/Ersetzen-/Löschen-Entscheidungen benötigen jedoch ein projektspezifisches Inventar und menschliche Freigaben."
+    },
+    {
+      "id": "MEDIA-INV-02",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Eine Manifeststruktur könnte getrennte technische, redaktionelle und rechtliche Nachweisfelder erzwingen. Ob die Nachweise inhaltlich unabhängig und belastbar sind, bleibt menschlich beziehungsweise administrativ zu bewerten."
+    },
+    {
+      "id": "MEDIA-INV-03",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "high",
+      "rationale": "HTML- und Accessibility-Tree-Beobachtungen können Alternativtexte, fehlende alt-Attribute, leere Alternativen und Accessibility-Tree-Zuordnung inventarisieren; axe liefert bereits Teilbeobachtungen. Sichtbarer Inhalt, Kontextrelevanz, dekorative Absicht und redaktionelle Prüfung bleiben offen."
+    },
+    {
+      "id": "MEDIA-INV-04",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Nicht referenzierte Dateien lassen sich nur durch Abgleich des öffentlichen Dateibestands mit Quellreferenzen, dynamischen Pfaden und einem Medienmanifest belastbar erkennen. Löschentscheidung, Zweckbegründung und Bestätigung eines externen Archivs bleiben projektspezifisch und manuell."
+    },
+    {
+      "id": "MEDIA-IMG-01",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Passive Browser- und GET-Daten können intrinsische Pixelmaße, dargestellte Größe, ausgewählte Quelle und Transfergröße melden und auffälliges Oversizing markieren. Sinnvolle Kompression sowie Schärfe, Farbe und Zuschnitt auf Desktop und Mobil bleiben visuelle Fachbewertungen."
+    },
+    {
+      "id": "MEDIA-IMG-02",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Der Crawler ruft Bildquellen bereits per GET ab; ergänzt werden könnten picture-/source-Deklarationen, tatsächliche MIME-Typen und ausgewählte Browserquellen. Ob ein modernes Format sinnvoll ist und welche Fallbacks oder Originaldownloads fachlich erforderlich sind, bleibt offen."
+    },
+    {
+      "id": "MEDIA-IMG-03",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "high",
+      "rationale": "Der bestehende Crawl entdeckt src- und srcset-URLs, modelliert aber srcset, sizes, Kandidatendeskriptoren und die tatsächlich gewählte Browserquelle noch nicht als Mediennachweis. Ob ein Bild groß oder mehrfach verwendet ist und ob die Varianten fachlich passend sind, bleibt zu bewerten."
+    },
+    {
+      "id": "MEDIA-IMG-04",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "high",
+      "rationale": "Ein passiver Browserlauf kann width/height, CSS aspect-ratio, intrinsische Maße, reservierte Layoutbox und beobachtete Layoutverschiebungen technisch prüfen. Die visuelle Angemessenheit bewusst abweichender Seitenverhältnisse bleibt manuell."
+    },
+    {
+      "id": "MEDIA-IMG-05",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "high",
+      "rationale": "Im ausschließlich passiven Initiallauf lassen sich LCP-Kandidat, Requeststart, loading-, fetchpriority- und Preload-Deklarationen sowie initial sichtbare und nicht sichtbare Medien technisch korrelieren. Interaktionsabhängige Ladezeitpunkte und die fachliche Wichtigkeit einzelner Medien bleiben offen."
+    },
+    {
+      "id": "MEDIA-IMG-06",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Ein öffentlicher GET kann aktuelles Format, Maße, Transfergröße und Cacheheader beobachten. Erwartete Transformationsparameter, Qualitätsbewertung sowie Vergleich vor und nach Neustart oder Redeployment benötigen ein projektspezifisches Manifest und kontrollierten Infrastruktur- beziehungsweise Deploymentnachweis."
+    },
+    {
+      "id": "MEDIA-PERF-01",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "browser-passive",
+        "human-review",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Nur der Initialtransfer ist im passiven Standardlauf erreichbar. Automatisierte Scrolls, Galerie-/Dialogöffnungen und weitere Interaktionen sind nach den Sicherheitsgrenzen für allgemeine Prüfer verboten; die getrennten Phasen müssen daher in einem gesondert freigegebenen Verfahren oder manuell gemessen werden."
+    },
+    {
+      "id": "MEDIA-PERF-02",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "browser-passive",
+        "project-manifest",
+        "human-review",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Ein fachlich nachvollziehbares Budget und erlaubte Ladephasen sind projektspezifische Erwartungen und müssen in einem Manifest festgelegt werden. Der passive Initiallauf kann nur frühe Requests beobachten; Idle-, Scroll- und Proximity-Verhalten sowie die fachliche Begründung späterer Transfers bleiben gesondert zu prüfen."
+    },
+    {
+      "id": "MEDIA-PERF-03",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "human-review",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Öffnen, Vor-/Zurücknavigation, direktes Anspringen und wiederholtes Öffnen erfordern simulierte Browserinteraktionen, die allgemeine Standardprüfer ausdrücklich nicht ausführen dürfen. Sichtbarkeit, Schärfe und Zwischenzustände bleiben zudem reale visuelle Bewertungen."
+    },
+    {
+      "id": "MEDIA-PERF-04",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Der bestehende Crawler verwendet bereits GET und berichtet Status, MIME-Typ, Bytes, Cacheheader und Redirects interner Ressourcen; der Browser zeichnet passive Requests und Antworten auf. Eine neue atomare Assertion könnte diese vorhandene GET-Abdeckung dem Medienpunkt zuordnen, ohne zusätzliche Requests auszulösen."
+    },
+    {
+      "id": "MEDIA-VID-01",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Videoelemente und sichere GET-Antworten können Poster, controls, Laufzeit, intrinsische Auflösung, MIME-Typ und begrenzte Größeninformationen liefern. Sinnvolle Auflösung, Bitrate, Dateigröße und verständliche Bedienung hängen vom Inhalt und Nutzungskontext ab."
+    },
+    {
+      "id": "MEDIA-VID-02",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "observation-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Ein passiver Lauf kann track-Elemente, Untertitelressourcen, Textspuren und erkennbare Transkriptverweise inventarisieren. Inhaltliche Erforderlichkeit, Vollständigkeit, Synchronität und Gleichwertigkeit der Textalternative bleiben menschlich zu beurteilen."
+    },
+    {
+      "id": "MEDIA-VID-03",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "autoplay-, muted- und preload-Zustände sowie passive Medienrequests und übertragene Bytes können ohne Interaktion geprüft werden; ungedämpftes Autoplay ist ein direktes technisches Negativkriterium. Die fachliche Begründung großer Vorabladevorgänge bleibt offen."
+    },
+    {
+      "id": "MEDIA-MOT-01",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Server-HTML, initialer DOM-Zustand, berechnete Sichtbarkeit, Fokusierbarkeit und Accessibility Tree können passiv auf verdeckte Inhalte und unsichtbare fokussierbare Bedienelemente geprüft werden. Welche Inhalte wesentlich sind und ob komplexe Übergänge verständlich bleiben, erfordert menschliche Bewertung."
+    },
+    {
+      "id": "MEDIA-MOT-02",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "browser-passive",
+        "human-review"
+      ],
+      "v1_1Priority": "high",
+      "rationale": "Der Browserprüfer besitzt bereits getrennte Normal- und Reduced-Motion-Profile. Ein passiver Vergleich von Animationen, Transitionen, Scrollverhalten, Sichtbarkeit und Inhaltsumfang könnte einen normativen technischen Teilnachweis liefern; Angemessenheit diskreter Ersatzdarstellungen bleibt manuell."
+    },
+    {
+      "id": "MEDIA-MOT-03",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "module": "medien-animationen",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Saisonale, responsive, zufällige und dynamische Zustände benötigen eine projektspezifische Zustandsmatrix oder kontrollierbare lokale Testhaken. Vorwärts-/Rückwärtswechsel, Dialogzuordnung, Fokus und Observer-Verhalten erfordern außerdem Interaktionen außerhalb des passiven Standardlaufs."
+    },
+    {
+      "id": "ENV-SEP-01",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "module": "umgebungen-domainmigration",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Zweck, URL, Verantwortlichkeit, Konfigurationsmodus und gewünschte Indexierung sind projektspezifische Sollangaben. Ein strukturiertes Umgebungsmanifest kann Vollständigkeit prüfen; Richtigkeit und Verantwortlichkeit bleiben administrativ zu bestätigen."
+    },
+    {
+      "id": "ENV-SEP-02",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "module": "umgebungen-domainmigration",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Für eine ausdrücklich als öffentlich erreichbare Nichtproduktionsumgebung kann ein sicherer GET X-Robots-Tag und Meta-Robots direkt auf noindex prüfen und robots.txt korrekt nur als Crawlingregel behandeln. Gewünschter Umgebungsstatus und Nachweis eines bevorzugten Zugriffsschutzes bleiben Manifest- beziehungsweise Administrativnachweise; eine Anmeldung darf der Standardprüfer nicht versuchen."
+    },
+    {
+      "id": "ENV-SEP-03",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "module": "umgebungen-domainmigration",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "medium",
+      "rationale": "Begrenzte GET-Abrufe von HTML, robots.txt, Standard-Sitemap und unbekanntem Pfad können noindex auf Seiten und Fehlerantworten sowie Sitemap-Veröffentlichung und -Verweise technisch prüfen. Dass die Umgebung tatsächlich nicht indexierbar sein soll, muss projektspezifisch deklariert bleiben."
+    },
+    {
+      "id": "ENV-SEP-04",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "module": "umgebungen-domainmigration",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Crawl und Social-Prüfer beobachten bereits Canonical-, OpenGraph-, Sitemap- und interne URLs. Ob deren Host je Umgebung bewusst richtig ist und welche anderen Produktions- oder Staginghosts ausgeschlossen sein müssen, benötigt jedoch eine projektspezifische Hostmatrix."
+    },
+    {
+      "id": "ENV-SEP-05",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "module": "umgebungen-domainmigration",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "browser-passive",
+        "project-manifest",
+        "project-local",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der passive Browser kann externe Dienstversuche und Formulare lediglich inventarisieren. Trennung von Diensten, Analysefunktionen und Zugangsdaten sowie Schutz vor Aktivierung durch Beispielkonfiguration erfordern Quell-, Build-, Laufzeit- und Infrastrukturabgleich; Zugangsdaten dürfen nicht ausgelesen oder protokolliert werden."
+    },
+    {
+      "id": "ENV-SEP-06",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "module": "umgebungen-domainmigration",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest",
+        "project-local",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Separate Builds, Deploymentstände und öffentliche URLs müssen in einer Umgebungsübersicht gebunden und je Umgebung ausgeführt werden. Ein URL-only-Prüfer kann weder den Build noch die Zuordnung zum tatsächlich laufenden Artefakt belegen."
+    },
+    {
+      "id": "ENV-MIG-01",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "module": "umgebungen-domainmigration",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "infrastructure-access",
+        "human-review",
+        "external-platform"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Domains, Zeitplan und Zuständigkeiten können dokumentiert werden, aber Inhaberschaft, Registrar und DNS-Zuständigkeit benötigen administrative beziehungsweise externe Plattformnachweise. Öffentliche URL-Antworten beweisen diese Verfügungsrechte nicht."
+    },
+    {
+      "id": "ENV-MIG-02",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "module": "umgebungen-domainmigration",
+      "classification": "direct-get-candidate",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "high",
+      "rationale": "Für einen ausdrücklich deklarierten indexierbaren Übergangshost können Crawl- und Social-GETs Canonical, Sitemap, og:url und finale URL auf Hostkonsistenz prüfen. Ein begrenzter sicherer GET zur deklarierten Zieldomain könnte vorzeitige unerreichbare Canonicals erkennen; Übergangsabsicht und bevorzugter Host bleiben Manifestangaben."
+    },
+    {
+      "id": "ENV-MIG-03",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "module": "umgebungen-domainmigration",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "GET-basierte Redirectprüfungen können Status, Pfad-/Queryerhalt und Ketten für bekannte Fälle validieren. Alte und neue Hosts, HTTP-/HTTPS-Varianten, erwartete Pfadregeln und zulässige Ausnahmen müssen jedoch zuerst in einem projektspezifischen Migrationsmanifest vollständig festgelegt werden."
+    },
+    {
+      "id": "ENV-MIG-04",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "module": "umgebungen-domainmigration",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest",
+        "infrastructure-access",
+        "human-review",
+        "external-platform"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Öffentliche GETs können Canonicals, interne Links, OpenGraph-URLs, Sitemap und robots.txt-Verweise auf bekannte alte und neue Hosts prüfen. Die vollständige Hostliste, Zertifikatsabdeckung und Search-Console-Zuordnung benötigen ein Migrationsmanifest sowie Infrastruktur- und externe Plattformnachweise."
+    },
+    {
+      "id": "ENV-MIG-05",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "module": "umgebungen-domainmigration",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review",
+        "external-platform"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Weiterleitungen sind öffentlich beobachtbar, doch die Entscheidung zur Aufgabe alter Domains oder Verifikationsdateien setzt bestätigtes Eigentum und belastbare alternative Verifizierung voraus. Diese administrativen und plattformspezifischen Nachweise können URL-only-Werkzeuge nicht erbringen."
+    },
+    {
+      "id": "CONT-CTX-01",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Die Ausschlüsse lassen sich nur gegen die projektspezifischen Verzeichnisse, Buildausgaben und benötigten Dateien bewerten. Eine lokale Manifestprüfung kann typische Lücken erkennen; Vollständigkeit und Secret-Relevanz bleiben projektspezifisch."
+    },
+    {
+      "id": "CONT-CTX-02",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Ob Tests oder Betriebsunterlagen für den Produktionsbuild benötigt werden, ergibt sich aus Buildgraph, Skripten und Quellcode. Erneute Builds und Tests sind lokale Projektprüfungen; URL-GET kann ausgelassene Buildbestandteile nicht zuverlässig erkennen."
+    },
+    {
+      "id": "CONT-CTX-03",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der simulierte Kontext muss lokal erzeugt und inhaltlich bewertet werden. Tatsächlich übertragene Größen oder effektive Buildlogs erfordern zusätzlich Plattformzugriff; ein öffentlicher GET liefert keinen belastbaren Kontextnachweis."
+    },
+    {
+      "id": "CONT-PLAN-01",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Generierter Buildplan und erkannte Pakete sind lokale Buildartefakte. Werkzeuge können Paketlisten extrahieren, doch tatsächlicher Bedarf und heuristische Fehlalarme müssen gegen den projektspezifischen Build bewertet werden."
+    },
+    {
+      "id": "CONT-PLAN-02",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Werkzeugversion, effektiver Plan und ausgeführte Phasen entstehen aus lokaler beziehungsweise plattformspezifischer Buildkonfiguration. Eine URL zeigt weder den zusammengeführten Plan noch die tatsächlich ausgeführten Setup-Schritte."
+    },
+    {
+      "id": "CONT-VAL-01",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Dockerfile-Prüfung und vollständiger Imagebuild benötigen Projektquellcode, Docker und den lokalen Buildkontext. Warnungen und Basisimages können automatisiert gesammelt werden, ihre Bewertung bleibt projektbezogen."
+    },
+    {
+      "id": "CONT-IMG-01",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Stage-Struktur und finaler Dateibestand lassen sich nur aus Dockerfile und gebautem Image ableiten. Statische und lokale Imageprüfungen können unerwünschte Artefakte finden; die Notwendigkeit einzelner Dateien bleibt projektspezifisch."
+    },
+    {
+      "id": "CONT-IMG-02",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Tags, Digests, Runtimeversionen, Plattformen und native Artefakte stehen in Buildmanifesten und lokalen Images. Ob Version und Architektur unterstützt sowie gemeinsam aktualisierbar sind, erfordert Projekt- und Upstreambewertung."
+    },
+    {
+      "id": "CONT-IMG-03",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Arbeitsverzeichnis, Startkommando und Benutzer können aus Imagekonfiguration und lokalem Containerlauf geprüft werden. Ob Root technisch unvermeidbar ist, bleibt eine projektspezifische Sicherheitsentscheidung."
+    },
+    {
+      "id": "CONT-IMG-04",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Ein lokaler Lauf des gebauten Produktionsimages kann Runtime, Architektur, UID, Kommando und Artefakte direkt prüfen. Die Gleichheit mit dem tatsächlich produktiv laufenden Container bleibt ohne vertraulichen Infrastrukturzugriff offen."
+    },
+    {
+      "id": "CONT-IMG-05",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Die exakte Zuordnung eines produktiven Services zu einer Image-ID oder einem Digest benötigt die Deploymentplattform beziehungsweise deren attestierten Status. Öffentliche Antwortfingerprints können diese Zuordnung nicht verlässlich beweisen."
+    },
+    {
+      "id": "CONT-IMG-06",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Image-ID, lokaler Größenwert und Dateibestand können am gebauten Image automatisiert erfasst werden. Serverseitige Größe sowie die Bewertung unnötiger Artefakte erfordern Plattformdaten beziehungsweise Projektwissen."
+    },
+    {
+      "id": "CONT-SEC-01",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Dockerfile und Deploymentmanifest können auf Secret-Nutzung in ARG oder dauerhaften ENV-Feldern untersucht werden. Welche Variablen tatsächlich Geheimnisse sind und wie die Laufzeitkonfiguration bereitgestellt wird, bleibt projektspezifisch."
+    },
+    {
+      "id": "CONT-SEC-02",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Secret-Mounts, Imagekonfiguration und redigierte Buildlogs sind lokale Buildnachweise. Ein Prüfer darf höchstens Namen und strukturelle Nutzung erfassen; Bedarf und mögliche indirekte Wertausgaben bleiben manuell zu bewerten."
+    },
+    {
+      "id": "CONT-SEC-03",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Das Image kann lokal wertfrei auf verdächtige Konfiguration geprüft werden, aber die ausschließlich im produktiven Container vorhandenen benötigten Variablen lassen sich nur über gezielt gefilterten Infrastrukturzugriff bestätigen. Werte dürfen dabei nicht ausgegeben werden."
+    },
+    {
+      "id": "CONT-SEC-04",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Produktivsetzung eines Ersatzimages, Zugangsdatenrotation sowie gezieltes Löschen alter Images und Caches verändern Betriebszustand und Zugangsdaten. Diese Schritte gehören in einen ausdrücklich freigegebenen projektspezifischen Ablauf; Volumes dürfen nicht pauschal bereinigt werden."
+    },
+    {
+      "id": "CONT-SEC-05",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Gezielt gefilterte lokale Image- und Historienprüfungen können verdächtige Namen oder Metadaten erkennen. Relevante Plattformbuildausgaben benötigen Infrastrukturzugriff; Secret-Treffer müssen ohne Werte manuell bewertet werden."
+    },
+    {
+      "id": "CONT-NET-01",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Deploymentmanifeste können Portfreigaben und Proxyzuordnungen strukturell prüfen. Ob ein interner Port tatsächlich direkt öffentlich erreichbar ist, erfordert jedoch projektspezifische Providergrenzen oder Infrastrukturprüfung; allgemeine Werkzeuge dürfen keine Portscans durchführen."
+    },
+    {
+      "id": "CONT-NET-02",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Ein sicherer GET mit manipuliertem Client-IP-Header kann Teil einer praktischen Probe sein, liefert ohne vertrauenswürdige Logs oder ein projektspezifisches Diagnoseziel aber keinen Beweis der effektiven Überschreibung. Proxykette und Auswertung benötigen kontrollierten Infrastrukturzugriff."
+    },
+    {
+      "id": "CONT-OPS-01",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Containerstatus, Neustarts, Ressourcen, freier Speicher und interne Logs sind nicht öffentlich per URL nachweisbar. Sie müssen über einen redigierten, lesenden Infrastrukturstatus geprüft werden; eventuelle Bereinigungen bleiben getrennt freizugebende Betriebsaktionen."
+    },
+    {
+      "id": "CONT-OPS-02",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Repository-Wurzel, Dockerfile, Stage und Variablennamen stehen in projektspezifischen Deploymentmanifesten. Strukturelle Leerheits- und Konsistenzprüfungen sind lokal möglich; Bedarf und sichere Secret-Zuordnung bleiben manuell."
+    },
+    {
+      "id": "CONT-OPS-03",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "module": "container-deployment",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Punkt verlangt ausdrücklich einen infrastrukturspezifisch dokumentierten, ausschließlich lesenden Statuscheck. Werkzeug, sichere Zugriffsgrenze und Nichtanwendbarkeit sind projektbezogen; Adressen, Zugangsdaten und ungefilterte Ausgaben dürfen nicht in allgemeine Berichte gelangen."
+    },
+    {
+      "id": "DATA-MIG-01",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "module": "datenbetrieb-wiederherstellung",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Schema, Datenarten und Speicheradapter können aus Projektquellen und lokaler Dokumentation inventarisiert werden. Verantwortlichkeiten und das tatsächlich produktive Speicherziel bleiben organisatorisch beziehungsweise infrastrukturell zu bestätigen."
+    },
+    {
+      "id": "DATA-MIG-02",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "module": "datenbetrieb-wiederherstellung",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Migrationstests gegen leere und bestehende Datenbanken verändern Schemazustand und benötigen projektspezifische Ausgangsdaten. Sie sind in isolierten lokalen Testumgebungen sinnvoll, aber nicht Teil eines allgemeinen beobachtenden URL-Werkzeugs."
+    },
+    {
+      "id": "DATA-MIG-03",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "module": "datenbetrieb-wiederherstellung",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Sicherungsplan, Rückfallentscheidung, Abbruchkriterien und Kennzeichnung irreversibler Schritte sind risikobezogene Projekt- und Betriebsentscheidungen. Automatisierung kann Dokumente inventarisieren, aber ihre Angemessenheit nicht allgemein feststellen."
+    },
+    {
+      "id": "DATA-MIG-04",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "module": "datenbetrieb-wiederherstellung",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "infrastructure-access",
+        "human-review",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Parallelitäts-, Transaktions- und Konflikttests müssen reale Schreibpfade auslösen und Datenbankinvarianten prüfen. Das erfordert isolierte projektspezifische Testdaten und gegebenenfalls Datenbankzugriff; gültige Produktionsschreibvorgänge sind für Standardwerkzeuge verboten."
+    },
+    {
+      "id": "DATA-MIG-05",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "module": "datenbetrieb-wiederherstellung",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Prüfbefehl, Werkzeugversion und sichere Konfiguration sind projektspezifische Manifest- und Validierungsmatrixdaten. Ein lokaler Runner kann den deklarierten Befehl ausführen, muss aber dessen mögliche Datenbankwirkung und Secret-Redaktion projektspezifisch absichern."
+    },
+    {
+      "id": "DATA-RET-01",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "module": "datenbetrieb-wiederherstellung",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Aufbewahrungsjobs und konfigurierte Fristen können in Quellcode und Manifesten gesucht werden. Welche Frist je Datenart vertraglich oder projektbezogen gilt und ob die Implementierung fachlich vollständig ist, bleibt menschlich zu bewerten."
+    },
+    {
+      "id": "DATA-RET-02",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "module": "datenbetrieb-wiederherstellung",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "infrastructure-access",
+        "human-review",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Nachweis zuverlässiger, wiederholbarer Löschung einschließlich Hilfszuständen muss Daten anlegen, Alterung beziehungsweise Jobs auslösen und Löschung kontrollieren. Das ist ein mutierender projektspezifischer Integrations- oder Betriebsablauf."
+    },
+    {
+      "id": "DATA-RET-03",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "module": "datenbetrieb-wiederherstellung",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-local",
+        "infrastructure-access",
+        "human-review",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Ein GET könnte lediglich die Nichterreichbarkeit eines vorbereiteten abgelaufenen Links beobachten. Der geforderte getrennte Nachweis der Objektlöschung benötigt zuvor erzeugte Zustände, sensible Tokens und Datenbank- oder Storagekontrolle und ist daher insgesamt ein freizugebender mutierender Test."
+    },
+    {
+      "id": "DATA-REC-01",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "module": "datenbetrieb-wiederherstellung",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Umfang, Takt, Aufbewahrung, Verschlüsselung, Speicherort und Zuständigkeit sind vertrauliche Betriebs- und Organisationsnachweise. Öffentliche URL-Prüfungen können weder Backupbestand noch Verantwortlichkeit belegen."
+    },
+    {
+      "id": "DATA-REC-02",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "module": "datenbetrieb-wiederherstellung",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Die Wiederbeschaffung von Konfiguration, Secrets, DNS-/Proxygrenzen und externen Abhängigkeiten ist eine projekt- und infrastrukturspezifische Betriebsplanung. Ein Manifestinventar kann unterstützen, beweist aber weder Zugriff noch Wiederbeschaffbarkeit."
+    },
+    {
+      "id": "DATA-REC-03",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "module": "datenbetrieb-wiederherstellung",
+      "classification": "unsafe-or-mutating",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review",
+        "mutating-test"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Ein Wiederherstellungstest oder Neuaufbau erzeugt und verändert Infrastruktur, Konfiguration und Datenbestände. Er benötigt ausdrückliche Freigabe, isolierte Ziele und dokumentierte Bereinigung; das bloße Lesen eines Backups oder einer URL genügt nicht."
+    },
+    {
+      "id": "DATA-REC-04",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "module": "datenbetrieb-wiederherstellung",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Rollbackablauf, bekannter gemeinsamer Anwendungs- und Datenstand, Zuständigkeit, RPO und RTO sind projektspezifische Betriebsentscheidungen. Automatisierung kann vorhandene Dokumentation inventarisieren, ihre Durchführbarkeit aber erst ein getrennt freigegebener Test belegen."
+    },
+    {
+      "id": "DATA-OPS-01",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "module": "datenbetrieb-wiederherstellung",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "url-get",
+        "project-manifest",
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Ein einzelner öffentlicher GET belegt nur momentane Erreichbarkeit und ist bereits durch bestehende Prüfer abgedeckt. Angemessene Überwachung von Zertifikatsablauf, Speicher, Datenbank, Jobs und Integrationen benötigt projektspezifische Betriebsziele, Infrastrukturzugriff und Zuständigkeit."
+    },
+    {
+      "id": "DATA-OPS-02",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "module": "datenbetrieb-wiederherstellung",
+      "classification": "manual-external-administrative",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "infrastructure-access",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Loginhalt, Diagnoseeignung, personenbezogene Daten, Secretfreiheit, Zugriffsregeln, Aufbewahrung und Löschung sind vertrauliche Infrastruktur- und Governancefragen. Ungefilterte Logs dürfen nicht durch allgemeine Werkzeuge abgerufen oder protokolliert werden."
+    },
+    {
+      "id": "DATA-OPS-03",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "module": "datenbetrieb-wiederherstellung",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Repositorydateien und lokale Betriebsanweisungen können auf hart codierte Adressen, Zugangsdatenmuster und die Verwendung sicherer Aliasse untersucht werden. Treffer müssen redigiert und projektspezifisch bewertet werden; tatsächliche Secret-Systeme bleiben außerhalb des URL-Prüfers."
+    },
+    {
+      "id": "CORE-DOC-01",
+      "source": "docs/checklisten/website/abschluss.md",
+      "module": "abschluss",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Projektkopie und Prüfprotokoll sind lokale versionierte Nachweise. Ein projektspezifischer Reporter kann Status- und Referenzwidersprüche erkennen; Produktionsstand, offene Folgen und fachliche Richtigkeit müssen verantwortlich bestätigt werden."
+    },
+    {
+      "id": "CORE-DOC-02",
+      "source": "docs/checklisten/website/abschluss.md",
+      "module": "abschluss",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Der Vorlagendelta-Abgleich benötigt die lokale Projektkopie, deren festgehaltenen Quellstand und die aktuelle Vorlage. Ein Diff kann automatisiert erstellt werden; Übernahmeentscheidung und Dokumentation bewusster Abweichungen bleiben manuell."
+    },
+    {
+      "id": "CORE-DOC-03",
+      "source": "docs/checklisten/website/abschluss.md",
+      "module": "abschluss",
+      "classification": "project-local-or-manifest",
+      "existingCatalog": false,
+      "contextNeeds": [
+        "project-manifest",
+        "project-local",
+        "human-review"
+      ],
+      "v1_1Priority": "none",
+      "rationale": "Welche Checklistenpunkte, Rechtstexte, Datenflüsse, Metadaten, Medien und Fachmodule von einer Änderung betroffen sind, erfordert Projektquellen und eine Impactanalyse. Lokale Werkzeuge können Änderungen inventarisieren, aber weder rechtliche Neubewertung noch vollständige fachliche Wiederprüfung ersetzen."
+    }
+  ]
+}

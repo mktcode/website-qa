@@ -1,10 +1,10 @@
 # Website-QA: abgeschlossene Umsetzung und nächste Konsolidierungsphase
 
-> **Status:** Der Workflow wurde mit Paketversion `0.2.0` eingeführt, mit `0.3.0` um strukturierte Social-Nachweise, mit `0.4.0` um vorhandene Sitemap-, Crawl- und Ressourcenbeobachtungen, mit `0.5.0` um öffentlich beobachtbare Sicherheitsheadernachweise und mit `0.6.0` um passive technische Datenschutzbeobachtungen ergänzt und mit `0.6.1` um eine summengleiche Kriterien- und `notApplicable`-Darstellung sowie mit `0.6.2` um die strikte Trennung von Nichtanwendbarkeit auf Punkt- und Kriterienebene korrigiert. Die Funktionsstände werden jeweils lokal und in installierten Verbraucherprojekten geprüft. Die reale Pilotmigration auf `0.6.0` wurde abgeschlossen; anschließend folgt bewusst ein Stabilisierungsfenster. Neue Assertions werden erst aus den dabei belegten Lücken priorisiert.
+> **Status:** Die Pilotreihe `0.2.0` bis `0.6.2` wurde mit `v1.0.0` in einen einzigen stabilen Berichtsvertrag, den begrenzten Basiskatalog `website-qa-baseline` 1.0.0 und allgemeine APIs überführt. v1.0.0 wurde lokal, als installierter Tarball, im ersten Nuxt-Verbraucher und anschließend in einem temporären zweiten Verbraucher gegen die öffentlich erreichbare WordPress-Version von `handpanzauber.de` geprüft. Die systematische Abdeckungsmatrix aller 215 Checklistenpunkte ist abgeschlossen; neue Assertions bleiben bis zur Einzelabnahme der begrenzten v1.1-Kandidaten zurückgestellt.
 >
 > Dieses Dokument bewahrt Planung, Entscheidungen, Sicherheitsanforderungen und Abnahmekriterien des frameworkunabhängigen Refactorings von `@mktcode/website-qa`. Es enthält keine ausgefüllten Nachweise oder Vorgaben für eine bestimmte Website. Zukunftsformulierungen in den historischen Planungsabschnitten beschreiben den damaligen Implementierungsweg und keine noch offene Zusage.
 >
-> Implementiert sind die gemeinsame Berichtsredaktion, `--json-file`, automatisch datierte lokale Bundles, bytegleiche technische Rohberichte für alle vier Prüfer, das Prüfsummenmanifest, der getrennte Whitelist-Markdownrenderer, kopierbare Projektvorlagen und die programmatische Reporting-API. Praxisumstellung, Social-Integration, installierter Verbrauchertest und beide Release-Tags wurden erfolgreich abgeschlossen.
+> Implementiert sind die gemeinsame Berichtsredaktion, `--json-file`, automatisch datierte lokale Bundles, bytegleiche technische Rohberichte für alle vier Prüfer, das Prüfsummenmanifest, der getrennte Whitelist-Markdownrenderer, kopierbare Projektvorlagen und die programmatische Reporting-API. Der stabile Releasecommit `cd105c834d2f27f4a065ed67aca6622b0d90ef22` ist als `v1.0.0` getaggt; beide Verbraucherprüfungen blieben GET-only und führten zu keiner schreibenden Produktionsaktion.
 
 ## 1. Ausgangslage
 
@@ -666,7 +666,7 @@ Systematischer Renderer- und Praxisreview vom 27. August 2026:
 
 ### Phase I – Stabiler 1.0-Vertrag
 
-**Status 28. August 2026: implementiert, noch nicht veröffentlicht.** Der bewusste inkompatible Schnitt stabilisiert die vier getrennten CLI-Verträge und den begrenzten Basiskatalog, ohne neue Assertions oder Netzwerkpfade einzuführen.
+**Status 27. August 2026: veröffentlicht und in zwei Verbrauchern geprüft.** Der bewusste inkompatible Schnitt stabilisiert die vier getrennten CLI-Verträge und den begrenzten Basiskatalog, ohne neue Assertions oder Netzwerkpfade einzuführen.
 
 Der Katalog heißt `website-qa-baseline`, besitzt Version `1.0.0` und Status `stable`. Stabilität bezeichnet IDs, Bedeutungen und Versionsregeln. Der Bestand von 34 Punkten, 93 Kriterien und 56 Assertions bleibt bewusst unvollständig und begründet keine WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe. Assertion-Versionierung bleibt eine getrennte Achse.
 
@@ -674,19 +674,22 @@ Projektkonfiguration und Ausgabe sind nun eindeutig getrennt: `project-report.co
 
 Die stabilen APIs verwenden allgemeine Namen. Frühere Projektberichtserzeuger, Konverter, Schemata und Namen werden weder exportiert noch als Alias erhalten. Der sichere getrennte Zusammenfassungsrenderer und der atomare Bundleworkflow mit bytegleichen technischen Eingaben, Dateirechten, Hashes und Whitelist-Zusammenfassung bleiben erhalten. Alte technische Berichte mit einer anderen Katalogkennung werden nicht still übernommen.
 
-Paket und Lockfile sind auf 1.0.0 vorbereitet. Ein Commit, Tag, Push oder eine Veröffentlichung sowie die Migration benachbarter Verbraucher erfolgen erst nach gesonderter Abnahme. Der zweite unabhängige Verbraucher bleibt ein externer Freigabenachweis und ist durch diese Repositoryänderung nicht automatisch erbracht.
+Releasecommit `cd105c834d2f27f4a065ed67aca6622b0d90ef22` und Tag `v1.0.0` wurden gepusht. Der erste Verbraucher ist unveränderlich auf diesen Stand festgelegt. Ein temporärer zweiter Verbraucher installierte denselben Releasecommit und verarbeitete vier fachlich negative, aber schemafähige GET-only-Läufe der öffentlich erreichbaren WordPress-Version von `handpanzauber.de` ohne Sonderformat; Bericht, Manifest, Bytekopien und Whitelist-Zusammenfassung bestanden die Validierung.
 
-### Phase J – Nächste fachliche Automatisierung erst nach einer Abdeckungsmatrix
+### Phase J – Abdeckungsmatrix und begrenzte v1.1-Kandidaten
 
-Vor einer weiteren Funktionsrunde werden die Punkte der vollständigen modularen Checkliste klassifiziert als:
+**Status 27. August 2026: Klassifikation abgeschlossen, Umsetzung nicht begonnen.** Die vollständige Einzelmatrix liegt unter [`planning/website-coverage-matrix.json`](https://github.com/mktcode/website-qa/blob/main/planning/website-coverage-matrix.json); die [Kurzfassung](https://github.com/mktcode/website-qa/blob/main/planning/website-coverage-matrix.md) erläutert Ergebnis, Grenzen und Auswahlregeln.
 
-- sicher und frameworkunabhängig automatisch prüfbar;
-- nur als technische Beobachtung ohne normative Bewertung modellierbar;
-- manuell, extern oder administrativ nachzuweisen;
-- nur bei bestimmten Modulen oder Projektmanifesten einschlägig;
-- grundsätzlich ungeeignet für die allgemeinen Nur-Lese-Werkzeuge.
+Alle 215 Punkte wurden genau einmal klassifiziert:
 
-Neue Assertions werden danach anhand von fachlichem Nutzen, Wiederverwendung vorhandener GET-Beobachtungen, Sicherheitsgrenzen, Fehlinterpretationsrisiko und lokal testbaren Nebenwirkungsnachweisen priorisiert. Denkbare Themen wie strukturierte Daten, weitere Indexierungsbeobachtungen oder atomarere Accessibility-Befunde sind Kandidaten, aber noch keine Zusage für eine bestimmte Version.
+- 31 besitzen bereits mindestens ein automatisches Kriterium im stabilen Basiskatalog;
+- 25 sind direkte GET-/Passivkandidaten für einen technischen Teilnachweis;
+- 19 sind nur als technische Beobachtung ohne normative Gesamtbewertung geeignet;
+- 79 benötigen Projektquellcode, Build, Manifest oder projektspezifische Sollvorgaben;
+- 41 bleiben überwiegend manuell, extern oder administrativ;
+- 20 würden einen gesondert freizugebenden mutierenden, authentifizierten oder sensiblen Betriebsnachweis erfordern und bleiben außerhalb der Standardwerkzeuge.
+
+Von 44 möglichen neuen technischen Teilbeobachtungen wurden nur sechs zur v1.1-Einzelprüfung vorgemerkt: `CORE-DOM-06`, `CORE-SEO-03`, `CORE-ROB-03`, `CORE-A11Y-03`, `CORE-A11Y-08` und `CORE-A11Y-09`. Diese Auswahl bevorzugt vorhandene HTML-, Crawl-, Social-, Browser- und Axe-Daten und öffnet keine neue Zielklasse. Sie ist noch keine Implementierungszusage. Jeder Kandidat benötigt vor Umsetzung einen Kriterienentwurf, eine klare manuelle Restgrenze, Redaktionsprüfung, Abhängigkeitsregeln für `inconclusive` sowie Positiv-, Negativ-, Limit- und Nebenwirkungstests.
 
 ### Unveränderte Grenzen
 
