@@ -1,78 +1,96 @@
 # website-qa
 
-Wiederverwendbare, ausschließlich lesende Qualitätsprüfungen für öffentliche Websites. Die Werkzeuge sind nicht an ein bestimmtes Framework, Projekt oder eine feste Seitenstruktur gebunden.
+`@mktcode/website-qa` vereinfacht die Qualitätssicherung von Websites auf zwei bewusst getrennten Wegen:
+
+1. Eine sehr umfangreiche, modulare und versionierte [Website-QA-Checkliste](docs/checklisten/website/) dient Menschen als fachliche Arbeitsgrundlage.
+2. Fünf unabhängige, ausschließlich lesende Prüfer sammeln technische Signale und identifizieren klar beobachtbare Defekte als erste Temperaturmessung.
+
+Die Werkzeuge haken niemals Checklistenpunkte ab. Positive Signale bedeuten nur, dass ein bestimmter Defekt im dokumentierten, begrenzten Prüfumfang nicht beobachtet wurde. Die eigentliche QA-Bewertung bleibt bei der prüfenden Person.
 
 ## Voraussetzungen
 
 - Node.js `>=22.19 <23` oder `>=24.11 <25`
-- für den Browser-Check ein lokal installiertes Chromium oder Google Chrome
-- Netzwerkzugriff auf die ausdrücklich gewählte öffentliche Ziel-URL
+- lokal installiertes Chromium oder Google Chrome für Browser- und Lighthouse-Check
+- Netzwerkzugriff auf die ausdrücklich gewählte Ziel-URL
 
-Ein Zielrepository oder lokaler Dev-Server ist für URL-Prüfungen nicht erforderlich. Lokale beziehungsweise private Ziele sind standardmäßig gesperrt und benötigen ausdrücklich `--allow-http` und `--allow-private`.
+Private oder lokale Ziele sind standardmäßig gesperrt. Sie benötigen ausdrücklich `--allow-http` und `--allow-private`.
 
 ## Installation
-
-Bis zu einer möglichen Veröffentlichung in der npm-Registry wird das Paket auf einen geprüften Git-Tag oder unveränderlichen Commit festgelegt:
 
 ```bash
 npm install --save-dev 'github:mktcode/website-qa#<TAG-ODER-COMMIT>'
 ```
 
-Die tatsächlich installierte Version lässt sich über jeden `--help`-Aufruf und in den JSON-Berichten nachvollziehen.
-
-## Technischer Schnellstart
-
-Jeder Prüfer ist unabhängig aufrufbar:
+## Die fünf unabhängigen Prüfer
 
 ```bash
 website-qa-http https://example.com/ --strict
 website-qa-crawl https://example.com/ --sitemap --max-pages=50 --strict
 website-qa-browser https://example.com/ --sitemap --max-pages=10 --strict
 website-qa-social https://example.com/ --sitemap --max-pages=20 --strict
+website-qa-lighthouse https://example.com/ --strict
 ```
 
-Es gibt bewusst keinen allgemeinen Sammelbefehl. Ein Projekt entscheidet selbst, welche Prüfungen zu seinem Umfang gehören.
+Es gibt bewusst keinen Sammelbefehl. Projekte entscheiden selbst, welche Läufe wann ausgeführt werden. Lighthouse ist fester Bestandteil der empfohlenen Standardprüfserie, bleibt aber ein eigenständig aufrufbarer Prüfer.
 
-Alle Befehle unterstützen `--help`, menschenlesbare Ausgabe und JSON:
+Alle Befehle unterstützen:
+
+- `--help`
+- menschenlesbare Ausgabe
+- `--json`
+- atomare Ausgabe mit `--json-file=<Pfad>`
+- `--strict`
+- dokumentierte Paketversion
+
+Beispiel:
 
 ```bash
-website-qa-http https://example.com/ --strict --json
-```
-
-Für wiederkehrende lokale Berichte kann JSON direkt atomar in eine Datei geschrieben werden. Benötigte Elternverzeichnisse werden angelegt:
-
-```bash
-website-qa-http https://example.com/ \
+website-qa-lighthouse https://example.com/ \
   --strict \
-  --json-file=.website-qa/current/http.json
+  --json-file=.website-qa/current/lighthouse.json
 ```
 
-`--json-file` impliziert `--json`. Die Datei wird auch bei fachlichen Befunden mit Exitcode 1 geschrieben. Exitcodes:
+## Exitcodes
 
-- `0`: Prüfung bestanden;
-- `1`: technischer Befund beziehungsweise Warnung mit `--strict`;
-- `2`: Aufruf- oder Laufzeitfehler; der erzeugte Fehleroutput ist kein vollständiger Checklistennachweis.
+- `0`: Der begrenzte Lauf wurde ohne technischen Fehlerbefund und ohne strikte Warnung abgeschlossen.
+- `1`: Ein gültiger statischer Bericht enthält Fehlerdefekte oder mit `--strict` relevante Warnungen. Ein sicherheitsbedingt nicht repräsentativer Lighthouse-Lauf liefert ebenfalls Exitcode 1.
+- `2`: Aufruf, Laufzeit oder Berichtserzeugung sind technisch fehlgeschlagen.
 
-Maschinenlesbare Schemata für vollständige technische Berichte und redigierte Fehlerhüllen liegen unter [`catalog/http-report.schema.json`](catalog/http-report.schema.json), [`catalog/crawl-report.schema.json`](catalog/crawl-report.schema.json), [`catalog/browser-report.schema.json`](catalog/browser-report.schema.json) und [`catalog/social-report.schema.json`](catalog/social-report.schema.json). Die vorbereiteten Kompatibilitäts-, Schema-, Assertion- und Deprecation-Regeln sind unter [`docs/compatibility.md`](docs/compatibility.md) dokumentiert; veröffentlichte Paketstände fasst das [`CHANGELOG.md`](CHANGELOG.md) zusammen.
+Exitcode 0 ist keine Website-, Checklisten- oder Produktionsfreigabe.
 
-## Vorgesehener Arbeitsablauf
+## Technische Berichte
 
-Die umfangreichen Netzwerk- und Browserprüfungen sind primär für bewusst gestartete lokale beziehungsweise operative Prüfserien gedacht, nicht als automatisch bei jedem Commit laufender CI-Schritt. Typische Zeitpunkte sind vor oder nach einem Deployment, nach wesentlichen Websiteänderungen oder bei einer periodischen Projektprüfung.
+Die JSON-Berichte verwenden `schemaVersion: 2`. Sie enthalten:
 
-Die Werkzeuge erzeugen ausführliche technische Befunde und strukturierte Teilnachweise für die anschließende Bewertung durch kompetente Entwicklerinnen und Entwickler. Sie automatisieren belastbar beobachtbare Teile, treffen aber keine vollständige Qualitäts-, Rechts-, Datenschutz-, Sicherheits- oder Freigabeentscheidung.
+- Werkzeug- und Paketversion;
+- Ziel, Optionen und dokumentierten Prüfumfang;
+- technische Beobachtungen und Issues;
+- atomare Signale mit `positive`, `defect`, `inconclusive` oder `notApplicable`;
+- Informationsreferenzen auf stabile Checklisten-IDs;
+- Nur-Lese-Garantien und erreichte Limits.
 
-Die Werkzeuge:
+Sie enthalten keine automatische Checklistenbewertung, Projektstatus, Evidence-Dateien, Freigaben, Workflows oder abgeleitete Zustände wie „vollständig“ und „teilweise“.
 
-- laufen nicht bei Installation, Commit oder Push automatisch;
-- setzen keine GitHub Actions voraus;
-- verändern keine Zielwebsite und keine Projektcheckliste;
-- führen ausschließlich die ausdrücklich gestarteten Prüfungen aus.
+Veröffentlichte Schemata und Beispiele liegen unter [`catalog/`](catalog/). Das neutrale [`checklist-index.json`](catalog/checklist-index.json) spiegelt alle 215 stabilen Checklisten-IDs. [`signals.json`](catalog/signals.json) registriert ausschließlich technische Signale und deren Informationsreferenzen. Beide Dateien enthalten keine Ergebnisse.
 
-CI-Nutzung bleibt möglich, ist aber nicht der dokumentierte Hauptworkflow.
+## Lighthouse
 
-## Wiederkehrende npm-Skripte
+`website-qa-lighthouse` führt genau einen festen mobilen Navigationstest mit den Lighthouse-Kategorien Performance, Accessibility, Best Practices und SEO aus. Es gibt keine projektspezifischen Scorebudgets.
 
-Ein Zielprojekt kann beispielsweise diese Skripte übernehmen und URL sowie Limits bewusst anpassen:
+Der Prüfer verwendet die Lighthouse-User-Flow-API mit einer vom Paket kontrollierten, isolierten Puppeteer-Seite. Bereits vor der Navigation werden Request- und DOM-Grenzen installiert:
+
+- nur GET und nur der Zielorigin;
+- DNS-/SSRF-Prüfung vor erlaubten Requests;
+- keine Formularübermittlung, Beacons oder Popups;
+- keine Worker, SharedWorker, EventSource, WebSockets, WebTransport oder WebRTC;
+- Request- und Zeitlimits;
+- kein persistentes Browserprofil.
+
+Blockierte Requests oder Aktionen können Lighthouse-Messwerte verändern. Der Bericht kennzeichnet den Lauf dann ausdrücklich als nicht repräsentativ und die betroffenen Signale als unklar. Der kompakte Bericht übernimmt weder Roh-LHR noch Screenshots, HTML oder ungebundene Auditdetails.
+
+Lighthouse und Axe liefern wertvolle technische Signale, aber keine vollständige WCAG-, BFSG-, BITV-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsbewertung. Reale Geräte, Safari, Screenreader, Interaktionszustände und fachliche Erwartungen bleiben manuell zu prüfen.
+
+## Empfohlene npm-Skripte
 
 ```json
 {
@@ -81,226 +99,60 @@ Ein Zielprojekt kann beispielsweise diese Skripte übernehmen und URL sowie Limi
     "qa:crawl": "website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json-file=.website-qa/current/crawl.json",
     "qa:browser": "website-qa-browser https://example.com/ --sitemap --max-pages=10 --max-requests=300 --strict --json-file=.website-qa/current/browser.json",
     "qa:social": "website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json-file=.website-qa/current/social.json",
-    "qa:report": "node scripts/website-qa-report.mjs"
+    "qa:lighthouse": "website-qa-lighthouse https://example.com/ --strict --json-file=.website-qa/current/lighthouse.json"
   }
 }
 ```
 
-Anschließend werden die gewählten Prüfungen bewusst gestartet:
-
-```bash
-npm run qa:http
-npm run qa:crawl
-npm run qa:browser
-npm run qa:social
-npm run qa:report
-```
-
-Ein Prüfer mit Exitcode 1 hat einen fachlich wichtigen JSON-Bericht erzeugt. Die übrigen ausgewählten Prüfer und der Berichtsschritt sollten deshalb trotzdem ausgeführt werden. Ein projektspezifisches Orchestrierungsskript kann dies abbilden; das Paket führt keinen universellen Netzwerk-Sammelbefehl ein.
+Die Berichte werden anschließend einzeln durch die QA-Prüferin oder den QA-Prüfer ausgewertet. Das Paket erzeugt keinen projektübergreifenden Gesamtstatus.
 
 Eine kopierbare Minimalintegration liegt unter [`examples/project-integration/`](examples/project-integration/).
 
-## Strukturierter Projektnachweis
+## Checkliste
 
-HTTP, Crawl, Browser und Social geben neben Befunden positive, negative, nicht anwendbare und unklare atomare Prüfaussagen aus. Der HTTP-Prüfer bildet die deklarierte Sicherheitsheaderbasis und ihre Beobachtungsabdeckung auf ausgewähltem HTML, 404, CSS und JavaScript ab. Der Crawl erfasst zusätzlich Sitemap-Dateien und -Einträge, robots.txt-Referenz, vollständige Sitemap-Abdeckung, interne Navigationen, Ressourcenstatus und MIME-Typen sowie erreichte Sicherheits- und Umfangsgrenzen atomar. Der Browser strukturiert außerdem die vollständige passive Beobachtung externer Requestversuche sowie des initialen Cookie- und Browser-Storage-Inventars, ohne daraus eine rechtliche oder fachliche Freigabe abzuleiten. Grundlage ist der mitgelieferte [stabile Basiskatalog](catalog/README.md). Er unterscheidet:
+Die zentrale Checkliste liegt unter [`docs/checklisten/website/`](docs/checklisten/website/). Sie umfasst einen verpflichtenden Kern, bedingte Fachmodule, Abschlussfragen und ein ausführliches Prüfverfahren. Die 215 stabilen IDs reichen bewusst weit über übliche Agentur- und Freelancerabläufe hinaus.
 
-- automatisch belegbare Kriterien;
-- manuell beziehungsweise redaktionell zu prüfende Kriterien;
-- externe, kommunikative oder nur mit Infrastrukturzugang belegbare Kriterien.
+Für ein Zielprojekt entsteht daraus eine eigenständige Projektkopie. Nur dort werden Punkte manuell bearbeitet, begründet als nicht anwendbar markiert oder mit Projektnachweisen verbunden. Das Paket liest und verändert diesen Status niemals.
 
-Ein technisch erfolgreicher Lauf schließt einen zusammengesetzten Checklistenpunkt nicht ab, solange erforderliche manuelle oder externe Nachweise fehlen. Fehlende Befunde gelten niemals automatisch als `pass`.
+Eine technische Referenz wie `CORE-A11Y-06` bedeutet nur: Das Signal kann bei der manuellen Bearbeitung dieses Punkts hilfreich sein. Sie bedeutet nicht, dass der Punkt geprüft oder erledigt ist.
 
-### Projektdateien vorbereiten
+## Datenschutz und Redaktion
 
-Aus dem installierten Paket können die allgemeinen Beispiele kopiert werden:
+Berichtete URLs werden zentral redigiert:
 
-```bash
-mkdir -p scripts
-cp node_modules/@mktcode/website-qa/examples/project-integration/website-qa.project.json ./website-qa.project.json
-cp node_modules/@mktcode/website-qa/examples/project-integration/website-qa-report.mjs ./scripts/website-qa-report.mjs
-```
+- Zugangsdaten in URLs werden abgelehnt;
+- Querywerte und Fragmente werden nicht ausgegeben;
+- private Hosts werden bei ausdrücklich erlaubten lokalen Läufen maskiert;
+- bekannte Secrets, Bearerwerte und E-Mail-Adressen werden redigiert;
+- Cookie- und Storagewerte werden niemals protokolliert.
 
-Danach werden mindestens angepasst:
-
-- öffentliche Ziel-URL;
-- Auswertungsumgebung;
-- ausgewählte Module;
-- technische npm-Befehle und Berichtspfade;
-- optional projektseitig deklarierter Quell- und Deploymentstand;
-- optional eine Datei mit manuellen beziehungsweise externen Nachweisen.
-
-Das Berichtsskript enthält ausschließlich:
-
-```js
-import { writeProjectReportBundle } from '@mktcode/website-qa/report'
-
-const result = writeProjectReportBundle({
-  configFile: './website-qa.project.json',
-})
-
-console.info(`Vollständiger lokaler Bericht: ${result.bundleDirectory}`)
-console.info(`Versionierbare Zusammenfassung: ${result.summaryFile}`)
-```
-
-Der Berichtsgenerator liest nur lokale Dateien. Er startet keinen Netzwerkprüfer. Konfiguration, optionale Evidence und jeder technische Bericht werden vor der Auswertung mit den veröffentlichten JSON-Schemas validiert. Unbekannte Werkzeuge, Fehlerhüllen, geschwächte Nur-Lese-Garantien sowie Assertions mit unpassendem Werkzeug oder unpassender Version werden geschlossen abgelehnt.
-
-## Automatisch datiertes Berichtsbundle
-
-`npm run qa:report` erzeugt standardmäßig:
-
-```text
-.website-qa/
-└── reports/
-    └── 2026-08-24T18-04-17Z/
-        ├── manifest.json
-        ├── report.json
-        ├── report.md
-        └── technical/
-            ├── http.json
-            ├── crawl.json
-            ├── browser.json
-            └── social.json
-```
-
-- `technical/*.json` sind bytegleiche Kopien der eingebundenen vollständigen Werkzeugberichte.
-- `report.json` ist der selbstständige strukturierte Checklistennachweis.
-- `report.md` ist die vollständige menschenlesbare Darstellung einschließlich Projektdetails.
-- `manifest.json` ordnet Dateien, Werkzeugläufe, Größen und SHA-256-Prüfsummen zu.
-- Ein vorhandener Zeitstempel wird niemals überschrieben.
-- Die Bundle-Erzeugung erfolgt temporär und wird erst nach vollständiger Validierung veröffentlicht.
-
-Die Rohberichte benötigen keinen manuellen Kompaktierungs- oder Kopierschritt.
-
-## Versionierbare Markdown-Zusammenfassung
-
-Getrennt vom vollständigen Bundle entsteht standardmäßig:
-
-```text
-docs/website-qa/berichte/2026-08-24T18-04-17Z.md
-```
-
-Diese Zusammenfassung besitzt einen eigenen Whitelist-Renderer. Standardmäßig enthält sie nur:
-
-- Zeit, Basiskatalog und Werkzeugversionen;
-- aggregierte Status- und Kriterienzahlen;
-- stabile Kennungen und allgemeine Katalogtexte nicht vollständig belegter Punkte;
-- allgemeine Grenzen des Nachweises.
-
-Sie übernimmt insbesondere keine freien Nachweisnotizen, Personen, Referenzen, Befundtexte, DOM-Selektoren, Befehle, Umgebungsnamen, Quell-/Deploymentkennungen oder lokalen Pfade. Projektname und URL fehlen standardmäßig. Eine ausdrücklich öffentliche Bezeichnung kann programmatisch freigegeben werden:
-
-```js
-writeProjectReportBundle({
-  configFile: './website-qa.project.json',
-  publicProject: {
-    label: 'Öffentliche Projektbezeichnung',
-    url: 'https://example.com/',
-  },
-})
-```
-
-Auch die datenarme Zusammenfassung wird vor Commit oder Veröffentlichung projektspezifisch geprüft. Sie ist eine Fortschrittsübersicht, kein vollständiger reproduzierbarer Nachweis.
-
-## Empfohlene `.gitignore`-Regel
-
-Vollständige lokale Läufe und Arbeitsdateien werden standardmäßig ignoriert:
+Rohberichte können dennoch öffentliche Pfade, DOM-Selektoren, Seitentitel, Ressourcen, Formular-Actions, Konsolenmeldungen sowie Cookie- und Storage-Schlüsselnamen enthalten. Sie gehören standardmäßig nach `.website-qa/` und müssen vor Veröffentlichung gesichtet werden.
 
 ```gitignore
-# Vollständige lokale Website-QA-Läufe und Rohberichte
 .website-qa/
 ```
-
-Die getrennte Zusammenfassung unter `docs/website-qa/berichte/` bleibt dadurch versionierbar. Projektkonfiguration, npm-Skripte und bewusst gepflegte Nachweise sind Eingaben und keine generierten Rohartefakte; über ihre Versionierung entscheidet das Zielprojekt anhand ihres Inhalts.
-
-## Programmatische Reporting-API
-
-Der Bericht kann ohne Dateiausgabe ausgewertet, validiert und gerendert werden:
-
-```js
-import {
-  createProjectReportFromFiles,
-  renderProjectReportMarkdown,
-  renderProjectSummaryMarkdown,
-} from '@mktcode/website-qa/report'
-
-const report = createProjectReportFromFiles('./website-qa.project.json')
-const markdown = renderProjectReportMarkdown(report)
-const summary = renderProjectSummaryMarkdown(report)
-```
-
-Oder als vollständiges Bundle:
-
-```js
-import { writeProjectReportBundle } from '@mktcode/website-qa/report'
-
-const files = writeProjectReportBundle({
-  configFile: './website-qa.project.json',
-  bundleDirectory: './.website-qa/reports',
-  summaryDirectory: './docs/website-qa/berichte',
-})
-```
-
-Schemas und Beispiele liegen unter [`catalog/`](catalog/). [`project-report.config.schema.json`](catalog/project-report.config.schema.json) beschreibt ausschließlich die Projektkonfiguration; [`project-report.schema.json`](catalog/project-report.schema.json) bezeichnet den einzigen normalisierten Ausgabebericht mit `schemaVersion: 3`. Records werden einmalig gespeichert und über deterministische berichtslokale Referenzen zugeordnet. `validateProjectReport` prüft zuerst dieses JSON-Schema und anschließend Katalog-, Scope-, Registry-, Werkzeug-, Workflow-, Referenz- und Aggregationskonsistenz. Der stabile Basiskatalog ist bewusst begrenzt und weder vollständige Website-Checkliste noch WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe. Die Bibliothek verändert keine Projektcheckliste automatisch.
-
-### Nachweis- und Statuspflege
-
-Kriterien verwenden ausschließlich `pass`, `fail`, `inconclusive`, `notApplicable` oder `noEvidence`. `partial` und `open` sind daraus abgeleitete Ergebnisse zusammengesetzter Checklistenpunkte, keine Ergebnisse einzelner Kriterien. Davon getrennte Workflowzustände wie `external`, `deferred`, `acceptedDeviation` oder eine Nichtanwendbarkeit des gesamten Punkts verändern die zugrunde liegenden Kriterienergebnisse nicht. Im vollständigen Markdownbericht gilt deshalb nur ein Kriterium mit `pass` oder eigenem `notApplicable` als geklärt; eine Nichtanwendbarkeit auf Punktebene setzt fehlende oder negative Kriteriennachweise nicht nachträglich auf erledigt.
-
-Alle Records in einer Evidence-Datei gelten als gleichzeitig aktive Nachweise; es gibt kein stilles „neuester Eintrag gewinnt“ und keinen automatischen Ablauf allein aufgrund des Datums. Mehrere Records für dasselbe Kriterium werden konservativ zusammengeführt: Ein aktives `fail` hat Vorrang, ein aktives `inconclusive` verhindert ein eindeutiges Ergebnis, und eine Mischung aus `pass` und `notApplicable` bleibt `pass`. Ersetzte oder fachlich nicht mehr geltende Records müssen deshalb bewusst aus der aktiven Projektkopie entfernt und bei Bedarf über deren Versionshistorie beziehungsweise Projektakte erhalten werden. Freie Notizen und Referenzen werden nur als Nachweisdaten übernommen; das Werkzeug öffnet oder bestätigt referenzierte Unterlagen nicht. Vertrauliche Unterlagen werden weiterhin ausschließlich außerhalb empfohlener Berichte verwahrt und nur redigiert referenziert.
-
-### Migration von 1.1.0 auf 1.2.0
-
-Version 1.2.0 ergänzt genau sieben passive Teilnachweise für URL-Konsistenz, Trainingsrichtlinien, verborgene fokussierbare Bereiche, Formularbeschriftungen, Laufzeit-/404-Fehlerfälle, Browser-Nur-Lese-Grenzen und echte GET-Beobachtungen interner Medien. Projektkonfiguration und Evidence müssen gemeinsam auf `website-qa-baseline` 1.2.0 umgestellt werden; alle in der jeweiligen Projektkonfiguration verwendeten technischen Berichte sind neu zu erzeugen. Technische Berichte behalten `schemaVersion: 1`, Projektberichte `schemaVersion: 3` und Assertions `assertionVersion: 1`.
-
-Die Browserassertion zu `FORM-TEST-04` belegt ausschließlich die installierten Grenzen der paketierten passiven Browserläufe und keine beliebigen projektspezifischen Skripte oder unveränderten Zielsystemspeicher. Eine Laufzeitdeklaration von `--ai-training-opt-in` ist kein Zustimmungsnachweis. URL- und Medienbefunde gelten nur für bereits beobachtete, innerhalb der Limits vollständig erfasste Ziele; dynamische Zustände, externe Einbettungen, Projektinventare und fachliche Freigaben bleiben manuell.
-
-### Migration von 1.0.0 auf 1.1.0
-
-Version 1.1.0 ergänzt drei bewusst begrenzte Accessibility-Punkte mit vier passiven Axe-Assertions. Projektkonfiguration, Evidence, technische Berichte und Projektberichte müssen gemeinsam auf `website-qa-baseline` 1.1.0 umgestellt und neu erzeugt werden. Die technischen Berichte behalten `schemaVersion: 1`; die neuen Assertions behalten davon unabhängig `assertionVersion: 1`.
-
-Automatische Teilnachweise betreffen nur maschinell erkennbare zugängliche Namen, ausschließlich farblich unterscheidbare Links, technisch fehlende Bildalternativen und passiv beobachtbaren Textkontrast. Verständlichkeit, redaktionelle Eignung, dekorative Absicht, Fokus-, Hover-, Aktiv- und dynamische Zustände sowie reale Browser- und Screenreaderprüfungen bleiben ausdrücklich manuell. Daraus folgt keine WCAG-, BFSG- oder BITV-Konformitätsaussage.
-
-### Migration von 0.6.x auf 1.0.0
-
-Version 1.0.0 ist ein bewusster inkompatibler Vertragsschnitt:
-
-- Projektkonfigurationen verwenden Katalog `website-qa-baseline` in Version `1.0.0`; technische Berichte müssen mit diesem Katalogbezug neu erzeugt werden.
-- `website-pilot.json` heißt nun `website-baseline.json`; die alten `*Pilot*`- und `*V3*`-APIs entfallen ohne Alias.
-- `project-report.config.schema.json` beschreibt die Eingabe. `project-report.schema.json` beschreibt als einziges Berichtsschema die normalisierte Ausgabe mit `schemaVersion: 3`. Schema 2 und sein Konverter entfallen.
-- Die stabilen Reportnamen sind `createProjectReport`, `createProjectReportFromFiles`, `validateProjectReport`, `renderProjectReportMarkdown`, `renderProjectSummaryMarkdown` und `writeProjectReportBundle`.
-- Alte technische Berichte mit `website-qa-pilot` werden nicht still dem stabilen Basiskatalog zugerechnet. Eine neue technische Erhebung oder bewusst geprüfte projektspezifische Evidence-Übernahme ist erforderlich.
-
-## Berichtsdaten und Redaktion
-
-Berichtete URLs werden zentral aufbereitet:
-
-- URL-Zugangsdaten werden abgelehnt;
-- bei ausdrücklich erlaubten privaten beziehungsweise lokalen Prüfungen werden Zielhosts in Berichten nicht offengelegt und die Berichte mit `privateTargetsRedacted` gekennzeichnet;
-- Querywerte und Fragmente werden nicht in Werkzeugberichte übernommen;
-- benötigte Queryparameternamen können getrennt dokumentiert werden;
-- bekannte Secret-Zuweisungen, Bearer-Werte und E-Mail-Adressen in berichteten Texten werden redigiert;
-- Cookie- und Browserstoragewerte werden nicht protokolliert.
-
-Vollständige Rohberichte enthalten dennoch umfangreiche Beobachtungen der öffentlich ausgelieferten Website, beispielsweise Pfade, Seitentitel, Überschriften, Ressourcen, Formular-Actions ohne Abruf, Browserkonsolentexte, DOM-Selektoren sowie Cookie- und Storage-Schlüsselnamen. Sie werden deshalb standardmäßig ignoriert und vor einer abweichenden Archivierung oder Veröffentlichung geprüft.
-
-Vertrauliche Unterlagen, Zugangsdaten, interne Infrastruktur und personenbezogene Projektdaten gehören nicht in technische Berichte. Manuelle Nachweise referenzieren vertrauliche Projektakten nur, statt sie zu kopieren.
 
 ## Sicherheitsgrenzen
 
-- HTTP-Abrufe verwenden ausschließlich GET.
-- Private, lokale und anderweitig nicht öffentliche Ziele sind standardmäßig gesperrt.
-- DNS-Auflösung und Weiterleitungen werden gegen SSRF und Originwechsel geprüft.
-- Der Crawler ruft keine Formular-Actions auf und betätigt keine Bedienelemente.
-- Externe Links werden im Crawl nur inventarisiert und nicht abgerufen.
-- Der Browser-Check klickt nie und verwendet isolierte, nicht persistente Browserkontexte.
-- Nicht-GET-Anfragen, externe Seitenrequests, Formulare, Uploads, Popups, Beacons, Worker, WebSockets, WebTransport und WebRTC werden im Browser blockiert und protokolliert.
-- Limits für Zeit, Antwortgröße, Seiten, Ressourcen, Sitemaps und Browserrequests begrenzen die Läufe.
-- Sicherheits- oder Umfangsbegrenzungen führen bei abhängigen Assertions zu `inconclusive`, nicht zu einem stillschweigenden Erfolg.
+- ausschließlich HTTP-GET;
+- keine Klicks, Formulare, Uploads oder mutierenden APIs;
+- private und lokale Ziele standardmäßig gesperrt;
+- DNS-, Redirect-, Origin-, Größen- und Zeitgrenzen;
+- externe Crawlziele nur inventarisiert;
+- externe Browserrequests und Nicht-GET-Methoden blockiert;
+- verdächtige GET-Navigationen vorsorglich ausgelassen;
+- Begrenzungen werden sichtbar und führen abhängigkeitsbezogen zu unklaren Signalen.
 
-Die Prüfberichte sind technische Teilnachweise. Sie ersetzen insbesondere keine vollständige WCAG-, Tastatur-, Screenreader-, Safari-, reale Mobilgeräte-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabeprüfung.
+Bei Unsicherheit brechen die Werkzeuge geschlossen ab, statt einen möglicherweise schreibenden Pfad aufzurufen.
 
-## Wiederverwendbare Prüfdokumentation
+## Öffentliche Paketoberfläche
 
-Unter [`docs/`](docs/) liegen eine modulare allgemeine [Website-Checkliste](docs/checklisten/website/) und ein zugehöriger [Agenten-Prompt](docs/prompts/website-checkliste.md). Diese Dateien sind ausschließlich Vorlagen. Für jedes Zielprojekt wird daraus eine eigenständige Projektkopie mit festgehaltenem Vorlagencommit erstellt; ausgefüllte Nachweise gehören nicht in dieses Repository.
+Es gibt keine JavaScript-API für Checklistenbewertung oder Projektberichte. Datenartefakte und Schemata werden über genaue Paketexporte bereitgestellt:
+
+- `@mktcode/website-qa/checklist-index.json`
+- `@mktcode/website-qa/signals.json`
+- `@mktcode/website-qa/technical-report.schema.json`
+- die fünf werkzeugspezifischen `*-report.schema.json`-Exporte
 
 ## Entwicklung
 
@@ -310,9 +162,7 @@ npm run check
 npm pack --dry-run
 ```
 
-Die Tests verwenden überwiegend lokale kurzlebige Testserver mit unterschiedlichen HTML-Strukturen. Der Browser-Integrationstest weist mit echtem Chromium nach, dass POST-Anfragen, Formulare, externe Requests und Popups keine Servernebenwirkungen auslösen. Diese Testserver und Chromium sind Voraussetzungen für die Paketentwicklung, nicht für die Prüfung einer entfernten Zielwebsite abgesehen vom Browser-Check selbst.
-
-Der detaillierte Refactoring- und Entscheidungsstand ist in [`PLANNING.md`](PLANNING.md) dokumentiert.
+Die Tests verwenden lokale kurzlebige Server. Echte Chromium-Integrationstests weisen für Browser und Lighthouse nach, dass automatische POSTs, Formulare, externe Requests und weitere Nebenwirkungspfade keine Zielservereffekte auslösen.
 
 ## Lizenz
 

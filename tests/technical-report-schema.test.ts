@@ -3,10 +3,6 @@ import { join } from 'node:path'
 import addFormats from 'ajv-formats'
 import Ajv2020 from 'ajv/dist/2020.js'
 import { describe, expect, it } from 'vitest'
-import { createJsonReport as createBrowserReport } from '../src/check-browser.mjs'
-import { createJsonReport as createCrawlReport } from '../src/check-crawl.mjs'
-import { createJsonReport as createHttpReport } from '../src/check-http.mjs'
-import { createJsonReport as createSocialReport } from '../src/check-social-preview.mjs'
 
 const catalogDirectory = join(import.meta.dirname, '..', 'catalog')
 const tools = [
@@ -14,6 +10,7 @@ const tools = [
   { name: 'crawl', tool: 'crawl-check' },
   { name: 'browser', tool: 'browser-check' },
   { name: 'social', tool: 'social-preview-check' },
+  { name: 'lighthouse', tool: 'lighthouse-check' },
 ]
 
 function json(name: string) {
@@ -32,7 +29,7 @@ function validationMessage(errors: unknown) {
 }
 
 describe('technical report schemas', () => {
-  it('validate all four published success examples', () => {
+  it('validates all five published static examples', () => {
     const schemas = validators()
     for (const { name } of tools) {
       const validate = schemas.get(name)!
@@ -40,89 +37,30 @@ describe('technical report schemas', () => {
     }
   })
 
-  it('regenerates all published reports byte for byte without trusting assertions changed in this slice', () => {
-    const schemas = validators()
-    const examples = Object.fromEntries(tools.map(({ name }) => [name, json(`${name}-report.example.json`)]))
-    const browserInput = structuredClone(examples.browser.result)
-    delete browserInput.assertions
-    const crawlInput = structuredClone(examples.crawl.results)
-    for (const result of crawlInput) {
-      result.assertions = result.assertions.filter((assertion: { assertionId: string }) => assertion.assertionId !== 'crawl.media.get-observation-complete')
-    }
-    const reports = {
-      browser: createBrowserReport(browserInput, examples.browser.options),
-      crawl: createCrawlReport(crawlInput, examples.crawl.options),
-      http: createHttpReport(examples.http.results, examples.http.options),
-      social: createSocialReport(examples.social.results.map((result: Record<string, any>) => ({
-        ...result,
-        assertions: undefined,
-        metadata: result.metadata
-          ? {
-              canonicals: result.metadata.canonical ? [result.metadata.canonical] : [],
-              metadata: Object.fromEntries([...Object.entries(result.metadata.openGraph || {}), ...Object.entries(result.metadata.twitter || {})]
-                .map(([key, value]) => [key, Array.isArray(value) ? value : [value]])),
-            }
-          : undefined,
-      })), examples.social.options),
-    }
-
-    expect(reports.crawl.results[0].assertions.find((assertion: { assertionId: string }) => assertion.assertionId === 'crawl.media.get-observation-complete')?.outcome).toBe('notApplicable')
+  it('contains only technical signals and informational checklist references', () => {
     for (const { name } of tools) {
-      const report = reports[name as keyof typeof reports]
-      report.generatedAt = examples[name].generatedAt
-      const validate = schemas.get(name)!
-      expect(validate(report), validationMessage(validate.errors)).toBe(true)
-      expect(`${JSON.stringify(report, null, 2)}\n`).toBe(readFileSync(join(catalogDirectory, `${name}-report.example.json`), 'utf8'))
+      const serialized = JSON.stringify(json(`${name}-report.example.json`))
+      expect(serialized).not.toContain('checklistCoverage')
+      expect(serialized).not.toContain('checklistIds')
+      expect(serialized).not.toContain('"assertions"')
+      expect(serialized).not.toContain('projectStatus')
+      expect(serialized).not.toContain('evidenceOutcome')
+      expect(serialized).not.toContain('noEvidence')
+      expect(serialized).not.toContain('workflow')
     }
   })
 
-  it('cover the redacted exit-code-2 error envelopes', () => {
+  it('covers the redacted exit-code-2 error envelopes', () => {
     const schemas = validators()
-    const reports = {
-      browser: {
+    for (const { name, tool } of tools) {
+      const report = {
         error: 'Ungültige Eingabe.',
-        schemaVersion: 1,
-        tool: 'browser-check',
-        toolPackage: { name: '@mktcode/website-qa', version: '0.6.2' },
-      },
-      crawl: {
-        error: 'Ungültige Eingabe.',
-        readOnlyGuarantees: {
-          buttonsActivated: false,
-          externalLinksFetched: false,
-          formActionsFetched: false,
-          formsSubmitted: false,
-          methods: ['GET'],
-        },
-        schemaVersion: 1,
-        summary: { errors: 1, failed: true, pages: 0, resources: 0, warnings: 0 },
-        tool: 'crawl-check',
-      },
-      http: {
-        error: 'Ungültige Eingabe.',
-        schemaVersion: 1,
-        summary: { errors: 1, failed: true, targets: 0, warnings: 0 },
-        tool: 'http-check',
-      },
-      social: {
-        error: 'Ungültige Eingabe.',
-        readOnlyGuarantees: {
-          browserInteractions: false,
-          buttonsActivated: false,
-          formActionsFetched: false,
-          formsSubmitted: false,
-          methods: ['GET'],
-        },
-        robotsPolicyReviewedAt: '2026-08-22',
-        schemaVersion: 1,
-        summary: { errors: 1, failed: true, pages: 0, warnings: 0 },
-        tool: 'social-preview-check',
-      },
-    }
-
-    for (const { name } of tools) {
+        schemaVersion: 2,
+        tool,
+        toolPackage: { name: '@mktcode/website-qa', version: '2.0.0' },
+      }
       const validate = schemas.get(name)!
-      expect(validate(reports[name as keyof typeof reports]), validationMessage(validate.errors)).toBe(true)
+      expect(validate(report), validationMessage(validate.errors)).toBe(true)
     }
   })
 
@@ -135,17 +73,31 @@ describe('technical report schemas', () => {
     const overstated = structuredClone(json('browser-report.example.json'))
     overstated.result.readOnlyExecutionEvidence.destinationSideEffectsVerified = true
     expect(validate(overstated)).toBe(false)
-
-    const malformed = structuredClone(json('browser-report.example.json'))
-    malformed.result.readOnlyExecutionEvidence.profileRuns[0].interceptedRequests = -1
-    expect(validate(malformed)).toBe(false)
   })
 
-  it('rejects another tool and weakened read-only guarantees', () => {
+  it('rejects removed top-level reporting surfaces for every tool', () => {
     const schemas = validators()
-    const report = structuredClone(json('browser-report.example.json'))
-    report.tool = 'crawl-check'
-    report.readOnlyGuarantees.externalRequestsAllowed = true
-    expect(schemas.get('browser')!(report)).toBe(false)
+    for (const { name } of tools) {
+      const report = structuredClone(json(`${name}-report.example.json`))
+      report.projectStatus = 'complete'
+      report.checklistCoverage = { complete: 215 }
+      expect(schemas.get(name)!(report)).toBe(false)
+    }
+  })
+
+  it('rejects weakened or incomplete Lighthouse contracts and oversized URLs', () => {
+    const validate = validators().get('lighthouse')!
+    const weakened = structuredClone(json('lighthouse-report.example.json'))
+    weakened.readOnlyGuarantees.externalRequestsAllowed = true
+    weakened.coverage.interceptionInstalledBeforeNavigation = false
+    expect(validate(weakened)).toBe(false)
+
+    const missingOptions = structuredClone(json('lighthouse-report.example.json'))
+    missingOptions.options = {}
+    expect(validate(missingOptions)).toBe(false)
+
+    const oversizedUrl = structuredClone(json('lighthouse-report.example.json'))
+    oversizedUrl.blockedActions = [{ kind: 'worker', url: `https://example.com/${'x'.repeat(2048)}` }]
+    expect(validate(oversizedUrl)).toBe(false)
   })
 })

@@ -3,12 +3,16 @@
 /* eslint-disable no-console */
 /* oxlint-disable no-await-in-loop */
 
-import { XMLParser, XMLValidator } from 'fast-xml-parser'
 import { parse } from 'parse5'
-import { checklistItemIdsForTool, evaluateChecklist } from './lib/checklist-report.mjs'
 import { fetchResource, normalizeMimeType, redactReportData, redactText, reportUrl, validateUrl } from './lib/http-client.mjs'
 import { writeJsonOutput } from './lib/json-output.mjs'
+import { readOnlyNavigationConcern } from './lib/navigation-safety.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
+import { checklistReference, technicalSignals, technicalSignalSummary } from './lib/signal-report.mjs'
+import { parseSitemapXml } from './lib/sitemap-parser.mjs'
+
+export { readOnlyNavigationConcern } from './lib/navigation-safety.mjs'
+export { parseSitemapXml } from './lib/sitemap-parser.mjs'
 
 const defaultOptions = {
   allowHttp: false,
@@ -29,44 +33,6 @@ const defaultOptions = {
 const htmlMimeTypes = new Set(['application/xhtml+xml', 'text/html'])
 const xmlMimeTypes = new Set(['application/xml', 'application/xml-sitemap', 'text/xml'])
 const ignoredProtocols = new Set(['data:', 'javascript:', 'mailto:', 'tel:'])
-const potentiallyMutatingPathSegments = [
-  'abmelden',
-  'activate',
-  'bestätigen',
-  'bestaetigen',
-  'cancel',
-  'checkout',
-  'confirm',
-  'deactivate',
-  'delete',
-  'destroy',
-  'kündigen',
-  'kuendigen',
-  'löschen',
-  'loeschen',
-  'logout',
-  'order',
-  'purchase',
-  'remove',
-  'reset',
-  'revoke',
-  'sign-out',
-  'signout',
-  'stornieren',
-  'unsubscribe',
-  'widerrufen',
-]
-const sensitiveNavigationParameters = new Set([
-  'action',
-  'auth',
-  'code',
-  'confirm',
-  'delete',
-  'remove',
-  'token',
-  'unsubscribe',
-])
-
 function usage() {
   return `${packageName} ${packageVersion}
 
@@ -163,8 +129,8 @@ export function parseArguments(argv) {
   return { options, urls }
 }
 
-function addIssue(result, severity, code, message, checklistIds = [], url = result.finalUrl || result.requestedUrl) {
-  result.issues.push({ checklistIds, code, message, severity, url })
+function addIssue(result, severity, code, message, checklistRefs = [], url = result.finalUrl || result.requestedUrl) {
+  result.issues.push({ checklistRefs, code, message, severity, url })
 }
 
 function addAssertion(result, assertionId, outcome, message) {
@@ -500,19 +466,6 @@ function resolveWebUrl(value, baseUrl) {
   }
 }
 
-export function readOnlyNavigationConcern(url) {
-  const pathSegments = url.pathname.split('/').filter(Boolean).map(segment => decodeURIComponentSafely(segment).toLowerCase())
-  const pathConcern = pathSegments.find(segment => potentiallyMutatingPathSegments.some(keyword => segment === keyword || segment.startsWith(`${keyword}-`) || segment.startsWith(`${keyword}_`)))
-  if (pathConcern) {
-    return `verdächtiges Pfadsegment ${pathConcern}`
-  }
-  const parameterConcern = [...url.searchParams.keys()].find(name => sensitiveNavigationParameters.has(name.toLowerCase()))
-  if (parameterConcern) {
-    return `potenziell zustandsverändernder Query-Parameter ${parameterConcern}`
-  }
-  return undefined
-}
-
 function srcsetUrls(value, baseUrl) {
   if (!value || value.trim().toLowerCase().startsWith('data:')) {
     return []
@@ -690,73 +643,6 @@ function robotDirectives(...values) {
     .flatMap(value => value.toLowerCase().split(/[;,]/))
     .map(value => value.trim())
     .filter(Boolean))
-}
-
-function arrayValue(value) {
-  if (value === undefined || value === null) {
-    return []
-  }
-  return Array.isArray(value) ? value : [value]
-}
-
-function decodeSafeXmlEntities(value) {
-  const namedEntities = {
-    amp: '&',
-    apos: '\'',
-    gt: '>',
-    lt: '<',
-    quot: '"',
-  }
-  return value.replace(/&(?:#\d{1,7}|#x[\da-f]{1,6}|amp|apos|gt|lt|quot);/gi, (entity) => {
-    const token = entity.slice(1, -1).toLowerCase()
-    if (namedEntities[token]) {
-      return namedEntities[token]
-    }
-    const codePoint = token.startsWith('#x')
-      ? Number.parseInt(token.slice(2), 16)
-      : Number.parseInt(token.slice(1), 10)
-    if (!Number.isInteger(codePoint) || codePoint < 1 || codePoint > 0x10FFFF || (codePoint >= 0xD800 && codePoint <= 0xDFFF)) {
-      return entity
-    }
-    return String.fromCodePoint(codePoint)
-  })
-}
-
-function xmlText(value) {
-  if (typeof value === 'string' || typeof value === 'number') {
-    return decodeSafeXmlEntities(String(value).trim())
-  }
-  return typeof value?.['#text'] === 'string' ? decodeSafeXmlEntities(value['#text'].trim()) : ''
-}
-
-export function parseSitemapXml(xml) {
-  const validation = XMLValidator.validate(xml, { allowBooleanAttributes: false })
-  if (validation !== true) {
-    const line = validation.err?.line ? ` in Zeile ${validation.err.line}` : ''
-    throw new Error(`Ungültiges Sitemap-XML${line}: ${validation.err?.msg || 'unbekannter XML-Fehler'}`)
-  }
-
-  const parser = new XMLParser({
-    ignoreAttributes: false,
-    parseTagValue: false,
-    processEntities: false,
-    trimValues: true,
-  })
-  const parsed = parser.parse(xml)
-
-  if (parsed.urlset) {
-    return {
-      kind: 'urlset',
-      locations: arrayValue(parsed.urlset.url).map(entry => xmlText(entry?.loc)).filter(Boolean),
-    }
-  }
-  if (parsed.sitemapindex) {
-    return {
-      kind: 'index',
-      locations: arrayValue(parsed.sitemapindex.sitemap).map(entry => xmlText(entry?.loc)).filter(Boolean),
-    }
-  }
-  throw new Error('Sitemap enthält weder urlset noch sitemapindex als Wurzelelement.')
 }
 
 function expectedMimeType(type, contentType) {
@@ -1365,11 +1251,8 @@ async function inspectSite(inputUrl, options) {
   return result
 }
 
-function checklistCoverage(results) {
-  return evaluateChecklist({
-    assertions: results.flatMap(result => result.assertions),
-    itemIds: checklistItemIdsForTool('crawl-check'),
-  })
+function signalSummary(results) {
+  return technicalSignalSummary(technicalSignals(results.flatMap(result => result.assertions), 'crawl-check'))
 }
 
 function summarize(results, strict) {
@@ -1398,9 +1281,11 @@ export function createJsonReport(results, options) {
     reportedResults[index].assertions = reportedResults[index].assertions
       .filter(assertion => assertion.assertionId !== 'crawl.media.get-observation-complete')
     addMediaGetObservationAssertion(reportedResults[index])
+    reportedResults[index].signals = technicalSignals(reportedResults[index].assertions, 'crawl-check')
+    delete reportedResults[index].assertions
   }
   return {
-    checklistCoverage: checklistCoverage(reportedResults),
+    checklist: checklistReference(),
     generatedAt: new Date().toISOString(),
     options: {
       maxPages: options.maxPages,
@@ -1420,7 +1305,7 @@ export function createJsonReport(results, options) {
       methods: ['GET'],
     },
     results: reportedResults,
-    schemaVersion: 1,
+    schemaVersion: 2,
     summary: summarize(reportedResults, options.strict),
     tool: 'crawl-check',
     toolPackage: { name: packageName, version: packageVersion },
@@ -1446,28 +1331,26 @@ function printText(results, options) {
     }
     else {
       for (const issue of result.issues) {
-        const ids = issue.checklistIds.length > 0 ? ` ${issue.checklistIds.join(',')}` : ''
+        const ids = issue.checklistRefs.length > 0 ? ` ${issue.checklistRefs.join(',')}` : ''
         console.log(`${issue.severity === 'error' ? 'FEHLER' : 'WARNUNG'} [${issue.code}]${ids}: ${issue.message} (${issue.url})`)
       }
     }
   }
 
-  const coverage = checklistCoverage(results)
-  const checklistSummary = coverage.summary.checklistItems
-  const nonAutomaticSummary = coverage.summary.nonAutomaticCriteria
-  console.log(`\nChecklistennachweis ${coverage.catalog.version}: ${checklistSummary.pass} Punkt(e) vollständig, ${checklistSummary.partial} teilweise, ${checklistSummary.fail} fehlgeschlagen, ${checklistSummary.open + checklistSummary.inconclusive} offen/unklar.`)
-  console.log(`Nicht automatisch belegbare Kriterien: ${nonAutomaticSummary.pass} belegt, ${nonAutomaticSummary.total - nonAutomaticSummary.pass - nonAutomaticSummary.notApplicable} offen; sie werden durch diesen Lauf nicht stillschweigend abgeschlossen.`)
+  const signals = signalSummary(results)
+  console.log(`\nTechnische Signale: ${signals.positive} positiv, ${signals.defect} Defekt(e), ${signals.inconclusive} unklar, ${signals.notApplicable} nicht anwendbar.`)
+  console.log('Checklistenreferenzen dienen nur der manuellen QA-Arbeit und ändern keinen Checklistenstatus.')
 
   const summary = summarize(results, options.strict)
   console.log('\nNur lesender Lauf: ausschließlich GET; keine Formular-Action und kein externer Link wurde abgerufen, kein Button betätigt.')
   console.log(`Ergebnis: ${summary.pages} Seite(n), ${summary.resources} Ressource(n), ${summary.errors} Fehler, ${summary.warnings} Warnung(en).`)
   if (summary.failed) {
     console.log(options.strict && summary.errors === 0
-      ? 'NICHT BESTANDEN: --strict wertet Warnungen als Fehler.'
-      : 'NICHT BESTANDEN.')
+      ? 'TECHNISCHER LAUF MIT STRICT-RELEVANTEN WARNUNGEN.'
+      : 'TECHNISCHER LAUF MIT FEHLERBEFUND.')
   }
   else {
-    console.log('BESTANDEN.')
+    console.log('TECHNISCHER LAUF OHNE FEHLERBEFUND.')
   }
 }
 
@@ -1479,7 +1362,6 @@ export async function runCrawlCheck(inputUrls, options = {}) {
   const inputUrl = validateUrl(inputUrls[0], mergedOptions).href
   const results = [await inspectSite(inputUrl, mergedOptions)]
   return {
-    checklistCoverage: checklistCoverage(results),
     options: mergedOptions,
     results,
     summary: summarize(results, mergedOptions.strict),
@@ -1526,7 +1408,7 @@ async function main() {
         formsSubmitted: false,
         methods: ['GET'],
       },
-      schemaVersion: 1,
+      schemaVersion: 2,
       summary: { errors: 1, failed: true, pages: 0, resources: 0, warnings: 0 },
       tool: 'crawl-check',
     }

@@ -231,11 +231,7 @@ describe('crawl checker', () => {
     })
     const jsonReport = createJsonReport(report.results, report.options)
     expect(jsonReport).toMatchObject({
-      checklistCoverage: {
-        summary: {
-          checklistItems: { pass: 0, partial: 11, total: 11 },
-        },
-      },
+      checklist: { id: 'website-qa-checklist', version: '2.0.0' },
       readOnlyGuarantees: {
         buttonsActivated: false,
         externalLinksFetched: false,
@@ -243,8 +239,11 @@ describe('crawl checker', () => {
         formsSubmitted: false,
         methods: ['GET'],
       },
-      schemaVersion: 1,
+      schemaVersion: 2,
     })
+    expect(jsonReport.results[0].signals).toHaveLength(17)
+    expect(jsonReport.results[0].signals.every((signal: { status: string }) => signal.status === 'positive')).toBe(true)
+    expect(JSON.stringify(jsonReport)).not.toContain('assertions')
     expect(JSON.stringify(jsonReport)).not.toContain('person%40example.com')
     expect(JSON.stringify(jsonReport)).not.toContain('person@example.com')
     expect(JSON.stringify(jsonReport)).not.toContain('127.0.0.1')

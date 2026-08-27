@@ -2,12 +2,15 @@
 
 Dieses Changelog dokumentiert veröffentlichte Paketstände von `@mktcode/website-qa`. Planungs- und reine Dokumentationscommits ohne Paketveröffentlichung erscheinen nicht als eigene Version.
 
-## Unveröffentlicht
+## Unveröffentlicht – 2.0.0
 
-- Basiskatalog 1.2.0 um `CORE-SEC-07`, `MEDIA-PERF-04`, `FORM-TEST-04`, `CORE-ROB-03`, `CORE-DOM-06`, `CORE-A11Y-04` und `CORE-A11Y-06` mit konservativen automatischen Teilnachweisen und ausdrücklich manuellen Restkriterien erweitert.
-- Vier atomare Assertions für passive Formularbeschriftungen, verborgen-fokussierbare Bereiche, pro Lauf belegte Browser-Nur-Lese-Grenzen und vollständige GET-Beobachtung entdeckter interner Medien ergänzt.
-- Automatisch entdeckte verdächtige Navigationsziele einschließlich Sitemap-Einträgen werden vor einem Abruf übersprungen; jeder unvollständige Axe-Regelbefund macht auch das allgemeine Audit-Ergebnis unklar.
-- Technische Berichte behalten Schema 1, Projektberichte Schema 3 und Assertions Version 1; neue Zielklassen, Methoden, Interaktionen oder gelockerte Sicherheitsgrenzen wurden nicht eingeführt.
+- Produktgrenze bewusst vereinfacht: zentrale manuelle 215-Punkte-Checkliste plus unabhängige technische Temperaturmessungen; keine automatische Checklistenbewertung.
+- Projektbericht-, Evidence-, Workflow-, Bundle- und Checklistenaggregations-APIs ohne Alias entfernt.
+- Technische Berichte auf `schemaVersion: 2` und neutrale Signale mit `positive`, `defect`, `inconclusive` und `notApplicable` umgestellt; Checklisten-IDs sind nur Informationsreferenzen.
+- Neutralen Checklistenindex und technisches Signalregister eingeführt; der Social-Prüfer dokumentiert Trainings-/Datennutzungstokens ohne Freigabeeingabe oder automatische Betreiberentscheidung.
+- `website-qa-lighthouse` als fünften unabhängigen Standardprüfer mit festem mobilen Lauf für Performance, Accessibility, Best Practices und SEO ergänzt.
+- Lighthouse verwendet eine vor Navigation abgesicherte, isolierte Puppeteer-Seite; externe Requests, Nicht-GET, Formulare, Beacons, Popups und Workerfamilien bleiben blockiert. Sicherheitsblockierungen kennzeichnen Messwerte als nicht repräsentativ.
+- Die sieben zuvor für 1.2 vorbereiteten passiven Signale bleiben als technische Beobachtungen erhalten, ohne zusammengesetzte Checklistenpunkte auszuwerten.
 
 ## 1.1.0 – 2026-08-27
 

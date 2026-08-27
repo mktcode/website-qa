@@ -7,13 +7,12 @@ import { fileTypeFromBuffer } from 'file-type'
 import { parse } from 'parse5'
 import robotsParser from 'robots-parser'
 import sharp from 'sharp'
-import { checklistItemIdsForTool, evaluateChecklist } from './lib/checklist-report.mjs'
 import { fetchResource, normalizeMimeType, redactReportData, redactText, reportUrl, validateUrl } from './lib/http-client.mjs'
 import { writeJsonOutput } from './lib/json-output.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
+import { checklistReference, technicalSignals, technicalSignalSummary } from './lib/signal-report.mjs'
 
 const defaultOptions = {
-  aiTrainingOptIn: false,
   allowHttp: false,
   allowPrivate: false,
   json: false,
@@ -252,8 +251,6 @@ Optionen:
   --json                 Maschinenlesbare JSON-Ausgabe auf stdout
   --json-file=<Pfad>     JSON atomar in eine lokale Datei schreiben
   --strict               Warnungen führen ebenfalls zu Exitcode 1
-  --ai-training-opt-in   Dokumentierte ausdrückliche KI-Trainingsfreigabe bestätigen
-                         (ändert robots.txt nicht; unterdrückt nur diese Warnung)
   --sitemap              Zusätzlich URLs aus /sitemap.xml prüfen
   --sitemap-url=<URL>    Abweichende Sitemap-URL verwenden
   --max-pages=<Anzahl>   Höchstens so viele Seiten prüfen (Standard: 50)
@@ -297,9 +294,6 @@ export function parseArguments(argv) {
       if (!options.jsonFile) {
         throw new Error('--json-file benötigt einen Pfad.')
       }
-    }
-    else if (argument === '--ai-training-opt-in') {
-      options.aiTrainingOptIn = true
     }
     else if (argument === '--sitemap') {
       options.sitemap = true
@@ -723,17 +717,6 @@ async function checkRobots(result, pageUrl, agentResults, options) {
         token: policy.token,
       }
     })
-
-    const allowedTrainingPolicies = result.robots.policies
-      .filter(policy => policy.category === 'ai-training' && policy.allowed)
-    if (allowedTrainingPolicies.length > 0 && !options.aiTrainingOptIn) {
-      addIssue(
-        result,
-        'warning',
-        'ai-training-opt-in-missing',
-        `KI-Training/Datennutzung ist für ${allowedTrainingPolicies.map(policy => policy.label).join(', ')} nicht per robots.txt ausgeschlossen. Standardmäßig wird ein Opt-out erwartet; eine Freigabe muss ausdrücklich dokumentiert sein. --ai-training-opt-in bestätigt nur diese Prüfentscheidung und ändert robots.txt nicht.`,
-      )
-    }
   }
   catch (error) {
     addIssue(result, 'warning', 'robots-fetch-failed', `robots.txt konnte nicht geprüft werden: ${error.message}`)
@@ -939,12 +922,11 @@ function metadataUrlIsSecure(value) {
   }
 }
 
-function createSocialAssertions(result, options) {
+function createSocialAssertions(result) {
   const trainingPolicies = Array.isArray(result.robots?.policies)
     ? result.robots.policies.filter(policy => policy.category === 'ai-training')
     : []
   const subject = {
-    aiTrainingOptInDeclaredForRun: Boolean(options.aiTrainingOptIn),
     allowedTrainingTokens: trainingPolicies.filter(policy => policy.allowed).length,
     blockedTrainingTokens: trainingPolicies.filter(policy => !policy.allowed).length,
     checkedAgents: result.agents.map(agent => agent.key),
@@ -1118,36 +1100,14 @@ function createSocialAssertions(result, options) {
   }
   add('social.robots.policy-matrix-recorded', outcome, {
     inconclusive: 'Crawler-/Produktkennungen, Kategorien oder offizielle Quellen sind im technischen Bericht nicht vollständig dokumentiert.',
-    pass: 'Crawler-/Produktkennungen, Kategorien, offizielle Quellen und Quellenstand sind im technischen Bericht dokumentiert.',
-  }[outcome])
-
-  if (!Array.isArray(policies) || policies.length !== robotsPolicies.length) {
-    outcome = 'inconclusive'
-  }
-  else {
-    const allowedTraining = policies.filter(policy => policy.category === 'ai-training' && policy.allowed)
-    outcome = allowedTraining.length === 0 || options.aiTrainingOptIn ? 'pass' : 'fail'
-  }
-  add('social.robots.training-access-blocked-or-declared', outcome, {
-    fail: 'Mindestens ein Trainings-/Datennutzungstoken ist erlaubt, ohne dass für diesen Lauf ein dokumentiertes Opt-in erklärt wurde.',
-    inconclusive: 'Die Trainings-/Datennutzungsregeln konnten nicht vollständig ausgewertet werden.',
-    pass: 'Trainings-/Datennutzungstokens sind blockiert oder der Lauf deklariert ausdrücklich ein separat nachzuweisendes Opt-in.',
-  }[outcome])
-
-  outcome = options.strict ? 'pass' : 'fail'
-  add('social.run.strict-mode-recorded', outcome, {
-    fail: 'Der Social-Lauf wurde nicht im strikten Modus ausgeführt.',
-    pass: 'Der Social-Lauf dokumentiert den strikten Modus, in dem Warnungen den Exitcode 1 auslösen.',
+    pass: 'Crawler-/Produktkennungen, Kategorien, erlaubte und blockierte Trainings-/Datennutzungstokens, offizielle Quellen und Quellenstand sind im technischen Bericht dokumentiert. Ob die beobachtete Policy der freigegebenen Betreiberentscheidung entspricht, bleibt manuell zu prüfen.',
   }[outcome])
 
   return assertions
 }
 
-function checklistCoverage(results) {
-  return evaluateChecklist({
-    assertions: results.flatMap(result => result.assertions || []),
-    itemIds: checklistItemIdsForTool('social-preview-check'),
-  })
+function signalSummary(results) {
+  return technicalSignalSummary(technicalSignals(results.flatMap(result => result.assertions || createSocialAssertions(result)), 'social-preview-check'))
 }
 
 function compactMetadata(metadataResult) {
@@ -1173,7 +1133,7 @@ export function createJsonReport(results, options) {
   const compactResults = results.map(result => ({
     agents: result.agents,
     coverage: result.coverage,
-    assertions: result.assertions || createSocialAssertions(result, options),
+    signals: technicalSignals(result.assertions || createSocialAssertions(result), 'social-preview-check'),
     finalUrl: result.finalUrl,
     images: result.images,
     issues: result.issues,
@@ -1189,11 +1149,9 @@ export function createJsonReport(results, options) {
     }
   }
   return {
-    aiTrainingOptIn: options.aiTrainingOptIn,
-    checklistCoverage: checklistCoverage(reportedResults),
+    checklist: checklistReference(),
     generatedAt: new Date().toISOString(),
     options: {
-      aiTrainingOptIn: options.aiTrainingOptIn,
       maxPages: options.maxPages,
       maxRedirects: options.maxRedirects,
       privateTargetsRedacted: Boolean(options.allowPrivate),
@@ -1212,7 +1170,7 @@ export function createJsonReport(results, options) {
     },
     results: reportedResults,
     robotsPolicyReviewedAt,
-    schemaVersion: 1,
+    schemaVersion: 2,
     summary: summarize(reportedResults, options.strict),
     tool: 'social-preview-check',
     toolPackage: { name: packageName, version: packageVersion },
@@ -1252,21 +1210,19 @@ function printText(results, options) {
   }
 
   const summary = summarize(results, options.strict)
-  const coverage = checklistCoverage(results)
-  const checklistSummary = coverage.summary.checklistItems
-  const nonAutomaticSummary = coverage.summary.nonAutomaticCriteria
-  console.log(`\nChecklistennachweis ${coverage.catalog.version}: ${checklistSummary.pass} Punkt(e) vollständig, ${checklistSummary.partial} teilweise, ${checklistSummary.fail} fehlgeschlagen, ${checklistSummary.open + checklistSummary.inconclusive} offen/unklar.`)
-  console.log(`Nicht automatische Kriterien im Social-Ausschnitt: ${nonAutomaticSummary.pass} belegt, ${nonAutomaticSummary.noEvidence} ohne Nachweis.`)
-  console.log(`KI-Trainingsfreigabe: ${options.aiTrainingOptIn ? 'ausdrücklich für diese Prüfung bestätigt' : 'nicht bestätigt; Opt-out wird standardmäßig erwartet'}.`)
+  const signals = signalSummary(results)
+  console.log(`\nTechnische Signale: ${signals.positive} positiv, ${signals.defect} Defekt(e), ${signals.inconclusive} unklar, ${signals.notApplicable} nicht anwendbar.`)
+  console.log('Checklistenreferenzen dienen nur der manuellen QA-Arbeit und ändern keinen Checklistenstatus.')
+  console.log('KI-Training/Datennutzung: beobachtete robots.txt-Regeln werden dokumentiert, aber nicht als Freigabeentscheidung bewertet.')
   console.log(`Robots-Matrix: ${robotsPolicies.length} Kennungen, Quellenstand ${robotsPolicyReviewedAt}.`)
   console.log(`Ergebnis: ${summary.pages} Seite(n), ${summary.errors} Fehler, ${summary.warnings} Warnung(en).`)
   if (summary.failed) {
     console.log(options.strict && summary.errors === 0
-      ? 'NICHT BESTANDEN: --strict wertet Warnungen als Fehler.'
-      : 'NICHT BESTANDEN.')
+      ? 'TECHNISCHER LAUF MIT STRICT-RELEVANTEN WARNUNGEN.'
+      : 'TECHNISCHER LAUF MIT FEHLERBEFUND.')
   }
   else {
-    console.log('BESTANDEN.')
+    console.log('TECHNISCHER LAUF OHNE FEHLERBEFUND.')
   }
 }
 
@@ -1294,7 +1250,7 @@ export async function runSocialPreviewCheck(inputUrls, options = {}) {
       selectedPages: urls.length,
       truncated: sitemapCoverageTruncated || discoveredUrls.length > urls.length,
     }
-    result.assertions = createSocialAssertions(result, mergedOptions)
+    result.assertions = createSocialAssertions(result)
     results.push(result)
   }
 
@@ -1346,7 +1302,7 @@ async function main() {
         methods: ['GET'],
       },
       robotsPolicyReviewedAt,
-      schemaVersion: 1,
+      schemaVersion: 2,
       summary: { errors: 1, failed: true, pages: 0, warnings: 0 },
       tool: 'social-preview-check',
     }

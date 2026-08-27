@@ -4,6 +4,7 @@ import { createServer } from 'node:http'
 import { brotliCompressSync, gzipSync } from 'node:zlib'
 import { afterEach, describe, expect, it } from 'vitest'
 import { createJsonReport, parseArguments, runHttpCheck } from '../src/check-http.mjs'
+import { reportUrl, validatedResolution } from '../src/lib/http-client.mjs'
 
 const servers = new Set<ReturnType<typeof createServer>>()
 
@@ -50,6 +51,18 @@ function compressedResponse(body: Buffer, acceptEncoding: string | undefined) {
 }
 
 describe('http checker', () => {
+  it('bounds reported URLs, redacts inline schemes and resolves literal IPv6 safely', async () => {
+    const longUrl = `https://example.com/${'x'.repeat(10_000)}?${'parameter'.repeat(20)}=secret`
+    const reported = reportUrl(longUrl)
+
+    expect(reported.url.length).toBe(2048)
+    expect(reported.url).not.toContain('secret')
+    expect(reported.parameterNames[0]?.length).toBeLessThanOrEqual(100)
+    expect(reportUrl('data:text/plain,INLINE_SECRET').url).toBe('(data-URL redigiert)')
+    await expect(validatedResolution(new URL('http://[::1]/'), { allowPrivate: false })).rejects.toThrow(/nicht öffentliche Adresse/)
+    await expect(validatedResolution(new URL('http://[::1]/'), { allowPrivate: true })).resolves.toEqual([{ address: '::1', family: 6 }])
+  })
+
   it('parses URLs and safe CLI options', () => {
     const parsed = parseArguments([
       'https://example.com/',
@@ -137,11 +150,6 @@ describe('http checker', () => {
     }
 
     expect(report.summary).toEqual({ errors: 0, failed: false, targets: 1, warnings: 0 })
-    expect(report.checklistCoverage.summary.checklistItems).toMatchObject({
-      automaticallyPassed: 1,
-      pass: 1,
-      total: 11,
-    })
     expect(result.notFound).toMatchObject({ status: 404 })
     expect(result.page).toMatchObject({
       finalUrl: `${url}?source=qa`,
@@ -173,11 +181,15 @@ describe('http checker', () => {
 
     const json = createJsonReport(report.results, report.options)
     expect(json).toMatchObject({
-      checklistCoverage: { catalog: { status: 'stable' } },
+      checklist: { id: 'website-qa-checklist', version: '2.0.0' },
       readOnlyGuarantees: { methods: ['GET'], mutatingActionsInvoked: false },
       results: [{ requestedUrl: '(privates/lokales Ziel)', requestedUrlParameterNames: ['source'] }],
-      schemaVersion: 1,
+      schemaVersion: 2,
     })
+    expect(json.results[0].signals).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'error.not-found.status-404', status: 'positive' }),
+    ]))
+    expect(JSON.stringify(json)).not.toContain('assertions')
     expect(JSON.stringify(json)).not.toContain('source=qa')
   })
 

@@ -72,8 +72,12 @@ function isNonPublicIp(address) {
     || normalized.startsWith('2001:db8:')
 }
 
+export function normalizedHostname(hostname) {
+  return hostname.toLowerCase().replace(/^\[|\]$/g, '')
+}
+
 function isPrivateHostname(hostname) {
-  const normalized = hostname.toLowerCase().replace(/^\[|\]$/g, '')
+  const normalized = normalizedHostname(hostname)
   if (normalized === 'localhost' || normalized.endsWith('.localhost') || normalized.endsWith('.local')) {
     return true
   }
@@ -84,7 +88,10 @@ function isPrivateHostname(hostname) {
 export function reportUrl(value, options = {}) {
   try {
     const url = new URL(value)
-    const parameterNames = [...new Set(url.searchParams.keys())]
+    const parameterNames = [...new Set([...url.searchParams.keys()].map(name => name.slice(0, 100)))].slice(0, 100)
+    if (!['http:', 'https:'].includes(url.protocol)) {
+      return { parameterNames: [], url: `(${url.protocol.slice(0, -1)}-URL redigiert)`.slice(0, 2048) }
+    }
     if (options.hideHosts || isPrivateHostname(url.hostname)) {
       return { parameterNames, url: '(privates/lokales Ziel)' }
     }
@@ -94,7 +101,7 @@ export function reportUrl(value, options = {}) {
     url.hash = ''
     return {
       parameterNames,
-      url: url.href,
+      url: url.href.slice(0, 2048),
     }
   }
   catch {
@@ -108,7 +115,7 @@ function redactPath(value) {
   }
   try {
     const url = new URL(value, 'https://website-qa.invalid')
-    return url.pathname
+    return url.pathname.slice(0, 2048)
   }
   catch {
     return undefined
@@ -187,27 +194,62 @@ export function validateUrl(value, options, context = 'URL') {
   return url
 }
 
-export async function assertPublicResolution(url, options) {
-  if (options.allowPrivate || isIP(url.hostname) > 0) {
-    return
+function remainingTimeout(options) {
+  const configured = options.timeoutMilliseconds || 15_000
+  if (!options.deadline) {
+    return configured
+  }
+  const remaining = options.deadline - Date.now()
+  if (remaining <= 0) {
+    throw new Error(`Laufzeitlimit von ${configured} ms ist abgelaufen.`)
+  }
+  return Math.min(configured, remaining)
+}
+
+async function withNetworkDeadline(promise, options, label) {
+  const milliseconds = remainingTimeout(options)
+  let timer
+  try {
+    return await Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`${label} überschritt das verbleibende Laufzeitlimit.`)), milliseconds)
+      }),
+    ])
+  }
+  finally {
+    clearTimeout(timer)
+  }
+}
+
+export async function validatedResolution(url, options) {
+  const hostname = normalizedHostname(url.hostname)
+  if (isIP(hostname) > 0) {
+    if (!options.allowPrivate && isNonPublicIp(hostname)) {
+      throw new Error('Abrufziel verwendet eine nicht öffentliche Adresse.')
+    }
+    return [{ address: hostname, family: isIP(hostname) }]
   }
 
   let addresses
   try {
-    addresses = await lookup(url.hostname, { all: true, verbatim: true })
+    addresses = await withNetworkDeadline(lookup(hostname, { all: true, verbatim: true }), options, 'DNS-Auflösung')
   }
   catch (error) {
     throw new Error(`DNS-Auflösung fehlgeschlagen: ${redactText(error.message)}`, { cause: error })
   }
 
   if (addresses.length === 0) {
-    throw new Error(`DNS-Auflösung für ${url.hostname} lieferte keine Adresse.`)
+    throw new Error(`DNS-Auflösung für ${hostname} lieferte keine Adresse.`)
   }
-
-  const nonPublicAddress = addresses.find(result => isNonPublicIp(result.address))
-  if (nonPublicAddress) {
+  if (!options.allowPrivate && addresses.some(result => isNonPublicIp(result.address))) {
     throw new Error('Abrufziel löst auf eine nicht öffentliche Adresse auf.')
   }
+  return addresses
+}
+
+export async function assertPublicResolution(url, options) {
+  await validatedResolution(url, options)
 }
 
 function normalizedHeaders(headers) {
@@ -218,7 +260,9 @@ function normalizedHeaders(headers) {
 }
 
 async function requestOnce(url, options, request) {
-  await assertPublicResolution(url, options)
+  const resolutions = await validatedResolution(url, options)
+  const pinnedResolution = resolutions.find(result => result.family === 4) || resolutions[0]
+  const timeoutMilliseconds = remainingTimeout(options)
 
   const transport = url.protocol === 'https:' ? https : http
   const maximumBytes = request.maximumBytes || options.maxHtmlBytes || 2 * 1024 * 1024
@@ -229,6 +273,14 @@ async function requestOnce(url, options, request) {
         'accept': request.accept || '*/*',
         'user-agent': request.userAgent || 'WebsiteQualityCheck/1.0',
         ...request.headers,
+      },
+      lookup(_hostname, lookupOptions, callback) {
+        if (lookupOptions?.all) {
+          callback(null, [pinnedResolution])
+        }
+        else {
+          callback(null, pinnedResolution.address, pinnedResolution.family)
+        }
       },
       method: 'GET',
     }, (response) => {
@@ -259,8 +311,8 @@ async function requestOnce(url, options, request) {
       response.on('error', reject)
     })
 
-    clientRequest.setTimeout(options.timeoutMilliseconds, () => {
-      clientRequest.destroy(new Error(`Abruf von ${reportUrl(url.href).url} überschritt ${options.timeoutMilliseconds} ms.`))
+    clientRequest.setTimeout(timeoutMilliseconds, () => {
+      clientRequest.destroy(new Error(`Abruf von ${reportUrl(url.href).url} überschritt das verbleibende Laufzeitlimit.`))
     })
     clientRequest.on('error', reject)
     clientRequest.end()

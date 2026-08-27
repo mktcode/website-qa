@@ -32,7 +32,6 @@ describe('social preview checker', () => {
       'https://example.com/',
       '--json-file=.website-qa/current/social.json',
       '--strict',
-      '--ai-training-opt-in',
       '--sitemap',
       '--max-pages=12',
       '--timeout=5000',
@@ -40,7 +39,6 @@ describe('social preview checker', () => {
 
     expect(parsed.urls).toEqual(['https://example.com/'])
     expect(parsed.options).toMatchObject({
-      aiTrainingOptIn: true,
       json: true,
       jsonFile: '.website-qa/current/social.json',
       maxPages: 12,
@@ -133,7 +131,6 @@ describe('social preview checker', () => {
       'social.robots.file-retrievable': 'inconclusive',
       'social.robots.policy-matrix-recorded': 'inconclusive',
       'social.robots.social-crawlers-allowed': 'inconclusive',
-      'social.robots.training-access-blocked-or-declared': 'inconclusive',
     })
   })
 
@@ -197,13 +194,6 @@ describe('social preview checker', () => {
       allowHttp: true,
       allowPrivate: true,
     })
-    const optedInReport = await runSocialPreviewCheck([url], {
-      aiTrainingOptIn: true,
-      allowHttp: true,
-      allowPrivate: true,
-      strict: true,
-    })
-
     const result = report.results[0] as unknown as {
       agents: unknown[]
       assertions: Array<{ assertionId: string, outcome: string }>
@@ -211,27 +201,16 @@ describe('social preview checker', () => {
       robots: { policies: unknown[] }
     }
 
-    expect(report.summary).toMatchObject({ errors: 0, failed: false, pages: 1, warnings: 1 })
-    expect(report.results[0]?.issues).toContainEqual(expect.objectContaining({
-      code: 'ai-training-opt-in-missing',
-      severity: 'warning',
-    }))
-    expect(optedInReport.summary).toMatchObject({ errors: 0, failed: false, pages: 1, warnings: 0 })
+    expect(report.summary).toMatchObject({ errors: 0, failed: false, pages: 1, warnings: 0 })
     expect(result.agents).toHaveLength(4)
     expect(result.images[0]).toMatchObject({ height: 630, width: 1200 })
     expect(result.robots.policies).toHaveLength(robotsPolicies.length)
-    expect(result.assertions).toHaveLength(10)
+    expect(result.assertions).toHaveLength(8)
     expect(result.assertions.find(assertion => assertion.assertionId === 'social.crawlers.html-metadata-consistent')?.outcome).toBe('pass')
-    expect(result.assertions.find(assertion => assertion.assertionId === 'social.robots.training-access-blocked-or-declared')?.outcome).toBe('fail')
-    expect(result.assertions.find(assertion => assertion.assertionId === 'social.run.strict-mode-recorded')?.outcome).toBe('fail')
-    const optedInAssertions = (optedInReport.results[0] as unknown as {
-      assertions: Array<{ assertionId: string, outcome: string, subject: { aiTrainingOptInDeclaredForRun: boolean, allowedTrainingTokens: number, blockedTrainingTokens: number } }>
-    })?.assertions || []
-    expect(optedInAssertions.find(assertion => assertion.assertionId === 'social.robots.training-access-blocked-or-declared')).toMatchObject({
+    expect(result.assertions.find(assertion => assertion.assertionId === 'social.robots.policy-matrix-recorded')).toMatchObject({
       outcome: 'pass',
-      subject: { aiTrainingOptInDeclaredForRun: true, allowedTrainingTokens: 6, blockedTrainingTokens: 0 },
+      subject: { allowedTrainingTokens: 6, blockedTrainingTokens: 0 },
     })
-    expect(optedInAssertions.find(assertion => assertion.assertionId === 'social.run.strict-mode-recorded')?.outcome).toBe('pass')
     const limitedReport = await runSocialPreviewCheck([url, `${url}second`], {
       allowHttp: true,
       allowPrivate: true,
@@ -246,17 +225,16 @@ describe('social preview checker', () => {
 
     const jsonReport = createJsonReport(report.results, report.options)
     expect(jsonReport).toMatchObject({
-      checklistCoverage: {
-        catalog: { version: '1.2.0' },
-        summary: { checklistItems: { total: 7 } },
-      },
+      checklist: { id: 'website-qa-checklist', version: '2.0.0' },
       readOnlyGuarantees: {
         browserInteractions: false,
         formsSubmitted: false,
         methods: ['GET'],
       },
-      schemaVersion: 1,
+      schemaVersion: 2,
     })
+    expect(jsonReport.results[0].signals).toHaveLength(8)
+    expect(JSON.stringify(jsonReport)).not.toContain('assertions')
     expect(JSON.stringify(jsonReport)).not.toContain('127.0.0.1')
     expect(JSON.stringify(jsonReport)).toContain('(privates/lokales Ziel)')
     expect([...seenMethods]).toEqual(['GET'])

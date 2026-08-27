@@ -5,10 +5,10 @@
 
 import { brotliDecompressSync, gunzipSync } from 'node:zlib'
 import { parse } from 'parse5'
-import { checklistItemIdsForTool, evaluateChecklist } from './lib/checklist-report.mjs'
 import { fetchResource, normalizeMimeType, redactReportData, redactText, reportUrl, validateUrl } from './lib/http-client.mjs'
 import { writeJsonOutput } from './lib/json-output.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
+import { checklistReference, technicalSignals, technicalSignalSummary } from './lib/signal-report.mjs'
 
 const defaultOptions = {
   allowHttp: false,
@@ -131,8 +131,8 @@ export function parseArguments(argv) {
   return { options, urls }
 }
 
-function addIssue(result, severity, code, message, checklistIds = [], url = result.finalUrl || result.requestedUrl) {
-  result.issues.push({ checklistIds, code, message, severity, url })
+function addIssue(result, severity, code, message, checklistRefs = [], url = result.finalUrl || result.requestedUrl) {
+  result.issues.push({ checklistRefs, code, message, severity, url })
 }
 
 function addAssertion(result, assertionId, outcome, message, url, details = {}) {
@@ -179,13 +179,13 @@ function directiveValues(value, directive) {
 function checkSecurityHeaders(result, response, label, documentLike = true) {
   const headers = response.headers
   const finalUrl = new URL(response.finalUrl)
-  const checklistIds = ['CORE-DOM-08', 'CORE-ERR-04', 'CORE-SEC-04', 'CORE-SEC-05']
+  const checklistRefs = ['CORE-DOM-08', 'CORE-ERR-04', 'CORE-SEC-04', 'CORE-SEC-05']
   result.securityHeaderCoverage.checkedResponseClasses.push(label)
 
   if (finalUrl.protocol === 'https:') {
     const hsts = headers['strict-transport-security']
     if (!hsts) {
-      addIssue(result, 'error', 'hsts-missing', `${label}: Strict-Transport-Security fehlt.`, checklistIds, response.finalUrl)
+      addIssue(result, 'error', 'hsts-missing', `${label}: Strict-Transport-Security fehlt.`, checklistRefs, response.finalUrl)
       addAssertion(result, 'http.hsts.present', 'fail', `${label}: HSTS fehlt.`, response.finalUrl, { responseClass: label })
       addAssertion(result, 'http.hsts.max-age-adequate', 'inconclusive', `${label}: max-age ist ohne HSTS nicht prüfbar.`, response.finalUrl, { responseClass: label })
     }
@@ -193,11 +193,11 @@ function checkSecurityHeaders(result, response, label, documentLike = true) {
       addAssertion(result, 'http.hsts.present', 'pass', `${label}: HSTS ist vorhanden.`, response.finalUrl, { responseClass: label })
       const maxAge = Number(hsts.match(/(?:^|;)\s*max-age\s*=\s*(\d+)/i)?.[1])
       if (!Number.isFinite(maxAge)) {
-        addIssue(result, 'error', 'hsts-invalid', `${label}: HSTS enthält kein gültiges max-age.`, checklistIds, response.finalUrl)
+        addIssue(result, 'error', 'hsts-invalid', `${label}: HSTS enthält kein gültiges max-age.`, checklistRefs, response.finalUrl)
         addAssertion(result, 'http.hsts.max-age-adequate', 'fail', `${label}: HSTS enthält kein gültiges max-age.`, response.finalUrl, { responseClass: label })
       }
       else if (maxAge < 15_552_000) {
-        addIssue(result, 'warning', 'hsts-short', `${label}: HSTS max-age ist mit ${maxAge} Sekunden kürzer als 180 Tage.`, checklistIds, response.finalUrl)
+        addIssue(result, 'warning', 'hsts-short', `${label}: HSTS max-age ist mit ${maxAge} Sekunden kürzer als 180 Tage.`, checklistRefs, response.finalUrl)
         addAssertion(result, 'http.hsts.max-age-adequate', 'fail', `${label}: HSTS max-age ist kürzer als 180 Tage.`, response.finalUrl, { maxAge, responseClass: label })
       }
       else {
@@ -220,7 +220,7 @@ function checkSecurityHeaders(result, response, label, documentLike = true) {
     { responseClass: label },
   )
   if (!nosniff) {
-    addIssue(result, 'warning', 'nosniff-missing', `${label}: X-Content-Type-Options: nosniff fehlt.`, checklistIds, response.finalUrl)
+    addIssue(result, 'warning', 'nosniff-missing', `${label}: X-Content-Type-Options: nosniff fehlt.`, checklistRefs, response.finalUrl)
   }
 
   if (!documentLike) {
@@ -237,7 +237,7 @@ function checkSecurityHeaders(result, response, label, documentLike = true) {
     { responseClass: label },
   )
   if (!referrerPolicyDeclared) {
-    addIssue(result, 'warning', 'referrer-policy-missing', `${label}: Referrer-Policy fehlt.`, checklistIds, response.finalUrl)
+    addIssue(result, 'warning', 'referrer-policy-missing', `${label}: Referrer-Policy fehlt.`, checklistRefs, response.finalUrl)
   }
 
   const permissionsPolicyDeclared = Boolean(headers['permissions-policy']?.trim())
@@ -250,7 +250,7 @@ function checkSecurityHeaders(result, response, label, documentLike = true) {
     { responseClass: label },
   )
   if (!permissionsPolicyDeclared) {
-    addIssue(result, 'warning', 'permissions-policy-missing', `${label}: Permissions-Policy fehlt.`, checklistIds, response.finalUrl)
+    addIssue(result, 'warning', 'permissions-policy-missing', `${label}: Permissions-Policy fehlt.`, checklistRefs, response.finalUrl)
   }
 
   const contentSecurityPolicy = headers['content-security-policy']?.trim()
@@ -264,7 +264,7 @@ function checkSecurityHeaders(result, response, label, documentLike = true) {
     { responseClass: label },
   )
   if (!cspDeclared) {
-    addIssue(result, 'warning', 'csp-missing', `${label}: Content-Security-Policy fehlt.`, checklistIds, response.finalUrl)
+    addIssue(result, 'warning', 'csp-missing', `${label}: Content-Security-Policy fehlt.`, checklistRefs, response.finalUrl)
   }
 
   const frameAncestors = directiveValues(contentSecurityPolicy, 'frame-ancestors')
@@ -281,7 +281,7 @@ function checkSecurityHeaders(result, response, label, documentLike = true) {
     { responseClass: label },
   )
   if (!framingProtected) {
-    addIssue(result, 'warning', 'framing-protection-missing', `${label}: Weder CSP frame-ancestors noch ein wirksames X-Frame-Options schützt vor Framing.`, checklistIds, response.finalUrl)
+    addIssue(result, 'warning', 'framing-protection-missing', `${label}: Weder CSP frame-ancestors noch ein wirksames X-Frame-Options schützt vor Framing.`, checklistRefs, response.finalUrl)
   }
 }
 
@@ -774,11 +774,8 @@ async function inspectTarget(inputUrl, options) {
   return result
 }
 
-function checklistCoverage(results) {
-  return evaluateChecklist({
-    assertions: results.flatMap(result => result.assertions),
-    itemIds: checklistItemIdsForTool('http-check'),
-  })
+function signalSummary(results) {
+  return technicalSignalSummary(technicalSignals(results.flatMap(result => result.assertions), 'http-check'))
 }
 
 function summarize(results, strict) {
@@ -801,8 +798,12 @@ export function createJsonReport(results, options) {
       reportedResults[index].requestedUrlParameterNames = parameterNames
     }
   }
+  for (const result of reportedResults) {
+    result.signals = technicalSignals(result.assertions, 'http-check')
+    delete result.assertions
+  }
   return {
-    checklistCoverage: checklistCoverage(reportedResults),
+    checklist: checklistReference(),
     generatedAt: new Date().toISOString(),
     options: {
       checkHttpRedirect: options.checkHttpRedirect,
@@ -817,7 +818,7 @@ export function createJsonReport(results, options) {
       mutatingActionsInvoked: false,
     },
     results: reportedResults,
-    schemaVersion: 1,
+    schemaVersion: 2,
     summary: summarize(reportedResults, options.strict),
     tool: 'http-check',
     toolPackage: { name: packageName, version: packageVersion },
@@ -851,27 +852,25 @@ function printText(results, options) {
     }
     else {
       for (const issue of result.issues) {
-        const ids = issue.checklistIds.length > 0 ? ` ${issue.checklistIds.join(',')}` : ''
+        const ids = issue.checklistRefs.length > 0 ? ` ${issue.checklistRefs.join(',')}` : ''
         console.log(`${issue.severity === 'error' ? 'FEHLER' : 'WARNUNG'} [${issue.code}]${ids}: ${issue.message}`)
       }
     }
   }
 
-  const coverage = checklistCoverage(results)
-  const checklistSummary = coverage.summary.checklistItems
-  const nonAutomaticSummary = coverage.summary.nonAutomaticCriteria
-  console.log(`\nChecklistennachweis ${coverage.catalog.version}: ${checklistSummary.pass} Punkt(e) vollständig, ${checklistSummary.partial} teilweise, ${checklistSummary.fail} fehlgeschlagen, ${checklistSummary.open + checklistSummary.inconclusive} offen/unklar.`)
-  console.log(`Nicht automatisch belegbare Kriterien: ${nonAutomaticSummary.pass} belegt, ${nonAutomaticSummary.total - nonAutomaticSummary.pass - nonAutomaticSummary.notApplicable} offen; sie werden durch diesen Lauf nicht stillschweigend abgeschlossen.`)
+  const signals = signalSummary(results)
+  console.log(`\nTechnische Signale: ${signals.positive} positiv, ${signals.defect} Defekt(e), ${signals.inconclusive} unklar, ${signals.notApplicable} nicht anwendbar.`)
+  console.log('Checklistenreferenzen dienen nur der manuellen QA-Arbeit und ändern keinen Checklistenstatus.')
 
   const summary = summarize(results, options.strict)
   console.log(`Ergebnis: ${summary.targets} Ziel(e), ${summary.errors} Fehler, ${summary.warnings} Warnung(en).`)
   if (summary.failed) {
     console.log(options.strict && summary.errors === 0
-      ? 'NICHT BESTANDEN: --strict wertet Warnungen als Fehler.'
-      : 'NICHT BESTANDEN.')
+      ? 'TECHNISCHER LAUF MIT STRICT-RELEVANTEN WARNUNGEN.'
+      : 'TECHNISCHER LAUF MIT FEHLERBEFUND.')
   }
   else {
-    console.log('BESTANDEN.')
+    console.log('TECHNISCHER LAUF OHNE FEHLERBEFUND.')
   }
 }
 
@@ -885,7 +884,6 @@ export async function runHttpCheck(inputUrls, options = {}) {
   }
 
   return {
-    checklistCoverage: checklistCoverage(results),
     options: mergedOptions,
     results,
     summary: summarize(results, mergedOptions.strict),
@@ -925,7 +923,7 @@ async function main() {
   catch (error) {
     const errorReport = {
       error: redactText(error.message),
-      schemaVersion: 1,
+      schemaVersion: 2,
       summary: { errors: 1, failed: true, targets: 0, warnings: 0 },
       tool: 'http-check',
     }

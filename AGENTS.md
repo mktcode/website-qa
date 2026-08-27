@@ -4,7 +4,7 @@ Dieses öffentliche MIT-Repository enthält frameworkunabhängige, ausschließli
 
 ## Entstehung und Ziel
 
-Die ersten Prüfer entstanden bei der systematischen Qualitätssicherung einer realen Nuxt-Website. Wiederverwendbare HTTP-, Crawl-, Browser- und Social-Prüfungen wurden anschließend bewusst aus dem Website-Repository herausgelöst, damit sie nicht kopiert, projektspezifisch verändert oder von einer benachbarten Arbeitskopie abhängig werden.
+Die ersten Prüfer entstanden bei der systematischen Qualitätssicherung einer realen Nuxt-Website. Wiederverwendbare HTTP-, Crawl-, Browser-, Social- und Lighthouse-Prüfungen wurden anschließend bewusst aus dem Website-Repository herausgelöst, damit sie nicht kopiert, projektspezifisch verändert oder von einer benachbarten Arbeitskopie abhängig werden.
 
 `markus-kottlaender.de` darf als zusätzlicher öffentlicher Regressionstest dienen, ist aber niemals eine fachliche Vorgabe. Kein Prüfer darf Domains, Routen, Seitenanzahlen, Frameworks, Texte, Headerausnahmen oder erwartete Funktionen dieser Website fest einbauen.
 
@@ -27,16 +27,19 @@ Eine Lockerung dieser Grenzen ist keine gewöhnliche Funktionserweiterung. Sie e
 
 ## Architektur und öffentliche Schnittstellen
 
-Es gibt bewusst vier unabhängige CLI-Befehle:
+Es gibt bewusst fünf unabhängige CLI-Befehle:
 
 - `website-qa-http`
 - `website-qa-crawl`
 - `website-qa-browser`
 - `website-qa-social`
+- `website-qa-lighthouse`
 
 Keinen allgemeinen Sammelbefehl und kein universelles `qa:local` einführen. Zielprojekte entscheiden selbst, welche Prüfer zu ihrem Workflow gehören, und können dafür lokale npm-Aliase anlegen.
 
-Gemeinsame URL-, DNS-, SSRF-, Redirect-, Größen- und Antwortlogik gehört nach `src/lib/http-client.mjs`. Sicherheitslogik nicht zwischen Prüfern duplizieren oder in Verbraucherprojekte kopieren.
+Gemeinsame URL-, DNS-, SSRF-, Redirect-, Größen- und Antwortlogik gehört nach `src/lib/http-client.mjs`. Gemeinsame Browser-Nur-Lese-Grenzen gehören nach `src/lib/browser-safety.mjs`. Sicherheitslogik nicht zwischen Prüfern duplizieren oder in Verbraucherprojekte kopieren.
+
+Die zentrale modulare Checkliste ist eine ausschließlich manuell bearbeitete Arbeitsgrundlage. Prüfer dürfen stabile IDs informativ referenzieren, aber niemals Checklistenpunkte bewerten, aggregieren, abhaken oder verändern. Keine Projektbericht-, Evidence-, Workflow-, Freigabe- oder Wizard-Plattform einführen.
 
 Bei CLI-Änderungen nach Möglichkeit erhalten:
 
@@ -49,13 +52,13 @@ Bei CLI-Änderungen nach Möglichkeit erhalten:
 - stabile fachliche Checklistenkennungen in Befunden;
 - symlink-sichere Ausführung installierter Paket-Binaries.
 
-Automatische Ergebnisse sind technische Teilnachweise. Die Werkzeuge dürfen keine Projektchecklisten selbständig abhaken und keine vollständige WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe behaupten.
+Automatische Ergebnisse sind begrenzte technische Signale. Ein positives Signal bedeutet nur, dass der konkrete Defekt im dokumentierten Umfang nicht beobachtet wurde. Die Werkzeuge dürfen keine Projektchecklisten selbständig bewerten oder abhaken und keine vollständige WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe behaupten.
 
 ## Tests und Validierung
 
 Primäre Tests verwenden lokale, kurzlebige Testserver mit unterschiedlichen HTML-Strukturen. Eine konkrete öffentliche Website ist nur ein ergänzender Smoke-Test und darf keine generische Erwartung definieren.
 
-Für Browser-Sicherheitsgrenzen sind echte Chromium-Integrationstests erforderlich. Bestehende Tests weisen insbesondere nach, dass automatische POSTs, Formularübermittlungen, externe Requests und Popups keine Servernebenwirkungen erzeugen. Diese Nachweise bei Änderungen an Request-Interception, Navigation, Seitenerkennung oder Browserkontexten erhalten und erweitern.
+Für Browser- und Lighthouse-Sicherheitsgrenzen sind echte Chromium-Integrationstests erforderlich. Bestehende Tests weisen insbesondere nach, dass automatische POSTs, Formularübermittlungen, externe Requests, Popups, Beacons und Workerfamilien keine Servernebenwirkungen erzeugen. Lighthouse verwendet ausschließlich die User-Flow-API mit einer vor Navigation abgesicherten, vom Paket kontrollierten Puppeteer-Seite. Diese Nachweise bei Änderungen an Request-Interception, Navigation, Seitenerkennung oder Browserkontexten erhalten und erweitern.
 
 Vor Abschluss einer Änderung mit dem in `package.json` vorgesehenen Node-Bereich ausführen:
 
@@ -65,13 +68,13 @@ npm run check
 npm pack --dry-run
 ```
 
-Bei Änderungen an Binaries, Paketmetadaten oder Installationsverhalten zusätzlich das erzeugte Tarball in einem temporären Verbraucherprojekt installieren und alle betroffenen installierten Befehle ausführen. Der unterstützte Bereich ist derzeit Node.js `>=22.19 <23 || >=24.11 <25`; für den Browser-Check wird lokal Chromium oder Google Chrome benötigt.
+Bei Änderungen an Binaries, Paketmetadaten oder Installationsverhalten zusätzlich das erzeugte Tarball in einem temporären Verbraucherprojekt installieren und alle betroffenen installierten Befehle ausführen. Der unterstützte Bereich ist derzeit Node.js `>=22.19 <23 || >=24.11 <25`; für Browser- und Lighthouse-Check wird lokal Chromium oder Google Chrome benötigt.
 
 Öffentliche Live-Smoke-Tests bleiben ausschließlich lesend. Ziele, exakte Befehle, Werkzeugcommit und Befunde dokumentieren; keine öffentlichen Formulare absenden.
 
 ## Dokumentation und Projektgrenzen
 
-`docs/` enthält nur allgemeine, wiederverwendbare Website-QS-Vorlagen und Prompts. Es enthält keine ausgefüllten Projektakten und keine Nachweise für eine konkrete Website.
+`docs/` enthält nur allgemeine, wiederverwendbare Website-QS-Vorlagen und statische Arbeitsanleitungen. Es enthält keine ausgefüllten Projektakten und keine Nachweise für eine konkrete Website.
 
 Für jedes Zielprojekt entsteht eine eigene versionierte Projektkopie. Änderungen der allgemeinen Vorlage setzen dort keinen Prüfpunkt automatisch auf erledigt. Stabile Kennungen dürfen nicht für eine neue fachliche Bedeutung wiederverwendet werden.
 

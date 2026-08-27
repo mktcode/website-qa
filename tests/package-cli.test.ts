@@ -22,6 +22,7 @@ describe('installed package commands', () => {
       ['website-qa-browser', 'src/check-browser.mjs'],
       ['website-qa-crawl', 'src/check-crawl.mjs'],
       ['website-qa-http', 'src/check-http.mjs'],
+      ['website-qa-lighthouse', 'src/check-lighthouse.mjs'],
       ['website-qa-social', 'src/check-social-preview.mjs'],
     ]
 

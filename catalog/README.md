@@ -1,21 +1,19 @@
-# Stabiler strukturierter Basiskatalog
+# Technische Berichtskataloge
 
-Dieses Verzeichnis enthält den bewusst begrenzten maschinenlesbaren Basiskatalog `website-qa-baseline` in Version `1.2.0`. Seine stabilen IDs und Versionsregeln behaupten keine vollständige Checklistenabdeckung. Der Basiskatalog ist weder vollständige Website-Checkliste noch WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe.
+Dieses Verzeichnis enthält ausschließlich neutrale, statische Datenverträge für die fünf technischen Prüfer. Es enthält keine Checklistenbewertung, Projektkonfiguration, Evidence-Verwaltung oder Freigabelogik.
 
-- `website-baseline.json` enthält 44 ausgewählte Punkte mit 118 Kriterien. Darunter sind automatische HTTP-, Crawl-, Browser- und Social-Nachweise sowie bewusst manuelle, externe, administrative und kommunikative Kriterien.
-- `assertions.json` registriert 64 atomare Aussagen. `assertionVersion` bleibt unabhängig von Paket-, Schema- und Katalogversion.
-- `website-catalog.schema.json` beschreibt das Katalogformat; zusätzliche semantische Konsistenzregeln werden durch Tests geprüft.
-- `technical-report.common.schema.json` beschreibt den gemeinsamen Berichtskern. `http-report.schema.json`, `crawl-report.schema.json`, `browser-report.schema.json` und `social-report.schema.json` validieren vollständige technische Berichte der Exitcodes 0 und 1 sowie redigierte Fehlerhüllen des Exitcodes 2. Die technischen Berichte behalten `schemaVersion: 1`.
-- `project-evidence.schema.json` und `project-evidence.example.json` beschreiben projektspezifische manuelle und externe Nachweise.
-- `project-report.config.schema.json` und `project-report.config.example.json` beschreiben ausschließlich Projektkonfiguration und Eingabedateien.
-- `project-report.schema.json` und `project-report.example.json` beschreiben den einzigen Projektbericht: das normalisierte Ausgabeformat mit `schemaVersion: 3`. Records werden einmalig gespeichert und von Kriterien über deterministische berichtslokale IDs referenziert.
-- `project-report.example.md` ist die deterministisch gerenderte vollständige Markdowndarstellung des JSON-Beispiels.
-- `project-report.bundle-manifest.schema.json` beschreibt Dateizuordnung, Größen und SHA-256-Prüfsummen eines automatisch datierten lokalen Bundles.
+- [`checklist-index.json`](checklist-index.json) indexiert alle 215 stabilen IDs der modularen manuellen Website-QA-Checkliste. Er dient nur zur Referenzvalidierung.
+- [`signals.json`](signals.json) registriert technische Signal-IDs, Versionen, erzeugende Werkzeuge, Beschreibungen und informative Checklistenreferenzen.
+- [`technical-report.common.schema.json`](technical-report.common.schema.json) beschreibt den gemeinsamen Kern der technischen Berichte mit `schemaVersion: 2`.
+- `http-report`, `crawl-report`, `browser-report`, `social-report` und `lighthouse-report` besitzen jeweils ein Schema und ein statisches Beispiel.
 
-Ein Checklistenpunkt kann automatische, manuelle und externe Kriterien verbinden. Ein erfolgreicher Werkzeuglauf schließt ihn nur ab, wenn alle erforderlichen Kriterien belegt sind. Fehlende Infrastrukturzugänge, Freigaben, Medienrechte oder kommunikative Nachweise bleiben offen. HTTP-Headerbeobachtungen belegen keine Richtlinienstärke; Crawls keine unbekannte Projektvollständigkeit; passive Browserbeobachtungen keine Datenschutz- oder Einwilligungsfreigabe. Externe Requests bleiben blockiert und Cookie-/Storagewerte werden nicht erfasst.
+Signalstatus bedeuten ausschließlich:
 
-Projektbezogene Auswahl, Nichtanwendbarkeit, Evidence und Workflowzustände gehören ausschließlich in das Zielprojekt. Alle Records einer Evidence-Datei gelten als aktiv und werden konservativ gemeinsam ausgewertet; referenzierte Unterlagen werden weder geöffnet noch bestätigt. Alte technische Berichte mit einer anderen Katalogkennung werden geschlossen abgelehnt.
+- `positive`: Der konkrete Defekt wurde im dokumentierten Umfang nicht beobachtet.
+- `defect`: Der konkrete technische Defekt wurde beobachtet.
+- `inconclusive`: Fehler, Sicherheitsblockierung oder Limits verhindern eine eindeutige Beobachtung.
+- `notApplicable`: Das technische Signal ist für diesen Lauf nicht anwendbar.
 
-Die Exportfunktionen unter `@mktcode/website-qa/report` lesen lokale Eingaben und starten keine Netzwerkprüfung. Vor der Auswertung werden Konfiguration, Evidence und über ihre Werkzeugkennung diskriminierte vollständige technische Berichte gegen die veröffentlichten Schemata validiert; Fehlerhüllen, unbekannte Werkzeuge und geschwächte Nur-Lese-Garantien werden abgelehnt. Die stabilen APIs sind `createProjectReport`, `createProjectReportFromFiles`, `validateProjectReport`, `renderProjectReportMarkdown`, `renderProjectSummaryMarkdown` und `writeProjectReportBundle`. Der öffentliche Validator prüft zuerst das Berichtsschema und danach die semantische Katalog-, Registry-, Werkzeug-, Workflow-, Referenz- und Aggregationsbindung. Der vollständige Renderer zeigt für fehlgeschlagene oder unklare automatische Kriterien nur kurze bereits redigierte Meldungen mit Recordreferenzen; Subjects, Evidence-Freitexte, Cookie-/Storagewerte und vertrauliche Referenzen werden nicht vervielfältigt.
+Kein Status hakt einen Checklistenpunkt ab. Eine Checklistenreferenz ist nur ein Hinweis für die anschließende manuelle QA-Arbeit. Änderungen an nicht betroffenen Checklistenformulierungen machen technische Berichte nicht automatisch ungültig; fachlich neu verwendete IDs oder Signalbedeutungen benötigen neue stabile Kennungen beziehungsweise Versionen.
 
-`writeProjectReportBundle` schreibt bytegleiche technische Eingaben, `report.json`, `report.md` und ein Prüfsummenmanifest atomar in einen datierten lokalen Ordner. Eine getrennte Markdown-Zusammenfassung wird über eine enge Feld-Whitelist erzeugt und kann erst nach Projektprüfung versioniert werden. Vollständige Bundles werden standardmäßig über `.website-qa/` ignoriert.
+Die Beispiele enthalten bewusst keine Roh-Lighthouse-Berichte, Screenshots, Cookie-/Storagewerte oder unredigierte Querywerte.

@@ -3,92 +3,223 @@
   "$id": "https://github.com/mktcode/website-qa/catalog/browser-report.schema.json",
   "title": "Technischer Bericht von website-qa-browser",
   "oneOf": [
-    { "$ref": "#/$defs/success" },
-    { "$ref": "#/$defs/error" }
+    {
+      "$ref": "#/$defs/success"
+    },
+    {
+      "$ref": "#/$defs/error"
+    }
   ],
   "$defs": {
     "success": {
       "allOf": [
-        { "$ref": "technical-report.common.schema.json#/$defs/successEnvelope" },
+        {
+          "$ref": "technical-report.common.schema.json#/$defs/successEnvelope"
+        },
         {
           "type": "object",
-          "required": ["result"],
+          "required": [
+            "result"
+          ],
           "properties": {
-            "tool": { "const": "browser-check" },
+            "tool": {
+              "const": "browser-check"
+            },
             "options": {
               "type": "object",
-              "required": ["maxPages", "maxRequests", "privateTargetsRedacted", "profiles", "settleMilliseconds", "sitemap", "strict", "timeoutMilliseconds"],
+              "required": [
+                "maxPages",
+                "maxRequests",
+                "privateTargetsRedacted",
+                "profiles",
+                "settleMilliseconds",
+                "sitemap",
+                "strict",
+                "timeoutMilliseconds"
+              ],
               "properties": {
-                "maxPages": { "type": "integer", "minimum": 1 },
-                "maxRequests": { "type": "integer", "minimum": 1 },
-                "privateTargetsRedacted": { "type": "boolean" },
+                "maxPages": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "maxRequests": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "privateTargetsRedacted": {
+                  "type": "boolean"
+                },
                 "profiles": {
                   "type": "array",
                   "minItems": 1,
-                  "items": { "type": "string", "minLength": 1 },
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
                   "uniqueItems": true
                 },
-                "settleMilliseconds": { "type": "integer", "minimum": 0 },
-                "sitemap": { "type": "boolean" },
-                "strict": { "type": "boolean" },
-                "timeoutMilliseconds": { "type": "integer", "minimum": 1 }
+                "settleMilliseconds": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "sitemap": {
+                  "type": "boolean"
+                },
+                "strict": {
+                  "type": "boolean"
+                },
+                "timeoutMilliseconds": {
+                  "type": "integer",
+                  "minimum": 1
+                }
               },
-              "additionalProperties": true
+              "additionalProperties": false
             },
             "readOnlyGuarantees": {
               "type": "object",
-              "required": ["buttonsActivated", "externalRequestsAllowed", "fileUploads", "formActionsInvoked", "formsSubmitted", "methodsAllowed", "persistentBrowserProfile"],
+              "required": [
+                "buttonsActivated",
+                "externalRequestsAllowed",
+                "fileUploads",
+                "formActionsInvoked",
+                "formsSubmitted",
+                "methodsAllowed",
+                "persistentBrowserProfile"
+              ],
               "properties": {
-                "buttonsActivated": { "const": false },
-                "externalRequestsAllowed": { "const": false },
-                "fileUploads": { "const": false },
-                "formActionsInvoked": { "const": false },
-                "formsSubmitted": { "const": false },
-                "methodsAllowed": { "const": ["GET"] },
-                "persistentBrowserProfile": { "const": false }
+                "buttonsActivated": {
+                  "const": false
+                },
+                "externalRequestsAllowed": {
+                  "const": false
+                },
+                "fileUploads": {
+                  "const": false
+                },
+                "formActionsInvoked": {
+                  "const": false
+                },
+                "formsSubmitted": {
+                  "const": false
+                },
+                "methodsAllowed": {
+                  "const": [
+                    "GET"
+                  ]
+                },
+                "persistentBrowserProfile": {
+                  "const": false
+                }
               },
               "additionalProperties": true
             },
             "result": {
               "allOf": [
-                { "$ref": "technical-report.common.schema.json#/$defs/result" },
+                {
+                  "$ref": "technical-report.common.schema.json#/$defs/result"
+                },
                 {
                   "type": "object",
-                  "required": ["blockedRequests", "browser", "privacyObservations", "profiles", "readOnlyExecutionEvidence", "requestedProfiles", "settleMilliseconds"],
+                  "required": [
+                    "blockedRequests",
+                    "browser",
+                    "privacyObservations",
+                    "profiles",
+                    "readOnlyExecutionEvidence",
+                    "requestedProfiles",
+                    "settleMilliseconds"
+                  ],
                   "properties": {
-                    "blockedRequests": { "type": "array" },
+                    "blockedRequests": {
+                      "type": "array"
+                    },
                     "browser": {
                       "type": "object",
-                      "required": ["product", "version"],
+                      "required": [
+                        "product",
+                        "version"
+                      ],
                       "properties": {
-                        "product": { "type": "string", "minLength": 1 },
-                        "version": { "type": "string", "minLength": 1 }
+                        "product": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "version": {
+                          "type": "string",
+                          "minLength": 1
+                        }
                       },
                       "additionalProperties": true
                     },
-                    "privacyObservations": { "type": "object" },
-                    "profiles": { "type": "array" },
+                    "privacyObservations": {
+                      "type": "object"
+                    },
+                    "profiles": {
+                      "type": "array"
+                    },
                     "readOnlyExecutionEvidence": {
                       "type": "object",
-                      "required": ["destinationSideEffectsVerified", "mode", "profileRuns", "requestedProfiles"],
+                      "required": [
+                        "destinationSideEffectsVerified",
+                        "mode",
+                        "profileRuns",
+                        "requestedProfiles"
+                      ],
                       "properties": {
-                        "destinationSideEffectsVerified": { "const": false },
-                        "mode": { "const": "passive-get-only-isolated" },
+                        "destinationSideEffectsVerified": {
+                          "const": false
+                        },
+                        "mode": {
+                          "const": "passive-get-only-isolated"
+                        },
                         "profileRuns": {
                           "type": "array",
                           "items": {
                             "type": "object",
-                            "required": ["allowedGetRequests", "allowedNonGetOrExternalRequests", "blockedActionCountsByKind", "blockedRequestCountsByCode", "domGuardsInstalledBeforeNavigation", "interceptedRequests", "profile", "requestInterceptionInstalledBeforeNavigation", "url"],
+                            "required": [
+                              "allowedGetRequests",
+                              "allowedNonGetOrExternalRequests",
+                              "blockedActionCountsByKind",
+                              "blockedRequestCountsByCode",
+                              "domGuardsInstalledBeforeNavigation",
+                              "interceptedRequests",
+                              "profile",
+                              "requestInterceptionInstalledBeforeNavigation",
+                              "url"
+                            ],
                             "properties": {
-                              "allowedGetRequests": { "type": "integer", "minimum": 0 },
-                              "allowedNonGetOrExternalRequests": { "type": "integer", "minimum": 0 },
-                              "blockedActionCountsByKind": { "$ref": "#/$defs/countsByKey" },
-                              "blockedRequestCountsByCode": { "$ref": "#/$defs/countsByKey" },
-                              "domGuardsInstalledBeforeNavigation": { "type": "boolean" },
-                              "interceptedRequests": { "type": "integer", "minimum": 0 },
-                              "profile": { "type": "string", "minLength": 1 },
-                              "requestInterceptionInstalledBeforeNavigation": { "type": "boolean" },
-                              "url": { "type": "string", "minLength": 1 }
+                              "allowedGetRequests": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "allowedNonGetOrExternalRequests": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "blockedActionCountsByKind": {
+                                "$ref": "#/$defs/countsByKey"
+                              },
+                              "blockedRequestCountsByCode": {
+                                "$ref": "#/$defs/countsByKey"
+                              },
+                              "domGuardsInstalledBeforeNavigation": {
+                                "type": "boolean"
+                              },
+                              "interceptedRequests": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "profile": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "requestInterceptionInstalledBeforeNavigation": {
+                                "type": "boolean"
+                              },
+                              "url": {
+                                "type": "string",
+                                "minLength": 1
+                              }
                             },
                             "additionalProperties": true
                           }
@@ -96,7 +227,10 @@
                         "requestedProfiles": {
                           "type": "array",
                           "minItems": 1,
-                          "items": { "type": "string", "minLength": 1 },
+                          "items": {
+                            "type": "string",
+                            "minLength": 1
+                          },
                           "uniqueItems": true
                         }
                       },
@@ -105,10 +239,16 @@
                     "requestedProfiles": {
                       "type": "array",
                       "minItems": 1,
-                      "items": { "type": "string", "minLength": 1 },
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      },
                       "uniqueItems": true
                     },
-                    "settleMilliseconds": { "type": "integer", "minimum": 0 }
+                    "settleMilliseconds": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
                   },
                   "additionalProperties": true
                 }
@@ -116,39 +256,71 @@
             },
             "summary": {
               "type": "object",
-              "required": ["blockedRequests", "errors", "failed", "pages", "profileRuns", "warnings"],
+              "required": [
+                "blockedRequests",
+                "errors",
+                "failed",
+                "pages",
+                "profileRuns",
+                "warnings"
+              ],
               "properties": {
-                "blockedRequests": { "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger" },
-                "errors": { "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger" },
-                "failed": { "type": "boolean" },
-                "pages": { "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger" },
-                "profileRuns": { "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger" },
-                "warnings": { "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger" }
+                "blockedRequests": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                },
+                "errors": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                },
+                "failed": {
+                  "type": "boolean"
+                },
+                "pages": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                },
+                "profileRuns": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                },
+                "warnings": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                }
               },
               "additionalProperties": true
             }
-          },
-          "additionalProperties": true
+          }
         }
-      ]
+      ],
+      "unevaluatedProperties": false,
+      "type": "object"
     },
     "error": {
       "allOf": [
-        { "$ref": "technical-report.common.schema.json#/$defs/errorEnvelope" },
+        {
+          "$ref": "technical-report.common.schema.json#/$defs/errorEnvelope"
+        },
         {
           "type": "object",
-          "required": ["toolPackage"],
+          "required": [
+            "toolPackage"
+          ],
           "properties": {
-            "tool": { "const": "browser-check" },
-            "toolPackage": { "$ref": "technical-report.common.schema.json#/$defs/toolPackage" }
-          },
-          "additionalProperties": true
+            "tool": {
+              "const": "browser-check"
+            },
+            "toolPackage": {
+              "$ref": "technical-report.common.schema.json#/$defs/toolPackage"
+            }
+          }
         }
-      ]
+      ],
+      "unevaluatedProperties": false,
+      "type": "object"
     },
     "countsByKey": {
       "type": "object",
-      "additionalProperties": { "type": "integer", "minimum": 0 }
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
     }
   }
 }

@@ -1,15 +1,13 @@
 # Minimale Projektintegration
 
-Diese Dateien sind allgemeine Kopiervorlagen. Vor Verwendung müssen URL, Auswertungsumgebung, Modulauswahl und Limits an das Zielprojekt angepasst werden.
+Diese Kopiervorlage enthält nur fünf unabhängige npm-Skripte und eine `.gitignore`-Regel.
 
-1. `website-qa.project.json` in den Projekt-Root kopieren.
-2. `website-qa-report.mjs` als `scripts/website-qa-report.mjs` kopieren.
-3. Die Einträge aus `package-scripts.json` in das Ziel-`package.json` übernehmen.
-4. Den Inhalt von `gitignore.txt` in die projektseitige `.gitignore` übernehmen.
-5. HTTP, Crawl, Browser und Social bewusst einzeln ausführen; anschließend `npm run qa:report` starten.
+1. URL und Limits in `package-scripts.json` anpassen.
+2. Die gewünschten Skripte ins Projekt-`package.json` übernehmen.
+3. `gitignore.txt` in die projektseitige `.gitignore` übernehmen.
+4. HTTP, Crawl, Browser, Social und Lighthouse bewusst einzeln ausführen.
+5. Die statischen Berichte manuell zusammen mit der zentralen Website-QA-Checkliste auswerten.
 
-Ein Exitcode 1 ist ein fachlicher Befund und der zugehörige JSON-Bericht bleibt auswertbar. Ein Exitcode 2 ist ein Laufzeit- oder Aufruffehler und muss vor der Berichtserzeugung behoben werden.
+Exitcode 1 liefert weiterhin einen gültigen fachlichen Bericht. Exitcode 2 bezeichnet einen Aufruf- oder Laufzeitfehler.
 
-Das Berichtsskript führt selbst keine Netzwerkprüfung aus. Vollständige Bundles bleiben unter `.website-qa/` lokal; nur die datenarme Zusammenfassung unter `docs/website-qa/berichte/` ist nach Sichtprüfung zur Versionierung vorgesehen.
-
-Die Konfiguration bindet den stabilen Basiskatalog `website-qa-baseline` in Version `1.2.0`. Das Berichtsskript verwendet `writeProjectReportBundle`; es akzeptiert keine früheren Katalogkennungen oder Projektberichtsformate. Der vollständige Bericht verwendet ausschließlich `schemaVersion: 3`.
+Das Paket erzeugt keinen Gesamtbericht und pflegt keinen Checklistenstatus. Vollständige technische Berichte bleiben standardmäßig unter `.website-qa/` lokal und werden vor jeder abweichenden Archivierung oder Veröffentlichung gesichtet.

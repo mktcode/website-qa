@@ -1,515 +1,6 @@
 {
-  "aiTrainingOptIn": false,
-  "checklistCoverage": {
-    "catalog": {
-      "id": "website-qa-baseline",
-      "status": "stable",
-      "version": "1.2.0"
-    },
-    "items": [
-      {
-        "criteria": [
-          {
-            "id": "CORE-DOM-06/C1",
-            "mode": "automatic",
-            "outcome": "noEvidence",
-            "records": [],
-            "statement": "Die Canonicals der vom Crawl geprüften indexierbaren Seiten entsprechen ihrer jeweiligen finalen Seiten-URL."
-          },
-          {
-            "id": "CORE-DOM-06/C2",
-            "mode": "automatic",
-            "outcome": "pass",
-            "records": [
-              {
-                "assertionId": "social.metadata.canonical-open-graph-consistent",
-                "assertionVersion": 1,
-                "message": "Canonical, finale Seiten-URL und og:url sind eindeutig und stimmen überein.",
-                "outcome": "pass",
-                "subject": {
-                  "aiTrainingOptInDeclaredForRun": false,
-                  "allowedTrainingTokens": 0,
-                  "blockedTrainingTokens": 6,
-                  "checkedAgents": [
-                    "browser",
-                    "facebook",
-                    "x",
-                    "linkedin"
-                  ],
-                  "checkedImages": 1,
-                  "robotsPolicyReviewedAt": "2026-08-22",
-                  "url": "https://example.com/"
-                }
-              }
-            ],
-            "statement": "Canonical, finale Seiten-URL und `og:url` stimmen auf allen vom Social-Check geprüften Seiten eindeutig überein."
-          },
-          {
-            "evidenceClass": "project-review",
-            "evidenceInstructions": "Nur bereits beobachtete URLs aus Crawl-, HTTP- und Social-Berichten gegen das vollständige projektspezifische Host- und Routeninventar abgleichen; Limits, ausgelassene Klassen und nicht beobachtete Varianten ausdrücklich offenhalten.",
-            "id": "CORE-DOM-06/C3",
-            "mode": "manual",
-            "outcome": "noEvidence",
-            "records": [],
-            "statement": "Interne Links, Sitemap-URLs, beobachtete Weiterleitungsziele und alle vorgesehenen Hosts und Routen entsprechen der dokumentierten öffentlichen URL-Strategie."
-          }
-        ],
-        "id": "CORE-DOM-06",
-        "module": "core",
-        "outcome": "partial",
-        "statement": "Canonicals, interne Links, Sitemap, OpenGraph-URLs und Weiterleitungen verwenden konsistent die vorgesehene öffentliche URL."
-      },
-      {
-        "criteria": [
-          {
-            "id": "CORE-SOC-01/C1",
-            "mode": "automatic",
-            "outcome": "pass",
-            "records": [
-              {
-                "assertionId": "social.metadata.open-graph-complete",
-                "assertionVersion": 1,
-                "message": "Die geprüfte Seite besitzt eindeutige OpenGraph-Pflichtfelder mit absoluten HTTPS-URLs für og:url und og:image.",
-                "outcome": "pass",
-                "subject": {
-                  "aiTrainingOptInDeclaredForRun": false,
-                  "allowedTrainingTokens": 0,
-                  "blockedTrainingTokens": 6,
-                  "checkedAgents": [
-                    "browser",
-                    "facebook",
-                    "x",
-                    "linkedin"
-                  ],
-                  "checkedImages": 1,
-                  "robotsPolicyReviewedAt": "2026-08-22",
-                  "url": "https://example.com/"
-                }
-              }
-            ],
-            "statement": "Alle vom Social-Check geprüften Seiten besitzen eindeutige OpenGraph-Pflichtfelder mit absoluten HTTPS-URLs für og:url und og:image."
-          },
-          {
-            "id": "CORE-SOC-01/C2",
-            "mode": "automatic",
-            "outcome": "pass",
-            "records": [
-              {
-                "assertionId": "social.metadata.twitter-card-valid",
-                "assertionVersion": 1,
-                "message": "twitter:card sowie die erforderlichen X-/Twitter-Werte oder OpenGraph-Fallbacks sind technisch verwendbar.",
-                "outcome": "pass",
-                "subject": {
-                  "aiTrainingOptInDeclaredForRun": false,
-                  "allowedTrainingTokens": 0,
-                  "blockedTrainingTokens": 6,
-                  "checkedAgents": [
-                    "browser",
-                    "facebook",
-                    "x",
-                    "linkedin"
-                  ],
-                  "checkedImages": 1,
-                  "robotsPolicyReviewedAt": "2026-08-22",
-                  "url": "https://example.com/"
-                }
-              }
-            ],
-            "statement": "twitter:card sowie erforderliche X-/Twitter-Werte oder geeignete OpenGraph-Fallbacks sind technisch verwendbar."
-          },
-          {
-            "evidenceClass": "editorial",
-            "evidenceInstructions": "Social-Texte und Vorschaubilder redaktionell gegen Seiteninhalt, Projektvorgaben und vorgesehenen Plattformkontext prüfen; technische Metadatenprüfung allein genügt nicht.",
-            "id": "CORE-SOC-01/C3",
-            "mode": "manual",
-            "outcome": "noEvidence",
-            "records": [],
-            "statement": "Titel, Beschreibungen, Bildinhalt und Bildzuschnitt sind für die vorgesehenen Seiten und Plattformen inhaltlich geeignet."
-          }
-        ],
-        "id": "CORE-SOC-01",
-        "module": "core",
-        "outcome": "partial",
-        "statement": "Relevante Seiten enthalten mindestens `og:title`, `og:description`, `og:type`, `og:url` und ein geeignetes `og:image` mit absoluter HTTPS-URL sowie, soweit vorgesehen, passende X-/Twitter-Metadaten."
-      },
-      {
-        "criteria": [
-          {
-            "id": "CORE-SOC-02/C1",
-            "mode": "automatic",
-            "outcome": "pass",
-            "records": [
-              {
-                "assertionId": "social.crawlers.html-metadata-consistent",
-                "assertionVersion": 1,
-                "message": "Browser, Facebook, X/Twitter und LinkedIn erhalten erfolgreiche, konsistente HTML-Antworten und Social-Metadaten.",
-                "outcome": "pass",
-                "subject": {
-                  "aiTrainingOptInDeclaredForRun": false,
-                  "allowedTrainingTokens": 0,
-                  "blockedTrainingTokens": 6,
-                  "checkedAgents": [
-                    "browser",
-                    "facebook",
-                    "x",
-                    "linkedin"
-                  ],
-                  "checkedImages": 1,
-                  "robotsPolicyReviewedAt": "2026-08-22",
-                  "url": "https://example.com/"
-                }
-              }
-            ],
-            "statement": "Browser, Facebook, X/Twitter und LinkedIn erhalten erfolgreiche, konsistente HTML-Antworten und Social-Metadaten."
-          },
-          {
-            "id": "CORE-SOC-02/C2",
-            "mode": "automatic",
-            "outcome": "pass",
-            "records": [
-              {
-                "assertionId": "social.metadata.canonical-open-graph-consistent",
-                "assertionVersion": 1,
-                "message": "Canonical, finale Seiten-URL und og:url sind eindeutig und stimmen überein.",
-                "outcome": "pass",
-                "subject": {
-                  "aiTrainingOptInDeclaredForRun": false,
-                  "allowedTrainingTokens": 0,
-                  "blockedTrainingTokens": 6,
-                  "checkedAgents": [
-                    "browser",
-                    "facebook",
-                    "x",
-                    "linkedin"
-                  ],
-                  "checkedImages": 1,
-                  "robotsPolicyReviewedAt": "2026-08-22",
-                  "url": "https://example.com/"
-                }
-              }
-            ],
-            "statement": "Canonical, finale Seiten-URL und og:url sind auf allen geprüften Seiten eindeutig und konsistent."
-          },
-          {
-            "id": "CORE-SOC-02/C3",
-            "mode": "automatic",
-            "outcome": "pass",
-            "records": [
-              {
-                "assertionId": "social.images.preview-technically-valid",
-                "assertionVersion": 1,
-                "message": "Die vorgesehenen Vorschaubilder erfüllen die geprüften technischen Anforderungen.",
-                "outcome": "pass",
-                "subject": {
-                  "aiTrainingOptInDeclaredForRun": false,
-                  "allowedTrainingTokens": 0,
-                  "blockedTrainingTokens": 6,
-                  "checkedAgents": [
-                    "browser",
-                    "facebook",
-                    "x",
-                    "linkedin"
-                  ],
-                  "checkedImages": 1,
-                  "robotsPolicyReviewedAt": "2026-08-22",
-                  "url": "https://example.com/"
-                }
-              }
-            ],
-            "statement": "Alle vorgesehenen Vorschaubilder erfüllen die geprüften Anforderungen an Abruf, MIME-Typ, Dateigröße, Pixelmaße, Seitenverhältnis, Deklarationen und Alternativtext."
-          },
-          {
-            "id": "CORE-SOC-02/C4",
-            "mode": "automatic",
-            "outcome": "pass",
-            "records": [
-              {
-                "assertionId": "social.run.strict-mode-recorded",
-                "assertionVersion": 1,
-                "message": "Der Social-Lauf dokumentiert den strikten Modus, in dem Warnungen den Exitcode 1 auslösen.",
-                "outcome": "pass",
-                "subject": {
-                  "aiTrainingOptInDeclaredForRun": false,
-                  "allowedTrainingTokens": 0,
-                  "blockedTrainingTokens": 6,
-                  "checkedAgents": [
-                    "browser",
-                    "facebook",
-                    "x",
-                    "linkedin"
-                  ],
-                  "checkedImages": 1,
-                  "robotsPolicyReviewedAt": "2026-08-22",
-                  "url": "https://example.com/"
-                }
-              }
-            ],
-            "statement": "Der technische Social-Lauf wurde streng ausgewertet, sodass Warnungen einen fachlich negativen Exitcode erzeugen."
-          }
-        ],
-        "id": "CORE-SOC-02",
-        "module": "core",
-        "outcome": "pass",
-        "statement": "Öffentlich ausgelieferte Social-Metadaten wurden automatisiert aus serverseitigem HTML mit Browser-, Facebook-, X-/Twitter- und LinkedIn-User-Agent geprüft. Pflichtfelder, Mehrdeutigkeiten, Canonical-/OpenGraph-Konsistenz, Redirects sowie Bildabruf, MIME-Typ, Dateigröße und Pixelmaße sind umfasst; Fehler liefern einen CI-tauglichen Exitcode. Standardverfahren mit lokal eingebundenem `@mktcode/website-qa`: `npm run ops:social:check -- https://[DOMAIN]/ --sitemap --max-pages=50 --strict`; Paket-/Werkzeugcommit und Bericht werden protokolliert."
-      },
-      {
-        "criteria": [
-          {
-            "id": "CORE-ROB-01/C1",
-            "mode": "automatic",
-            "outcome": "pass",
-            "records": [
-              {
-                "assertionId": "social.robots.file-retrievable",
-                "assertionVersion": 1,
-                "message": "robots.txt wurde erfolgreich abgerufen und ausgewertet.",
-                "outcome": "pass",
-                "subject": {
-                  "aiTrainingOptInDeclaredForRun": false,
-                  "allowedTrainingTokens": 0,
-                  "blockedTrainingTokens": 6,
-                  "checkedAgents": [
-                    "browser",
-                    "facebook",
-                    "x",
-                    "linkedin"
-                  ],
-                  "checkedImages": 1,
-                  "robotsPolicyReviewedAt": "2026-08-22",
-                  "url": "https://example.com/"
-                }
-              },
-              {
-                "assertionId": "social.robots.social-crawlers-allowed",
-                "assertionVersion": 1,
-                "message": "Die vorgesehenen Social-Crawler sind für die geprüfte Seite nicht durch robots.txt oder Robots-Anweisungen blockiert.",
-                "outcome": "pass",
-                "subject": {
-                  "aiTrainingOptInDeclaredForRun": false,
-                  "allowedTrainingTokens": 0,
-                  "blockedTrainingTokens": 6,
-                  "checkedAgents": [
-                    "browser",
-                    "facebook",
-                    "x",
-                    "linkedin"
-                  ],
-                  "checkedImages": 1,
-                  "robotsPolicyReviewedAt": "2026-08-22",
-                  "url": "https://example.com/"
-                }
-              }
-            ],
-            "statement": "robots.txt wurde erfolgreich ausgewertet und blockiert die vorgesehenen Social-Crawler auf den geprüften Seiten nicht."
-          },
-          {
-            "evidenceClass": "project-review",
-            "evidenceInstructions": "Gewünschte Indexierung und erforderliche Seiten beziehungsweise Ressourcen mit den ausgelieferten Regeln abgleichen; robots.txt nicht als Zugriffsschutz bewerten.",
-            "id": "CORE-ROB-01/C2",
-            "mode": "manual",
-            "outcome": "noEvidence",
-            "records": [],
-            "statement": "Die robots.txt-Regeln wurden gegen die projektspezifisch gewünschte Indexierung notwendiger Seiten und Ressourcen bewertet."
-          }
-        ],
-        "id": "CORE-ROB-01",
-        "module": "core",
-        "outcome": "partial",
-        "statement": "`robots.txt` ist öffentlich erreichbar, syntaktisch plausibel und blockiert keine für die gewünschte Indexierung notwendigen Seiten oder Ressourcen."
-      },
-      {
-        "criteria": [
-          {
-            "id": "CORE-ROB-02/C1",
-            "mode": "automatic",
-            "outcome": "pass",
-            "records": [
-              {
-                "assertionId": "social.robots.policy-matrix-recorded",
-                "assertionVersion": 1,
-                "message": "Crawler-/Produktkennungen, Kategorien, offizielle Quellen und Quellenstand sind im technischen Bericht dokumentiert.",
-                "outcome": "pass",
-                "subject": {
-                  "aiTrainingOptInDeclaredForRun": false,
-                  "allowedTrainingTokens": 0,
-                  "blockedTrainingTokens": 6,
-                  "checkedAgents": [
-                    "browser",
-                    "facebook",
-                    "x",
-                    "linkedin"
-                  ],
-                  "checkedImages": 1,
-                  "robotsPolicyReviewedAt": "2026-08-22",
-                  "url": "https://example.com/"
-                }
-              }
-            ],
-            "statement": "Der technische Bericht dokumentiert die geprüften Kennungen, Kategorien, offiziellen Quellen und den Quellenstand der Policy-Matrix."
-          },
-          {
-            "evidenceClass": "project-review",
-            "evidenceInstructions": "Quellenstand, relevante Anbieter und erkennbare Richtlinienänderungen prüfen; der im Werkzeug eingebettete Stand ist kein automatischer Aktualitätsnachweis.",
-            "id": "CORE-ROB-02/C2",
-            "mode": "manual",
-            "outcome": "noEvidence",
-            "records": [],
-            "statement": "Quellenstand und Auswahl der Kennungen wurden auf ausreichende Aktualität und projektspezifische Relevanz bewertet."
-          }
-        ],
-        "id": "CORE-ROB-02",
-        "module": "core",
-        "outcome": "partial",
-        "statement": "Aktuelle, offiziell dokumentierte Kennungen wichtiger Social-, Such-, KI-Such-, Nutzerabruf- und Trainingsdienste sowie reine Produkt- beziehungsweise Datennutzungstokens werden mit dokumentiertem Quellenstand getrennt bewertet."
-      },
-      {
-        "criteria": [
-          {
-            "id": "CORE-ROB-03/C1",
-            "mode": "automatic",
-            "outcome": "pass",
-            "records": [
-              {
-                "assertionId": "social.robots.training-access-blocked-or-declared",
-                "assertionVersion": 1,
-                "message": "Trainings-/Datennutzungstokens sind blockiert oder der Lauf deklariert ausdrücklich ein separat nachzuweisendes Opt-in.",
-                "outcome": "pass",
-                "subject": {
-                  "aiTrainingOptInDeclaredForRun": false,
-                  "allowedTrainingTokens": 0,
-                  "blockedTrainingTokens": 6,
-                  "checkedAgents": [
-                    "browser",
-                    "facebook",
-                    "x",
-                    "linkedin"
-                  ],
-                  "checkedImages": 1,
-                  "robotsPolicyReviewedAt": "2026-08-22",
-                  "url": "https://example.com/"
-                }
-              }
-            ],
-            "statement": "Trainings-/Datennutzungstokens sind blockiert oder der technische Lauf deklariert ein separat nachzuweisendes Opt-in."
-          },
-          {
-            "evidenceClass": "administrative",
-            "evidenceInstructions": "Tatsächliche Tokenblockierung und eine bloße Laufzeitdeklaration getrennt auswerten; bei erlaubten Trainings-/Datennutzungstokens ist die ausdrückliche Zustimmung mit verantwortlicher Stelle, Umfang und Datum unabhängig vom CLI-Schalter nachzuweisen.",
-            "id": "CORE-ROB-03/C2",
-            "mode": "manual",
-            "outcome": "noEvidence",
-            "records": [],
-            "statement": "Die tatsächliche Trainings-/Datennutzungskonfiguration entspricht entweder dem standardmäßigen Opt-out oder einer ausdrücklichen dokumentierten Betreiber-/Kundenzustimmung; Geltungsbereich, Datum und getrennte Entscheidungen zu Suche/Indexierung sowie nutzerinitiierten Abrufen sind belegt."
-          }
-        ],
-        "id": "CORE-ROB-03",
-        "module": "core",
-        "outcome": "partial",
-        "statement": "KI-Training und vergleichbare Datennutzung sind standardmäßig per `robots.txt` ausgeschlossen. Eine Freigabe erfolgt nur nach ausdrücklicher dokumentierter Betreiber- beziehungsweise Kundenzustimmung; Such-/Indexbots und nutzerinitiierte Abrufe werden unabhängig entschieden."
-      },
-      {
-        "criteria": [
-          {
-            "id": "CORE-ROB-04/C1",
-            "mode": "automatic",
-            "outcome": "pass",
-            "records": [
-              {
-                "assertionId": "social.robots.training-access-blocked-or-declared",
-                "assertionVersion": 1,
-                "message": "Trainings-/Datennutzungstokens sind blockiert oder der Lauf deklariert ausdrücklich ein separat nachzuweisendes Opt-in.",
-                "outcome": "pass",
-                "subject": {
-                  "aiTrainingOptInDeclaredForRun": false,
-                  "allowedTrainingTokens": 0,
-                  "blockedTrainingTokens": 6,
-                  "checkedAgents": [
-                    "browser",
-                    "facebook",
-                    "x",
-                    "linkedin"
-                  ],
-                  "checkedImages": 1,
-                  "robotsPolicyReviewedAt": "2026-08-22",
-                  "url": "https://example.com/"
-                }
-              },
-              {
-                "assertionId": "social.run.strict-mode-recorded",
-                "assertionVersion": 1,
-                "message": "Der Social-Lauf dokumentiert den strikten Modus, in dem Warnungen den Exitcode 1 auslösen.",
-                "outcome": "pass",
-                "subject": {
-                  "aiTrainingOptInDeclaredForRun": false,
-                  "allowedTrainingTokens": 0,
-                  "blockedTrainingTokens": 6,
-                  "checkedAgents": [
-                    "browser",
-                    "facebook",
-                    "x",
-                    "linkedin"
-                  ],
-                  "checkedImages": 1,
-                  "robotsPolicyReviewedAt": "2026-08-22",
-                  "url": "https://example.com/"
-                }
-              }
-            ],
-            "statement": "Trainings-/Datennutzungstokens sind blockiert oder der strikte technische Lauf deklariert ausdrücklich ein separat nachzuweisendes Opt-in."
-          },
-          {
-            "evidenceClass": "administrative",
-            "evidenceInstructions": "Standardmäßiges Opt-out oder ausdrückliche Trainingsfreigabe dokumentieren; die CLI-Option allein gilt nicht als Betreiber- beziehungsweise Kundenfreigabe.",
-            "id": "CORE-ROB-04/C2",
-            "mode": "manual",
-            "outcome": "noEvidence",
-            "records": [],
-            "statement": "Die projektspezifische Opt-out- beziehungsweise Opt-in-Entscheidung ist mit zuständiger Stelle, Umfang und Datum dokumentiert."
-          }
-        ],
-        "id": "CORE-ROB-04",
-        "module": "core",
-        "outcome": "partial",
-        "statement": "Die automatisierte Prüfung warnt vor jedem ohne dokumentiertes Opt-in erlaubten Training-/Datennutzungstoken und behandelt diese Warnungen im Standardaufruf mit `--strict` als Fehler. `--ai-training-opt-in` wird ausschließlich nach ausdrücklicher dokumentierter Freigabe verwendet und verändert keine Robots-Regel. `robots.txt` wird nicht als Zugriffsschutz, Rechtsgarantie oder rückwirkende Löschung dargestellt."
-      }
-    ],
-    "summary": {
-      "automaticCriteria": {
-        "pass": 11,
-        "fail": 0,
-        "partial": 0,
-        "open": 0,
-        "inconclusive": 0,
-        "notApplicable": 0,
-        "noEvidence": 1,
-        "total": 12
-      },
-      "checklistItems": {
-        "pass": 1,
-        "fail": 0,
-        "partial": 6,
-        "open": 0,
-        "inconclusive": 0,
-        "notApplicable": 0,
-        "noEvidence": 0,
-        "automaticallyPassed": 1,
-        "total": 7
-      },
-      "nonAutomaticCriteria": {
-        "pass": 0,
-        "fail": 0,
-        "partial": 0,
-        "open": 0,
-        "inconclusive": 0,
-        "notApplicable": 0,
-        "noEvidence": 6,
-        "total": 6
-      }
-    }
-  },
   "generatedAt": "2026-08-24T21:00:00.000Z",
   "options": {
-    "aiTrainingOptIn": false,
     "maxPages": 20,
     "maxRedirects": 5,
     "privateTargetsRedacted": false,
@@ -568,208 +59,6 @@
         "selectedPages": 1,
         "truncated": false
       },
-      "assertions": [
-        {
-          "assertionId": "social.metadata.open-graph-complete",
-          "assertionVersion": 1,
-          "message": "Die geprüfte Seite besitzt eindeutige OpenGraph-Pflichtfelder mit absoluten HTTPS-URLs für og:url und og:image.",
-          "outcome": "pass",
-          "subject": {
-            "aiTrainingOptInDeclaredForRun": false,
-            "allowedTrainingTokens": 0,
-            "blockedTrainingTokens": 6,
-            "checkedAgents": [
-              "browser",
-              "facebook",
-              "x",
-              "linkedin"
-            ],
-            "checkedImages": 1,
-            "robotsPolicyReviewedAt": "2026-08-22",
-            "url": "https://example.com/"
-          }
-        },
-        {
-          "assertionId": "social.metadata.twitter-card-valid",
-          "assertionVersion": 1,
-          "message": "twitter:card sowie die erforderlichen X-/Twitter-Werte oder OpenGraph-Fallbacks sind technisch verwendbar.",
-          "outcome": "pass",
-          "subject": {
-            "aiTrainingOptInDeclaredForRun": false,
-            "allowedTrainingTokens": 0,
-            "blockedTrainingTokens": 6,
-            "checkedAgents": [
-              "browser",
-              "facebook",
-              "x",
-              "linkedin"
-            ],
-            "checkedImages": 1,
-            "robotsPolicyReviewedAt": "2026-08-22",
-            "url": "https://example.com/"
-          }
-        },
-        {
-          "assertionId": "social.metadata.canonical-open-graph-consistent",
-          "assertionVersion": 1,
-          "message": "Canonical, finale Seiten-URL und og:url sind eindeutig und stimmen überein.",
-          "outcome": "pass",
-          "subject": {
-            "aiTrainingOptInDeclaredForRun": false,
-            "allowedTrainingTokens": 0,
-            "blockedTrainingTokens": 6,
-            "checkedAgents": [
-              "browser",
-              "facebook",
-              "x",
-              "linkedin"
-            ],
-            "checkedImages": 1,
-            "robotsPolicyReviewedAt": "2026-08-22",
-            "url": "https://example.com/"
-          }
-        },
-        {
-          "assertionId": "social.crawlers.html-metadata-consistent",
-          "assertionVersion": 1,
-          "message": "Browser, Facebook, X/Twitter und LinkedIn erhalten erfolgreiche, konsistente HTML-Antworten und Social-Metadaten.",
-          "outcome": "pass",
-          "subject": {
-            "aiTrainingOptInDeclaredForRun": false,
-            "allowedTrainingTokens": 0,
-            "blockedTrainingTokens": 6,
-            "checkedAgents": [
-              "browser",
-              "facebook",
-              "x",
-              "linkedin"
-            ],
-            "checkedImages": 1,
-            "robotsPolicyReviewedAt": "2026-08-22",
-            "url": "https://example.com/"
-          }
-        },
-        {
-          "assertionId": "social.images.preview-technically-valid",
-          "assertionVersion": 1,
-          "message": "Die vorgesehenen Vorschaubilder erfüllen die geprüften technischen Anforderungen.",
-          "outcome": "pass",
-          "subject": {
-            "aiTrainingOptInDeclaredForRun": false,
-            "allowedTrainingTokens": 0,
-            "blockedTrainingTokens": 6,
-            "checkedAgents": [
-              "browser",
-              "facebook",
-              "x",
-              "linkedin"
-            ],
-            "checkedImages": 1,
-            "robotsPolicyReviewedAt": "2026-08-22",
-            "url": "https://example.com/"
-          }
-        },
-        {
-          "assertionId": "social.robots.file-retrievable",
-          "assertionVersion": 1,
-          "message": "robots.txt wurde erfolgreich abgerufen und ausgewertet.",
-          "outcome": "pass",
-          "subject": {
-            "aiTrainingOptInDeclaredForRun": false,
-            "allowedTrainingTokens": 0,
-            "blockedTrainingTokens": 6,
-            "checkedAgents": [
-              "browser",
-              "facebook",
-              "x",
-              "linkedin"
-            ],
-            "checkedImages": 1,
-            "robotsPolicyReviewedAt": "2026-08-22",
-            "url": "https://example.com/"
-          }
-        },
-        {
-          "assertionId": "social.robots.social-crawlers-allowed",
-          "assertionVersion": 1,
-          "message": "Die vorgesehenen Social-Crawler sind für die geprüfte Seite nicht durch robots.txt oder Robots-Anweisungen blockiert.",
-          "outcome": "pass",
-          "subject": {
-            "aiTrainingOptInDeclaredForRun": false,
-            "allowedTrainingTokens": 0,
-            "blockedTrainingTokens": 6,
-            "checkedAgents": [
-              "browser",
-              "facebook",
-              "x",
-              "linkedin"
-            ],
-            "checkedImages": 1,
-            "robotsPolicyReviewedAt": "2026-08-22",
-            "url": "https://example.com/"
-          }
-        },
-        {
-          "assertionId": "social.robots.policy-matrix-recorded",
-          "assertionVersion": 1,
-          "message": "Crawler-/Produktkennungen, Kategorien, offizielle Quellen und Quellenstand sind im technischen Bericht dokumentiert.",
-          "outcome": "pass",
-          "subject": {
-            "aiTrainingOptInDeclaredForRun": false,
-            "allowedTrainingTokens": 0,
-            "blockedTrainingTokens": 6,
-            "checkedAgents": [
-              "browser",
-              "facebook",
-              "x",
-              "linkedin"
-            ],
-            "checkedImages": 1,
-            "robotsPolicyReviewedAt": "2026-08-22",
-            "url": "https://example.com/"
-          }
-        },
-        {
-          "assertionId": "social.robots.training-access-blocked-or-declared",
-          "assertionVersion": 1,
-          "message": "Trainings-/Datennutzungstokens sind blockiert oder der Lauf deklariert ausdrücklich ein separat nachzuweisendes Opt-in.",
-          "outcome": "pass",
-          "subject": {
-            "aiTrainingOptInDeclaredForRun": false,
-            "allowedTrainingTokens": 0,
-            "blockedTrainingTokens": 6,
-            "checkedAgents": [
-              "browser",
-              "facebook",
-              "x",
-              "linkedin"
-            ],
-            "checkedImages": 1,
-            "robotsPolicyReviewedAt": "2026-08-22",
-            "url": "https://example.com/"
-          }
-        },
-        {
-          "assertionId": "social.run.strict-mode-recorded",
-          "assertionVersion": 1,
-          "message": "Der Social-Lauf dokumentiert den strikten Modus, in dem Warnungen den Exitcode 1 auslösen.",
-          "outcome": "pass",
-          "subject": {
-            "aiTrainingOptInDeclaredForRun": false,
-            "allowedTrainingTokens": 0,
-            "blockedTrainingTokens": 6,
-            "checkedAgents": [
-              "browser",
-              "facebook",
-              "x",
-              "linkedin"
-            ],
-            "checkedImages": 1,
-            "robotsPolicyReviewedAt": "2026-08-22",
-            "url": "https://example.com/"
-          }
-        }
-      ],
       "finalUrl": "https://example.com/",
       "images": [
         {
@@ -1037,11 +326,192 @@
         ],
         "status": 200,
         "url": "https://example.com/robots.txt"
-      }
+      },
+      "signals": [
+        {
+          "checklistRefs": [
+            "CORE-SOC-01"
+          ],
+          "id": "social.metadata.open-graph-complete",
+          "message": "Die geprüfte Seite besitzt eindeutige OpenGraph-Pflichtfelder mit absoluten HTTPS-URLs für og:url und og:image.",
+          "signalVersion": 1,
+          "status": "positive",
+          "subject": {
+            "allowedTrainingTokens": 0,
+            "blockedTrainingTokens": 6,
+            "checkedAgents": [
+              "browser",
+              "facebook",
+              "x",
+              "linkedin"
+            ],
+            "checkedImages": 1,
+            "robotsPolicyReviewedAt": "2026-08-22",
+            "url": "https://example.com/"
+          }
+        },
+        {
+          "checklistRefs": [
+            "CORE-SOC-01"
+          ],
+          "id": "social.metadata.twitter-card-valid",
+          "message": "twitter:card sowie die erforderlichen X-/Twitter-Werte oder OpenGraph-Fallbacks sind technisch verwendbar.",
+          "signalVersion": 1,
+          "status": "positive",
+          "subject": {
+            "allowedTrainingTokens": 0,
+            "blockedTrainingTokens": 6,
+            "checkedAgents": [
+              "browser",
+              "facebook",
+              "x",
+              "linkedin"
+            ],
+            "checkedImages": 1,
+            "robotsPolicyReviewedAt": "2026-08-22",
+            "url": "https://example.com/"
+          }
+        },
+        {
+          "checklistRefs": [
+            "CORE-DOM-06",
+            "CORE-SOC-02"
+          ],
+          "id": "social.metadata.canonical-open-graph-consistent",
+          "message": "Canonical, finale Seiten-URL und og:url sind eindeutig und stimmen überein.",
+          "signalVersion": 1,
+          "status": "positive",
+          "subject": {
+            "allowedTrainingTokens": 0,
+            "blockedTrainingTokens": 6,
+            "checkedAgents": [
+              "browser",
+              "facebook",
+              "x",
+              "linkedin"
+            ],
+            "checkedImages": 1,
+            "robotsPolicyReviewedAt": "2026-08-22",
+            "url": "https://example.com/"
+          }
+        },
+        {
+          "checklistRefs": [
+            "CORE-SOC-02"
+          ],
+          "id": "social.crawlers.html-metadata-consistent",
+          "message": "Browser, Facebook, X/Twitter und LinkedIn erhalten erfolgreiche, konsistente HTML-Antworten und Social-Metadaten.",
+          "signalVersion": 1,
+          "status": "positive",
+          "subject": {
+            "allowedTrainingTokens": 0,
+            "blockedTrainingTokens": 6,
+            "checkedAgents": [
+              "browser",
+              "facebook",
+              "x",
+              "linkedin"
+            ],
+            "checkedImages": 1,
+            "robotsPolicyReviewedAt": "2026-08-22",
+            "url": "https://example.com/"
+          }
+        },
+        {
+          "checklistRefs": [
+            "CORE-SOC-02"
+          ],
+          "id": "social.images.preview-technically-valid",
+          "message": "Die vorgesehenen Vorschaubilder erfüllen die geprüften technischen Anforderungen.",
+          "signalVersion": 1,
+          "status": "positive",
+          "subject": {
+            "allowedTrainingTokens": 0,
+            "blockedTrainingTokens": 6,
+            "checkedAgents": [
+              "browser",
+              "facebook",
+              "x",
+              "linkedin"
+            ],
+            "checkedImages": 1,
+            "robotsPolicyReviewedAt": "2026-08-22",
+            "url": "https://example.com/"
+          }
+        },
+        {
+          "checklistRefs": [
+            "CORE-ROB-01"
+          ],
+          "id": "social.robots.file-retrievable",
+          "message": "robots.txt wurde erfolgreich abgerufen und ausgewertet.",
+          "signalVersion": 1,
+          "status": "positive",
+          "subject": {
+            "allowedTrainingTokens": 0,
+            "blockedTrainingTokens": 6,
+            "checkedAgents": [
+              "browser",
+              "facebook",
+              "x",
+              "linkedin"
+            ],
+            "checkedImages": 1,
+            "robotsPolicyReviewedAt": "2026-08-22",
+            "url": "https://example.com/"
+          }
+        },
+        {
+          "checklistRefs": [
+            "CORE-ROB-01"
+          ],
+          "id": "social.robots.social-crawlers-allowed",
+          "message": "Die vorgesehenen Social-Crawler sind für die geprüfte Seite nicht durch robots.txt oder Robots-Anweisungen blockiert.",
+          "signalVersion": 1,
+          "status": "positive",
+          "subject": {
+            "allowedTrainingTokens": 0,
+            "blockedTrainingTokens": 6,
+            "checkedAgents": [
+              "browser",
+              "facebook",
+              "x",
+              "linkedin"
+            ],
+            "checkedImages": 1,
+            "robotsPolicyReviewedAt": "2026-08-22",
+            "url": "https://example.com/"
+          }
+        },
+        {
+          "checklistRefs": [
+            "CORE-ROB-02",
+            "CORE-ROB-03",
+            "CORE-ROB-04"
+          ],
+          "id": "social.robots.policy-matrix-recorded",
+          "message": "Crawler-/Produktkennungen, Kategorien, erlaubte und blockierte Trainings-/Datennutzungstokens, offizielle Quellen und Quellenstand sind im technischen Bericht dokumentiert. Ob die beobachtete Policy der freigegebenen Betreiberentscheidung entspricht, bleibt manuell zu prüfen.",
+          "signalVersion": 1,
+          "status": "positive",
+          "subject": {
+            "allowedTrainingTokens": 0,
+            "blockedTrainingTokens": 6,
+            "checkedAgents": [
+              "browser",
+              "facebook",
+              "x",
+              "linkedin"
+            ],
+            "checkedImages": 1,
+            "robotsPolicyReviewedAt": "2026-08-22",
+            "url": "https://example.com/"
+          }
+        }
+      ]
     }
   ],
   "robotsPolicyReviewedAt": "2026-08-22",
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "summary": {
     "errors": 0,
     "failed": false,
@@ -1051,6 +521,10 @@
   "tool": "social-preview-check",
   "toolPackage": {
     "name": "@mktcode/website-qa",
-    "version": "1.2.0"
+    "version": "2.0.0"
+  },
+  "checklist": {
+    "id": "website-qa-checklist",
+    "version": "2.0.0"
   }
 }

@@ -3,70 +3,134 @@
   "$id": "https://github.com/mktcode/website-qa/catalog/http-report.schema.json",
   "title": "Technischer Bericht von website-qa-http",
   "oneOf": [
-    { "$ref": "#/$defs/success" },
-    { "$ref": "#/$defs/error" }
+    {
+      "$ref": "#/$defs/success"
+    },
+    {
+      "$ref": "#/$defs/error"
+    }
   ],
   "$defs": {
     "success": {
       "allOf": [
-        { "$ref": "technical-report.common.schema.json#/$defs/successEnvelope" },
+        {
+          "$ref": "technical-report.common.schema.json#/$defs/successEnvelope"
+        },
         {
           "type": "object",
-          "required": ["results"],
+          "required": [
+            "results"
+          ],
           "properties": {
-            "tool": { "const": "http-check" },
+            "tool": {
+              "const": "http-check"
+            },
             "options": {
               "type": "object",
-              "required": ["checkHttpRedirect", "maxRedirects", "notFoundPath", "privateTargetsRedacted", "strict", "timeoutMilliseconds"],
+              "required": [
+                "checkHttpRedirect",
+                "maxRedirects",
+                "notFoundPath",
+                "privateTargetsRedacted",
+                "strict",
+                "timeoutMilliseconds"
+              ],
               "properties": {
-                "checkHttpRedirect": { "type": "boolean" },
-                "maxRedirects": { "type": "integer", "minimum": 0 },
-                "notFoundPath": { "type": "string", "minLength": 1 },
-                "privateTargetsRedacted": { "type": "boolean" },
-                "strict": { "type": "boolean" },
-                "timeoutMilliseconds": { "type": "integer", "minimum": 1 }
+                "checkHttpRedirect": {
+                  "type": "boolean"
+                },
+                "maxRedirects": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "notFoundPath": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "privateTargetsRedacted": {
+                  "type": "boolean"
+                },
+                "strict": {
+                  "type": "boolean"
+                },
+                "timeoutMilliseconds": {
+                  "type": "integer",
+                  "minimum": 1
+                }
               },
-              "additionalProperties": true
+              "additionalProperties": false
             },
             "readOnlyGuarantees": {
               "type": "object",
-              "required": ["methods", "mutatingActionsInvoked"],
+              "required": [
+                "methods",
+                "mutatingActionsInvoked"
+              ],
               "properties": {
-                "methods": { "const": ["GET"] },
-                "mutatingActionsInvoked": { "const": false }
+                "methods": {
+                  "const": [
+                    "GET"
+                  ]
+                },
+                "mutatingActionsInvoked": {
+                  "const": false
+                }
               },
               "additionalProperties": true
             },
             "results": {
               "type": "array",
               "minItems": 1,
-              "items": { "$ref": "technical-report.common.schema.json#/$defs/result" }
+              "items": {
+                "$ref": "technical-report.common.schema.json#/$defs/result"
+              }
             },
             "summary": {
               "type": "object",
-              "required": ["errors", "failed", "targets", "warnings"],
+              "required": [
+                "errors",
+                "failed",
+                "targets",
+                "warnings"
+              ],
               "properties": {
-                "errors": { "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger" },
-                "failed": { "type": "boolean" },
-                "targets": { "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger" },
-                "warnings": { "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger" }
+                "errors": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                },
+                "failed": {
+                  "type": "boolean"
+                },
+                "targets": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                },
+                "warnings": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                }
               },
               "additionalProperties": true
             }
-          },
-          "additionalProperties": true
+          }
         }
-      ]
+      ],
+      "unevaluatedProperties": false,
+      "type": "object"
     },
     "error": {
       "allOf": [
-        { "$ref": "technical-report.common.schema.json#/$defs/errorEnvelope" },
+        {
+          "$ref": "technical-report.common.schema.json#/$defs/errorEnvelope"
+        },
         {
           "type": "object",
-          "properties": { "tool": { "const": "http-check" } },
-          "additionalProperties": true
+          "properties": {
+            "tool": {
+              "const": "http-check"
+            }
+          }
         }
-      ]
+      ],
+      "unevaluatedProperties": false,
+      "type": "object"
     }
   }
 }

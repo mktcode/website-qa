@@ -3,81 +3,163 @@
   "$id": "https://github.com/mktcode/website-qa/catalog/social-report.schema.json",
   "title": "Technischer Bericht von website-qa-social",
   "oneOf": [
-    { "$ref": "#/$defs/success" },
-    { "$ref": "#/$defs/error" }
+    {
+      "$ref": "#/$defs/success"
+    },
+    {
+      "$ref": "#/$defs/error"
+    }
   ],
   "$defs": {
     "success": {
       "allOf": [
-        { "$ref": "technical-report.common.schema.json#/$defs/successEnvelope" },
+        {
+          "$ref": "technical-report.common.schema.json#/$defs/successEnvelope"
+        },
         {
           "type": "object",
-          "required": ["aiTrainingOptIn", "privateTargetsRedacted", "results", "robotsPolicyReviewedAt"],
+          "required": [
+            "privateTargetsRedacted",
+            "results",
+            "robotsPolicyReviewedAt"
+          ],
           "properties": {
-            "tool": { "const": "social-preview-check" },
-            "aiTrainingOptIn": { "type": "boolean" },
-            "privateTargetsRedacted": { "type": "boolean" },
-            "robotsPolicyReviewedAt": { "type": "string", "format": "date" },
+            "tool": {
+              "const": "social-preview-check"
+            },
+            "privateTargetsRedacted": {
+              "type": "boolean"
+            },
+            "robotsPolicyReviewedAt": {
+              "type": "string",
+              "format": "date"
+            },
             "options": {
               "type": "object",
-              "required": ["aiTrainingOptIn", "maxPages", "maxRedirects", "privateTargetsRedacted", "sitemap", "strict", "timeoutMilliseconds"],
+              "required": [
+                "maxPages",
+                "maxRedirects",
+                "privateTargetsRedacted",
+                "sitemap",
+                "strict",
+                "timeoutMilliseconds"
+              ],
               "properties": {
-                "aiTrainingOptIn": { "type": "boolean" },
-                "maxPages": { "type": "integer", "minimum": 1 },
-                "maxRedirects": { "type": "integer", "minimum": 0 },
-                "privateTargetsRedacted": { "type": "boolean" },
-                "sitemap": { "type": "boolean" },
-                "sitemapUrl": { "type": "string", "minLength": 1 },
-                "strict": { "type": "boolean" },
-                "timeoutMilliseconds": { "type": "integer", "minimum": 1 }
+                "maxPages": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "maxRedirects": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "privateTargetsRedacted": {
+                  "type": "boolean"
+                },
+                "sitemap": {
+                  "type": "boolean"
+                },
+                "sitemapUrl": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "strict": {
+                  "type": "boolean"
+                },
+                "timeoutMilliseconds": {
+                  "type": "integer",
+                  "minimum": 1
+                }
               },
-              "additionalProperties": true
+              "additionalProperties": false
             },
             "readOnlyGuarantees": {
               "type": "object",
-              "required": ["browserInteractions", "buttonsActivated", "formActionsFetched", "formsSubmitted", "methods"],
+              "required": [
+                "browserInteractions",
+                "buttonsActivated",
+                "formActionsFetched",
+                "formsSubmitted",
+                "methods"
+              ],
               "properties": {
-                "browserInteractions": { "const": false },
-                "buttonsActivated": { "const": false },
-                "formActionsFetched": { "const": false },
-                "formsSubmitted": { "const": false },
-                "methods": { "const": ["GET"] }
+                "browserInteractions": {
+                  "const": false
+                },
+                "buttonsActivated": {
+                  "const": false
+                },
+                "formActionsFetched": {
+                  "const": false
+                },
+                "formsSubmitted": {
+                  "const": false
+                },
+                "methods": {
+                  "const": [
+                    "GET"
+                  ]
+                }
               },
               "additionalProperties": true
             },
             "results": {
               "type": "array",
               "minItems": 1,
-              "items": { "$ref": "technical-report.common.schema.json#/$defs/result" }
+              "items": {
+                "$ref": "technical-report.common.schema.json#/$defs/result"
+              }
             },
             "summary": {
               "type": "object",
-              "required": ["errors", "failed", "pages", "warnings"],
+              "required": [
+                "errors",
+                "failed",
+                "pages",
+                "warnings"
+              ],
               "properties": {
-                "errors": { "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger" },
-                "failed": { "type": "boolean" },
-                "pages": { "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger" },
-                "warnings": { "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger" }
+                "errors": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                },
+                "failed": {
+                  "type": "boolean"
+                },
+                "pages": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                },
+                "warnings": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                }
               },
               "additionalProperties": true
             }
-          },
-          "additionalProperties": true
+          }
         }
-      ]
+      ],
+      "unevaluatedProperties": false,
+      "type": "object"
     },
     "error": {
       "allOf": [
-        { "$ref": "technical-report.common.schema.json#/$defs/errorEnvelope" },
+        {
+          "$ref": "technical-report.common.schema.json#/$defs/errorEnvelope"
+        },
         {
           "type": "object",
           "properties": {
-            "tool": { "const": "social-preview-check" },
-            "robotsPolicyReviewedAt": { "type": "string", "format": "date" }
-          },
-          "additionalProperties": true
+            "tool": {
+              "const": "social-preview-check"
+            },
+            "robotsPolicyReviewedAt": {
+              "type": "string",
+              "format": "date"
+            }
+          }
         }
-      ]
+      ],
+      "unevaluatedProperties": false,
+      "type": "object"
     }
   }
 }

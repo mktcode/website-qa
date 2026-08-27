@@ -1,0 +1,1299 @@
+{
+  "schemaVersion": 1,
+  "checklistId": "website-qa-checklist",
+  "checklistVersion": "2.0.0",
+  "status": "stable",
+  "description": "Maschinenlesbarer Index der modularen, ausschließlich manuell bearbeiteten Website-QA-Checkliste. Er dient nur zur Validierung technischer Referenzen und enthält keine Prüfergebnisse.",
+  "items": [
+    {
+      "id": "CORE-SCP-01",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Projektziel, veröffentlichte Funktionen, vereinbarter Prüfumfang, Rollen und ausdrücklich nicht geprüfte Bereiche sind dokumentiert."
+    },
+    {
+      "id": "CORE-SCP-02",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Betreiber, inhaltlich Verantwortliche, technische Zuständigkeiten und Ansprechpartner für externe Nachweise sind benannt."
+    },
+    {
+      "id": "CORE-SCP-03",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Ein Inventar ordnet alle öffentlichen Routen, Funktionen, Datenflüsse, externen Integrationen und administrativen Wege den einschlägigen Kernpunkten, Modulen und Prüfverfahren zu. Für nicht abgedeckte Sonderfunktionen wurden projektspezifische `PROJ-*`-Punkte ergänzt."
+    },
+    {
+      "id": "CORE-CNT-01",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Veröffentlichte Texte, geschäftliche Angaben, Kontaktwege und Call-to-Action-Inhalte entsprechen dem freigegebenen Stand."
+    },
+    {
+      "id": "CORE-CNT-02",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Besondere rechtliche, branchenspezifische, barrierefreiheitsbezogene oder sicherheitstechnische Anforderungen wurden abgefragt. Nicht vereinbarte Anforderungen werden nicht stillschweigend als erfüllt oder geschuldet dargestellt."
+    },
+    {
+      "id": "CORE-CNT-03",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Inhalte für Suchmaschinen und ausdrücklich gewünschte KI-Such-, Index- oder nutzerinitiierte Antwortdienste sind klar strukturiert, eindeutig, informationsreich, aktuell, überprüfbar und serverseitig zugänglich. Konkrete Fakten, Zahlen und Entitäten werden soweit sinnvoll genannt und Aussagen durch Quellen oder Belege gestützt. Daraus wird keine Freigabe für KI-Training abgeleitet."
+    },
+    {
+      "id": "CORE-DOM-01",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Bevorzugte öffentliche URL, Schema, Host und Slash-Strategie sind eindeutig festgelegt."
+    },
+    {
+      "id": "CORE-DOM-02",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "HTTP leitet dauerhaft, pfad- und queryerhaltend und möglichst ohne unnötige Zwischenstation auf HTTPS um."
+    },
+    {
+      "id": "CORE-DOM-03",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Nicht bevorzugte Hostvarianten leiten dauerhaft, pfad- und queryerhaltend auf die bevorzugte URL um."
+    },
+    {
+      "id": "CORE-DOM-04",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Zertifikat, Zertifikatskette, Hostabdeckung und unterstützte TLS-Versionen sind mit einem geeigneten Werkzeug geprüft. Die automatische Verlängerung ist durch Konfiguration oder einen erfolgreichen Erneuerungsnachweis plausibilisiert."
+    },
+    {
+      "id": "CORE-DOM-05",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Jede indexierbare Seite enthält genau einen absoluten Canonical auf der festgelegten Host- und HTTPS-Variante."
+    },
+    {
+      "id": "CORE-DOM-06",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Canonicals, interne Links, Sitemap, OpenGraph-URLs und Weiterleitungen verwenden konsistent die vorgesehene öffentliche URL."
+    },
+    {
+      "id": "CORE-DOM-07",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Weiterleitungen wurden auf Statuscode, Pfad- und Queryerhalt, Schleifen und unnötige Ketten geprüft."
+    },
+    {
+      "id": "CORE-DOM-08",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "HSTS-Wert und Reichweite sind bewusst gewählt und auf allen relevanten HTTPS-Antworten einschließlich vorgeschalteter Weiterleitungshosts geprüft. `includeSubDomains` und `preload` werden nur nach Prüfung aller betroffenen Subdomains aktiviert."
+    },
+    {
+      "id": "CORE-DOM-09",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Apex-, `www`- und sonstige veröffentlichte Hosts lösen über die beabsichtigten A-, AAAA- beziehungsweise CNAME-Einträge auf die zuständige Infrastruktur auf; IPv4 und IPv6, veraltete Einträge und unbeabsichtigt direkt erreichbare Altziele wurden geprüft."
+    },
+    {
+      "id": "CORE-ERR-01",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Eine unbekannte Browserroute liefert eine verständliche HTML-Fehlerseite mit tatsächlichem HTTP-404-Status und ohne interne technische Details."
+    },
+    {
+      "id": "CORE-ERR-02",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Nicht indexierbare Fehlerseiten senden `noindex` und enthalten weder einen irreführenden Canonical noch `og:url` auf die Fehleradresse."
+    },
+    {
+      "id": "CORE-ERR-03",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "API-, Asset- und Content-Negotiation-Fehler liefern passende Statuscodes und Medientypen statt einer scheinbar erfolgreichen HTML-Antwort."
+    },
+    {
+      "id": "CORE-ERR-04",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Sicherheits-, Indexierungs- und Cacheheader wurden auch auf Fehlerantworten und app- sowie proxyseitigen Weiterleitungen geprüft."
+    },
+    {
+      "id": "CORE-SEO-01",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Jede relevante Seite besitzt einen eindeutigen, inhaltlich passenden Titel und eine passende Meta-Beschreibung."
+    },
+    {
+      "id": "CORE-SEO-02",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Die Seitensprache ist mit einem passenden `lang`-Attribut angegeben; Überschriften bilden eine nachvollziehbare Hierarchie mit verständlicher Hauptüberschrift."
+    },
+    {
+      "id": "CORE-SEO-03",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Strukturierte Daten werden nur verwendet, wenn sie zum sichtbaren Inhalt passen, vollständig sind und mit einem geeigneten Validator geprüft wurden."
+    },
+    {
+      "id": "CORE-SOC-01",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Relevante Seiten enthalten mindestens `og:title`, `og:description`, `og:type`, `og:url` und ein geeignetes `og:image` mit absoluter HTTPS-URL sowie, soweit vorgesehen, passende X-/Twitter-Metadaten."
+    },
+    {
+      "id": "CORE-SOC-02",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Öffentlich ausgelieferte Social-Metadaten wurden automatisiert aus serverseitigem HTML mit Browser-, Facebook-, X-/Twitter- und LinkedIn-User-Agent geprüft. Pflichtfelder, Mehrdeutigkeiten, Canonical-/OpenGraph-Konsistenz, Redirects sowie Bildabruf, MIME-Typ, Dateigröße und Pixelmaße sind umfasst; Fehler liefern einen CI-tauglichen Exitcode. Standardverfahren mit lokal eingebundenem `@mktcode/website-qa`: `npm run ops:social:check -- https://[DOMAIN]/ --sitemap --max-pages=50 --strict`; Paket-/Werkzeugcommit und Bericht werden protokolliert."
+    },
+    {
+      "id": "CORE-SOC-03",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Zusätzlich wurde mindestens eine echte öffentliche Plattformvorschau oder ein echter Plattformcrawler manuell geprüft. Darstellung, Zuschnitt und Plattformcache werden nicht aus einer lokalen User-Agent-Simulation abgeleitet."
+    },
+    {
+      "id": "CORE-ROB-01",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "`robots.txt` ist öffentlich erreichbar, syntaktisch plausibel und blockiert keine für die gewünschte Indexierung notwendigen Seiten oder Ressourcen."
+    },
+    {
+      "id": "CORE-ROB-02",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Aktuelle, offiziell dokumentierte Kennungen wichtiger Social-, Such-, KI-Such-, Nutzerabruf- und Trainingsdienste sowie reine Produkt- beziehungsweise Datennutzungstokens werden mit dokumentiertem Quellenstand getrennt bewertet."
+    },
+    {
+      "id": "CORE-ROB-03",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "KI-Training und vergleichbare Datennutzung sind standardmäßig per `robots.txt` ausgeschlossen. Eine Freigabe erfolgt nur nach ausdrücklicher dokumentierter Betreiber- beziehungsweise Kundenzustimmung; Such-/Indexbots und nutzerinitiierte Abrufe werden unabhängig entschieden."
+    },
+    {
+      "id": "CORE-ROB-04",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Die automatisierte Prüfung dokumentiert erlaubte und blockierte Trainings-/Datennutzungstokens neutral. Menschen gleichen die Beobachtung mit der ausdrücklichen Betreiberentscheidung aus `CORE-ROB-03` ab; der technische Lauf nimmt keine Freigabe entgegen und leitet keine Zustimmung ab. `robots.txt` wird nicht als Zugriffsschutz, Rechtsgarantie oder rückwirkende Löschung dargestellt."
+    },
+    {
+      "id": "CORE-ROB-05",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Der im Prüfbericht ausgewiesene Quellenstand der Crawler- und Produktkennungen wurde protokolliert und auf ausreichende Aktualität bewertet; Anbieteränderungen an Kennungen oder Richtlinien lösen eine erneute Quellenprüfung aus."
+    },
+    {
+      "id": "CORE-MAP-01",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Soweit sinnvoll, ist eine Sitemap vorhanden und in `robots.txt` referenziert. Sie enthält ausschließlich absolute, kanonische, indexierbare 200-URLs und keine Fehler-, Redirect- oder `noindex`-Ziele."
+    },
+    {
+      "id": "CORE-MAP-02",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Die öffentlich erzeugte Sitemap wurde als XML geparst, auf Medientyp, Hosts, Duplikate und Canonical-Abgleich geprüft. Nicht belastbare `lastmod`-, `changefreq`- oder `priority`-Werte werden nicht künstlich gesetzt; eine vorhandene XSL-Darstellung enthält keine Platzhalter oder sichtbaren Fehler."
+    },
+    {
+      "id": "CORE-SEO-04",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Statuscodes, Weiterleitungen, Canonicals, Robots-Angaben, interne Links, Downloads und notwendige Seitenressourcen wurden mit einem technischen Crawl und echten GET-Abrufen kontrolliert. Standardverfahren mit lokal eingebundenem `@mktcode/website-qa`: `npm run ops:crawl:check -- https://[DOMAIN]/ --sitemap --max-pages=50 --max-resources=500 --strict`; Paket-/Werkzeugcommit und Bericht werden protokolliert. Der zentrale Social-Check ersetzt diesen allgemeinen Crawl nicht."
+    },
+    {
+      "id": "CORE-SEO-05",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Search Console oder vergleichbare Webmaster-Werkzeuge sind soweit vereinbart eingerichtet; Eigentümer, Konto, Property, Verifizierungsweg und Ergebnisübermittlung sind dokumentiert."
+    },
+    {
+      "id": "CORE-A11Y-01",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Semantische HTML-Elemente werden passend eingesetzt; Navigation, Hauptinhalt, ergänzende Bereiche und Footer sind sinnvoll ausgezeichnet."
+    },
+    {
+      "id": "CORE-A11Y-02",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Alle interaktiven Elemente sind per Tastatur in nachvollziehbarer Reihenfolge erreichbar und besitzen eine deutlich sichtbare Fokusanzeige. Navigation, eingebettete Inhalte und sonstige Komponenten erzeugen keine Fokusfalle."
+    },
+    {
+      "id": "CORE-A11Y-03",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Links, Schaltflächen und reine Icons besitzen verständliche zugängliche Namen; Zustände und Informationen werden nicht ausschließlich über Farbe vermittelt."
+    },
+    {
+      "id": "CORE-A11Y-04",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Per Opacity, Transformation, Offscreen-Position oder Animation unsichtbare Bedienelemente sind bis zu ihrer Sichtbarkeit weder fokussierbar noch irreführend im Accessibility Tree vorhanden."
+    },
+    {
+      "id": "CORE-A11Y-05",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Modale Dialoge erhalten sinnvollen initialen Fokus, begrenzen Vorwärts- und Rückwärts-Tabben, setzen den Hintergrund inaktiv, unterstützen einen verständlichen Schließweg und stellen den Fokus auf den Auslöser zurück."
+    },
+    {
+      "id": "CORE-A11Y-06",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Formulare besitzen zugeordnete Labels, verständliche Pflichtfeldhinweise, zugängliche Fehlermeldungen und nachvollziehbare Erfolgs- und Fehlerzustände."
+    },
+    {
+      "id": "CORE-A11Y-07",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Dynamische Formularfehler und Statusmeldungen verwenden passend `aria-invalid`, `aria-describedby` und Live-Regionen, ohne Fokus oder Screenreader unnötig zu überlasten."
+    },
+    {
+      "id": "CORE-A11Y-08",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Bilder besitzen redaktionell passende Alternativtexte; dekorative Bilder und Hintergründe werden nicht unnötig vorgelesen."
+    },
+    {
+      "id": "CORE-A11Y-09",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Text, Bedienelemente, Fokus und wichtige Zustände besitzen ausreichenden Kontrast."
+    },
+    {
+      "id": "CORE-A11Y-10",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Bei 320 CSS-Pixeln und bei 200 Prozent reiner Textvergrößerung bleibt der Inhalt ohne zweidimensionales Scrollen sinnvoll nutzbar; lange URLs, E-Mail-Adressen und Komposita verursachen keinen Dokumentüberlauf."
+    },
+    {
+      "id": "CORE-A11Y-11",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Wesentliche Inhalte und Funktionen bleiben ohne Maus sowie bei erzwungener reduzierter Bewegung vollständig sichtbar und bedienbar."
+    },
+    {
+      "id": "CORE-A11Y-12",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "`prefers-reduced-motion` berücksichtigt CSS-Animationen, Übergänge, Smooth-Scroll, scrollgekoppelte Effekte und JavaScript-Animationsbibliotheken. Automatisch startende, blinkende oder ablenkende Inhalte werden vermieden beziehungsweise sind anhaltbar; Autoplay mit Ton wird nicht eingesetzt."
+    },
+    {
+      "id": "CORE-A11Y-13",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Tastaturprüfung, automatisierter Accessibility-Audit und reale Mobilbrowserprüfung sind getrennt mit Datum und Werkzeug dokumentiert; eine Screenreader-Stichprobe erfolgt risikogerecht und bei vereinbarter Konformität zwingend."
+    },
+    {
+      "id": "CORE-A11Y-14",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Falls BFSG-, BITV- oder WCAG-Konformität geschuldet ist, sind Umfang, Prüfverfahren, Ergebnis und Abweichungen separat dokumentiert. Ohne ausdrückliche Vereinbarung wird keine Konformität behauptet."
+    },
+    {
+      "id": "CORE-PERF-01",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Geeignete textbasierte Antworten wie HTML, CSS, JavaScript, JSON und größere SVG-Dateien werden per HTTP komprimiert. Produktion wurde mindestens für HTML, CSS und JavaScript mit Identity, Gzip und Brotli geprüft; `Content-Encoding`, `Vary` und tatsächliche Größenreduktion sind plausibel. Erfolgt die Kompression am Reverse Proxy, sind Middlewarekonfiguration und Zuordnung zum produktiven HTTPS-Router bestätigt."
+    },
+    {
+      "id": "CORE-PERF-02",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Bereits komprimierte Bilder, Archive und Schriftformate werden nicht unnötig erneut komprimiert."
+    },
+    {
+      "id": "CORE-PERF-03",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Ladezeit, realer LCP-Kandidat, CLS, Blocking Time und Renderprobleme wurden lokal gegen den Produktionsbuild und nach Möglichkeit öffentlich geprüft. Tracewarnungen werden zusätzlich zum Gesamtscore bewertet."
+    },
+    {
+      "id": "CORE-PERF-04",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Wesentliche Above-the-fold-Inhalte sind nicht bis zu einer verspäteten JavaScript-Freigabe vollständig unsichtbar; es werden keine unsichtbaren Duplikate oder künstlichen Platzhalter zur Beschönigung von Metriken eingesetzt."
+    },
+    {
+      "id": "CORE-PERF-05",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Cacheheader passen zur Ressource: versionierte unveränderliche Assets dürfen langfristig cachen, veränderliche öffentliche Dateien bleiben aktualisierbar und sensible Antworten werden nicht öffentlich gespeichert."
+    },
+    {
+      "id": "CORE-PRIV-01",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Impressum und Datenschutzerklärung sind unter dauerhaften Links erreichbar und entsprechen den tatsächlich eingesetzten Funktionen und Diensten."
+    },
+    {
+      "id": "CORE-PRIV-02",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Tatsächliche externe Schriftarten, CDNs, Karten, Videos, Tracker, Analyse-, Fehlertracking- und sonstige Drittanbieteranfragen wurden per Quellprüfung und Browsernetzwerk kontrolliert."
+    },
+    {
+      "id": "CORE-PRIV-03",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Externe Dienste sind nur aktiviert, wenn Zweck, Rechtsgrundlage, Hinweis-/Einwilligungsbedarf und technische Einbindung geklärt sind; Beispielkonfigurationen aktivieren nichts unbeabsichtigt."
+    },
+    {
+      "id": "CORE-PRIV-04",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Cookies sowie Local- und Session-Storage stimmen mit Dokumentation und Einwilligungslogik überein. Sicherheitsrelevante Cookies verwenden soweit einschlägig `Secure`, `HttpOnly` und eine passende `SameSite`-Richtlinie."
+    },
+    {
+      "id": "CORE-PRIV-05",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Ein Datenschutzhinweis wird nicht fälschlich als Einwilligung behandelt; eine Einwilligung wird nur eingesetzt, wenn sie tatsächlich erforderlich und technisch nachweisbar umgesetzt ist."
+    },
+    {
+      "id": "CORE-SEC-01",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Secrets, Zugangsdaten und private Schlüssel befinden sich nicht im Repository, Clientcode, öffentlich ausgelieferten Dateien oder frei zugänglichen Buildartefakten."
+    },
+    {
+      "id": "CORE-SEC-02",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Abhängigkeiten, Lockdatei, Build und Produktionskonfiguration wurden auf bekannte Probleme geprüft. Meldungen werden anhand realer Laufzeit, Plattform und Angriffsweg bewertet statt blind ignoriert oder erzwungen aktualisiert."
+    },
+    {
+      "id": "CORE-SEC-03",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Produktionslaufzeit, Architektur und Frameworkversionen sind unterstützt und passen zu nativen Buildartefakten."
+    },
+    {
+      "id": "CORE-SEC-04",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Sicherheitsheader und Proxygrenzen wurden passend zum Projekt für HTML, statische Assets, APIs, Fehler, appseitige sowie proxyseitige Weiterleitungen geprüft. Anwendung und Proxy entfernen oder widersprechen sich nicht unbeabsichtigt."
+    },
+    {
+      "id": "CORE-SEC-05",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "CSP, Framing-Schutz, MIME-Sniffing-Schutz, Referrer Policy, Permissions Policy und HSTS wurden risikogerecht bewertet; eine bewusst begrenzte Richtlinie wird nicht als Vollschutz ausgegeben."
+    },
+    {
+      "id": "CORE-SEC-06",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Öffentlich ausgelieferte Verzeichnisse und Dateien enthalten keine Secrets, Produktionsdaten, internen Dokumente, Debugausgaben oder unnötigen Source Maps."
+    },
+    {
+      "id": "CORE-SEC-07",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Zentrale Nutzerpfade und Fehlerfälle funktionieren ohne interne Fehlermeldungen, unerwartete Browserkonsolenfehler oder fehlgeschlagene Netzwerkanfragen."
+    },
+    {
+      "id": "CORE-SEC-08",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Falls verschlüsselte Secretdateien im privaten Repository verwaltet werden, arbeiten Ver- und Entschlüsselungsskripte fehlersicher, mit restriktiver `umask`, sicheren Dateimodi und Bereinigung unvollständiger Ausgaben; entschlüsselte Dateien sind ignoriert und Secret-Werte erscheinen nicht in Logs."
+    },
+    {
+      "id": "CORE-SEC-09",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Erforderliche Laufzeitvariablen sind ohne reale Werte in einer Beispiel- oder Betriebsdokumentation beschrieben. Nicht mehr verwendete Variablen wurden entfernt; Beispielwerte aktivieren keine externen Dienste oder unsicheren Fallbacks."
+    },
+    {
+      "id": "CORE-SEC-10",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Zuständigkeit, sichere Übergabe, Rotation und Wiederbeschaffung produktiver Zugangsdaten sind dokumentiert. Rotation wird insbesondere nach möglicher Ablage in Repository, Logs, Images, Layern oder Caches durchgeführt."
+    },
+    {
+      "id": "CORE-VAL-01",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Unterstützte Laufzeit, Architektur und Paketmanagerversion sind aus Projektkonfiguration und Deploymentvorgaben ermittelt und mit den tatsächlich verwendeten Versionen protokolliert."
+    },
+    {
+      "id": "CORE-VAL-02",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Eine saubere, lockdateibasierte Installation wurde mit dem vorgesehenen Paketmanager durchgeführt; uncommittete Lockdateiänderungen, Installationswarnungen und optionale plattformspezifische Artefakte wurden bewertet."
+    },
+    {
+      "id": "CORE-VAL-03",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Die im Projekt vorhandenen Skripte für Lint, Typecheck, Unit-/Integrationstests, Datenbank- beziehungsweise Migrationsprüfung und Produktionsbuild wurden erfasst und alle einschlägigen Prüfungen ausgeführt oder mit Grund als nicht anwendbar dokumentiert."
+    },
+    {
+      "id": "CORE-VAL-04",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Die erzeugte Produktionsausgabe wurde mit dem vorgesehenen Produktionsstartkommando lokal gestartet und per HTTP sowie im Browser einem Smoke-Test unterzogen; ein Dev-Server gilt nicht als Produktionsbuildnachweis."
+    },
+    {
+      "id": "CORE-VAL-05",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "`git diff --check`, relative Dokumentationslinks und soweit relevant generierte Dokumente wurden geprüft. Ein erfolgreicher Code-Linter wird nicht als Link- oder Dokumentationsprüfung ausgegeben."
+    },
+    {
+      "id": "CORE-VAL-06",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Entwicklungs- und Produktionsabhängigkeiten wurden getrennt auditiert und Meldungen anhand von Laufzeitpfad, Plattform und Erreichbarkeit bewertet; es wurde kein ungeprüftes erzwungenes Audit-Fix verwendet."
+    },
+    {
+      "id": "CORE-VAL-07",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Versionierte Dateien, öffentliche Verzeichnisse und relevante Artefakte wurden mit geeigneten Mustern auf Secrets, private Schlüssel, interne Produktionsdaten und versehentliche Debugausgaben geprüft, ohne Trefferwerte zu protokollieren."
+    },
+    {
+      "id": "CORE-VAL-08",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Für jede ausgeführte Prüfung sind exakter Befehl beziehungsweise reproduzierbarer Aufruf, Werkzeugversion, Zielumgebung, Ergebnis und bewusst übersprungene Teilprüfung im Protokoll festgehalten."
+    },
+    {
+      "id": "CORE-QA-01",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Darstellung und Bedienung wurden risikogerecht auf aktuellen Desktop- und Mobilbrowsern geprüft; Browser, Versionen, Viewports und nicht geprüfte Plattformen sind dokumentiert."
+    },
+    {
+      "id": "CORE-QA-02",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Browserengine, Headless-Emulation und reale Browser beziehungsweise Geräte werden im Nachweis korrekt unterschieden; eine WebKit-Prüfung wird nicht als Safari-Prüfung bezeichnet."
+    },
+    {
+      "id": "CORE-QA-03",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Navigation, Kontaktwege, Links, Downloads und alle vereinbarten nebenwirkungsfreien Funktionen wurden durchgespielt."
+    },
+    {
+      "id": "CORE-QA-04",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Texte wurden eigenständig redaktionell auf Tippfehler und Verständlichkeit geprüft; Telefonnummern, E-Mail-Adressen, Anschriften und Öffnungszeiten sind korrekt."
+    },
+    {
+      "id": "CORE-QA-05",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Bilder, Videos, Dokumente und externe Einbettungen laden wie erwartet; defekte interne und externe Links wurden automatisiert oder manuell gesucht."
+    },
+    {
+      "id": "CORE-QA-06",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Dynamische Zustandswechsel, responsive Varianten und wiederholte Vorwärts-/Rückwärtsinteraktionen wurden geprüft, damit neu erzeugte oder umsortierte Elemente funktionsfähig bleiben."
+    },
+    {
+      "id": "CORE-QA-07",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Die Seiten wurden ohne sichtbare JavaScript-, Netzwerk- oder Hydrationsfehler in der Browserkonsole geprüft."
+    },
+    {
+      "id": "CORE-QA-08",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Der öffentliche Ressourcenlauf erfasst neben HTML auch tatsächlich angeforderte CSS-, JavaScript-, Schrift-, Bild- und Downloadressourcen mit Status und MIME-Typ; dynamische Pfade und erst nach Interaktion geladene Ressourcen werden zusätzlich im Browser geprüft."
+    },
+    {
+      "id": "CORE-REP-01",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Das Repository enthält eine grundlegende README zu Aufbau, unterstützter Laufzeit, Installation, Build, Tests und lokalem Produktionsstart."
+    },
+    {
+      "id": "CORE-REP-02",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Buildartefakte, Abhängigkeiten, Caches, Logs, temporäre Dateien, lokale Laufzeitdaten und unverschlüsselte Secrets sind nicht versioniert; Ausschlussdateien entsprechen den verwendeten Werkzeugen."
+    },
+    {
+      "id": "CORE-REP-03",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Nicht referenzierte Komponenten, Beispieldaten, Altdateien und überholte Varianten wurden identifiziert und entfernt oder mit Zweck und Aufbewahrungsgrund dokumentiert."
+    },
+    {
+      "id": "CORE-REP-04",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Vor Löschungen wurden dynamische Pfade, Build- und Dokumentationsskripte sowie Laufzeitkonfigurationen berücksichtigt; danach wurden Build, Tests, Links und zentrale Pfade erneut geprüft."
+    },
+    {
+      "id": "CORE-REP-05",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Direkte Abhängigkeiten, Skripte, Komponenten und Konfigurationen wurden auf tatsächliche Verwendung geprüft; direkte Imports sind direkt deklariert, nicht mehr benötigte Einträge entfernt und Lockdateien konsistent."
+    },
+    {
+      "id": "CORE-REP-06",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Große versionierte Dateien, Repository-Größe und Deploymentkontext wurden inventarisiert; für Build und Betrieb unnötige Inhalte werden durch geeignete plattformspezifische Ausschlüsse ferngehalten."
+    },
+    {
+      "id": "CORE-REP-07",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Bewusst aufbewahrte historische, rechtlich relevante oder revisionsdienliche Dokumente sind durch Verzeichnis, Dateiname, Version oder README als gewollter Bestand erkennbar und werden nicht pauschal als veraltet gelöscht."
+    },
+    {
+      "id": "CORE-REL-01",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Lokale Implementierung, Commit, Push, Plattformdeployment, laufendes Artefakt und öffentliche Verifikation sind getrennt dokumentiert."
+    },
+    {
+      "id": "CORE-REL-02",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Der öffentlich geprüfte Stand wurde über Commit-, Image-, Artefakt- oder andere belastbare Deploymentinformationen identifiziert. Ein erfolgreicher lokaler Build oder eine bloße Betreiberbestätigung ersetzt dies nicht, soweit ein technischer Nachweis möglich ist."
+    },
+    {
+      "id": "CORE-REL-03",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Nach dem Deployment wurden öffentliche URL, TLS, Weiterleitungen, HSTS, Kompression, Metadaten, Fehlerseiten, zentrale Ressourcen und Nutzerpfade erneut geprüft."
+    },
+    {
+      "id": "CORE-REL-04",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Die Veröffentlichung wurde technisch sowie getrennt davon inhaltlich beziehungsweise visuell durch die zuständigen Personen freigegeben; bekannte offene Punkte sind dokumentiert."
+    },
+    {
+      "id": "CORE-REL-05",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Offene Punkte besitzen Priorität, verantwortliche Person und Prüftermin. Bewusst akzeptierte Abweichungen nennen Risiko, Entscheidung und Wiedervorlage."
+    },
+    {
+      "id": "CORE-REL-06",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Entscheidungen, Änderungen, ausgeführte Prüfungen, Commits, Deployments und offene Folgen werden fortlaufend im projektspezifischen Prüfprotokoll dokumentiert; das Protokoll ersetzt nicht die Checkboxen."
+    },
+    {
+      "id": "CORE-REL-07",
+      "module": "core",
+      "source": "docs/checklisten/website/kern.md",
+      "statement": "Deploymentweg, zuständige Infrastrukturkomponenten und Grenzen zwischen Anwendung, Plattform, Reverse Proxy und Provider sind dokumentiert; ein Rollback oder Neuaufbau auf einen bekannten Commit ist grundsätzlich möglich."
+    },
+    {
+      "id": "GOV-CON-01",
+      "module": "auftrag-recht-uebergabe",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "statement": "Hauptangebot beziehungsweise Auftrag wurde nachweisbar angenommen; Zeitpunkt, Fassung und tatsächlich einbezogene Anlagen sind dokumentiert."
+    },
+    {
+      "id": "GOV-CON-02",
+      "module": "auftrag-recht-uebergabe",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "statement": "Leistungsbeschreibung und Zusatzaufträge liegen in den vereinbarten Fassungen vor; technische Umsetzung und behaupteter Leistungsumfang stimmen damit überein."
+    },
+    {
+      "id": "GOV-CON-03",
+      "module": "auftrag-recht-uebergabe",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "statement": "Soweit zum Prüfumfang gehörend, wurden Rechnung, vereinbarte Vorauszahlung und Vertragsperiode durch die zuständige Stelle bestätigt."
+    },
+    {
+      "id": "GOV-CON-04",
+      "module": "auftrag-recht-uebergabe",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "statement": "Abweichende Rollen zwischen Kunde, Vertragspartner, Agentur, technischem Dienstleister, Hostinganbieter und Betreiber sind dokumentiert; Nachweise werden der tatsächlich verantwortlichen Stelle zugeordnet."
+    },
+    {
+      "id": "GOV-RGT-01",
+      "module": "auftrag-recht-uebergabe",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "statement": "Domaininhaber, Registrar, DNS-Verantwortung und vorgesehene spätere Übergabe sind dokumentiert."
+    },
+    {
+      "id": "GOV-RGT-02",
+      "module": "auftrag-recht-uebergabe",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "statement": "Inhalte, Logo, Bilder, Videos, Schriftarten, Testimonials und sonstige Materialien sind freigegeben oder ihre Nutzungs- und Veröffentlichungsrechte sind dokumentiert."
+    },
+    {
+      "id": "GOV-RGT-03",
+      "module": "auftrag-recht-uebergabe",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "statement": "Impressumsdaten, Kontaktwege, Öffnungszeiten und sonstige geschäftliche Angaben wurden von der zuständigen Person bestätigt."
+    },
+    {
+      "id": "GOV-RGT-04",
+      "module": "auftrag-recht-uebergabe",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "statement": "Rechtstexte stammen aus der vereinbarten Quelle beziehungsweise wurden durch Kunde oder Rechtsberatung freigegeben. Die technische Prüfung wird nicht als juristische Prüfung ausgegeben."
+    },
+    {
+      "id": "GOV-RGT-05",
+      "module": "auftrag-recht-uebergabe",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "statement": "Erforderliche gesetzliche oder organisatorische Kontaktadressen und Weiterleitungen sind eingerichtet und ihre Erreichbarkeit wurde risikogerecht bestätigt."
+    },
+    {
+      "id": "GOV-DPA-01",
+      "module": "auftrag-recht-uebergabe",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "statement": "Tatsächliche Datenflüsse sind den einschlägigen Modulen des Rahmen-AVV und der projektspezifischen Anlage zugeordnet, soweit Auftragsverarbeitung vorliegt."
+    },
+    {
+      "id": "GOV-DPA-02",
+      "module": "auftrag-recht-uebergabe",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "statement": "AVV-/TOM-Anlagen, Speicherfristen und Unterauftragsverarbeiter sind aktuell; Dateinamen und Versionen stimmen mit den einbezogenen Vertragsunterlagen überein."
+    },
+    {
+      "id": "GOV-DPA-03",
+      "module": "auftrag-recht-uebergabe",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "statement": "Ist der Betreiber selbst Verantwortlicher und besteht keine kundenbezogene Auftragsverarbeitung, ist die Nichtanwendbarkeit einer Kunden-Unterauftragsakte kurz begründet statt pauschal offen gelassen."
+    },
+    {
+      "id": "GOV-HO-01",
+      "module": "auftrag-recht-uebergabe",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "statement": "Kundenspezifische Zugänge zu Domain, DNS, Repository und Plattform sind dokumentiert und getrennt sicher übergeben; Zugangsdaten stehen nicht im Prüfnachweis."
+    },
+    {
+      "id": "GOV-HO-02",
+      "module": "auftrag-recht-uebergabe",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "statement": "Backupumfang, Wiederherstellungsgrenzen, Betriebszuständigkeiten und Supportgrenzen wurden entsprechend Vertrag und tatsächlicher Infrastruktur transparent gemacht."
+    },
+    {
+      "id": "GOV-HO-03",
+      "module": "auftrag-recht-uebergabe",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "statement": "Technische Freigabe, inhaltliche Freigabe, rechtliche Freigabe und Veröffentlichungserlaubnis sind getrennt den zuständigen Personen und Zeitpunkten zugeordnet."
+    },
+    {
+      "id": "GOV-HO-04",
+      "module": "auftrag-recht-uebergabe",
+      "source": "docs/checklisten/website/module/auftrag-recht-uebergabe.md",
+      "statement": "Übergebene Dokumente, bekannte Abweichungen, offene Nachweise und nächste Prüftermine sind in einem kompakten Übergabe- beziehungsweise Abschlussnachweis festgehalten."
+    },
+    {
+      "id": "FORM-GOV-01",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Für komplexe Formulare, Uploads, Administrationsbereiche und andere Zusatzfunktionen liegen soweit erforderlich Zusatzauftrag, dokumentierte Weisung, Berechtigungsmodell und ergänzende Verarbeitungsbeschreibung vor."
+    },
+    {
+      "id": "FORM-FLOW-01",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Erfasste Felder, Zweck, Empfänger, serverseitige Verarbeitung, externe Dienste, temporäre und dauerhafte Speicherorte sowie Fristen sind als tatsächlicher Datenfluss dokumentiert."
+    },
+    {
+      "id": "FORM-FLOW-02",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Es werden nur erforderliche Daten abgefragt; Zweck und Datenschutzhinweis sind verständlich angegeben. Ein Hinweis wird nicht fälschlich als Einwilligung bezeichnet."
+    },
+    {
+      "id": "FORM-FLOW-03",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Ein Standard-Kontaktformular versendet nur an vereinbarte Empfänger und speichert außerhalb notwendiger kurzfristiger Verarbeitung nichts dauerhaft, sofern keine andere dokumentierte Weisung besteht."
+    },
+    {
+      "id": "FORM-FLOW-04",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Sichtbare, aber noch deaktivierte Formulare senden keine Daten, erzeugen keine Nebenwirkung und täuschen keinen Erfolg vor; der alternative Kontaktweg ist verständlich."
+    },
+    {
+      "id": "FORM-FLOW-05",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Erfolgs-, Validierungs-, Missbrauchs- und technische Fehlerzustände sind für Nutzer verständlich, zugänglich und unterscheiden keine intern sensiblen Details."
+    },
+    {
+      "id": "FORM-SEC-01",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Eingaben werden serverseitig anhand eines dokumentierten Schemas validiert; Clientvalidierung ist nur ergänzend."
+    },
+    {
+      "id": "FORM-SEC-02",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Zulässige HTTP-Methoden, Content-Types, Bodygrößen, Feldlängen und Zeichensätze sind begrenzt; unerwartete Inhalte werden kontrolliert abgewiesen."
+    },
+    {
+      "id": "FORM-SEC-03",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Zustandsverändernde Browserendpunkte sind gegen fremde Origins beziehungsweise CSRF geschützt. CORS, Cookies und vertrauenswürdige Proxyheader passen zum tatsächlichen Aufrufmodell."
+    },
+    {
+      "id": "FORM-SEC-04",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Spam- und Missbrauchsschutz ist risikogerecht und datenschutzrechtlich dokumentiert. Schutzmaßnahmen verhindern weder legitime Nutzung noch verlassen sie sich auf manipulierbare Clientheader."
+    },
+    {
+      "id": "FORM-SEC-05",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Bei IP-basiertem Schutz werden vollständige IP-Adressen nicht unnötig im Anwendungszustand gespeichert; Pseudonymisierung, Ablauf und periodische Bereinigung begrenzen Speicher und Schutzfenster. Weitergeleitete Client-IP-Header werden nur aus einer vertrauenswürdigen Proxykette übernommen und risikogerecht praktisch geprüft."
+    },
+    {
+      "id": "FORM-SEC-06",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Fehlermeldungen, API-Antworten und Logs geben keine Secrets, Stacktraces, Datenbankdetails oder unnötigen personenbezogenen Formularinhalt preis."
+    },
+    {
+      "id": "FORM-SEC-07",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Serverseitige Abrufe und Proxyendpunkte begrenzen Zielhosts, Protokolle, Redirects, Koordinaten beziehungsweise Pfade, Timeouts und Antwortgrößen; nutzerkontrollierte Eingaben ermöglichen keinen Zugriff auf interne oder private Ziele."
+    },
+    {
+      "id": "FORM-AUTH-01",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Administrationsbereiche und geschützte APIs erzwingen Authentifizierung und Autorisierung serverseitig bei jeder Anfrage; erratbare IDs, Clientzustand oder versteckte UI gelten nicht als Berechtigung."
+    },
+    {
+      "id": "FORM-AUTH-02",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Sitzungen, Tokens und Cookies besitzen angemessene Gültigkeit, Rotation, Widerruf, Logout und Schutzattribute. Anmeldung, Fehlversuche und Wiederherstellung sind gegen Missbrauch begrenzt, ohne unnötige Kontoinformationen preiszugeben."
+    },
+    {
+      "id": "FORM-AUTH-03",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Rollen und Rechte folgen dem Minimalprinzip; administrative Änderungen, Exporte und Löschungen werden soweit erforderlich nachvollziehbar protokolliert, ohne sensible Inhalte übermäßig zu loggen."
+    },
+    {
+      "id": "FORM-SIDE-01",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Reihenfolge, Verantwortlichkeit und Fehlersemantik aller Nebenwirkungen wie Datenbank, Object Storage, E-Mail, Kalender, Telegram oder Webhooks sind dokumentiert."
+    },
+    {
+      "id": "FORM-SIDE-02",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Teilfehler, Wiederholungen, Timeouts, Idempotenz, Rollback beziehungsweise Kompensation und Nutzerkommunikation sind so festgelegt, dass kein unbemerkter falscher Erfolg oder unkontrolliertes Duplikat entsteht."
+    },
+    {
+      "id": "FORM-SIDE-03",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Deaktivierte oder falsch konfigurierte Integrationen werden früh und kontrolliert erkannt; sie melden nicht erfolgreich, wenn die fachlich zugesagte Wirkung ausbleibt."
+    },
+    {
+      "id": "FORM-SIDE-04",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "E-Mail-Absender, Envelope-From, Reply-To, Empfänger, Transportverschlüsselung und soweit relevant SPF-, DKIM- und DMARC-Ausrichtung entsprechen dem vereinbarten Versandweg."
+    },
+    {
+      "id": "FORM-SIDE-05",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Webhooks und administrative Endpunkte prüfen Secrets beziehungsweise Signaturen, Berechtigungen und Replay-/Missbrauchsrisiken; öffentliche Hilfsfunktionen sind gesondert begrenzt."
+    },
+    {
+      "id": "FORM-DATA-01",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Dauerhaft gespeicherte Formulardaten besitzen eine dokumentierte und technisch getestete Speicherfrist. Eine organisatorische Standardfrist wie 90 Tage wird nur angewandt, wenn sie für das Projekt gilt."
+    },
+    {
+      "id": "FORM-DATA-02",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Download- oder Freigabelinks sind ausreichend zufällig, zeitlich begrenzt, nicht erratbar und senden sensible Inhalte mit geeigneten Cacheheadern. Ablauf des Links und Löschung des Objekts werden getrennt geprüft."
+    },
+    {
+      "id": "FORM-UP-01",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Uploads begrenzen Dateigröße und erlaubte Typen, prüfen tatsächlichen Inhalt statt nur Dateiendung beziehungsweise Browser-MIME und verhindern Pfadmanipulation sowie ausführbare öffentliche Ablage."
+    },
+    {
+      "id": "FORM-UP-02",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Speicherung, Downloadberechtigung, Lifecycle, Löschung, Malware-/Missbrauchsrisiko und Verhalten nach Redeployment sind für Uploads getestet."
+    },
+    {
+      "id": "FORM-TEST-01",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Unit- und Integrationstests decken Validierung, Berechtigung, Missbrauchsschutz, Fehlerfälle und Nebenwirkungsgrenzen ab."
+    },
+    {
+      "id": "FORM-TEST-02",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Ungültige öffentliche Stichproben enden nachweislich vor E-Mail-, Datenbank-, Object-Storage-, Kalender-, Telegram- oder sonstiger externer Wirkung."
+    },
+    {
+      "id": "FORM-TEST-03",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Ein gültiger Produktionsend-to-end-Test mit Nebenwirkungen erfolgt nur nach ausdrücklicher Freigabe, mit eindeutigem Testdatensatz, Kontrolle aller Empfänger und anschließendem Bereinigungsnachweis. Wird er bewusst nicht durchgeführt, bleibt diese Grenze dokumentiert."
+    },
+    {
+      "id": "FORM-TEST-04",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Prüfskripte und Crawler senden nicht unbeabsichtigt Formulare ab und erzeugen keine E-Mails, Nachrichten oder Speicherobjekte."
+    },
+    {
+      "id": "FORM-TEST-05",
+      "module": "formulare-api-daten",
+      "source": "docs/checklisten/website/module/formulare-api-daten.md",
+      "statement": "Fremde beziehungsweise fehlende Origins, manipulierte weitergeleitete IP-Header und das öffentliche Rate-Limit-Verhalten wurden mit nachweislich nebenwirkungsfreien Anfragen geprüft; erwartete 4xx-Antworten und Schutzfenster sind protokolliert."
+    },
+    {
+      "id": "MEDIA-INV-01",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Ein Medieninventar erfasst mindestens Datei, Größe, aktive Verwendung, Darstellungszweck, Alternativtext, Rechte-/Freigabestatus, externes Original beziehungsweise Archiv und Entscheidung über Behalten, Ersetzen oder Löschen."
+    },
+    {
+      "id": "MEDIA-INV-02",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Technisches Inventar, redaktionelle Freigabe und Rechte-/Veröffentlichungsnachweis werden nicht miteinander gleichgesetzt."
+    },
+    {
+      "id": "MEDIA-INV-03",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Alternativtexte beschreiben den tatsächlich sichtbaren und kontextrelevanten Inhalt, wurden redaktionell geprüft und nicht ungeprüft aus Dateinamen erzeugt. Dekorative Medien besitzen eine passende leere Alternative beziehungsweise bleiben außerhalb des Accessibility Trees."
+    },
+    {
+      "id": "MEDIA-INV-04",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Nicht referenzierte Medien und Originaldateien im öffentlichen Verzeichnis wurden entfernt oder mit Zweck begründet. Vor einer Löschung ist der notwendige externe Original- oder Archivbestand bestätigt."
+    },
+    {
+      "id": "MEDIA-IMG-01",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Jedes ausgelieferte Bild ist auf den tatsächlich benötigten maximalen Darstellungsumfang zugeschnitten und sinnvoll komprimiert; Schärfe und Farbdarstellung wurden auf Desktop und Mobil geprüft."
+    },
+    {
+      "id": "MEDIA-IMG-02",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Moderne Formate wie AVIF oder WebP werden soweit sinnvoll eingesetzt; erforderliche Fallbacks und bewusst verlinkte Originaldownloads funktionieren."
+    },
+    {
+      "id": "MEDIA-IMG-03",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Große oder mehrfach verwendete Bilder besitzen passende responsive Quellen, `srcset`/`sizes` oder eine gleichwertige Frameworkoptimierung."
+    },
+    {
+      "id": "MEDIA-IMG-04",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Breite und Höhe beziehungsweise Seitenverhältnis sind festgelegt, sodass keine vermeidbaren Layoutverschiebungen entstehen."
+    },
+    {
+      "id": "MEDIA-IMG-05",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Unmittelbar sichtbare LCP-Medien werden rechtzeitig geladen; nicht sichtbare Medien laden verzögert, ohne wichtige Interaktionen unnötig warten zu lassen."
+    },
+    {
+      "id": "MEDIA-IMG-06",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Dynamische Bildtransformationen wurden im Produktionsdeployment auf Format, Maße, Qualität, Cacheheader und Verhalten nach Neustart beziehungsweise Redeployment geprüft. Ein erfolgreicher lokaler Build genügt nicht."
+    },
+    {
+      "id": "MEDIA-PERF-01",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Transfer und Requestanzahl wurden getrennt für Initialaufruf, ersten Scroll, Galerie-/Dialogöffnung und weitere wesentliche Interaktionen betrachtet. Später gestartete Transfers werden nicht allein deshalb akzeptiert, weil ein Initial-Lighthouse-Lauf sie nicht erfasst."
+    },
+    {
+      "id": "MEDIA-PERF-02",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Preload-, Idle-, Scroll- und Proximity-Ladestrategien besitzen ein nachvollziehbares Budget und laden nicht ohne fachlichen Grund ganze Originalbestände."
+    },
+    {
+      "id": "MEDIA-PERF-03",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Große Galerien öffnen ohne leere, unscharfe oder unsichtbare Zwischenzustände; Vor- und Zurücknavigation, direktes Anspringen und wiederholtes Öffnen funktionieren."
+    },
+    {
+      "id": "MEDIA-PERF-04",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Bilder und Einbettungen wurden mit echten GET-Abrufen beziehungsweise im Browser geprüft, wenn HEAD-Anfragen das tatsächliche Transformations- oder Cacheverhalten nicht zuverlässig abbilden."
+    },
+    {
+      "id": "MEDIA-VID-01",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Videos besitzen sinnvolle Auflösung, Bitrate, Laufzeit und Dateigröße sowie Posterbild und verständliche Bedienung."
+    },
+    {
+      "id": "MEDIA-VID-02",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Inhaltlich erforderliche Untertitel, Transkripte oder gleichwertige Textalternativen sind vorhanden."
+    },
+    {
+      "id": "MEDIA-VID-03",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Große Videos oder Audiodateien werden nicht ohne fachlichen Grund automatisch vollständig geladen; Autoplay mit Ton wird nicht eingesetzt."
+    },
+    {
+      "id": "MEDIA-MOT-01",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Animationen verdecken keine wesentlichen Inhalte bis zur JavaScriptinitialisierung und entfernen unsichtbare Bedienelemente aus Fokus- und Accessibility-Reihenfolge."
+    },
+    {
+      "id": "MEDIA-MOT-02",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Unter `prefers-reduced-motion: reduce` entfallen wesentliche Entrance-, Scroll-, Parallax-, Smooth-Scroll- und Kreuzblendeeffekte oder werden durch diskrete Zustände ersetzt; der vollständige Inhalt bleibt sichtbar."
+    },
+    {
+      "id": "MEDIA-MOT-03",
+      "module": "medien-animationen",
+      "source": "docs/checklisten/website/module/medien-animationen.md",
+      "statement": "Saisonale, responsive, zufällige oder anderweitig dynamisch ersetzte Medien wurden über mehrere Zustandswechsel vorwärts und rückwärts geprüft; Observer, Lazy Loading, Fokus und Dialogzuordnung bleiben intakt."
+    },
+    {
+      "id": "ENV-SEP-01",
+      "module": "umgebungen-domainmigration",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "statement": "Zweck, URL, Verantwortlichkeit, Konfigurationsmodus und gewünschte Indexierung jeder Umgebung sind in der Umgebungsübersicht dokumentiert."
+    },
+    {
+      "id": "ENV-SEP-02",
+      "module": "umgebungen-domainmigration",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "statement": "Nicht produktive Umgebungen sind bevorzugt zugriffsgeschützt. Soweit sie öffentlich erreichbar sein müssen, sind sie mindestens per passendem `X-Robots-Tag` beziehungsweise Meta-Robots von der Indexierung ausgeschlossen; `robots.txt` wird nicht als Zugriffsschutz missverstanden."
+    },
+    {
+      "id": "ENV-SEP-03",
+      "module": "umgebungen-domainmigration",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "statement": "Nicht indexierbare Umgebungen veröffentlichen keine indexierbare Sitemap und keinen irreführenden Sitemap-Verweis. Fehlerantworten tragen ebenfalls die vorgesehene Indexierungsrichtlinie."
+    },
+    {
+      "id": "ENV-SEP-04",
+      "module": "umgebungen-domainmigration",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "statement": "Canonical-, OpenGraph-, Sitemap- und interne URLs verwenden je Umgebung bewusst den festgelegten Host; Produktions- und Staginghosts gelangen nicht versehentlich in die jeweils andere Ausgabe."
+    },
+    {
+      "id": "ENV-SEP-05",
+      "module": "umgebungen-domainmigration",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "statement": "Umgebungsabhängige Dienste, Formulare, Analysefunktionen und Zugangsdaten sind getrennt und werden nicht allein durch eine Beispielkonfiguration aktiviert."
+    },
+    {
+      "id": "ENV-SEP-06",
+      "module": "umgebungen-domainmigration",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "statement": "Build und öffentlicher Abruf wurden für jede relevante Umgebung separat geprüft. Ein Nachweis einer Umgebung wird nicht auf eine andere übertragen."
+    },
+    {
+      "id": "ENV-MIG-01",
+      "module": "umgebungen-domainmigration",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "statement": "Bevorzugte endgültige Domain, vorläufig öffentliche Domain, Migrationszeitpunkt, Domaininhaberschaft, Registrar und DNS-Zuständigkeit sind dokumentiert."
+    },
+    {
+      "id": "ENV-MIG-02",
+      "module": "umgebungen-domainmigration",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "statement": "Während eines bewusst indexierbaren Übergangsbetriebs sind Canonicals, Sitemap und Social-URLs in sich konsistent; eine noch nicht erreichbare Zieldomain wird nicht vorzeitig als Canonical gesetzt."
+    },
+    {
+      "id": "ENV-MIG-03",
+      "module": "umgebungen-domainmigration",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "statement": "Für die Migration sind alte und neue Hosts, HTTP/HTTPS-Varianten, Pfad- und Queryerhalt, Redirectstatus und vermeidbare Zwischenstationen festgelegt und getestet."
+    },
+    {
+      "id": "ENV-MIG-04",
+      "module": "umgebungen-domainmigration",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "statement": "Nach der Migration werden Canonicals, interne Links, OpenGraph-URLs, Sitemap, Robots-Verweis, Zertifikate und Search-Console-Zuordnung gemeinsam auf den neuen Host umgestellt und öffentlich geprüft."
+    },
+    {
+      "id": "ENV-MIG-05",
+      "module": "umgebungen-domainmigration",
+      "source": "docs/checklisten/website/module/umgebungen-domainmigration.md",
+      "statement": "Alte Domains und Verifikationsdateien werden erst aufgegeben, wenn Eigentum, Weiterleitung und alternative Verifizierung belastbar bestätigt sind."
+    },
+    {
+      "id": "CONT-CTX-01",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Eine projektspezifische `.dockerignore` schließt mindestens Git-Historie, lokale Abhängigkeiten und Buildausgaben, Caches, Logs, lokale Laufzeitdaten und unverschlüsselte Secrets aus."
+    },
+    {
+      "id": "CONT-CTX-02",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Nicht benötigte Betriebsunterlagen und Tests werden nur ausgeschlossen, wenn der Produktionsbuild sie nachweislich nicht verwendet. Build, Tests und zentrale Produktionspfade wurden anschließend erneut geprüft."
+    },
+    {
+      "id": "CONT-CTX-03",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Größe und Inhalt des lokal simulierten Buildkontexts sind plausibel; soweit die Plattform dies ausweist, wurden zusätzlich die tatsächlich übertragene Kontextgröße oder das effektive Buildlog kontrolliert."
+    },
+    {
+      "id": "CONT-PLAN-01",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Automatisch erzeugte Buildpläne und erkannte Systempakete wurden auf tatsächlichen Bedarf und Fehlalarme geprüft. Browser, Medienwerkzeuge, Init-Systeme oder GUI-Bibliotheken werden nicht allein aufgrund ungenauer Heuristiken installiert."
+    },
+    {
+      "id": "CONT-PLAN-02",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Bei generierten Buildsystemen wurden Werkzeugversion, zusammengeführter effektiver Plan, Installations-, Build- und Startkommando sowie tatsächlich ausgeführte Setup-Phasen protokolliert; die Konfigurationsdatei allein gilt nicht als effektiver Plan."
+    },
+    {
+      "id": "CONT-VAL-01",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Dockerfile und Build wurden mindestens mit `docker build --check .` und einem vollständigen Build geprüft; Warnungen, Buildkontext und verwendete Basisimages wurden ausgewertet."
+    },
+    {
+      "id": "CONT-IMG-01",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Ein mehrstufiger Build hält Quellcode, Entwicklungsabhängigkeiten und Buildwerkzeuge aus dem finalen Image heraus; das Laufzeitstadium enthält nur benötigte Artefakte."
+    },
+    {
+      "id": "CONT-IMG-02",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Basisimage und Laufzeit sind mit unterstützter exakter Version und möglichst unveränderlichem Digest reproduzierbar festgelegt. Architektur, native Artefakte und gemeinsamer Aktualisierungsweg für Version und Digest sind geprüft."
+    },
+    {
+      "id": "CONT-IMG-03",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Arbeitsverzeichnis, Startkommando und Benutzer sind ausdrücklich festgelegt; der Laufzeitcontainer arbeitet soweit technisch möglich ohne Rootrechte."
+    },
+    {
+      "id": "CONT-IMG-04",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Tatsächliche Laufzeitversion, Architektur, UID, Startkommando und enthaltene Laufzeitartefakte wurden im laufenden Container geprüft und nicht nur aus Buildkonfiguration oder funktionierenden nativen Funktionen abgeleitet."
+    },
+    {
+      "id": "CONT-IMG-05",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Nach dem Deployment wurde bestätigt, dass Service beziehungsweise Container exakt das vorgesehene aktuelle Produktionsimage verwenden."
+    },
+    {
+      "id": "CONT-IMG-06",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Finale Image-ID, komprimierte beziehungsweise serverseitig ausgewiesene Größe und Dateibestand des Laufzeit-Arbeitsverzeichnisses wurden kontrolliert; unnötiger Quellcode, Tests und Buildwerkzeuge fehlen."
+    },
+    {
+      "id": "CONT-SEC-01",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Build- und Laufzeitkonfiguration sind getrennt. Laufzeit-Secrets werden weder als Docker-`ARG` noch als dauerhafte Image-`ENV` geschrieben."
+    },
+    {
+      "id": "CONT-SEC-02",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Nur tatsächlich während des Builds benötigte Geheimnisse werden über einen vorgesehenen Secret-Mount bereitgestellt; Image-Konfiguration und Buildprotokoll wurden ohne Ausgabe geheimer Werte kontrolliert."
+    },
+    {
+      "id": "CONT-SEC-03",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Ohne Ausgabe von Werten wurde bestätigt, dass das Image keine Anwendungs-Secrets enthält und alle benötigten Laufzeitvariablen ausschließlich im laufenden Container vorhanden sind."
+    },
+    {
+      "id": "CONT-SEC-04",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Falls Geheimnisse früher in Images, Layern oder Build-Caches lagen, wurde zuerst ein secretfreies Ersatzimage produktiv bestätigt. Danach wurden Zugangsdaten rotiert und betroffene Altimages und Caches gezielt entfernt; Volumes wurden nicht pauschal bereinigt."
+    },
+    {
+      "id": "CONT-SEC-05",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Image-Konfiguration, Historie und relevante Buildausgaben wurden gezielt und ohne Ausgabe von Werten auf dauerhafte Secrets, Buildargumente und unerwünschte Umgebungsvariablen geprüft; ungefilterte Inspektionsdumps werden nicht protokolliert."
+    },
+    {
+      "id": "CONT-NET-01",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Anwendung, Reverse Proxy und Providergrenzen sind dokumentiert. Interne Anwendungsports sind nicht unbeabsichtigt direkt öffentlich erreichbar."
+    },
+    {
+      "id": "CONT-NET-02",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Weitergeleitete Client-IP-Header werden nur aus der vertrauenswürdigen Proxykette übernommen; die effektive Bereinigung beziehungsweise Überschreibung wurde risikogerecht praktisch geprüft."
+    },
+    {
+      "id": "CONT-OPS-01",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Containerstatus, Neustartverhalten, Ressourcenverbrauch, freier Speicher und wachstumsrelevante Logs beziehungsweise Caches wurden geprüft. Bereinigungen gefährden keine aktiven Images oder persistenten Volumes."
+    },
+    {
+      "id": "CONT-OPS-02",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Deploymentkonfiguration benennt Repository-Wurzel, Dockerfile, Stage, Buildargumente, Build-Secrets und Laufzeitvariablen eindeutig; nicht benötigte Felder und erzeugte `.env`-Dateien bleiben leer beziehungsweise deaktiviert."
+    },
+    {
+      "id": "CONT-OPS-03",
+      "module": "container-deployment",
+      "source": "docs/checklisten/website/module/container-deployment.md",
+      "statement": "Ein für die tatsächlich verwendete Infrastruktur dokumentierter, ausschließlich lesender Statuscheck wurde ausgeführt oder seine Nichtanwendbarkeit begründet. Werkzeug und Zugriffsgrenze werden benannt; Zugangsdaten, Serveradressen und ungefilterte Ausgaben werden nicht versioniert."
+    },
+    {
+      "id": "DATA-MIG-01",
+      "module": "datenbetrieb-wiederherstellung",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "statement": "Schema, Datenarten, Verantwortlichkeiten und produktiv verwendete Datenbank beziehungsweise Speicherziele sind dokumentiert."
+    },
+    {
+      "id": "DATA-MIG-02",
+      "module": "datenbetrieb-wiederherstellung",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "statement": "Migrationen sind versioniert und sowohl gegen eine leere Umgebung als auch als Upgrade vom maßgeblichen Vorgängerstand geprüft."
+    },
+    {
+      "id": "DATA-MIG-03",
+      "module": "datenbetrieb-wiederherstellung",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "statement": "Vor riskanten Migrationen bestehen ein geeigneter Sicherungs- und Rückfallplan sowie klare Abbruchkriterien. Irreversible Schritte sind ausdrücklich gekennzeichnet."
+    },
+    {
+      "id": "DATA-MIG-04",
+      "module": "datenbetrieb-wiederherstellung",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "statement": "Parallelität, Eindeutigkeit, Transaktionen und Konfliktfälle zentraler Schreibvorgänge wurden geprüft; reine UI-Prüfungen ersetzen keine server- beziehungsweise datenbankseitige Absicherung."
+    },
+    {
+      "id": "DATA-MIG-05",
+      "module": "datenbetrieb-wiederherstellung",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "statement": "Der projektspezifische Migrations- beziehungsweise Schemaprüfbefehl, Werkzeugversion und benötigte sichere Konfiguration sind in der Validierungsmatrix dokumentiert und wurden ohne Ausgabe von Zugangsdaten ausgeführt."
+    },
+    {
+      "id": "DATA-RET-01",
+      "module": "datenbetrieb-wiederherstellung",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "statement": "Speicherfristen sind je Datenart dokumentiert und technisch umgesetzt; vertragliche oder projektspezifische Vorgaben werden nicht als allgemeine gesetzliche Frist dargestellt."
+    },
+    {
+      "id": "DATA-RET-02",
+      "module": "datenbetrieb-wiederherstellung",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "statement": "Löschung wird unabhängig von seltenen Nutzerzugriffen zuverlässig ausgelöst, ist wiederholbar und begrenzt auch Hilfszustände wie Rate-Limit-, Session- oder Downloaddatensätze."
+    },
+    {
+      "id": "DATA-RET-03",
+      "module": "datenbetrieb-wiederherstellung",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "statement": "Ablauf von Downloadlinks, Sessions oder Freigaben und die tatsächliche Löschung der zugrunde liegenden Objekte werden getrennt geprüft."
+    },
+    {
+      "id": "DATA-REC-01",
+      "module": "datenbetrieb-wiederherstellung",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "statement": "Backupumfang, Häufigkeit, Aufbewahrung, Verschlüsselung, Speicherort, Zuständigkeit und ausdrücklich nicht gesicherte Bestandteile sind dokumentiert."
+    },
+    {
+      "id": "DATA-REC-02",
+      "module": "datenbetrieb-wiederherstellung",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "statement": "Wiederherstellung umfasst neben Daten auch benötigte Konfiguration, Secrets, DNS-/Proxygrenzen und externe Abhängigkeiten oder benennt deren getrennte Wiederbeschaffung."
+    },
+    {
+      "id": "DATA-REC-03",
+      "module": "datenbetrieb-wiederherstellung",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "statement": "Ein Wiederherstellungstest beziehungsweise risikogerechter Neuaufbau auf einer leeren Umgebung wurde mit Datum, Dauer, Ergebnis und offenen Grenzen dokumentiert. Das bloße Vorhandensein eines Backups genügt nicht."
+    },
+    {
+      "id": "DATA-REC-04",
+      "module": "datenbetrieb-wiederherstellung",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "statement": "Rollback und Wiederanlauf auf einen bekannten Anwendungs- und Datenstand sind beschrieben; Zuständigkeit und zulässiger Datenverlust beziehungsweise Ausfallzeit sind transparent."
+    },
+    {
+      "id": "DATA-OPS-01",
+      "module": "datenbetrieb-wiederherstellung",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "statement": "Erreichbarkeit, Zertifikatsablauf, Speicher, Datenbankzustand, fehlgeschlagene Jobs und relevante Integrationen werden angemessen überwacht oder bewusst mit dokumentierter Zuständigkeit manuell geprüft."
+    },
+    {
+      "id": "DATA-OPS-02",
+      "module": "datenbetrieb-wiederherstellung",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "statement": "Betriebslogs und Fehlermeldungen erlauben eine Diagnose ohne unnötige personenbezogene Inhalte oder Secrets; Zugriff, Aufbewahrung und Löschung sind geregelt."
+    },
+    {
+      "id": "DATA-OPS-03",
+      "module": "datenbetrieb-wiederherstellung",
+      "source": "docs/checklisten/website/module/datenbetrieb-wiederherstellung.md",
+      "statement": "Wiederherstellungs-, Rotations- und Wartungsanweisungen verwenden keine im Repository gespeicherten Serveradressen oder Zugangsdaten, sofern sichere lokale Aliasse beziehungsweise Secret-Systeme vorgesehen sind."
+    },
+    {
+      "id": "CORE-DOC-01",
+      "module": "abschluss",
+      "source": "docs/checklisten/website/abschluss.md",
+      "statement": "Die Projektkopie und das fortlaufende Prüfprotokoll stimmen beim Abschluss hinsichtlich Status, Produktionsstand und offenen Folgen überein."
+    },
+    {
+      "id": "CORE-DOC-02",
+      "module": "abschluss",
+      "source": "docs/checklisten/website/abschluss.md",
+      "statement": "Die Projektkopie wurde gegen den aktuellen Stand der Quellvorlage verglichen; übernommene Änderungen und bewusst noch nicht übernommene Vorlagendeltas sind dokumentiert."
+    },
+    {
+      "id": "CORE-DOC-03",
+      "module": "abschluss",
+      "source": "docs/checklisten/website/abschluss.md",
+      "statement": "Bei späteren Änderungen wurden die Projektcheckliste und alle betroffenen Rechtstexte, Datenflüsse, SEO-/Social-Metadaten, Medien und ausgewählten Fachmodule erneut geprüft. Die allgemeine Vorlage wird nicht als Projektnachweis verwendet."
+    }
+  ]
+}

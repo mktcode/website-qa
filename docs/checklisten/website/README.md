@@ -3,6 +3,8 @@
 > **Wiederverwendbare operative Vorlage – kein projektspezifischer Prüfnachweis.** Die Dateien dieses Verzeichnisses werden nicht für ein konkretes Projekt abgehakt oder mit Projektdaten gefüllt. Für jedes Projekt wird daraus eine eigenständige, versionierte Projektcheckliste erstellt.
 >
 > Die Vorlage begründet keine rechtliche, barrierefreie oder sicherheitstechnische Garantie. Besondere Anforderungen müssen ausdrücklich vereinbart werden. Aussagen zu Produktion, externen Konten und organisatorischen Abläufen dürfen nur mit belastbarem Nachweis abgeschlossen werden.
+>
+> Die technischen Werkzeuge lesen und verändern den Checkboxstatus niemals. Checklistenpunkte werden ausschließlich durch Menschen in der jeweiligen Projektkopie bearbeitet.
 
 ## Aufbau
 
@@ -46,17 +48,13 @@ Ein Commit, Push, erfolgreicher Build, Plattformstatus und öffentlicher Produkt
 
 Jeder Prüfpunkt besitzt eine fachliche Kennung wie `CORE-DOM-01`, `FORM-SEC-03` oder `CONT-IMG-02`. Diese Kennungen werden in Projektkopien, Protokollen und späteren Vorlagenrevisionen beibehalten. Neue Punkte erhalten neue Kennungen; bestehende Kennungen werden nicht für andere Aussagen wiederverwendet.
 
-### Strukturierter Basiskatalog
+### Technische Signale als Arbeitshilfe
 
-Unter [`../../../catalog/`](../../../catalog/) liegt ein bewusst begrenzter stabiler Basiskatalog für ausgewählte Punkte. Ein grober Checklistenpunkt wird dort in stabile Kriterien wie `CORE-DOM-08/C1` zerlegt. Jedes Kriterium legt fest, ob ein automatischer, manueller oder externer Nachweis erforderlich ist.
+Unter [`../../../catalog/checklist-index.json`](../../../catalog/checklist-index.json) liegt ein neutraler maschinenlesbarer Index aller 215 stabilen Kennungen. Er dient ausschließlich dazu, Informationsreferenzen technischer Signale zu prüfen. Er enthält keinen Projekt- oder Prüfstatus.
 
-Der HTTP-, Crawl-, Browser- und Social-Prüfer liefern atomare Prüfaussagen mit den Ergebnissen `pass`, `fail`, `inconclusive` oder `notApplicable`. Der HTTP-Prüfer strukturiert vorhandene Beobachtungen zur deklarierten Sicherheitsheaderbasis auf ausgewähltem HTML, 404, CSS und JavaScript, ohne daraus die inhaltliche Stärke der Richtlinien oder die Proxykonfiguration abzuleiten. Der Crawl bildet bereits vorhandene Beobachtungen zu Sitemap, internen Navigationen, Ressourcenstatus, MIME-Typen und Laufabdeckung strukturiert ab; externe Linkziele und interaktionsabhängige Ressourcen bleiben außerhalb seines Abrufumfangs. Der Browser inventarisiert zusätzlich externe Requestversuche sowie Cookies und Browser-Storage im passiven Initialzustand. Er führt externe Versuche nicht aus, speichert keine Cookie-/Storagewerte und ersetzt weder Quellcodeabgleich noch rechtliche, Einwilligungs- oder Cookieattribut-Bewertungen. Ein fehlender Befund gilt nicht als positiver Nachweis. Ein zusammengesetzter Punkt ist erst vollständig belegt, wenn alle erforderlichen Kriterien erfüllt sind. Insbesondere werden Infrastrukturzugänge, Betreiberentscheidungen, Kundenkommunikation, Freigaben, Medienrechte und redaktionelle Bewertungen nicht aus einem erfolgreichen technischen Lauf abgeleitet.
+HTTP-, Crawl-, Browser-, Social- und Lighthouse-Prüfer liefern begrenzte technische Signale mit `positive`, `defect`, `inconclusive` oder `notApplicable`. Ein positives Signal bedeutet nur, dass der konkrete Defekt im dokumentierten Umfang nicht beobachtet wurde. Ein Signal kann auf einen oder mehrere Punkte dieser Checkliste verweisen, hakt sie aber niemals ab und bewertet weder manuelle, rechtliche, organisatorische noch projektspezifische Anforderungen.
 
-Der Basiskatalog ersetzt diese vollständige Markdown-Vorlage nicht. Seine Stabilität bezeichnet IDs, Bedeutungen und Versionsregeln, nicht vollständige Abdeckung. Ein Konsistenztest hält die enthaltenen Punkttexte mit ihrer Markdown-Quelle synchron. Projektbezogene Modulauswahl, Nichtanwendbarkeit und nicht automatische Nachweise bleiben Teil der eigenständigen Projektakte.
-
-Die Reporting-Bibliothek kann technische JSON-Läufe und den strukturierten Projektnachweis zu einer JSON- und Markdown-Sicht zusammenführen. Sie startet keine Prüfer selbst. Die Auswertungsumgebung wird in der Projektkonfiguration festgelegt und die Ziel-URL gegen den technischen Bericht geprüft. Quell- und Deploymentstand sind projektseitig deklarierte Zuordnungen, keine unabhängige Werkzeugbestätigung. Workflowzustände wie `Extern`, `Zurückgestellt` oder `Akzeptierte Abweichung` bleiben von einem technischen `pass` getrennt und schließen einen offenen Punkt nicht als erfüllt ab.
-
-Für bewusst gestartete lokale Prüfserien kann die Bibliothek ein automatisch datiertes, standardmäßig ignoriertes Bundle aus vollständigen technischen JSON-Berichten, strukturierter Gesamtauswertung, vollständigem Markdown und Prüfsummenmanifest erzeugen. Eine getrennte datenarme Markdown-Zusammenfassung übernimmt nur allgemeine Statuszahlen, stabile Kennungen und Katalogtexte. Sie kann nach projektspezifischer Sichtprüfung versioniert werden. Vollständige Rohberichte, freie Nachweisnotizen oder interne Kontextangaben gehören nicht in diese Zusammenfassung.
+Die statischen Werkzeugberichte sind eine erste Temperaturmessung für die anschließende manuelle QA-Arbeit. Sie werden einzeln gelesen und bei Bedarf in der Projektkopie referenziert. Das Paket erzeugt keinen Projektgesamtstatus, keine Freigabe und kein Checklistenbundle.
 
 ## Anforderungen an Nachweise
 

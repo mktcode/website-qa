@@ -1,0 +1,648 @@
+{
+  "schemaVersion": 1,
+  "signals": [
+    {
+      "id": "http.redirect.permanent",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Die HTTP-Probe verwendet eine permanente Weiterleitung auf HTTPS.",
+      "checklistRefs": [
+        "CORE-DOM-02"
+      ]
+    },
+    {
+      "id": "http.redirect.path-query-preserved",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Die HTTP-Probe endet pfad- und queryerhaltend auf HTTPS.",
+      "checklistRefs": [
+        "CORE-DOM-02"
+      ]
+    },
+    {
+      "id": "http.redirect.chain-direct",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Die HTTP-Probe benötigt genau eine Weiterleitung.",
+      "checklistRefs": [
+        "CORE-DOM-07"
+      ]
+    },
+    {
+      "id": "https.redirect.no-downgrade",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Die Zielnavigation enthält keinen HTTPS-zu-HTTP-Downgrade.",
+      "checklistRefs": [
+        "CORE-DOM-07"
+      ]
+    },
+    {
+      "id": "https.redirect.chain-direct",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Die Zielnavigation benötigt höchstens eine Weiterleitung.",
+      "checklistRefs": [
+        "CORE-DOM-07"
+      ]
+    },
+    {
+      "id": "http.hsts.present",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Die untersuchte HTTPS-Antwort enthält Strict-Transport-Security.",
+      "checklistRefs": [
+        "CORE-DOM-08",
+        "CORE-ERR-04",
+        "CORE-SEC-04",
+        "CORE-SEC-05"
+      ]
+    },
+    {
+      "id": "http.hsts.max-age-adequate",
+      "version": 1,
+      "tool": "http-check",
+      "description": "HSTS enthält einen gültigen max-age von mindestens 180 Tagen.",
+      "checklistRefs": [
+        "CORE-DOM-08",
+        "CORE-ERR-04",
+        "CORE-SEC-04",
+        "CORE-SEC-05"
+      ]
+    },
+    {
+      "id": "http.security.csp-declared",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Content-Security-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
+      "checklistRefs": [
+        "CORE-ERR-04",
+        "CORE-SEC-04",
+        "CORE-SEC-05"
+      ]
+    },
+    {
+      "id": "http.security.framing-protection-present",
+      "version": 1,
+      "tool": "http-check",
+      "description": "CSP frame-ancestors oder X-Frame-Options begrenzt Framing auf den ausgewählten dokumentartigen Antworten.",
+      "checklistRefs": [
+        "CORE-ERR-04",
+        "CORE-SEC-04",
+        "CORE-SEC-05"
+      ]
+    },
+    {
+      "id": "http.security.nosniff-valid",
+      "version": 1,
+      "tool": "http-check",
+      "description": "X-Content-Type-Options ist auf den ausgewählten Antworten wirksam als nosniff deklariert.",
+      "checklistRefs": [
+        "CORE-ERR-04",
+        "CORE-SEC-04",
+        "CORE-SEC-05"
+      ]
+    },
+    {
+      "id": "http.security.referrer-policy-declared",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Referrer-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
+      "checklistRefs": [
+        "CORE-ERR-04",
+        "CORE-SEC-04",
+        "CORE-SEC-05"
+      ]
+    },
+    {
+      "id": "http.security.permissions-policy-declared",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Permissions-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
+      "checklistRefs": [
+        "CORE-ERR-04",
+        "CORE-SEC-04",
+        "CORE-SEC-05"
+      ]
+    },
+    {
+      "id": "http.security.document-response-coverage-complete",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Die relevanten Sicherheitsheader wurden auf allen ausgewählten dokumentartigen Antworten beobachtet.",
+      "checklistRefs": [
+        "CORE-SEC-05"
+      ]
+    },
+    {
+      "id": "http.security.selected-response-coverage-complete",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Die relevanten Sicherheitsheader wurden auf allen ausgewählten Antwortklassen beobachtet.",
+      "checklistRefs": [
+        "CORE-DOM-08",
+        "CORE-ERR-04",
+        "CORE-SEC-04",
+        "CORE-SEC-05"
+      ]
+    },
+    {
+      "id": "error.not-found.status-404",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Der unbekannte Pfad antwortet mit HTTP 404.",
+      "checklistRefs": [
+        "CORE-ERR-01",
+        "CORE-SEC-07"
+      ]
+    },
+    {
+      "id": "error.not-found.no-technical-details",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Die automatische Stichprobe erkennt keine typischen technischen Interna.",
+      "checklistRefs": [
+        "CORE-ERR-01",
+        "CORE-SEC-07"
+      ]
+    },
+    {
+      "id": "error.not-found.noindex",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Die 404-Antwort enthält noindex.",
+      "checklistRefs": [
+        "CORE-ERR-02",
+        "CORE-ERR-04"
+      ]
+    },
+    {
+      "id": "error.not-found.no-url-metadata",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Die 404-Antwort enthält weder Canonical noch og:url.",
+      "checklistRefs": [
+        "CORE-ERR-02"
+      ]
+    },
+    {
+      "id": "compression.identity.valid",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Die Identity-Variante ist erfolgreich und nicht komprimiert.",
+      "checklistRefs": [
+        "CORE-PERF-01"
+      ]
+    },
+    {
+      "id": "compression.gzip.effective",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Gzip ist für eine geeignete Ressource gültig, variiert und wirksam.",
+      "checklistRefs": [
+        "CORE-PERF-01"
+      ]
+    },
+    {
+      "id": "compression.br.effective",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Brotli ist für eine geeignete Ressource gültig, variiert und wirksam.",
+      "checklistRefs": [
+        "CORE-PERF-01"
+      ]
+    },
+    {
+      "id": "cache.versioned-asset.immutable",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Ein versioniert wirkendes Asset besitzt langfristiges immutable-Caching.",
+      "checklistRefs": [
+        "CORE-PERF-05"
+      ]
+    },
+    {
+      "id": "cache.not-found.not-publicly-cacheable",
+      "version": 1,
+      "tool": "http-check",
+      "description": "Die 404-Antwort ist nicht ausdrücklich langfristig öffentlich cachebar.",
+      "checklistRefs": [
+        "CORE-ERR-04",
+        "CORE-PERF-05"
+      ]
+    },
+    {
+      "id": "crawl.canonical.single-absolute",
+      "version": 1,
+      "tool": "crawl-check",
+      "description": "Alle geprüften indexierbaren Seiten besitzen genau einen absoluten Canonical.",
+      "checklistRefs": [
+        "CORE-DOM-05"
+      ]
+    },
+    {
+      "id": "crawl.canonical.matches-final-url",
+      "version": 1,
+      "tool": "crawl-check",
+      "description": "Alle geprüften Canonicals entsprechen der jeweiligen finalen Seiten-URL.",
+      "checklistRefs": [
+        "CORE-DOM-05",
+        "CORE-DOM-06"
+      ]
+    },
+    {
+      "id": "crawl.metadata.title-present",
+      "version": 1,
+      "tool": "crawl-check",
+      "description": "Alle geprüften Seiten besitzen einen Seitentitel.",
+      "checklistRefs": [
+        "CORE-SEO-01"
+      ]
+    },
+    {
+      "id": "crawl.metadata.description-single",
+      "version": 1,
+      "tool": "crawl-check",
+      "description": "Alle geprüften Seiten besitzen genau eine Meta-Beschreibung.",
+      "checklistRefs": [
+        "CORE-SEO-01"
+      ]
+    },
+    {
+      "id": "crawl.metadata.unique",
+      "version": 1,
+      "tool": "crawl-check",
+      "description": "Titel und Meta-Beschreibungen sind unter den geprüften indexierbaren Seiten eindeutig.",
+      "checklistRefs": [
+        "CORE-SEO-01"
+      ]
+    },
+    {
+      "id": "crawl.document.language-present",
+      "version": 1,
+      "tool": "crawl-check",
+      "description": "Alle geprüften Seiten besitzen ein lang-Attribut.",
+      "checklistRefs": [
+        "CORE-SEO-02"
+      ]
+    },
+    {
+      "id": "crawl.document.single-h1",
+      "version": 1,
+      "tool": "crawl-check",
+      "description": "Alle geprüften Seiten besitzen genau eine H1-Überschrift.",
+      "checklistRefs": [
+        "CORE-SEO-02"
+      ]
+    },
+    {
+      "id": "crawl.sitemap.file-valid",
+      "version": 1,
+      "tool": "crawl-check",
+      "description": "Die geprüften Sitemap-Dateien sind direkt als erfolgreiche, gültige XML-Antworten mit passendem Medientyp verfügbar.",
+      "checklistRefs": [
+        "CORE-MAP-01",
+        "CORE-MAP-02"
+      ]
+    },
+    {
+      "id": "crawl.sitemap.robots-reference-present",
+      "version": 1,
+      "tool": "crawl-check",
+      "description": "robots.txt referenziert die geprüfte Sitemap.",
+      "checklistRefs": [
+        "CORE-MAP-01"
+      ]
+    },
+    {
+      "id": "crawl.sitemap.entries-valid",
+      "version": 1,
+      "tool": "crawl-check",
+      "description": "Die geprüfte Sitemap enthält ausschließlich eindeutige, absolute, kanonische, indexierbare 200-URLs des Zielorigins.",
+      "checklistRefs": [
+        "CORE-MAP-01",
+        "CORE-MAP-02"
+      ]
+    },
+    {
+      "id": "crawl.sitemap.coverage-complete",
+      "version": 1,
+      "tool": "crawl-check",
+      "description": "Alle gültig erfassten Sitemap-URLs wurden innerhalb der dokumentierten Limits geprüft.",
+      "checklistRefs": [
+        "CORE-MAP-02"
+      ]
+    },
+    {
+      "id": "crawl.navigation.internal-valid",
+      "version": 1,
+      "tool": "crawl-check",
+      "description": "Die geprüften internen Seiten- und Fragmentziele sind erfolgreich erreichbar.",
+      "checklistRefs": [
+        "CORE-QA-05",
+        "CORE-SEO-04"
+      ]
+    },
+    {
+      "id": "crawl.navigation.internal-direct",
+      "version": 1,
+      "tool": "crawl-check",
+      "description": "Die geprüften internen Seitenziele sind ohne Weiterleitung direkt erreichbar.",
+      "checklistRefs": [
+        "CORE-SEO-04"
+      ]
+    },
+    {
+      "id": "crawl.resources.status-valid",
+      "version": 1,
+      "tool": "crawl-check",
+      "description": "Die geprüften internen Ressourcen antworten erfolgreich.",
+      "checklistRefs": [
+        "CORE-ERR-03",
+        "CORE-QA-05",
+        "CORE-QA-08",
+        "CORE-SEO-04"
+      ]
+    },
+    {
+      "id": "crawl.resources.mime-valid",
+      "version": 1,
+      "tool": "crawl-check",
+      "description": "Die geprüften internen Ressourcen verwenden zum Einbindungszweck passende MIME-Typen.",
+      "checklistRefs": [
+        "CORE-ERR-03",
+        "CORE-QA-08",
+        "CORE-SEO-04"
+      ]
+    },
+    {
+      "id": "crawl.run.coverage-complete",
+      "version": 1,
+      "tool": "crawl-check",
+      "description": "Der Crawl blieb innerhalb seiner Grenzen und ließ keine Navigation aus Sicherheitsgründen aus.",
+      "checklistRefs": [
+        "CORE-SEO-04"
+      ]
+    },
+    {
+      "id": "crawl.media.get-observation-complete",
+      "version": 1,
+      "tool": "crawl-check",
+      "description": "Für alle im geprüften Seitenumfang entdeckten internen Bild- und Medienressourcen liegt eine begrenzte GET-Antwortbeobachtung vor.",
+      "checklistRefs": [
+        "MEDIA-PERF-04"
+      ]
+    },
+    {
+      "id": "browser.document.main-landmark-single",
+      "version": 1,
+      "tool": "browser-check",
+      "description": "Alle geprüften Seiten-/Profil-Läufe besitzen genau ein Main-Landmark.",
+      "checklistRefs": [
+        "CORE-A11Y-01"
+      ]
+    },
+    {
+      "id": "browser.viewport.narrow-zoom-no-horizontal-overflow",
+      "version": 1,
+      "tool": "browser-check",
+      "description": "Die schmalen und 200-%-Näherungsprofile weisen keinen horizontalen Dokumentüberlauf auf.",
+      "checklistRefs": [
+        "CORE-A11Y-10"
+      ]
+    },
+    {
+      "id": "browser.accessibility.axe-no-detected-violations",
+      "version": 1,
+      "tool": "browser-check",
+      "description": "Der Axe-Audit wurde ausgeführt und hat auf den geprüften Seiten-/Profil-Läufen keine Verstöße erkannt.",
+      "checklistRefs": [
+        "CORE-A11Y-13"
+      ]
+    },
+    {
+      "id": "browser.accessibility.control-names-no-detected-violations",
+      "version": 1,
+      "tool": "browser-check",
+      "description": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine fehlenden zugänglichen Namen für Links und Schaltflächen erkannt.",
+      "checklistRefs": [
+        "CORE-A11Y-03"
+      ]
+    },
+    {
+      "id": "browser.accessibility.visually-hidden-focusable-controls-no-detected-violations",
+      "version": 1,
+      "tool": "browser-check",
+      "description": "Axe hat im passiven Initialzustand keine fokussierbaren Bedienelemente innerhalb vor assistiver Technik verborgener Bereiche erkannt.",
+      "checklistRefs": [
+        "CORE-A11Y-04"
+      ]
+    },
+    {
+      "id": "browser.accessibility.form-control-labels-no-detected-violations",
+      "version": 1,
+      "tool": "browser-check",
+      "description": "Axe hat im passiven Initialzustand keine fehlenden oder mehrdeutigen programmatischen Formularbeschriftungen erkannt.",
+      "checklistRefs": [
+        "CORE-A11Y-06"
+      ]
+    },
+    {
+      "id": "browser.accessibility.links-not-color-only-no-detected-violations",
+      "version": 1,
+      "tool": "browser-check",
+      "description": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine ausschließlich durch Farbe unterscheidbaren Links erkannt.",
+      "checklistRefs": [
+        "CORE-A11Y-03"
+      ]
+    },
+    {
+      "id": "browser.accessibility.image-alternatives-no-detected-violations",
+      "version": 1,
+      "tool": "browser-check",
+      "description": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine technisch fehlenden Bildalternativen erkannt.",
+      "checklistRefs": [
+        "CORE-A11Y-08"
+      ]
+    },
+    {
+      "id": "browser.accessibility.text-contrast-no-detected-violations",
+      "version": 1,
+      "tool": "browser-check",
+      "description": "Axe hat im passiven Zustand der geprüften Seiten-/Profil-Läufe keine Textkontrastverstöße erkannt.",
+      "checklistRefs": [
+        "CORE-A11Y-09"
+      ]
+    },
+    {
+      "id": "browser.context.chromium-headless-recorded",
+      "version": 1,
+      "tool": "browser-check",
+      "description": "Chromium-Version und ausgeführte Headless-Emulationsprofile sind dokumentiert.",
+      "checklistRefs": [
+        "CORE-QA-02"
+      ]
+    },
+    {
+      "id": "browser.run.read-only-boundaries-enforced",
+      "version": 1,
+      "tool": "browser-check",
+      "description": "Die ausgeführten passiven Browserprofile belegen vor Navigation installierte DOM- und Requestgrenzen; kein Nicht-GET- oder externer Request wurde zugelassen.",
+      "checklistRefs": [
+        "FORM-TEST-04"
+      ]
+    },
+    {
+      "id": "browser.runtime.no-observed-errors",
+      "version": 1,
+      "tool": "browser-check",
+      "description": "In den geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet.",
+      "checklistRefs": [
+        "CORE-QA-07",
+        "CORE-SEC-07"
+      ]
+    },
+    {
+      "id": "browser.privacy.external-request-observation-complete",
+      "version": 1,
+      "tool": "browser-check",
+      "description": "Externe Requestversuche wurden innerhalb der deklarierten passiven Prüfumgebung vollständig inventarisiert und weiterhin blockiert.",
+      "checklistRefs": [
+        "CORE-PRIV-02"
+      ]
+    },
+    {
+      "id": "browser.privacy.initial-storage-observation-complete",
+      "version": 1,
+      "tool": "browser-check",
+      "description": "Cookies und Browser-Storage wurden im passiven Initialzustand ohne Werte vollständig inventarisiert.",
+      "checklistRefs": [
+        "CORE-PRIV-04"
+      ]
+    },
+    {
+      "id": "social.metadata.open-graph-complete",
+      "version": 1,
+      "tool": "social-preview-check",
+      "description": "Die geprüften Seiten besitzen eindeutige OpenGraph-Pflichtfelder mit absoluten HTTPS-URLs für og:url und og:image.",
+      "checklistRefs": [
+        "CORE-SOC-01"
+      ]
+    },
+    {
+      "id": "social.metadata.twitter-card-valid",
+      "version": 1,
+      "tool": "social-preview-check",
+      "description": "twitter:card sowie erforderliche X-/Twitter-Werte oder OpenGraph-Fallbacks sind technisch verwendbar.",
+      "checklistRefs": [
+        "CORE-SOC-01"
+      ]
+    },
+    {
+      "id": "social.metadata.canonical-open-graph-consistent",
+      "version": 1,
+      "tool": "social-preview-check",
+      "description": "Canonical, finale Seiten-URL und og:url sind eindeutig und stimmen überein.",
+      "checklistRefs": [
+        "CORE-DOM-06",
+        "CORE-SOC-02"
+      ]
+    },
+    {
+      "id": "social.crawlers.html-metadata-consistent",
+      "version": 1,
+      "tool": "social-preview-check",
+      "description": "Browser, Facebook, X/Twitter und LinkedIn erhalten erfolgreiche, konsistente HTML-Antworten und Social-Metadaten.",
+      "checklistRefs": [
+        "CORE-SOC-02"
+      ]
+    },
+    {
+      "id": "social.images.preview-technically-valid",
+      "version": 1,
+      "tool": "social-preview-check",
+      "description": "Die vorgesehenen Vorschaubilder erfüllen die geprüften technischen Anforderungen.",
+      "checklistRefs": [
+        "CORE-SOC-02"
+      ]
+    },
+    {
+      "id": "social.robots.file-retrievable",
+      "version": 1,
+      "tool": "social-preview-check",
+      "description": "robots.txt wurde erfolgreich abgerufen und ausgewertet.",
+      "checklistRefs": [
+        "CORE-ROB-01"
+      ]
+    },
+    {
+      "id": "social.robots.social-crawlers-allowed",
+      "version": 1,
+      "tool": "social-preview-check",
+      "description": "Die vorgesehenen Social-Crawler sind für die geprüften Seiten nicht blockiert.",
+      "checklistRefs": [
+        "CORE-ROB-01"
+      ]
+    },
+    {
+      "id": "social.robots.policy-matrix-recorded",
+      "version": 1,
+      "tool": "social-preview-check",
+      "description": "Crawler-/Produktkennungen, Kategorien, erlaubte und blockierte Trainings-/Datennutzungstokens, offizielle Quellen und Quellenstand sind dokumentiert; die Freigabeentscheidung bleibt manuell.",
+      "checklistRefs": [
+        "CORE-ROB-02",
+        "CORE-ROB-03",
+        "CORE-ROB-04"
+      ]
+    },
+    {
+      "id": "lighthouse.run.completed",
+      "version": 1,
+      "tool": "lighthouse-check",
+      "description": "Der feste mobile Lighthouse-Navigationslauf wurde mit den vier Standardkategorien ausgeführt.",
+      "checklistRefs": [
+        "CORE-PERF-01",
+        "CORE-A11Y-13",
+        "CORE-QA-02",
+        "CORE-SEO-01"
+      ]
+    },
+    {
+      "id": "lighthouse.category.performance-recorded",
+      "version": 1,
+      "tool": "lighthouse-check",
+      "description": "Der mobile Lighthouse-Performance-Score wurde als begrenztes technisches Signal aufgezeichnet.",
+      "checklistRefs": [
+        "CORE-PERF-01"
+      ]
+    },
+    {
+      "id": "lighthouse.category.accessibility-recorded",
+      "version": 1,
+      "tool": "lighthouse-check",
+      "description": "Der Lighthouse-Accessibility-Score wurde als begrenztes technisches Signal aufgezeichnet.",
+      "checklistRefs": [
+        "CORE-A11Y-13"
+      ]
+    },
+    {
+      "id": "lighthouse.category.best-practices-recorded",
+      "version": 1,
+      "tool": "lighthouse-check",
+      "description": "Der Lighthouse-Best-Practices-Score wurde als begrenztes technisches Signal aufgezeichnet.",
+      "checklistRefs": [
+        "CORE-QA-02",
+        "CORE-SEC-07"
+      ]
+    },
+    {
+      "id": "lighthouse.category.seo-recorded",
+      "version": 1,
+      "tool": "lighthouse-check",
+      "description": "Der Lighthouse-SEO-Score wurde als begrenztes technisches Signal aufgezeichnet.",
+      "checklistRefs": [
+        "CORE-SEO-01"
+      ]
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "name": "@mktcode/website-qa",
-  "version": "1.2.0",
-  "description": "Read-only HTTP, crawl, browser and social-preview checks for public websites",
+  "version": "2.0.0",
+  "description": "Read-only technical signals and a comprehensive manual checklist for website quality assurance",
   "license": "MIT",
   "type": "module",
   "engines": {
@@ -11,15 +11,22 @@
     "website-qa-browser": "./src/check-browser.mjs",
     "website-qa-crawl": "./src/check-crawl.mjs",
     "website-qa-http": "./src/check-http.mjs",
-    "website-qa-social": "./src/check-social-preview.mjs"
+    "website-qa-social": "./src/check-social-preview.mjs",
+    "website-qa-lighthouse": "./src/check-lighthouse.mjs"
   },
   "exports": {
-    "./catalog/*": "./catalog/*",
-    "./checklist": "./src/lib/checklist-report.mjs",
-    "./report": "./src/lib/project-report.mjs"
+    "./checklist-index.json": "./catalog/checklist-index.json",
+    "./signals.json": "./catalog/signals.json",
+    "./technical-report.schema.json": "./catalog/technical-report.common.schema.json",
+    "./http-report.schema.json": "./catalog/http-report.schema.json",
+    "./crawl-report.schema.json": "./catalog/crawl-report.schema.json",
+    "./browser-report.schema.json": "./catalog/browser-report.schema.json",
+    "./social-report.schema.json": "./catalog/social-report.schema.json",
+    "./lighthouse-report.schema.json": "./catalog/lighthouse-report.schema.json",
+    "./package.json": "./package.json"
   },
   "files": [
-    "catalog",
+    "catalog/*.json",
     "CHANGELOG.md",
     "docs",
     "examples",
@@ -45,17 +52,19 @@
   "keywords": [
     "accessibility",
     "axe-core",
+    "checklist",
     "crawler",
+    "lighthouse",
     "quality-assurance",
     "read-only",
+    "technical-signals",
     "website"
   ],
   "dependencies": {
-    "ajv": "8.20.0",
-    "ajv-formats": "3.0.1",
     "axe-core": "4.13.0",
     "fast-xml-parser": "5.11.0",
     "file-type": "22.0.1",
+    "lighthouse": "13.4.1",
     "parse5": "8.0.0",
     "puppeteer-core": "25.8.0",
     "robots-parser": "3.0.1",
@@ -64,6 +73,8 @@
   "devDependencies": {
     "@antfu/eslint-config": "9.3.0",
     "@types/node": "22.20.1",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
     "eslint": "10.8.1",
     "oxlint": "1.78.0",
     "typescript": "6.0.3",

@@ -1,93 +1,58 @@
-# Kompatibilitäts- und Deprecation-Regeln
+# Öffentlicher v2-Vertrag
 
-Dieses Dokument beschreibt den öffentlichen Vertrag von `@mktcode/website-qa` ab Version 1.0.0.
+Version 2.0.0 ist ein bewusster inkompatibler Produktschnitt. Rückwärtskompatibilität zu Projektberichten, Evidence-Dateien, Checklistenauswertung und Berichts-Bundles aus 0.x/1.x wird nicht angeboten.
 
 ## Getrennte Versionsachsen
 
-Vier Versionen haben unterschiedliche Bedeutungen:
+- Die Paketversion bezeichnet den Implementierungsstand.
+- `schemaVersion: 2` bezeichnet den aktuellen technischen JSON-Bericht.
+- `signalVersion` bezeichnet die fachliche Bedeutung einer technischen Signal-ID.
+- Die Checklistenversion bezeichnet den Stand des neutralen 215-ID-Index.
 
-1. Die Paketversion bezeichnet den Implementierungsstand.
-2. `schemaVersion` bezeichnet die Struktur eines JSON-Dokuments.
-3. `assertionVersion` bezeichnet die fachliche Bedeutung einer Assertion-ID.
-4. Die Katalogversion bezeichnet Zusammenstellung und Bedeutung der Checklistenpunkte und Kriterien.
-
-Projektberichte verwenden ausschließlich das normalisierte `schemaVersion: 3`. Projektkonfiguration, Evidence, technische Berichte und Bundlemanifest besitzen davon unabhängig jeweils `schemaVersion: 1`.
+Diese Achsen werden nicht auseinander abgeleitet.
 
 ## CLI-Vertrag
 
-Die vier unabhängigen Befehle sind stabil:
+Die fünf unabhängigen Befehle sind:
 
 - `website-qa-http`
 - `website-qa-crawl`
 - `website-qa-browser`
 - `website-qa-social`
+- `website-qa-lighthouse`
 
-Zum Vertrag gehören direkte Ausführbarkeit, `--help`, menschenlesbare Ausgabe, `--json`, `--json-file`, `--strict`, Paketversionsausgabe und die Exitcodes:
+Jeder Befehl unterstützt direkte Ausführung, `--help`, Textausgabe, `--json`, atomare `--json-file`-Ausgabe, `--strict`, Paketversion und die Exitcodes 0, 1 und 2. Es gibt keinen Sammelbefehl.
 
-- `0`: Lauf vollständig und nach den gewählten Regeln bestanden;
-- `1`: gültiger Bericht mit Fehlern oder im strikten Modus relevanten Warnungen;
-- `2`: Aufruf, Umgebung oder Berichtserzeugung technisch fehlgeschlagen.
+Die GET-, SSRF-, Redirect-, Origin-, Browser- und Redaktionsgrenzen sind Teil des Vertrags. Sicherheitsgrenzen dürfen geschlossen verschärft, aber nicht still gelockert werden.
 
-Die GET-only-, Browser- und SSRF-Grenzen sind Teil des Vertrags. Eine Lockerung ist keine kompatible Erweiterung. Sicherheitsgrenzen dürfen geschlossen verschärft werden, wenn ein Abruf sonst möglicherweise unsicher wäre; das Ergebnis muss sichtbar fehlschlagen oder unklar werden.
+## Technische Berichte
 
-## Technische JSON-Berichte
+Die Berichte verwenden `schemaVersion: 2` und die Status `positive`, `defect`, `inconclusive` und `notApplicable`. Checklistenreferenzen sind reine Informationsverweise. Berichte enthalten keine Checklistenpunktzustände und dürfen nicht als automatische Projektfreigabe ausgewertet werden.
 
-Die technischen Berichte behalten `schemaVersion: 1` und werden durch folgende Schemata beschrieben:
+Schemata:
 
 - [`../catalog/http-report.schema.json`](../catalog/http-report.schema.json)
 - [`../catalog/crawl-report.schema.json`](../catalog/crawl-report.schema.json)
 - [`../catalog/browser-report.schema.json`](../catalog/browser-report.schema.json)
 - [`../catalog/social-report.schema.json`](../catalog/social-report.schema.json)
+- [`../catalog/lighthouse-report.schema.json`](../catalog/lighthouse-report.schema.json)
 - [`../catalog/technical-report.common.schema.json`](../catalog/technical-report.common.schema.json)
 
-Verbraucher wählen nach `tool` und `schemaVersion` und erraten keine Schemaversion aus der Paketversion. Entfernte Pflichtfelder, geänderte Typen oder Bedeutungen benötigen eine neue Schemaversion. Additive Detailfelder bleiben nur in ausdrücklich erweiterbaren Bereichen kompatibel.
+Verbraucher wählen nach `tool` und `schemaVersion`. Eine geänderte Signalbedeutung erhöht `signalVersion` oder erhält eine neue ID.
 
-## Assertions und stabiler Basiskatalog
+## Entfernte v1-Oberflächen
 
-Eine Assertion wird durch `assertionId` und `assertionVersion` identifiziert. `message` und `subject` sind redigierte Befunddetails und keine stabilen Vergleichswerte. Eine fachlich geänderte Aussage erhöht die Assertionversion; eine bestehende ID wird nicht mit neuer Bedeutung wiederverwendet.
+Ohne Alias oder Konverter entfernt wurden:
 
-Der ausgelieferte Katalog heißt `website-qa-baseline`, besitzt Version `1.2.0` und Status `stable`. Stabil sind seine IDs, Bedeutungen und Versionsregeln, nicht eine vollständige Abdeckung der allgemeinen Markdowncheckliste. Der Basiskatalog ist weder vollständige Website-Checkliste noch WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe. Technische Berichte mit einer anderen Katalogversion werden nicht automatisch zugerechnet; für 1.2 müssen alle in der Projektkonfiguration verwendeten technischen Berichte neu erzeugt werden. Die technischen Berichte behalten `schemaVersion: 1`, Projektberichte `schemaVersion: 3` und die vier neuen Assertions `assertionVersion: 1`. Browser-Nur-Lese-Evidence behauptet keine unveränderten Zielsystemspeicher, die Trainings-Opt-in-Laufzeitdeklaration keine Betreiberzustimmung und beobachtete URL-/Medienabdeckung kein vollständiges Projektinventar.
+- `@mktcode/website-qa/report`
+- `@mktcode/website-qa/checklist`
+- Projektberichtskonfiguration und manuelle Evidence-Eingaben
+- Projektstatus und Workflowzustände
+- JSON-/Markdown-Gesamtberichte und Bundlemanifeste
+- `checklistCoverage` und automatische Checklistenaggregation
 
-Die stabile Checklist-API unter `@mktcode/website-qa/checklist` exportiert:
-
-- `loadWebsiteCatalog()`
-- `loadAssertionRegistry()`
-- `validateChecklistCatalog(catalog?, registry?)`
-- `evaluateChecklist(options?)`
-- `checklistItemIdsForTool(tool, catalog?, registry?)`
-
-`evaluateChecklist` verwendet den ausgelieferten Basiskatalog. Assertion-Versionierung und Katalog-Versionierung bleiben getrennte Achsen.
-
-## Reporting-API und Recordmodell
-
-Die stabile API unter `@mktcode/website-qa/report` exportiert:
-
-- `createProjectReport(options)`
-- `createProjectReportFromFiles(configFile)`
-- `validateProjectReport(report)`
-- `renderProjectReportMarkdown(report)`
-- `renderProjectSummaryMarkdown(report, options?)`
-- `writeProjectReportBundle(options)`
-
-[`../catalog/project-report.config.schema.json`](../catalog/project-report.config.schema.json) beschreibt ausschließlich die Konfiguration. [`../catalog/project-report.schema.json`](../catalog/project-report.schema.json) bezeichnet den einzigen normalisierten Projektbericht mit `schemaVersion: 3`.
-
-Assertion- und Evidence-Records werden einmalig auf Berichtsebene gespeichert. Kriterien referenzieren sie über deterministische berichtslokale IDs; diese IDs besitzen keine berichtsübergreifende Identität. Inhaltlich gleiche Records werden dedupliziert. Automatische Kriterien nennen ihre erforderlichen Assertion-IDs und das erzeugende Werkzeug. Konfiguration, Evidence, technische Berichte und Projektbericht werden vor ihrer semantischen Auswertung mit den veröffentlichten JSON-Schemas validiert. Unbekannte Werkzeuge, Fehlerhüllen, geschwächte Nur-Lese-Garantien und Cross-tool-Assertions werden geschlossen abgelehnt. Katalogbindung, Scope, Registryversion, Werkzeug, Workflow, Recordtypen, Referenzen, Ergebnisse, Punktzustände und Summen werden anschließend semantisch validiert.
-
-Der vollständige Renderer zeigt bei fehlgeschlagenen oder unklaren automatischen Kriterien kurze bereits redigierte Meldungen mit Recordreferenzen. Er vervielfältigt keine Subjects, Evidence-Freitexte, Cookie-/Storagewerte oder vertraulichen Referenzen. Der getrennte Zusammenfassungsrenderer verwendet eine enge Feld-Whitelist und ist trotzdem vor Veröffentlichung projektspezifisch zu prüfen.
-
-Der Bundlewriter verarbeitet nur lokale Dateien, archiviert technische Eingaben bytegleich und schreibt `report.json`, `report.md`, `manifest.json` sowie `technical/*.json` atomar. Die optionale Whitelist-Zusammenfassung liegt getrennt außerhalb des vollständigen Bundles.
-
-## Inkompatibler 1.0-Schnitt
-
-Die vor 1.0 veröffentlichten Projektberichtsnamen, die frühere Katalogdatei und frühere Projektberichtsausgaben gehören nicht zum 1.0-Vertrag. Es gibt keine Laufzeitaliasse, Deprecation-Hüllen oder automatische Konvertierung. Historische Artefakte bleiben über veröffentlichte Git-Tags verfügbar.
-
-## Deprecation und Entfernung nach 1.0
-
-1. Eine Deprecation wird in README und [`../CHANGELOG.md`](../CHANGELOG.md) mit Ersatz und frühestem Entfernungszeitpunkt dokumentiert.
-2. Eine kompatible Übergangslösung bleibt mindestens über die nächste Minor-Version erhalten.
-3. Eine Entfernung oder inkompatible Bedeutungsänderung erfolgt regulär erst in einer neuen Major-Version.
-4. Kritische Sicherheitskorrekturen dürfen den Übergang verkürzen und brechen geschlossen.
+Historische Artefakte bleiben über ihre veröffentlichten Git-Tags reproduzierbar. Sie werden nicht in v2 konvertiert, weil ein früher abgeleiteter Checklistenstatus kein technischer Defektbericht ist.
 
 ## Node.js
 
-Der Bereich `engines.node` in `package.json` ist verbindlich: Node 22 ab 22.19 bis vor 23 und Node 24 ab 24.11 bis vor 25. Ein unterstützter Node-Major wird regulär nur mit einer Major-Version oder nach seinem Upstream-Supportende entfernt; zwingende Sicherheits- oder Abhängigkeitsgründe werden dokumentiert.
+Unterstützt werden Node.js `>=22.19 <23` und `>=24.11 <25`. Browser- und Lighthouse-Check benötigen ein kompatibles lokal installiertes Chromium oder Google Chrome.

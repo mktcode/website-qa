@@ -148,10 +148,8 @@ describe('browser check', () => {
       persistentBrowserProfile: false,
     })
     expect(report).toMatchObject({
-      checklistCoverage: {
-        summary: { checklistItems: { partial: 14, total: 14 } },
-      },
-      schemaVersion: 1,
+      checklist: { id: 'website-qa-checklist', version: '2.0.0' },
+      schemaVersion: 2,
       summary: { errors: 0, failed: false, pages: 1, warnings: 0 },
     })
     expect(report.result).toMatchObject({
@@ -159,8 +157,8 @@ describe('browser check', () => {
       requestedUrlParameterNames: ['session'],
     })
     expect(JSON.stringify(report)).not.toContain('private-value')
-    expect(report.result.assertions).toHaveLength(14)
-    expect(report.result.assertions.every((assertion: { outcome: string }) => assertion.outcome === 'pass')).toBe(true)
+    expect(report.result.signals).toHaveLength(14)
+    expect(report.result.signals.every((signal: { status: string }) => signal.status === 'positive')).toBe(true)
 
     const prohibitedProfile = completeProfile('desktop', 1280)
     prohibitedProfile.readOnlyExecution.allowedNonGetOrExternalRequests = 1
@@ -180,7 +178,7 @@ describe('browser check', () => {
       strict: true,
       timeoutMilliseconds: 20_000,
     })
-    expect(prohibitedReport.result.assertions.find((entry: { assertionId: string }) => entry.assertionId === 'browser.run.read-only-boundaries-enforced')?.outcome).toBe('fail')
+    expect(prohibitedReport.result.signals.find((entry: { id: string }) => entry.id === 'browser.run.read-only-boundaries-enforced')?.status).toBe('defect')
   })
 
   it('marks bounded storage inventories as inconclusive when identifiers are truncated', () => {
@@ -203,8 +201,8 @@ describe('browser check', () => {
       timeoutMilliseconds: 20_000,
     })
 
-    const outcomes = new Map(report.result.assertions.map((assertion: { assertionId: string, outcome: string }) => [assertion.assertionId, assertion.outcome]))
-    expect(outcomes.get('browser.privacy.external-request-observation-complete')).toBe('pass')
+    const outcomes = new Map(report.result.signals.map((assertion: { id: string, status: string }) => [assertion.id, assertion.status]))
+    expect(outcomes.get('browser.privacy.external-request-observation-complete')).toBe('positive')
     expect(outcomes.get('browser.privacy.initial-storage-observation-complete')).toBe('inconclusive')
     expect(report.result.privacyObservations).toMatchObject({
       coverage: { identifierLimitPerKindAndProfile: 100, storageDataRecorded: true },
@@ -238,14 +236,14 @@ describe('browser check', () => {
       timeoutMilliseconds: 20_000,
     })
 
-    const outcomes = new Map(report.result.assertions.map((assertion: { assertionId: string, outcome: string }) => [assertion.assertionId, assertion.outcome]))
-    expect(outcomes.get('browser.document.main-landmark-single')).toBe('fail')
-    expect(outcomes.get('browser.viewport.narrow-zoom-no-horizontal-overflow')).toBe('fail')
-    expect(outcomes.get('browser.accessibility.axe-no-detected-violations')).toBe('fail')
-    expect(outcomes.get('browser.runtime.no-observed-errors')).toBe('fail')
+    const outcomes = new Map(report.result.signals.map((assertion: { id: string, status: string }) => [assertion.id, assertion.status]))
+    expect(outcomes.get('browser.document.main-landmark-single')).toBe('defect')
+    expect(outcomes.get('browser.viewport.narrow-zoom-no-horizontal-overflow')).toBe('defect')
+    expect(outcomes.get('browser.accessibility.axe-no-detected-violations')).toBe('defect')
+    expect(outcomes.get('browser.runtime.no-observed-errors')).toBe('defect')
     expect(outcomes.get('browser.privacy.external-request-observation-complete')).toBe('inconclusive')
     expect(outcomes.get('browser.privacy.initial-storage-observation-complete')).toBe('inconclusive')
-    expect(report.checklistCoverage.summary.checklistItems).toMatchObject({ fail: 5, partial: 6, total: 14 })
+    expect(report.result.signals.filter((signal: { status: string }) => signal.status === 'defect')).toHaveLength(4)
   })
 
   it('maps bounded Axe rule families to atomic accessibility assertions', () => {
@@ -273,16 +271,16 @@ describe('browser check', () => {
       strict: true,
       timeoutMilliseconds: 20_000,
     })
-    const outcomes = new Map(report.result.assertions.map(
-      (assertion: { assertionId: string, outcome: string }) => [assertion.assertionId, assertion.outcome],
+    const outcomes = new Map(report.result.signals.map(
+      (assertion: { id: string, status: string }) => [assertion.id, assertion.status],
     ))
 
-    expect(outcomes.get('browser.accessibility.control-names-no-detected-violations')).toBe('fail')
-    expect(outcomes.get('browser.accessibility.links-not-color-only-no-detected-violations')).toBe('fail')
-    expect(outcomes.get('browser.accessibility.image-alternatives-no-detected-violations')).toBe('fail')
-    expect(outcomes.get('browser.accessibility.text-contrast-no-detected-violations')).toBe('fail')
-    expect(outcomes.get('browser.accessibility.visually-hidden-focusable-controls-no-detected-violations')).toBe('fail')
-    expect(outcomes.get('browser.accessibility.form-control-labels-no-detected-violations')).toBe('fail')
+    expect(outcomes.get('browser.accessibility.control-names-no-detected-violations')).toBe('defect')
+    expect(outcomes.get('browser.accessibility.links-not-color-only-no-detected-violations')).toBe('defect')
+    expect(outcomes.get('browser.accessibility.image-alternatives-no-detected-violations')).toBe('defect')
+    expect(outcomes.get('browser.accessibility.text-contrast-no-detected-violations')).toBe('defect')
+    expect(outcomes.get('browser.accessibility.visually-hidden-focusable-controls-no-detected-violations')).toBe('defect')
+    expect(outcomes.get('browser.accessibility.form-control-labels-no-detected-violations')).toBe('defect')
 
     const incompleteProfile = {
       ...profile,
@@ -304,11 +302,11 @@ describe('browser check', () => {
       strict: true,
       timeoutMilliseconds: 20_000,
     })
-    const incompleteOutcomes = new Map(incompleteReport.result.assertions.map(
-      (assertion: { assertionId: string, outcome: string }) => [assertion.assertionId, assertion.outcome],
+    const incompleteOutcomes = new Map(incompleteReport.result.signals.map(
+      (assertion: { id: string, status: string }) => [assertion.id, assertion.status],
     ))
     expect(incompleteOutcomes.get('browser.accessibility.text-contrast-no-detected-violations')).toBe('inconclusive')
-    expect(incompleteOutcomes.get('browser.accessibility.control-names-no-detected-violations')).toBe('pass')
+    expect(incompleteOutcomes.get('browser.accessibility.control-names-no-detected-violations')).toBe('positive')
     expect(incompleteOutcomes.get('browser.accessibility.visually-hidden-focusable-controls-no-detected-violations')).toBe('inconclusive')
     expect(incompleteOutcomes.get('browser.accessibility.form-control-labels-no-detected-violations')).toBe('inconclusive')
 
@@ -328,7 +326,7 @@ describe('browser check', () => {
       strict: true,
       timeoutMilliseconds: 20_000,
     })
-    expect(precedenceReport.result.assertions.find((entry: { assertionId: string }) => entry.assertionId === 'browser.accessibility.form-control-labels-no-detected-violations')?.outcome).toBe('fail')
+    expect(precedenceReport.result.signals.find((entry: { id: string }) => entry.id === 'browser.accessibility.form-control-labels-no-detected-violations')?.status).toBe('defect')
 
     for (const ruleId of ['area-alt', 'input-image-alt']) {
       const overlappingReport = createJsonReport({
@@ -347,11 +345,11 @@ describe('browser check', () => {
         strict: true,
         timeoutMilliseconds: 20_000,
       })
-      const overlappingOutcomes = new Map(overlappingReport.result.assertions.map(
-        (assertion: { assertionId: string, outcome: string }) => [assertion.assertionId, assertion.outcome],
+      const overlappingOutcomes = new Map(overlappingReport.result.signals.map(
+        (assertion: { id: string, status: string }) => [assertion.id, assertion.status],
       ))
-      expect(overlappingOutcomes.get('browser.accessibility.control-names-no-detected-violations')).toBe('fail')
-      expect(overlappingOutcomes.get('browser.accessibility.image-alternatives-no-detected-violations')).toBe('fail')
+      expect(overlappingOutcomes.get('browser.accessibility.control-names-no-detected-violations')).toBe('defect')
+      expect(overlappingOutcomes.get('browser.accessibility.image-alternatives-no-detected-violations')).toBe('defect')
     }
   })
 
@@ -414,7 +412,7 @@ describe('browser check', () => {
         settleMilliseconds: 0,
       }) as unknown as {
         assertions: Array<{ assertionId: string, outcome: string }>
-        issues: Array<{ checklistIds: string[], code: string }>
+        issues: Array<{ checklistRefs: string[], code: string }>
       }
       return { fixture, result }
     }))
@@ -425,7 +423,7 @@ describe('browser check', () => {
 
       expect(outcomes.get('browser.accessibility.control-names-no-detected-violations')).toBe('fail')
       expect(outcomes.get('browser.accessibility.image-alternatives-no-detected-violations')).toBe('fail')
-      expect(issue?.checklistIds).toEqual(expect.arrayContaining(['CORE-A11Y-03', 'CORE-A11Y-08']))
+      expect(issue?.checklistRefs).toEqual(expect.arrayContaining(['CORE-A11Y-03', 'CORE-A11Y-08']))
     }
   }, 30_000)
 
@@ -455,7 +453,7 @@ describe('browser check', () => {
       settleMilliseconds: 0,
     }) as unknown as {
       assertions: Array<{ assertionId: string, outcome: string }>
-      issues: Array<{ checklistIds: string[], code: string }>
+      issues: Array<{ checklistRefs: string[], code: string }>
     }
     const issueCodes = result.issues.map(issue => issue.code)
     const outcomes = new Map(result.assertions.map(assertion => [assertion.assertionId, assertion.outcome]))
@@ -473,11 +471,11 @@ describe('browser check', () => {
     expect(outcomes.get('browser.accessibility.text-contrast-no-detected-violations')).toBe('fail')
     expect(outcomes.get('browser.accessibility.visually-hidden-focusable-controls-no-detected-violations')).toBe('fail')
     expect(outcomes.get('browser.accessibility.form-control-labels-no-detected-violations')).toBe('fail')
-    expect(result.issues.find(issue => issue.code === 'axe-button-name')?.checklistIds).toContain('CORE-A11Y-03')
-    expect(result.issues.find(issue => issue.code === 'axe-image-alt')?.checklistIds).toContain('CORE-A11Y-08')
-    expect(result.issues.find(issue => issue.code === 'axe-color-contrast')?.checklistIds).toContain('CORE-A11Y-09')
-    expect(result.issues.find(issue => issue.code === 'axe-aria-hidden-focus')?.checklistIds).toContain('CORE-A11Y-04')
-    expect(result.issues.find(issue => issue.code === 'axe-label')?.checklistIds).toContain('CORE-A11Y-06')
+    expect(result.issues.find(issue => issue.code === 'axe-button-name')?.checklistRefs).toContain('CORE-A11Y-03')
+    expect(result.issues.find(issue => issue.code === 'axe-image-alt')?.checklistRefs).toContain('CORE-A11Y-08')
+    expect(result.issues.find(issue => issue.code === 'axe-color-contrast')?.checklistRefs).toContain('CORE-A11Y-09')
+    expect(result.issues.find(issue => issue.code === 'axe-aria-hidden-focus')?.checklistRefs).toContain('CORE-A11Y-04')
+    expect(result.issues.find(issue => issue.code === 'axe-label')?.checklistRefs).toContain('CORE-A11Y-06')
   }, 30_000)
 
   chromiumIt('blocks side effects while inventorying external attempts, cookies and storage without values', async () => {
@@ -507,6 +505,13 @@ describe('browser check', () => {
   fetch('${externalOrigin}/tracker?token=private-query-value').catch(() => {})
   document.querySelector('form').requestSubmit()
   window.open('/popup')
+  const popupLink = document.createElement('a')
+  popupLink.href = '${externalOrigin}/declarative-popup'
+  popupLink.target = '_blank'
+  popupLink.textContent = 'Popup-Test'
+  document.body.append(popupLink)
+  popupLink.click()
+  navigator.serviceWorker.register('/service-worker.js').catch(() => {})
 </script></body></html>`)
     })
     origin = await listen(server)
@@ -539,19 +544,21 @@ describe('browser check', () => {
     const outcomes = new Map(typedResult.assertions.map(assertion => [assertion.assertionId, assertion.outcome]))
 
     expect(receivedRequests.every(request => request.method === 'GET')).toBe(true)
-    expect(receivedRequests.some(request => ['/mutate', '/submit', '/popup'].includes(request.url))).toBe(false)
+    expect(receivedRequests.some(request => ['/mutate', '/submit', '/popup', '/service-worker.js'].includes(request.url))).toBe(false)
     expect(externalRequests).toEqual([])
     expect(issueCodes).toContain('non-get-blocked')
     expect(issueCodes).toContain('external-request-blocked')
     expect(issueCodes).toContain('form-submission-blocked')
     expect(issueCodes).toContain('popup-blocked')
+    expect(issueCodes).toContain('browser-action-blocked')
     expect(outcomes.get('browser.context.chromium-headless-recorded')).toBe('pass')
     expect(outcomes.get('browser.privacy.external-request-observation-complete')).toBe('pass')
     expect(outcomes.get('browser.privacy.initial-storage-observation-complete')).toBe('pass')
     expect(outcomes.get('browser.run.read-only-boundaries-enforced')).toBe('pass')
-    expect(typedResult.assertions.filter(assertion => !assertion.assertionId.startsWith('browser.privacy.') && !['browser.context.chromium-headless-recorded', 'browser.run.read-only-boundaries-enforced'].includes(assertion.assertionId)).every(assertion => assertion.outcome === 'inconclusive')).toBe(true)
+    const dependentAssertions = typedResult.assertions.filter(assertion => !assertion.assertionId.startsWith('browser.privacy.') && !assertion.assertionId.startsWith('browser.accessibility.') && !['browser.context.chromium-headless-recorded', 'browser.run.read-only-boundaries-enforced'].includes(assertion.assertionId))
+    expect(dependentAssertions.every(assertion => assertion.outcome === 'inconclusive'), JSON.stringify(dependentAssertions)).toBe(true)
     expect(typedResult.privacyObservations).toMatchObject({
-      externalRequestAttempts: { total: 2 },
+      externalRequestAttempts: { total: 4 },
       initialStorage: {
         cookies: { observations: 2 },
         indexedDatabases: { observations: 2 },

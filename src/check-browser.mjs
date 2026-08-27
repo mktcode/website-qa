@@ -3,14 +3,15 @@
 /* eslint-disable no-console */
 /* oxlint-disable no-await-in-loop */
 
-import { existsSync } from 'node:fs'
 import axe from 'axe-core'
 import puppeteer from 'puppeteer-core'
-import { parseSitemapXml, readOnlyNavigationConcern } from './check-crawl.mjs'
-import { checklistItemIdsForTool, evaluateChecklist } from './lib/checklist-report.mjs'
+import { chromiumExecutable, classifyBrowserRequest, installReadOnlyDomGuards } from './lib/browser-safety.mjs'
 import { assertPublicResolution, fetchResource, normalizeMimeType, redactReportData, redactText, reportUrl, validateUrl } from './lib/http-client.mjs'
 import { writeJsonOutput } from './lib/json-output.mjs'
+import { readOnlyNavigationConcern } from './lib/navigation-safety.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
+import { checklistReference, technicalSignals, technicalSignalSummary } from './lib/signal-report.mjs'
+import { parseSitemapXml } from './lib/sitemap-parser.mjs'
 
 const defaultProfiles = ['desktop', 'mobile', 'narrow', 'reduced-motion', 'zoom-200']
 const maxPrivacyIdentifiersPerProfile = 100
@@ -158,35 +159,13 @@ export function parseArguments(argv) {
   return { options, urls }
 }
 
-function chromiumExecutable(configuredPath) {
-  const candidates = [
-    configuredPath,
-    process.env.CHROMIUM_PATH,
-    '/usr/bin/chromium',
-    '/usr/bin/chromium-browser',
-    '/usr/bin/google-chrome',
-    '/usr/bin/google-chrome-stable',
-  ].filter(Boolean)
-  const executable = candidates.find(candidate => existsSync(candidate))
-  if (!executable) {
-    throw new Error('Keine Chromium-/Chrome-Binärdatei gefunden. --chromium-path oder CHROMIUM_PATH setzen.')
-  }
-  return executable
-}
-
-function comparableUrl(value) {
-  const url = new URL(value)
-  url.hash = ''
-  return url.href
-}
-
 function issueKey(issue) {
   return `${issue.severity}\n${issue.code}\n${issue.url}\n${issue.message}`
 }
 
-function addIssue(result, severity, code, message, checklistIds, url, profile) {
+function addIssue(result, severity, code, message, checklistRefs, url, profile) {
   const issue = {
-    checklistIds,
+    checklistRefs,
     code,
     message,
     profiles: profile ? [profile] : [],
@@ -290,23 +269,23 @@ function axeRuleOutcome(result, ruleIds) {
 }
 
 function axeViolationChecklistIds(ruleId) {
-  const checklistIds = ['CORE-A11Y-01', 'CORE-A11Y-13']
+  const checklistRefs = ['CORE-A11Y-01', 'CORE-A11Y-13']
   if (axeRuleGroups.controlNames.has(ruleId) || axeRuleGroups.linkColorIndependence.has(ruleId)) {
-    checklistIds.push('CORE-A11Y-03')
+    checklistRefs.push('CORE-A11Y-03')
   }
   if (axeRuleGroups.hiddenFocusable.has(ruleId)) {
-    checklistIds.push('CORE-A11Y-04')
+    checklistRefs.push('CORE-A11Y-04')
   }
   if (axeRuleGroups.formControlLabels.has(ruleId)) {
-    checklistIds.push('CORE-A11Y-06')
+    checklistRefs.push('CORE-A11Y-06')
   }
   if (axeRuleGroups.imageAlternatives.has(ruleId)) {
-    checklistIds.push('CORE-A11Y-08')
+    checklistRefs.push('CORE-A11Y-08')
   }
   if (axeRuleGroups.textContrast.has(ruleId)) {
-    checklistIds.push('CORE-A11Y-09')
+    checklistRefs.push('CORE-A11Y-09')
   }
-  return checklistIds
+  return checklistRefs
 }
 
 function profilesCoverEveryPage(result, requiredProfiles) {
@@ -607,13 +586,6 @@ function createBrowserAssertions(result) {
   return assertions
 }
 
-function checklistCoverage(result) {
-  return evaluateChecklist({
-    assertions: result.assertions,
-    itemIds: checklistItemIdsForTool('browser-check'),
-  })
-}
-
 function addBlockedRequest(result, pageUrl, profile, request, reason, code, severity = 'warning') {
   const requestUrl = new URL(request.url())
   const reported = reportUrl(request.url())
@@ -636,29 +608,7 @@ function addBlockedRequest(result, pageUrl, profile, request, reason, code, seve
   addIssue(result, severity, code, reason, ['CORE-PRIV-02', 'CORE-SEC-07', 'FORM-TEST-04'], reported.url, profile)
 }
 
-export function classifyBrowserRequest(details, policy) {
-  if (!['http:', 'https:'].includes(details.protocol)) {
-    return { action: 'allow' }
-  }
-  if (details.method !== 'GET') {
-    return { action: 'block', code: 'non-get-blocked', reason: `Browser versuchte eine blockierte ${details.method}-Anfrage.`, severity: 'error' }
-  }
-  if (details.origin !== policy.origin) {
-    return { action: 'block', code: 'external-request-blocked', reason: `Externer Browser-Request zu ${details.origin} wurde blockiert.`, severity: 'warning' }
-  }
-
-  const concern = readOnlyNavigationConcern(new URL(details.url))
-  if (concern) {
-    return { action: 'block', code: 'suspicious-get-blocked', reason: `GET-Anfrage wurde wegen ${concern} vorsorglich blockiert.`, severity: 'warning' }
-  }
-  if (details.mainFrameNavigation && comparableUrl(details.url) !== comparableUrl(policy.expectedUrl)) {
-    return { action: 'block', code: 'unexpected-navigation-blocked', reason: 'Unerwartete Hauptfenster-Navigation wurde blockiert.', severity: 'warning' }
-  }
-  if (details.requestNumber > policy.maxRequests) {
-    return { action: 'block', code: 'request-limit', reason: `Request-Limit von ${policy.maxRequests} je Seite und Profil erreicht.`, severity: 'warning' }
-  }
-  return { action: 'allow' }
-}
+export { classifyBrowserRequest } from './lib/browser-safety.mjs'
 
 async function sitemapPages(result, options, origin, defaultSitemapUrl) {
   const sitemapQueue = [options.sitemapUrl || defaultSitemapUrl]
@@ -871,7 +821,7 @@ async function inspectProfile(browser, result, options, url, profileName, discov
     ])
     page.setDefaultNavigationTimeout(options.timeoutMilliseconds)
     page.setDefaultTimeout(options.timeoutMilliseconds)
-    await page.exposeFunction('websiteQaRecordBlockedAction', (kind, value) => {
+    await installReadOnlyDomGuards(page, (kind, value) => {
       let actionUrl
       try {
         actionUrl = new URL(String(value || url), url)
@@ -881,64 +831,10 @@ async function inspectProfile(browser, result, options, url, profileName, discov
       }
       blockedActions.push({
         external: actionUrl.origin !== result.origin,
-        kind: String(kind),
+        kind,
         origin: reportUrl(actionUrl.origin).url,
         url: reportUrl(actionUrl.href).url,
       })
-    })
-    await page.evaluateOnNewDocument(() => {
-      // Die Hilfsfunktion muss im serialisierten Browser-Kontext definiert sein.
-      // oxlint-disable-next-line unicorn/consistent-function-scoping
-      const record = (kind, value) => {
-        void globalThis.websiteQaRecordBlockedAction(kind, String(value || location.href))
-      }
-      globalThis.open = (target) => {
-        record('popup', target)
-        return null
-      }
-      navigator.sendBeacon = (target) => {
-        record('beacon', target)
-        return false
-      }
-      globalThis.WebSocket = function BlockedWebSocket(target) {
-        record('websocket', target)
-        throw new DOMException('WebSocket durch Nur-Lese-Prüfung blockiert.', 'SecurityError')
-      }
-      globalThis.EventSource = function BlockedEventSource(target) {
-        record('eventsource', target)
-        throw new DOMException('EventSource durch Nur-Lese-Prüfung blockiert.', 'SecurityError')
-      }
-      globalThis.Worker = function BlockedWorker(target) {
-        record('worker', target)
-        throw new DOMException('Worker durch Nur-Lese-Prüfung blockiert.', 'SecurityError')
-      }
-      globalThis.SharedWorker = function BlockedSharedWorker(target) {
-        record('shared-worker', target)
-        throw new DOMException('SharedWorker durch Nur-Lese-Prüfung blockiert.', 'SecurityError')
-      }
-      globalThis.RTCPeerConnection = function BlockedRtcPeerConnection() {
-        record('webrtc', location.href)
-        throw new DOMException('WebRTC durch Nur-Lese-Prüfung blockiert.', 'SecurityError')
-      }
-      globalThis.webkitRTCPeerConnection = globalThis.RTCPeerConnection
-      globalThis.WebTransport = function BlockedWebTransport(target) {
-        record('webtransport', target)
-        throw new DOMException('WebTransport durch Nur-Lese-Prüfung blockiert.', 'SecurityError')
-      }
-      const blockForm = (form) => {
-        record('form-submit', form.action || location.href)
-      }
-      HTMLFormElement.prototype.submit = function submit() {
-        blockForm(this)
-      }
-      HTMLFormElement.prototype.requestSubmit = function requestSubmit() {
-        blockForm(this)
-      }
-      document.addEventListener('submit', (event) => {
-        event.preventDefault()
-        event.stopImmediatePropagation()
-        blockForm(event.target)
-      }, true)
     })
     readOnlyExecution.domGuardsInstalledBeforeNavigation = true
     await page.setRequestInterception(true)
@@ -1298,6 +1194,8 @@ export function createJsonReport(inputResult, options) {
     ? preparedResult
     : { ...preparedResult, assertions: createBrowserAssertions(preparedResult) }
   const result = redactReportData(assertionResult, '', { hideHosts: options.allowPrivate })
+  result.signals = technicalSignals(result.assertions, 'browser-check')
+  delete result.assertions
   const parameterNames = reportUrl(assertionResult.requestedUrl).parameterNames
   if (parameterNames.length > 0) {
     result.requestedUrlParameterNames = parameterNames
@@ -1306,7 +1204,7 @@ export function createJsonReport(inputResult, options) {
   const warnings = result.issues.filter(issue => issue.severity === 'warning').length
   const pages = new Set(result.profiles.map(profile => profile.url)).size
   return {
-    checklistCoverage: checklistCoverage(result),
+    checklist: checklistReference(),
     generatedAt: new Date().toISOString(),
     options: {
       maxPages: options.maxPages,
@@ -1328,7 +1226,7 @@ export function createJsonReport(inputResult, options) {
       persistentBrowserProfile: false,
     },
     result,
-    schemaVersion: 1,
+    schemaVersion: 2,
     summary: {
       blockedRequests: result.blockedRequests.length,
       errors,
@@ -1363,13 +1261,12 @@ function printReport(report) {
     console.log('OK: Keine Fehler oder Warnungen.')
   }
 
-  const checklistSummary = report.checklistCoverage.summary.checklistItems
-  const nonAutomaticSummary = report.checklistCoverage.summary.nonAutomaticCriteria
-  console.log(`\nChecklistennachweis ${report.checklistCoverage.catalog.version}: ${checklistSummary.pass} Punkt(e) vollständig, ${checklistSummary.partial} teilweise, ${checklistSummary.fail} fehlgeschlagen, ${checklistSummary.open + checklistSummary.inconclusive} offen/unklar.`)
-  console.log(`Nicht automatisch belegbare Kriterien: ${nonAutomaticSummary.pass} belegt, ${nonAutomaticSummary.total - nonAutomaticSummary.pass - nonAutomaticSummary.notApplicable} offen; sie werden durch diesen Lauf nicht stillschweigend abgeschlossen.`)
+  const signals = technicalSignalSummary(result.signals)
+  console.log(`\nTechnische Signale: ${signals.positive} positiv, ${signals.defect} Defekt(e), ${signals.inconclusive} unklar, ${signals.notApplicable} nicht anwendbar.`)
+  console.log('Checklistenreferenzen dienen nur der manuellen QA-Arbeit und ändern keinen Checklistenstatus.')
   console.log('\nNur lesender Lauf: ausschließlich GET; externe Requests und alle anderen Methoden wurden blockiert; keine Klicks, Uploads oder Formularübermittlungen.')
   console.log(`Ergebnis: ${summary.errors} Fehler, ${summary.warnings} Warnung(en).`)
-  console.log(summary.failed ? 'NICHT BESTANDEN.' : 'BESTANDEN.')
+  console.log(summary.failed ? 'TECHNISCHER LAUF MIT FEHLERBEFUND ODER STRICT-RELEVANTER WARNUNG.' : 'TECHNISCHER LAUF OHNE FEHLERBEFUND.')
 }
 
 async function main() {
@@ -1399,7 +1296,7 @@ async function main() {
     process.exitCode = report.summary.failed ? 1 : 0
   }
   catch (error) {
-    const errorReport = { error: redactText(error.message), schemaVersion: 1, tool: 'browser-check', toolPackage: { name: packageName, version: packageVersion } }
+    const errorReport = { error: redactText(error.message), schemaVersion: 2, tool: 'browser-check', toolPackage: { name: packageName, version: packageVersion } }
     if (parsed?.options?.json) {
       if (parsed.options.jsonFile) {
         try {

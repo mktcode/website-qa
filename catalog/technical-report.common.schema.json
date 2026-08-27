@@ -3,12 +3,9 @@
   "$id": "https://github.com/mktcode/website-qa/catalog/technical-report.common.schema.json",
   "title": "Gemeinsamer Kern technischer Website-QA-Berichte",
   "$defs": {
-    "schemaVersion": { "const": 1 },
+    "schemaVersion": { "const": 2 },
     "generatedAt": { "type": "string", "format": "date-time" },
-    "reportedUrl": {
-      "type": "string",
-      "minLength": 1
-    },
+    "reportedUrl": { "type": "string", "minLength": 1, "maxLength": 2048 },
     "toolPackage": {
       "type": "object",
       "required": ["name", "version"],
@@ -18,97 +15,71 @@
       },
       "additionalProperties": true
     },
-    "catalogReference": {
+    "checklistReference": {
       "type": "object",
-      "required": ["id", "version", "status"],
+      "required": ["id", "version"],
       "properties": {
-        "id": { "const": "website-qa-baseline" },
-        "version": { "const": "1.2.0" },
-        "status": { "const": "stable" }
+        "id": { "const": "website-qa-checklist" },
+        "version": { "const": "2.0.0" }
       },
-      "additionalProperties": true
+      "additionalProperties": false
     },
-    "checklistCoverage": {
-      "type": "object",
-      "required": ["catalog"],
-      "properties": {
-        "catalog": { "$ref": "#/$defs/catalogReference" },
-        "items": {
-          "type": "array",
-          "items": { "type": "object" }
-        },
-        "summary": { "type": "object" }
-      },
-      "additionalProperties": true
+    "checklistRefs": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[A-Z]+(?:-[A-Z0-9]+)+-[0-9]{2}$" },
+      "uniqueItems": true
     },
-    "assertion": {
+    "signal": {
       "type": "object",
-      "required": ["assertionId", "assertionVersion", "outcome", "message", "subject"],
+      "required": ["id", "signalVersion", "status", "message", "subject", "checklistRefs"],
       "properties": {
-        "assertionId": { "type": "string", "minLength": 1 },
-        "assertionVersion": { "type": "integer", "minimum": 1 },
-        "outcome": { "enum": ["pass", "fail", "inconclusive", "notApplicable"] },
+        "id": { "type": "string", "minLength": 1 },
+        "signalVersion": { "type": "integer", "minimum": 1 },
+        "status": { "enum": ["positive", "defect", "inconclusive", "notApplicable"] },
         "message": { "type": "string", "minLength": 1 },
-        "subject": { "type": "object" }
+        "subject": { "type": "object" },
+        "checklistRefs": { "$ref": "#/$defs/checklistRefs" }
       },
       "additionalProperties": true
     },
     "issue": {
       "type": "object",
-      "required": ["code", "message", "severity"],
+      "required": ["code", "message", "severity", "checklistRefs"],
       "properties": {
         "code": { "type": "string", "minLength": 1 },
         "message": { "type": "string", "minLength": 1 },
         "severity": { "enum": ["error", "warning"] },
-        "checklistIds": {
-          "type": "array",
-          "items": { "type": "string", "minLength": 1 },
-          "uniqueItems": true
-        },
+        "checklistRefs": { "$ref": "#/$defs/checklistRefs" },
         "url": { "$ref": "#/$defs/reportedUrl" }
       },
       "additionalProperties": true
     },
     "result": {
       "type": "object",
-      "required": ["requestedUrl", "assertions", "issues"],
+      "required": ["requestedUrl", "signals", "issues"],
       "properties": {
         "requestedUrl": { "$ref": "#/$defs/reportedUrl" },
         "requestedUrlParameterNames": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 },
+          "maxItems": 100,
+          "items": { "type": "string", "minLength": 1, "maxLength": 100 },
           "uniqueItems": true
         },
         "finalUrl": { "$ref": "#/$defs/reportedUrl" },
-        "assertions": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/assertion" }
-        },
-        "issues": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/issue" }
-        }
+        "signals": { "type": "array", "items": { "$ref": "#/$defs/signal" } },
+        "issues": { "type": "array", "items": { "$ref": "#/$defs/issue" } }
       },
       "additionalProperties": true
     },
     "successEnvelope": {
       "type": "object",
-      "required": [
-        "schemaVersion",
-        "generatedAt",
-        "tool",
-        "toolPackage",
-        "checklistCoverage",
-        "options",
-        "readOnlyGuarantees",
-        "summary"
-      ],
+      "required": ["schemaVersion", "generatedAt", "tool", "toolPackage", "checklist", "options", "readOnlyGuarantees", "summary"],
       "properties": {
         "schemaVersion": { "$ref": "#/$defs/schemaVersion" },
         "generatedAt": { "$ref": "#/$defs/generatedAt" },
         "tool": { "type": "string", "minLength": 1 },
         "toolPackage": { "$ref": "#/$defs/toolPackage" },
-        "checklistCoverage": { "$ref": "#/$defs/checklistCoverage" },
+        "checklist": { "$ref": "#/$defs/checklistReference" },
         "options": { "type": "object" },
         "readOnlyGuarantees": { "type": "object" },
         "summary": { "type": "object" }
@@ -121,9 +92,7 @@
         "schemaVersion": { "$ref": "#/$defs/schemaVersion" },
         "tool": { "type": "string", "minLength": 1 },
         "error": { "type": "string", "minLength": 1 },
-        "toolPackage": { "$ref": "#/$defs/toolPackage" },
-        "readOnlyGuarantees": { "type": "object" },
-        "summary": { "type": "object" }
+        "toolPackage": { "$ref": "#/$defs/toolPackage" }
       }
     },
     "nonNegativeInteger": { "type": "integer", "minimum": 0 }

@@ -3,79 +3,171 @@
   "$id": "https://github.com/mktcode/website-qa/catalog/crawl-report.schema.json",
   "title": "Technischer Bericht von website-qa-crawl",
   "oneOf": [
-    { "$ref": "#/$defs/success" },
-    { "$ref": "#/$defs/error" }
+    {
+      "$ref": "#/$defs/success"
+    },
+    {
+      "$ref": "#/$defs/error"
+    }
   ],
   "$defs": {
     "success": {
       "allOf": [
-        { "$ref": "technical-report.common.schema.json#/$defs/successEnvelope" },
+        {
+          "$ref": "technical-report.common.schema.json#/$defs/successEnvelope"
+        },
         {
           "type": "object",
-          "required": ["results"],
+          "required": [
+            "results"
+          ],
           "properties": {
-            "tool": { "const": "crawl-check" },
+            "tool": {
+              "const": "crawl-check"
+            },
             "options": {
               "type": "object",
-              "required": ["maxPages", "maxRedirects", "maxResources", "privateTargetsRedacted", "sitemap", "strict", "timeoutMilliseconds"],
+              "required": [
+                "maxPages",
+                "maxRedirects",
+                "maxResources",
+                "privateTargetsRedacted",
+                "sitemap",
+                "strict",
+                "timeoutMilliseconds"
+              ],
               "properties": {
-                "maxPages": { "type": "integer", "minimum": 1 },
-                "maxRedirects": { "type": "integer", "minimum": 0 },
-                "maxResources": { "type": "integer", "minimum": 1 },
-                "privateTargetsRedacted": { "type": "boolean" },
-                "sitemap": { "type": "boolean" },
-                "sitemapUrl": { "type": "string", "minLength": 1 },
-                "strict": { "type": "boolean" },
-                "timeoutMilliseconds": { "type": "integer", "minimum": 1 }
+                "maxPages": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "maxRedirects": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "maxResources": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "privateTargetsRedacted": {
+                  "type": "boolean"
+                },
+                "sitemap": {
+                  "type": "boolean"
+                },
+                "sitemapUrl": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "strict": {
+                  "type": "boolean"
+                },
+                "timeoutMilliseconds": {
+                  "type": "integer",
+                  "minimum": 1
+                }
               },
-              "additionalProperties": true
+              "additionalProperties": false
             },
             "readOnlyGuarantees": {
               "type": "object",
-              "required": ["buttonsActivated", "externalLinksFetched", "formActionsFetched", "formsSubmitted", "methods"],
+              "required": [
+                "buttonsActivated",
+                "externalLinksFetched",
+                "formActionsFetched",
+                "formsSubmitted",
+                "methods"
+              ],
               "properties": {
-                "buttonsActivated": { "const": false },
-                "externalLinksFetched": { "const": false },
-                "formActionsFetched": { "const": false },
-                "formsSubmitted": { "const": false },
-                "methods": { "const": ["GET"] }
+                "buttonsActivated": {
+                  "const": false
+                },
+                "externalLinksFetched": {
+                  "const": false
+                },
+                "formActionsFetched": {
+                  "const": false
+                },
+                "formsSubmitted": {
+                  "const": false
+                },
+                "methods": {
+                  "const": [
+                    "GET"
+                  ]
+                }
               },
               "additionalProperties": true
             },
             "results": {
               "type": "array",
               "minItems": 1,
-              "items": { "$ref": "technical-report.common.schema.json#/$defs/result" }
+              "items": {
+                "$ref": "technical-report.common.schema.json#/$defs/result"
+              }
             },
             "summary": {
               "type": "object",
-              "required": ["errors", "externalLinks", "failed", "formsObservedNotSubmitted", "pages", "resources", "skippedNavigation", "warnings"],
+              "required": [
+                "errors",
+                "externalLinks",
+                "failed",
+                "formsObservedNotSubmitted",
+                "pages",
+                "resources",
+                "skippedNavigation",
+                "warnings"
+              ],
               "properties": {
-                "errors": { "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger" },
-                "externalLinks": { "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger" },
-                "failed": { "type": "boolean" },
-                "formsObservedNotSubmitted": { "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger" },
-                "pages": { "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger" },
-                "resources": { "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger" },
-                "skippedNavigation": { "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger" },
-                "warnings": { "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger" }
+                "errors": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                },
+                "externalLinks": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                },
+                "failed": {
+                  "type": "boolean"
+                },
+                "formsObservedNotSubmitted": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                },
+                "pages": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                },
+                "resources": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                },
+                "skippedNavigation": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                },
+                "warnings": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                }
               },
               "additionalProperties": true
             }
-          },
-          "additionalProperties": true
+          }
         }
-      ]
+      ],
+      "unevaluatedProperties": false,
+      "type": "object"
     },
     "error": {
       "allOf": [
-        { "$ref": "technical-report.common.schema.json#/$defs/errorEnvelope" },
+        {
+          "$ref": "technical-report.common.schema.json#/$defs/errorEnvelope"
+        },
         {
           "type": "object",
-          "properties": { "tool": { "const": "crawl-check" } },
-          "additionalProperties": true
+          "properties": {
+            "tool": {
+              "const": "crawl-check"
+            }
+          }
         }
-      ]
+      ],
+      "unevaluatedProperties": false,
+      "type": "object"
     }
   }
 }

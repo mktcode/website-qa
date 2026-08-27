@@ -1,0 +1,597 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mktcode/website-qa/catalog/lighthouse-report.schema.json",
+  "title": "Technischer Bericht von website-qa-lighthouse",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/success"
+    },
+    {
+      "$ref": "#/$defs/error"
+    }
+  ],
+  "$defs": {
+    "boundedRecords": {
+      "type": "object",
+      "required": [
+        "recorded",
+        "total",
+        "truncated"
+      ],
+      "properties": {
+        "recorded": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "blockedAction": {
+      "type": "object",
+      "required": [
+        "kind",
+        "url"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "url": {
+          "$ref": "technical-report.common.schema.json#/$defs/reportedUrl"
+        }
+      },
+      "additionalProperties": false
+    },
+    "blockedRequest": {
+      "type": "object",
+      "required": [
+        "code",
+        "method",
+        "reason",
+        "url"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "url": {
+          "$ref": "technical-report.common.schema.json#/$defs/reportedUrl"
+        }
+      },
+      "additionalProperties": false
+    },
+    "category": {
+      "type": "object",
+      "required": [
+        "score",
+        "title"
+      ],
+      "properties": {
+        "score": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      },
+      "additionalProperties": false
+    },
+    "metric": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "value"
+          ],
+          "properties": {
+            "displayValue": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "unit": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "value": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "audit": {
+      "type": "object",
+      "required": [
+        "checklistRefs",
+        "id",
+        "score",
+        "status",
+        "title",
+        "warnings"
+      ],
+      "properties": {
+        "checklistRefs": {
+          "$ref": "technical-report.common.schema.json#/$defs/checklistRefs"
+        },
+        "displayValue": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "errorMessage": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "numericUnit": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "numericValue": {
+          "type": "number"
+        },
+        "score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "scoreDisplayMode": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "status": {
+          "enum": [
+            "positive",
+            "defect",
+            "inconclusive",
+            "observation"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "warnings": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "lcp": {
+      "type": "object",
+      "required": [
+        "breakdown",
+        "candidate"
+      ],
+      "properties": {
+        "breakdown": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "required": [
+              "durationMilliseconds",
+              "label"
+            ],
+            "properties": {
+              "durationMilliseconds": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "subpart": {
+                "type": "string",
+                "maxLength": 100
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "candidate": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                "selector": {
+                  "type": "string",
+                  "maxLength": 500
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "success": {
+      "allOf": [
+        {
+          "$ref": "technical-report.common.schema.json#/$defs/successEnvelope"
+        },
+        {
+          "type": "object",
+          "required": [
+            "blockedActions",
+            "blockedRequests",
+            "requestedUrl",
+            "finalUrl",
+            "browser",
+            "coverage",
+            "issues",
+            "lighthouse",
+            "signals"
+          ],
+          "properties": {
+            "tool": {
+              "const": "lighthouse-check"
+            },
+            "blockedActions": {
+              "type": "array",
+              "maxItems": 100,
+              "items": {
+                "$ref": "#/$defs/blockedAction"
+              }
+            },
+            "blockedRequests": {
+              "type": "array",
+              "maxItems": 100,
+              "items": {
+                "$ref": "#/$defs/blockedRequest"
+              }
+            },
+            "browser": {
+              "type": "object",
+              "required": [
+                "product",
+                "version"
+              ],
+              "properties": {
+                "product": {
+                  "const": "Chromium"
+                },
+                "version": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                }
+              },
+              "additionalProperties": false
+            },
+            "requestedUrl": {
+              "$ref": "technical-report.common.schema.json#/$defs/reportedUrl"
+            },
+            "finalUrl": {
+              "$ref": "technical-report.common.schema.json#/$defs/reportedUrl"
+            },
+            "signals": {
+              "type": "array",
+              "items": {
+                "$ref": "technical-report.common.schema.json#/$defs/signal"
+              }
+            },
+            "issues": {
+              "type": "array",
+              "items": {
+                "$ref": "technical-report.common.schema.json#/$defs/issue"
+              }
+            },
+            "coverage": {
+              "type": "object",
+              "required": [
+                "blockedActions",
+                "blockedRequests",
+                "categories",
+                "constrainedBySafetyControls",
+                "guardsInstalledBeforeNavigation",
+                "hostnameResolutionPinned",
+                "interceptionInstalledBeforeNavigation",
+                "representative",
+                "requestLimit",
+                "requestsObserved"
+              ],
+              "properties": {
+                "blockedActions": {
+                  "$ref": "#/$defs/boundedRecords"
+                },
+                "blockedRequests": {
+                  "$ref": "#/$defs/boundedRecords"
+                },
+                "categories": {
+                  "const": [
+                    "performance",
+                    "accessibility",
+                    "best-practices",
+                    "seo"
+                  ]
+                },
+                "constrainedBySafetyControls": {
+                  "type": "boolean"
+                },
+                "guardsInstalledBeforeNavigation": {
+                  "const": true
+                },
+                "hostnameResolutionPinned": {
+                  "const": true
+                },
+                "interceptionInstalledBeforeNavigation": {
+                  "const": true
+                },
+                "representative": {
+                  "type": "boolean"
+                },
+                "requestLimit": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "requestsObserved": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            "lighthouse": {
+              "type": "object",
+              "required": [
+                "audits",
+                "categories",
+                "lcp",
+                "metrics",
+                "version"
+              ],
+              "properties": {
+                "audits": {
+                  "type": "array",
+                  "maxItems": 250,
+                  "items": {
+                    "$ref": "#/$defs/audit"
+                  }
+                },
+                "categories": {
+                  "type": "object",
+                  "required": [
+                    "performance",
+                    "accessibility",
+                    "best-practices",
+                    "seo"
+                  ],
+                  "properties": {
+                    "performance": {
+                      "$ref": "#/$defs/category"
+                    },
+                    "accessibility": {
+                      "$ref": "#/$defs/category"
+                    },
+                    "best-practices": {
+                      "$ref": "#/$defs/category"
+                    },
+                    "seo": {
+                      "$ref": "#/$defs/category"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "lcp": {
+                  "$ref": "#/$defs/lcp"
+                },
+                "metrics": {
+                  "type": "object",
+                  "required": [
+                    "first-contentful-paint",
+                    "largest-contentful-paint",
+                    "cumulative-layout-shift",
+                    "total-blocking-time",
+                    "speed-index",
+                    "interactive",
+                    "total-byte-weight"
+                  ],
+                  "properties": {
+                    "first-contentful-paint": {
+                      "$ref": "#/$defs/metric"
+                    },
+                    "largest-contentful-paint": {
+                      "$ref": "#/$defs/metric"
+                    },
+                    "cumulative-layout-shift": {
+                      "$ref": "#/$defs/metric"
+                    },
+                    "total-blocking-time": {
+                      "$ref": "#/$defs/metric"
+                    },
+                    "speed-index": {
+                      "$ref": "#/$defs/metric"
+                    },
+                    "interactive": {
+                      "$ref": "#/$defs/metric"
+                    },
+                    "total-byte-weight": {
+                      "$ref": "#/$defs/metric"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "version": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                }
+              },
+              "additionalProperties": false
+            },
+            "readOnlyGuarantees": {
+              "type": "object",
+              "required": [
+                "externalRequestsAllowed",
+                "formsSubmitted",
+                "methodsAllowed",
+                "mutatingActionsInvoked",
+                "persistentBrowserProfile"
+              ],
+              "properties": {
+                "externalRequestsAllowed": {
+                  "const": false
+                },
+                "formsSubmitted": {
+                  "const": false
+                },
+                "methodsAllowed": {
+                  "const": [
+                    "GET"
+                  ]
+                },
+                "mutatingActionsInvoked": {
+                  "const": false
+                },
+                "persistentBrowserProfile": {
+                  "const": false
+                }
+              },
+              "additionalProperties": false
+            },
+            "summary": {
+              "type": "object",
+              "required": [
+                "auditDefects",
+                "auditInconclusive",
+                "errors",
+                "failed",
+                "warnings"
+              ],
+              "properties": {
+                "auditDefects": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "auditInconclusive": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "errors": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "failed": {
+                  "type": "boolean"
+                },
+                "warnings": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "additionalProperties": false
+            },
+            "options": {
+              "type": "object",
+              "required": [
+                "formFactor",
+                "maxRequests",
+                "privateTargetsRedacted",
+                "strict",
+                "timeoutMilliseconds"
+              ],
+              "properties": {
+                "formFactor": {
+                  "const": "mobile"
+                },
+                "maxRequests": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "privateTargetsRedacted": {
+                  "type": "boolean"
+                },
+                "strict": {
+                  "type": "boolean"
+                },
+                "timeoutMilliseconds": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "type": "object"
+    },
+    "error": {
+      "allOf": [
+        {
+          "$ref": "technical-report.common.schema.json#/$defs/errorEnvelope"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "tool": {
+              "const": "lighthouse-check"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "type": "object"
+    }
+  }
+}
