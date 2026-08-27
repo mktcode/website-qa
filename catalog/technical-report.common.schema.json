@@ -22,9 +22,9 @@
       "type": "object",
       "required": ["id", "version", "status"],
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
-        "version": { "type": "string", "minLength": 1 },
-        "status": { "enum": ["pilot", "stable"] }
+        "id": { "const": "website-qa-baseline" },
+        "version": { "const": "1.0.0" },
+        "status": { "const": "stable" }
       },
       "additionalProperties": true
     },

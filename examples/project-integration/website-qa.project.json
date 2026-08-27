@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "catalog": {
-    "id": "website-qa-pilot",
-    "version": "1.0.0-pilot.7"
+    "id": "website-qa-baseline",
+    "version": "1.0.0"
   },
   "project": {
     "name": "Interne Projektbezeichnung",

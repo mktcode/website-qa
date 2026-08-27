@@ -102,7 +102,7 @@ Eine kopierbare Minimalintegration liegt unter [`examples/project-integration/`]
 
 ## Strukturierter Projektnachweis
 
-HTTP, Crawl, Browser und Social geben neben Befunden positive, negative, nicht anwendbare und unklare atomare Prüfaussagen aus. Der HTTP-Prüfer bildet die deklarierte Sicherheitsheaderbasis und ihre Beobachtungsabdeckung auf ausgewähltem HTML, 404, CSS und JavaScript ab. Der Crawl erfasst zusätzlich Sitemap-Dateien und -Einträge, robots.txt-Referenz, vollständige Sitemap-Abdeckung, interne Navigationen, Ressourcenstatus und MIME-Typen sowie erreichte Sicherheits- und Umfangsgrenzen atomar. Der Browser strukturiert außerdem die vollständige passive Beobachtung externer Requestversuche sowie des initialen Cookie- und Browser-Storage-Inventars, ohne daraus eine rechtliche oder fachliche Freigabe abzuleiten. Grundlage ist der mitgelieferte [Pilotkatalog](catalog/README.md). Er unterscheidet:
+HTTP, Crawl, Browser und Social geben neben Befunden positive, negative, nicht anwendbare und unklare atomare Prüfaussagen aus. Der HTTP-Prüfer bildet die deklarierte Sicherheitsheaderbasis und ihre Beobachtungsabdeckung auf ausgewähltem HTML, 404, CSS und JavaScript ab. Der Crawl erfasst zusätzlich Sitemap-Dateien und -Einträge, robots.txt-Referenz, vollständige Sitemap-Abdeckung, interne Navigationen, Ressourcenstatus und MIME-Typen sowie erreichte Sicherheits- und Umfangsgrenzen atomar. Der Browser strukturiert außerdem die vollständige passive Beobachtung externer Requestversuche sowie des initialen Cookie- und Browser-Storage-Inventars, ohne daraus eine rechtliche oder fachliche Freigabe abzuleiten. Grundlage ist der mitgelieferte [stabile Basiskatalog](catalog/README.md). Er unterscheidet:
 
 - automatisch belegbare Kriterien;
 - manuell beziehungsweise redaktionell zu prüfende Kriterien;
@@ -132,9 +132,9 @@ Danach werden mindestens angepasst:
 Das Berichtsskript enthält ausschließlich:
 
 ```js
-import { writePilotProjectReportBundle } from '@mktcode/website-qa/report'
+import { writeProjectReportBundle } from '@mktcode/website-qa/report'
 
-const result = writePilotProjectReportBundle({
+const result = writeProjectReportBundle({
   configFile: './website-qa.project.json',
 })
 
@@ -142,7 +142,7 @@ console.info(`Vollständiger lokaler Bericht: ${result.bundleDirectory}`)
 console.info(`Versionierbare Zusammenfassung: ${result.summaryFile}`)
 ```
 
-Der Berichtsgenerator liest nur lokale Dateien. Er startet keinen Netzwerkprüfer.
+Der Berichtsgenerator liest nur lokale Dateien. Er startet keinen Netzwerkprüfer. Konfiguration, optionale Evidence und jeder technische Bericht werden vor der Auswertung mit den veröffentlichten JSON-Schemas validiert. Unbekannte Werkzeuge, Fehlerhüllen, geschwächte Nur-Lese-Garantien sowie Assertions mit unpassendem Werkzeug oder unpassender Version werden geschlossen abgelehnt.
 
 ## Automatisch datiertes Berichtsbundle
 
@@ -181,7 +181,7 @@ docs/website-qa/berichte/2026-08-24T18-04-17Z.md
 
 Diese Zusammenfassung besitzt einen eigenen Whitelist-Renderer. Standardmäßig enthält sie nur:
 
-- Zeit, Pilotkatalog und Werkzeugversionen;
+- Zeit, Basiskatalog und Werkzeugversionen;
 - aggregierte Status- und Kriterienzahlen;
 - stabile Kennungen und allgemeine Katalogtexte nicht vollständig belegter Punkte;
 - allgemeine Grenzen des Nachweises.
@@ -189,7 +189,7 @@ Diese Zusammenfassung besitzt einen eigenen Whitelist-Renderer. Standardmäßig 
 Sie übernimmt insbesondere keine freien Nachweisnotizen, Personen, Referenzen, Befundtexte, DOM-Selektoren, Befehle, Umgebungsnamen, Quell-/Deploymentkennungen oder lokalen Pfade. Projektname und URL fehlen standardmäßig. Eine ausdrücklich öffentliche Bezeichnung kann programmatisch freigegeben werden:
 
 ```js
-writePilotProjectReportBundle({
+writeProjectReportBundle({
   configFile: './website-qa.project.json',
   publicProject: {
     label: 'Öffentliche Projektbezeichnung',
@@ -213,33 +213,33 @@ Die getrennte Zusammenfassung unter `docs/website-qa/berichte/` bleibt dadurch v
 
 ## Programmatische Reporting-API
 
-Der Pilot kann ohne Dateiausgabe ausgewertet und gerendert werden:
+Der Bericht kann ohne Dateiausgabe ausgewertet, validiert und gerendert werden:
 
 ```js
 import {
-  createPilotProjectReportFromFiles,
-  renderPilotProjectReportMarkdown,
-  renderPilotProjectSummaryMarkdown,
+  createProjectReportFromFiles,
+  renderProjectReportMarkdown,
+  renderProjectSummaryMarkdown,
 } from '@mktcode/website-qa/report'
 
-const report = createPilotProjectReportFromFiles('./website-qa.project.json')
-const markdown = renderPilotProjectReportMarkdown(report)
-const summary = renderPilotProjectSummaryMarkdown(report)
+const report = createProjectReportFromFiles('./website-qa.project.json')
+const markdown = renderProjectReportMarkdown(report)
+const summary = renderProjectSummaryMarkdown(report)
 ```
 
 Oder als vollständiges Bundle:
 
 ```js
-import { writePilotProjectReportBundle } from '@mktcode/website-qa/report'
+import { writeProjectReportBundle } from '@mktcode/website-qa/report'
 
-const files = writePilotProjectReportBundle({
+const files = writeProjectReportBundle({
   configFile: './website-qa.project.json',
   bundleDirectory: './.website-qa/reports',
   summaryDirectory: './docs/website-qa/berichte',
 })
 ```
 
-Schemas und Beispiele liegen unter [`catalog/`](catalog/). `report.json` verwendet standardmäßig weiterhin Ausgabeschema 2, weil berichtete Ziel-URLs ohne Querywerte gebunden werden; bei Queryzielen werden zusätzlich nur die Parameternamen verglichen. Das experimentelle Ausgabeschema 3 normalisiert eingebettete Assertion- und Evidence-Records als opt-in Vorschau über `convertPilotProjectReportToV3`, `createPilotProjectReportV3`, `createPilotProjectReportV3FromFiles` und `validatePilotProjectReportV3`; bestehende Renderer und Bundles wechseln nicht automatisch. Der Pilot umfasst noch nicht die vollständige Website-Checkliste und verändert keine Projektcheckliste automatisch.
+Schemas und Beispiele liegen unter [`catalog/`](catalog/). [`project-report.config.schema.json`](catalog/project-report.config.schema.json) beschreibt ausschließlich die Projektkonfiguration; [`project-report.schema.json`](catalog/project-report.schema.json) bezeichnet den einzigen normalisierten Ausgabebericht mit `schemaVersion: 3`. Records werden einmalig gespeichert und über deterministische berichtslokale Referenzen zugeordnet. `validateProjectReport` prüft zuerst dieses JSON-Schema und anschließend Katalog-, Scope-, Registry-, Werkzeug-, Workflow-, Referenz- und Aggregationskonsistenz. Der stabile Basiskatalog ist bewusst begrenzt und weder vollständige Website-Checkliste noch WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe. Die Bibliothek verändert keine Projektcheckliste automatisch.
 
 ### Nachweis- und Statuspflege
 
@@ -247,58 +247,15 @@ Kriterien verwenden ausschließlich `pass`, `fail`, `inconclusive`, `notApplicab
 
 Alle Records in einer Evidence-Datei gelten als gleichzeitig aktive Nachweise; es gibt kein stilles „neuester Eintrag gewinnt“ und keinen automatischen Ablauf allein aufgrund des Datums. Mehrere Records für dasselbe Kriterium werden konservativ zusammengeführt: Ein aktives `fail` hat Vorrang, ein aktives `inconclusive` verhindert ein eindeutiges Ergebnis, und eine Mischung aus `pass` und `notApplicable` bleibt `pass`. Ersetzte oder fachlich nicht mehr geltende Records müssen deshalb bewusst aus der aktiven Projektkopie entfernt und bei Bedarf über deren Versionshistorie beziehungsweise Projektakte erhalten werden. Freie Notizen und Referenzen werden nur als Nachweisdaten übernommen; das Werkzeug öffnet oder bestätigt referenzierte Unterlagen nicht. Vertrauliche Unterlagen werden weiterhin ausschließlich außerhalb empfohlener Berichte verwahrt und nur redigiert referenziert.
 
-### Migration von 0.6.1
+### Migration von 0.6.x auf 1.0.0
 
-- Eine ausdrücklich dokumentierte Nichtanwendbarkeit des gesamten Checklistenpunkts verändert weiterhin nur dessen Projektstatus. Sie markiert fehlende, unklare oder negative Kriterien im vollständigen Markdownbericht nicht mehr fälschlich als abgehakt.
-- Kriteriencheckboxen folgen damit wie die Kriterienzähler ausschließlich dem jeweiligen Kriterienergebnis: `pass` und `notApplicable` gelten als geklärt; `fail`, `inconclusive` und `noEvidence` bleiben sichtbar offen.
-- JSON-Schemas, Auswertung, Pilotkatalog, Assertions und technische Prüfergebnisse ändern sich nicht. Vorhandene technische 0.6.x-Berichte und Evidence-Dateien können ohne neue Netzwerkprüfung verarbeitet werden.
+Version 1.0.0 ist ein bewusster inkompatibler Vertragsschnitt:
 
-### Migration von 0.6.0
-
-- Die vollständige und die datenarme Markdowndarstellung nennen für automatische und nicht automatische Kriterien nun jeweils Gesamtzahl, bestandene beziehungsweise belegte, fehlgeschlagene, unklare, nicht zutreffende und nicht belegte Kriterien. Die Kurzzeilen sind damit summengleich.
-- In der Kriterienübersicht des vollständigen Markdownberichts zählen `pass` und `notApplicable` als geklärt. Ein fachlich nicht zutreffendes Kriterium wird dadurch nicht länger wie ein fehlender Nachweis dargestellt.
-- JSON-Schemas, Pilotkatalog, Assertions und technische Prüfergebnisse ändern sich nicht. Bereits mit `0.6.0` erzeugte technische Berichte können deshalb ohne erneute Netzwerkprüfung mit dem korrigierten Berichtsgenerator verarbeitet werden.
-
-### Migration von 0.5.x
-
-- Der Browser-Prüfer liefert zwei zusätzliche atomare Assertions für die vollständige passive Beobachtung externer Requestversuche sowie des initialen Cookie-, Local-/Session-Storage- und IndexedDB-Inventars.
-- Der Pilotkatalog `1.0.0-pilot.7` ergänzt `CORE-PRIV-02` und `CORE-PRIV-04`. Projektkonfigurationen und Evidence-Dateien müssen diese Katalogversion ausdrücklich übernehmen.
-- Technische Berichte aller vier Werkzeuge weisen die aktuelle Katalogversion aus. Für einen gemeinsamen Projektbericht müssen deshalb alle eingebundenen Berichte mit einem einheitlichen `0.6.x`-Werkzeugstand neu erzeugt werden.
-- Ein automatisches `pass` bestätigt nur, dass die Beobachtung innerhalb der deklarierten passiven, isolierten Seiten-/Profilumgebung vollständig war. Quell- und Konfigurationsabgleich, Zulässigkeit externer Dienste, Dokumentation, Einwilligungslogik sowie die Angemessenheit von `Secure`, `HttpOnly` und `SameSite` bleiben manuell.
-- Externe Requests bleiben blockiert. Es werden keine Consent-Auswahl, Klicks, Formulare oder zusätzlichen Netzwerkpfade eingeführt. Blockierte Versuche bleiben als Befund sichtbar und werden nicht als tatsächlich ausgeführte Drittanbieteranfrage dargestellt.
-- Cookie- und Storagewerte werden nie in den Bericht übernommen. Bezeichner sind auf 100 Einträge je Art und Seiten-/Profil-Lauf begrenzt; eine Überschreitung führt beim abhängigen Nachweis zu `inconclusive`. Die Beobachtungszeit nach `DOMContentLoaded` wird im Bericht dokumentiert.
-
-### Migration von 0.4.x
-
-- Der HTTP-Prüfer liefert sieben zusätzliche atomare Assertions für deklarierte CSP, Framing-Schutz, `X-Content-Type-Options: nosniff`, Referrer Policy sowie Permissions Policy und unterscheidet vollständige Dokument- von vollständiger Gesamtbeobachtung der ausgewählten Antwortklassen. Bereits vorhandene HSTS-Assertions umfassen nun auch die ohnehin abgerufene CSS-/JavaScript-Stichprobe.
-- Der Pilotkatalog `1.0.0-pilot.6` ergänzt `CORE-ERR-04`, `CORE-SEC-04` und `CORE-SEC-05`. Projektkonfigurationen und Evidence-Dateien müssen diese Katalogversion ausdrücklich übernehmen.
-- Technische Berichte aller vier Werkzeuge weisen die aktuelle Katalogversion aus. Für einen gemeinsamen Projektbericht müssen deshalb alle eingebundenen Berichte mit einem einheitlichen `0.5.x`-Werkzeugstand neu erzeugt werden.
-- Es entstehen keine zusätzlichen HTTP-Anfragen: ausgewertet werden reguläres HTML, die bestehende 404-Probe sowie die bereits für MIME-, Cache- und Kompressionsprüfungen ausgewählten CSS-/JavaScript-Antworten.
-- Deklarierte Header und ein syntaktisch erkennbarer Framing-Schutz belegen weder die inhaltliche Stärke einer CSP noch widerspruchsfreie Anwendung-/Proxykonfiguration oder risikogerechte Projekteignung. APIs, weitere Antwortklassen, alternative Hosts sowie app- und proxyseitige Redirectheader bleiben manuell zu prüfen.
-- Fehlt eine ausgewählte Antwort wegen eines Abruffehlers, wird die Headerabdeckung `inconclusive`. HSTS ist bei ausdrücklich zugelassenen HTTP-Zielen `notApplicable` statt ein positiver HTTPS-Nachweis.
-
-### Migration von 0.3.x
-
-- Der Crawl liefert neun zusätzliche atomare Assertions für Sitemap, interne Navigationen, Ressourcen und Laufabdeckung. Es werden dafür keine neuen Netzwerkpfade geöffnet; ausgewertet werden bereits vorhandene GET-Beobachtungen.
-- Der Pilotkatalog `1.0.0-pilot.5` ergänzt `CORE-ERR-03`, `CORE-MAP-01`, `CORE-MAP-02`, `CORE-SEO-04`, `CORE-QA-05` und `CORE-QA-08`. Projektkonfigurationen und Evidence-Dateien müssen die neue Katalogversion ausdrücklich übernehmen.
-- Technische Berichte aller vier Werkzeuge weisen die aktuelle Katalogversion aus. Für einen gemeinsamen Projektbericht müssen deshalb alle eingebundenen Berichte mit einem einheitlichen `0.4.x`-Werkzeugstand neu erzeugt werden.
-- API-/Content-Negotiation-Fehler, projektspezifischer Routen- und Indexierungsumfang, optionale Sitemap-Metadaten und XSL, externe Links sowie dynamische oder interaktionsabhängige Ressourcen bleiben nicht automatische Kriterien.
-- Abruffehler, Sicherheitsauslassungen und erreichte Seiten-, Ressourcen- oder Sitemaplimits führen bei abhängigen Assertions weiterhin zu `inconclusive` statt zu einem stillschweigenden Erfolg.
-
-### Migration von 0.2.x
-
-- Social-Berichte verwenden nun `schemaVersion: 1`, zehn atomare Assertions, Nur-Lese-Garantien und `checklistCoverage`.
-- Der Pilotkatalog `1.0.0-pilot.4` ergänzt `CORE-SOC-01` bis `CORE-SOC-03` sowie ausgewählte Robots-Punkte. Projektkonfigurationen und Evidence-Dateien müssen diese Katalogversion ausdrücklich übernehmen.
-- Social-Berichte werden als vierter technischer Lauf in Projektbericht und Bundle eingebunden.
-- Echte Plattformvorschau, redaktionelle Eignung, Policy-Aktualität und Betreiberentscheidung bleiben manuelle Kriterien; ein technisch grüner Social-Lauf schließt sie nicht automatisch ab.
-
-### Migration von 0.1.x
-
-- Technische JSON-Berichte entfernen nun Querywerte, URL-Zugangsdaten, private Zielhosts sowie weitere bekannte sensible Textwerte.
-- Bei Queryzielen enthalten Berichte nur `requestedUrlParameterNames`; die Werte können nicht mehr zur Berichtsbindung verwendet werden.
-- Der abgeleitete Projektbericht verwendet deshalb `schemaVersion: 2` und kennzeichnet die Bindung als `matchedAgainstRedactedTechnicalReport`.
-- Bestehende Funktionen zum Erzeugen und Rendern eines Projektberichts bleiben verfügbar.
-- Die neue Bundle-Funktion verarbeitet vollständige Werkzeugberichte direkt; alte manuell kompaktierte Zwischenberichte sind nicht mehr erforderlich.
+- Projektkonfigurationen verwenden Katalog `website-qa-baseline` in Version `1.0.0`; technische Berichte müssen mit diesem Katalogbezug neu erzeugt werden.
+- `website-pilot.json` heißt nun `website-baseline.json`; die alten `*Pilot*`- und `*V3*`-APIs entfallen ohne Alias.
+- `project-report.config.schema.json` beschreibt die Eingabe. `project-report.schema.json` beschreibt als einziges Berichtsschema die normalisierte Ausgabe mit `schemaVersion: 3`. Schema 2 und sein Konverter entfallen.
+- Die stabilen Reportnamen sind `createProjectReport`, `createProjectReportFromFiles`, `validateProjectReport`, `renderProjectReportMarkdown`, `renderProjectSummaryMarkdown` und `writeProjectReportBundle`.
+- Alte technische Berichte mit `website-qa-pilot` werden nicht still dem stabilen Basiskatalog zugerechnet. Eine neue technische Erhebung oder bewusst geprüfte projektspezifische Evidence-Übernahme ist erforderlich.
 
 ## Berichtsdaten und Redaktion
 

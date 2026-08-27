@@ -1,10 +1,10 @@
 {
   "$schema": "./website-catalog.schema.json",
   "schemaVersion": 1,
-  "catalogId": "website-qa-pilot",
-  "catalogVersion": "1.0.0-pilot.7",
-  "status": "pilot",
-  "description": "Strukturierter Pilotkatalog für HTTP-, Crawl-, Browser- und Social-bezogene sowie bewusst nicht automatisierbare Website-Prüfnachweise.",
+  "catalogId": "website-qa-baseline",
+  "catalogVersion": "1.0.0",
+  "status": "stable",
+  "description": "Bewusst begrenzter stabiler Basiskatalog für HTTP-, Crawl-, Browser- und Social-bezogene sowie bewusst nicht automatisierbare Website-Prüfnachweise.",
   "items": [
     {
       "id": "CORE-DOM-02",

@@ -173,7 +173,7 @@ describe('http checker', () => {
 
     const json = createJsonReport(report.results, report.options)
     expect(json).toMatchObject({
-      checklistCoverage: { catalog: { status: 'pilot' } },
+      checklistCoverage: { catalog: { status: 'stable' } },
       readOnlyGuarantees: { methods: ['GET'], mutatingActionsInvoked: false },
       results: [{ requestedUrl: '(privates/lokales Ziel)', requestedUrlParameterNames: ['source'] }],
       schemaVersion: 1,

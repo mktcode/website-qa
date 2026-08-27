@@ -2,13 +2,16 @@
 
 Dieses Changelog dokumentiert veröffentlichte Paketstände von `@mktcode/website-qa`. Planungs- und reine Dokumentationscommits ohne Paketveröffentlichung erscheinen nicht als eigene Version.
 
-## Unveröffentlicht
+## Unveröffentlicht – 1.0.0 vorbereitet
 
-- Phase I bereitet technische Berichtsschemas sowie Kompatibilitäts-, Deprecation- und API-Verträge für eine spätere 1.0 vor.
-- Experimentelles Projektberichtsschema 3 als opt-in Vorschau ergänzt: Records werden einmalig gespeichert und von Kriterien über semantisch validierte berichtslokale IDs referenziert; Item-, Kriterien- und Assertion-Zuordnungen sind dabei exakt an den referenzierten Pilotkatalog gebunden.
-- Assertion- und Evidence-Recordtypen im JSON-Schema 3 diskriminiert mit ihrer jeweils zulässigen Recordstruktur gekoppelt.
-- Schema-2-Erzeuger, Renderer und Bundles unverändert gelassen; Kriterienzähler in Schema 3 auf die fünf tatsächlich möglichen atomaren Ergebnisse bereinigt.
-- Katalog-ID-Muster für Kennungen mit zusätzlichen oder alphanumerischen Segmenten korrigiert, Evidence-Klassen und deklarierte `$schema`-Felder mit den Beispielen synchronisiert und die Zielbindungsprovenienz vor URL-Redaktion geschützt.
+- Bewussten inkompatiblen 1.0-Vertragsschnitt umgesetzt; noch nicht veröffentlicht.
+- Den begrenzten Bestand ohne neue Assertions als `website-qa-baseline` 1.0.0 stabilisiert. Stabilität bezeichnet IDs und Versionsregeln, nicht vollständige Checklistenabdeckung oder Freigabe.
+- Projektkonfiguration und Berichtsschema eindeutig als `project-report.config.schema.json` beziehungsweise `project-report.schema.json` benannt.
+- Genau ein normalisiertes Projektberichtsausgabeformat beibehalten: `schemaVersion: 3` mit deterministischen berichtslokalen Referenzen, Deduplizierung und semantischer Katalog-, Scope-, Referenz- und Aggregationsvalidierung.
+- Frühere Projektberichtserzeugung, Konvertierung, Schemata und API-Namen ohne Alias oder Deprecation-Hülle entfernt.
+- Stabile Checklist- und Reporting-APIs, einen vollständigen Renderer, eine sichere Whitelist-Zusammenfassung und ausschließlich normalisierte Bundles eingeführt.
+- Konfiguration, Evidence, technische Eingaben und Projektberichte vor der Auswertung mit den veröffentlichten JSON-Schemas validiert; Werkzeug-, Assertion- und Nur-Lese-Bindung geschlossen geprüft und alle variablen Markdownfelder kontextgerecht escaped.
+- Paket- und Lockfileversion auf 1.0.0 vorbereitet; vier CLI-Namen, technische Berichtsschemata 1 sowie GET-, SSRF-, Redirect-, Browser-, Ressourcen- und Redaktionsgrenzen unverändert erhalten.
 
 ## 0.6.2 – 2026-08-27
 

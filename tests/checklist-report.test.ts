@@ -2,9 +2,9 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import {
   checklistItemIdsForTool,
-  evaluatePilotChecklist,
+  evaluateChecklist,
   loadAssertionRegistry,
-  loadPilotCatalog,
+  loadWebsiteCatalog,
   validateChecklistCatalog,
 } from '../src/lib/checklist-report.mjs'
 
@@ -27,13 +27,13 @@ function evidenceRecord(outcome: 'fail' | 'inconclusive' | 'notApplicable' | 'pa
   }
 }
 
-describe('structured checklist pilot', () => {
+describe('structured baseline checklist', () => {
   it('validates unique checklist criteria and registered assertions', () => {
-    const catalog = loadPilotCatalog()
+    const catalog = loadWebsiteCatalog()
     const registry = loadAssertionRegistry()
 
     expect(validateChecklistCatalog(catalog, registry)).toBe(true)
-    expect(catalog).toMatchObject({ catalogVersion: '1.0.0-pilot.7' })
+    expect(catalog).toMatchObject({ catalogVersion: '1.0.0' })
     expect(catalog.items).toHaveLength(34)
     expect(catalog.items.flatMap((item: { criteria: unknown[] }) => item.criteria)).toHaveLength(93)
     expect(registry.assertions).toHaveLength(56)
@@ -76,11 +76,11 @@ describe('structured checklist pilot', () => {
       'CORE-ROB-02',
       'CORE-ROB-04',
     ])
-    expect(() => evaluatePilotChecklist({ assertions: [assertion('unknown.assertion')] })).toThrow(/unbekannte Assertion/)
+    expect(() => evaluateChecklist({ assertions: [assertion('unknown.assertion')] })).toThrow(/unbekannte Assertion/)
   })
 
   it('keeps automatic, manual and external evidence separate', () => {
-    const automaticOnly = evaluatePilotChecklist({
+    const automaticOnly = evaluateChecklist({
       assertions: [
         assertion('error.not-found.status-404'),
         assertion('error.not-found.no-technical-details'),
@@ -98,7 +98,7 @@ describe('structured checklist pilot', () => {
       nonAutomaticCriteria: { noEvidence: 1, total: 1 },
     })
 
-    const withEditorialReview = evaluatePilotChecklist({
+    const withEditorialReview = evaluateChecklist({
       assertions: automaticOnly.items[0]?.criteria.flatMap((criterion: { records: ReturnType<typeof assertion>[] }) => criterion.records) || [],
       evidence: [{
         checkedAt: '2026-08-24',
@@ -118,7 +118,7 @@ describe('structured checklist pilot', () => {
   })
 
   it('aggregates every active manual or external evidence record conservatively', () => {
-    const evaluate = (outcomes: Array<'fail' | 'inconclusive' | 'notApplicable' | 'pass'>) => evaluatePilotChecklist({
+    const evaluate = (outcomes: Array<'fail' | 'inconclusive' | 'notApplicable' | 'pass'>) => evaluateChecklist({
       evidence: outcomes.map((outcome, index) => evidenceRecord(outcome, `2026-08-${String(index + 20).padStart(2, '0')}`)),
       itemIds: ['GOV-RGT-02'],
     })
@@ -133,20 +133,20 @@ describe('structured checklist pilot', () => {
   })
 
   it('does not complete communication or infrastructure points without explicit evidence', () => {
-    const open = evaluatePilotChecklist({ itemIds: ['CORE-DOM-04', 'GOV-RGT-02'] })
+    const open = evaluateChecklist({ itemIds: ['CORE-DOM-04', 'GOV-RGT-02'] })
     expect(open.items.map((item: { id: string, outcome: string }) => [item.id, item.outcome])).toEqual([
       ['CORE-DOM-04', 'open'],
       ['GOV-RGT-02', 'open'],
     ])
     expect(open.summary.nonAutomaticCriteria).toMatchObject({ noEvidence: 3, total: 3 })
-    expect(() => evaluatePilotChecklist({
+    expect(() => evaluateChecklist({
       evidence: [{ criterionId: 'GOV-RGT-02/C1', outcome: 'pass' }],
       itemIds: ['GOV-RGT-02'],
     })).toThrow(/gültiges Datum/)
 
     const evidenceExample = JSON.parse(readFileSync(new URL('../catalog/project-evidence.example.json', import.meta.url), 'utf8'))
-    expect(evidenceExample.catalog).toEqual({ id: 'website-qa-pilot', version: '1.0.0-pilot.7' })
-    const evidencedRights = evaluatePilotChecklist({
+    expect(evidenceExample.catalog).toEqual({ id: 'website-qa-baseline', version: '1.0.0' })
+    const evidencedRights = evaluateChecklist({
       evidence: evidenceExample.evidence,
       itemIds: ['GOV-RGT-02'],
     })
@@ -166,7 +166,7 @@ describe('structured checklist pilot', () => {
       'crawl.resources.mime-valid',
       'crawl.run.coverage-complete',
     ].map(assertionId => assertion(assertionId))
-    const report = evaluatePilotChecklist({
+    const report = evaluateChecklist({
       assertions: crawlAssertions,
       itemIds: ['CORE-ERR-03', 'CORE-MAP-01', 'CORE-MAP-02', 'CORE-SEO-04', 'CORE-QA-05', 'CORE-QA-08'],
     })
@@ -193,7 +193,7 @@ describe('structured checklist pilot', () => {
       'error.not-found.noindex',
       'cache.not-found.not-publicly-cacheable',
     ].map(assertionId => assertion(assertionId))
-    const report = evaluatePilotChecklist({
+    const report = evaluateChecklist({
       assertions: securityAssertions,
       itemIds: ['CORE-ERR-04', 'CORE-SEC-04', 'CORE-SEC-05'],
     })
@@ -207,7 +207,7 @@ describe('structured checklist pilot', () => {
   })
 
   it('keeps privacy interpretation and consent review open after complete passive observations', () => {
-    const report = evaluatePilotChecklist({
+    const report = evaluateChecklist({
       assertions: [
         assertion('browser.privacy.external-request-observation-complete'),
         assertion('browser.privacy.initial-storage-observation-complete'),
@@ -224,7 +224,7 @@ describe('structured checklist pilot', () => {
   })
 
   it('can fully substantiate a point whose required criteria are automatic', () => {
-    const report = evaluatePilotChecklist({
+    const report = evaluateChecklist({
       assertions: [
         assertion('error.not-found.noindex'),
         assertion('error.not-found.no-url-metadata'),
@@ -236,13 +236,13 @@ describe('structured checklist pilot', () => {
     expect(report.summary.checklistItems).toMatchObject({ automaticallyPassed: 1, pass: 1, total: 1 })
   })
 
-  it('keeps pilot statements synchronized with their Markdown source points', () => {
+  it('keeps baseline statements synchronized with their Markdown source points', () => {
     const markdown = [
       readFileSync(new URL('../docs/checklisten/website/kern.md', import.meta.url), 'utf8'),
       readFileSync(new URL('../docs/checklisten/website/module/auftrag-recht-uebergabe.md', import.meta.url), 'utf8'),
     ].join('\n')
 
-    for (const item of loadPilotCatalog().items) {
+    for (const item of loadWebsiteCatalog().items) {
       const sourceStatement = markdown.match(new RegExp(`^- \\[ \\] \`${item.id}\` (.+)$`, 'm'))?.[1]
       expect(sourceStatement, `Markdown-Quelle für ${item.id}`).toBe(item.statement)
     }

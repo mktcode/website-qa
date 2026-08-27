@@ -12,10 +12,16 @@ import {
   writeFileSync,
 } from 'node:fs'
 import { dirname, join, relative, resolve, sep } from 'node:path'
-import { evaluatePilotChecklist, loadPilotCatalog } from './checklist-report.mjs'
+import { evaluateChecklist, loadAssertionRegistry, loadWebsiteCatalog } from './checklist-report.mjs'
 import { redactReportData, redactText, reportUrl } from './http-client.mjs'
 import { aggregateEvidenceOutcomes, aggregateItemOutcome } from './outcome-aggregation.mjs'
 import { packageName, packageVersion } from './package-info.mjs'
+import {
+  validateProjectConfigurationSchema,
+  validateProjectEvidenceSchema,
+  validateProjectReportSchema,
+  validateTechnicalReportSchema,
+} from './schema-validation.mjs'
 
 const allowedItemStates = new Set(['acceptedDeviation', 'deferred', 'external', 'notApplicable'])
 const projectStatusOrder = ['complete', 'failed', 'partial', 'open', 'inconclusive', 'notApplicable', 'external', 'deferred', 'acceptedDeviation']
@@ -38,12 +44,15 @@ function requireText(value, label) {
 }
 
 function validateCatalogReference(reference, catalog, label) {
-  if (reference?.id !== catalog.catalogId || reference?.version !== catalog.catalogVersion) {
+  if (reference?.id !== catalog.catalogId
+    || reference?.version !== catalog.catalogVersion
+    || (reference.status !== undefined && reference.status !== catalog.status)) {
     throw new Error(`${label} verwendet nicht ${catalog.catalogId} ${catalog.catalogVersion}.`)
   }
 }
 
 function validateProjectConfiguration(config, catalog) {
+  validateProjectConfigurationSchema(config)
   if (config.schemaVersion !== 1) {
     throw new Error('Projektberichtskonfiguration verwendet kein unterstütztes Schema.')
   }
@@ -60,7 +69,7 @@ function validateProjectConfiguration(config, catalog) {
   const knownModules = new Set(catalog.items.map(item => item.module))
   for (const module of config.selectedModules) {
     if (!knownModules.has(module)) {
-      throw new Error(`Der Pilotkatalog enthält das ausgewählte Modul ${module} nicht.`)
+      throw new Error(`Der Basiskatalog enthält das ausgewählte Modul ${module} nicht.`)
     }
   }
 
@@ -96,6 +105,7 @@ function validateEvidenceDocument(document, catalog) {
   if (!document) {
     return []
   }
+  validateProjectEvidenceSchema(document)
   if (document.schemaVersion !== 1 || !Array.isArray(document.evidence)) {
     throw new Error('Projektnachweisdatei verwendet kein unterstütztes Schema.')
   }
@@ -128,7 +138,9 @@ function validateTechnicalRun(run, config, catalog) {
   requireText(run.targetUrl, 'Ziel-URL eines technischen Laufs')
   const targetUrl = normalizeUrl(run.targetUrl, 'Ziel-URL eines technischen Laufs')
   const report = run.report
-  const privateTargetsRedacted = report?.options?.privateTargetsRedacted === true
+  const reportLabel = 'Technischer Bericht'
+  validateTechnicalReportSchema(report, reportLabel)
+  const privateTargetsRedacted = report.options.privateTargetsRedacted === true
   const reportedTargetUrl = reportUrl(targetUrl, { hideHosts: privateTargetsRedacted }).url
   const results = technicalReportResults(report)
   if (report?.schemaVersion !== 1 || !results) {
@@ -137,7 +149,16 @@ function validateTechnicalRun(run, config, catalog) {
   requireText(report.generatedAt, 'Erstellungszeit des technischen Berichts')
   requireText(report.tool, 'Werkzeugkennung des technischen Berichts')
   requireText(report.toolPackage?.version, 'Werkzeugversion des technischen Berichts')
-  validateCatalogReference(report.checklistCoverage?.catalog, catalog, `Technischer Bericht ${run.reportFile || run.command}`)
+  validateCatalogReference(report.checklistCoverage?.catalog, catalog, reportLabel)
+  const assertionsById = new Map(loadAssertionRegistry().assertions.map(assertion => [assertion.id, assertion]))
+  for (const assertion of results.flatMap(result => result.assertions || [])) {
+    const registeredAssertion = assertionsById.get(assertion.assertionId)
+    if (!registeredAssertion
+      || assertion.assertionVersion !== registeredAssertion.version
+      || registeredAssertion.tool !== report.tool) {
+      throw new Error(`${reportLabel} enthält eine nicht zum Werkzeug passende Assertion.`)
+    }
+  }
   const expectedParameterNames = reportUrl(targetUrl).parameterNames
   const targetReported = results.some((result) => {
     if (!result.requestedUrl) {
@@ -164,6 +185,7 @@ function validateTechnicalRun(run, config, catalog) {
   return {
     assertions: results.flatMap(result => result.assertions || []).map((assertion) => {
       const scopedAssertion = structuredClone(assertion)
+      scopedAssertion.tool = report.tool
       scopedAssertion.subject = Object.assign({}, scopedAssertion.subject, {
         deploymentId: run.deploymentId,
         environment: run.environment,
@@ -209,16 +231,30 @@ function countProjectStatuses(items) {
   return Object.fromEntries(projectStatusOrder.map(status => [status, items.filter(item => item.projectStatus === status).length]))
 }
 
-export function createPilotProjectReport({ config, evidenceDocument, generatedAt = new Date().toISOString(), technicalRuns }) {
-  const catalog = loadPilotCatalog()
+export function createProjectReport({ config, evidenceDocument, generatedAt = new Date().toISOString(), technicalRuns }) {
+  const catalog = loadWebsiteCatalog()
   const selectedItemIds = validateProjectConfiguration(config, catalog)
   const evidence = validateEvidenceDocument(evidenceDocument, catalog)
   const runEvaluations = technicalRuns.map(run => validateTechnicalRun(run, config, catalog))
   const usedRuns = runEvaluations.filter(run => run.record.usedForEvaluation)
   const assertions = usedRuns.flatMap(run => run.assertions)
-  const evaluated = evaluatePilotChecklist({ assertions, evidence, itemIds: selectedItemIds })
+  const evaluated = evaluateChecklist({ assertions, evidence, itemIds: selectedItemIds })
   const statesByItem = new Map((config.itemStates || []).map(state => [state.itemId, state]))
   const warnings = []
+  const records = []
+  const referencesByRecord = new Map()
+
+  function recordReference(type, record) {
+    const safeRecord = redactReportData(structuredClone(record))
+    const key = `${type}:${canonicalJson(safeRecord)}`
+    let reference = referencesByRecord.get(key)
+    if (!reference) {
+      reference = `R${String(records.length + 1).padStart(6, '0')}`
+      referencesByRecord.set(key, reference)
+      records.push({ id: reference, record: safeRecord, type })
+    }
+    return reference
+  }
 
   if (usedRuns.length === 0) {
     warnings.push(`Kein technischer Lauf gehört zur Auswertungsumgebung ${config.project.evaluationEnvironment}.`)
@@ -231,7 +267,23 @@ export function createPilotProjectReport({ config, evidenceDocument, generatedAt
       warnings.push(`${item.id} ist technisch beziehungsweise dokumentarisch vollständig belegt, besitzt aber weiterhin den Workflowstatus ${workflow.status}.`)
     }
     return {
-      criteria: item.criteria,
+      criteria: item.criteria.map((criterion) => {
+        const normalized = {
+          evidenceClass: criterion.evidenceClass,
+          evidenceInstructions: criterion.evidenceInstructions,
+          id: criterion.id,
+          mode: criterion.mode,
+          outcome: criterion.outcome,
+          recordRefs: [...new Set(criterion.records.map(record => recordReference(criterion.mode === 'automatic' ? 'assertion' : 'evidence', record)))],
+          statement: criterion.statement,
+        }
+        if (criterion.mode === 'automatic') {
+          const catalogItem = catalog.items.find(entry => entry.id === item.id)
+          const catalogCriterion = catalogItem.criteria.find(entry => entry.id === criterion.id)
+          normalized.requiredAssertionIds = [...catalogCriterion.verification.assertions]
+        }
+        return normalized
+      }),
       evidenceOutcome: item.outcome,
       id: item.id,
       module: item.module,
@@ -241,17 +293,16 @@ export function createPilotProjectReport({ config, evidenceDocument, generatedAt
     }
   })
 
-  const reportGeneratedAt = generatedAt
-  if (Number.isNaN(new Date(reportGeneratedAt).valueOf())) {
+  if (Number.isNaN(new Date(generatedAt).valueOf())) {
     throw new TypeError('Erstellungszeit des Projektberichts ist ungültig.')
   }
 
-  return redactReportData({
+  const report = redactReportData({
     catalog: evaluated.catalog,
-    generatedAt: reportGeneratedAt,
+    generatedAt,
     items,
     limitations: [
-      'Der strukturierte Katalog ist ein Pilot und umfasst noch nicht die vollständige Website-Checkliste.',
+      'Der stabile Basiskatalog ist bewusst begrenzt und weder vollständige Website-Checkliste noch WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe.',
       'Automatische Ergebnisse sind technische Teilnachweise und ersetzen keine manuellen, externen, rechtlichen oder organisatorischen Prüfungen.',
       'Nur technische Läufe der festgelegten Auswertungsumgebung fließen in die Checklistenbewertung ein.',
       'Quell- und Deploymentstand technischer Läufe sind projektseitig deklarierte Zuordnungen; das technische Werkzeug bestätigt sie nicht unabhängig.',
@@ -262,34 +313,38 @@ export function createPilotProjectReport({ config, evidenceDocument, generatedAt
       deploymentAndSourceContext: 'projectDeclared',
       targetUrlBinding: 'matchedAgainstRedactedTechnicalReport',
     },
-    schemaVersion: 2,
+    records,
+    schemaVersion: 3,
     scope: {
       selectedItemIds,
       selectedModules: [...config.selectedModules],
     },
     summary: {
-      automaticCriteria: evaluated.summary.automaticCriteria,
+      automaticCriteria: normalizedCriterionCounts(evaluated.summary.automaticCriteria),
       checklistItems: {
         ...countProjectStatuses(items),
         total: items.length,
       },
-      nonAutomaticCriteria: evaluated.summary.nonAutomaticCriteria,
+      nonAutomaticCriteria: normalizedCriterionCounts(evaluated.summary.nonAutomaticCriteria),
     },
     technicalRuns: runEvaluations.map(run => run.record),
     warnings,
   })
+  validateProjectReport(report)
+  return report
 }
 
-export function createPilotProjectReportFromFiles(configFile) {
+export function createProjectReportFromFiles(configFile) {
   const absoluteConfigFile = resolve(configFile)
   const baseDirectory = dirname(absoluteConfigFile)
   const config = readJson(absoluteConfigFile)
+  validateProjectConfigurationSchema(config)
   const evidenceDocument = config.evidenceFile ? readJson(resolve(baseDirectory, config.evidenceFile)) : undefined
   const technicalRuns = config.technicalRuns.map(run => ({
     ...run,
     report: readJson(resolve(baseDirectory, run.reportFile)),
   }))
-  return createPilotProjectReport({ config, evidenceDocument, technicalRuns })
+  return createProjectReport({ config, evidenceDocument, technicalRuns })
 }
 
 function canonicalValue(entry) {
@@ -309,7 +364,7 @@ function canonicalJson(value) {
   return JSON.stringify(canonicalValue(value))
 }
 
-function v3CriterionCounts(counts) {
+function normalizedCriterionCounts(counts) {
   return Object.fromEntries(['pass', 'fail', 'inconclusive', 'notApplicable', 'noEvidence', 'total']
     .map(key => [key, counts[key]]))
 }
@@ -340,20 +395,172 @@ function requireEqualCounts(actual, expected, label) {
 
 function requireSameSequence(actual, expected, label) {
   if (!Array.isArray(actual) || actual.length !== expected.length || actual.some((value, index) => value !== expected[index])) {
-    throw new Error(`${label} passt nicht zum Pilotkatalog.`)
+    throw new Error(`${label} passt nicht zum Basiskatalog.`)
   }
 }
 
 function catalogCriteriaForItem(item, catalogItemsById) {
   const catalogItem = catalogItemsById.get(item.id)
   if (!catalogItem) {
-    throw new Error(`Checklistenpunkt ${item.id} ist im Pilotkatalog unbekannt.`)
+    throw new Error(`Checklistenpunkt ${item.id} ist im Basiskatalog unbekannt.`)
   }
   if (item.module !== catalogItem.module) {
     throw new Error(`Checklistenpunkt ${item.id} verwendet das Modul ${item.module} statt ${catalogItem.module}.`)
   }
+  if (item.statement !== catalogItem.statement) {
+    throw new Error(`Checklistenpunkt ${item.id} verwendet nicht die Aussage des Basiskatalogs.`)
+  }
   requireSameSequence(item.criteria?.map(criterion => criterion.id), catalogItem.criteria.map(criterion => criterion.id), `Kriterienzuordnung für ${item.id}`)
   return catalogItem.criteria
+}
+
+function requireObjectShape(value, required, allowed, label) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new TypeError(`${label} ist kein Objekt.`)
+  }
+  const keys = Object.keys(value).filter(key => value[key] !== undefined)
+  const unknown = keys.find(key => !allowed.includes(key))
+  if (unknown) {
+    throw new Error(`${label} enthält das unbekannte Feld ${unknown}.`)
+  }
+  const missing = required.find(key => value[key] === undefined)
+  if (missing) {
+    throw new Error(`${label} enthält das Pflichtfeld ${missing} nicht.`)
+  }
+}
+
+function requireStringArray(value, label, { nonEmpty = false } = {}) {
+  if (!Array.isArray(value) || (nonEmpty && value.length === 0) || value.some(entry => typeof entry !== 'string' || !entry.trim())) {
+    throw new TypeError(`${label} ist keine gültige Textliste.`)
+  }
+}
+
+function requireCountObject(value, keys, label) {
+  requireObjectShape(value, keys, keys, label)
+  for (const key of keys) {
+    if (!Number.isInteger(value[key]) || value[key] < 0) {
+      throw new TypeError(`${label}.${key} ist keine nichtnegative Ganzzahl.`)
+    }
+  }
+}
+
+function validateProjectReportStructure(report) {
+  const rootKeys = ['schemaVersion', 'generatedAt', 'catalog', 'project', 'provenance', 'scope', 'technicalRuns', 'records', 'items', 'summary', 'warnings', 'limitations']
+  requireObjectShape(report, rootKeys, rootKeys, 'Projektbericht')
+  if (report.schemaVersion !== 3 || Number.isNaN(new Date(report.generatedAt).valueOf())) {
+    throw new Error('Projektbericht verwendet nicht das normalisierte Schema 3.')
+  }
+  requireObjectShape(report.catalog, ['id', 'version', 'status'], ['id', 'version', 'status'], 'Katalogreferenz')
+  requireText(report.catalog.id, 'Katalogkennung')
+  requireText(report.catalog.version, 'Katalogversion')
+  requireText(report.catalog.status, 'Katalogstatus')
+  requireObjectShape(report.project, ['name', 'evaluationEnvironment'], ['name', 'preferredUrl', 'evaluationEnvironment', 'sourceRevision', 'deploymentId'], 'Projekt')
+  requireText(report.project.name, 'Projektname')
+  requireText(report.project.evaluationEnvironment, 'Auswertungsumgebung')
+  for (const key of ['preferredUrl', 'sourceRevision', 'deploymentId']) {
+    if (report.project[key] !== undefined) {
+      requireText(report.project[key], `Projekt.${key}`)
+    }
+  }
+  requireObjectShape(report.provenance, ['deploymentAndSourceContext', 'targetUrlBinding'], ['deploymentAndSourceContext', 'targetUrlBinding'], 'Provenienz')
+  if (report.provenance.deploymentAndSourceContext !== 'projectDeclared'
+    || report.provenance.targetUrlBinding !== 'matchedAgainstRedactedTechnicalReport') {
+    throw new Error('Projektbericht enthält keine unterstützte Provenienz.')
+  }
+  requireObjectShape(report.scope, ['selectedModules', 'selectedItemIds'], ['selectedModules', 'selectedItemIds'], 'Katalogumfang')
+  requireStringArray(report.scope.selectedModules, 'Ausgewählte Module', { nonEmpty: true })
+  requireStringArray(report.scope.selectedItemIds, 'Ausgewählte Checklistenpunkte')
+  if (!Array.isArray(report.technicalRuns)) {
+    throw new TypeError('Technische Läufe sind keine Liste.')
+  }
+  for (const run of report.technicalRuns) {
+    const required = ['tool', 'toolPackage', 'generatedAt', 'targetUrl', 'environment', 'command', 'contextProvenance', 'assertionCount', 'usedForEvaluation', 'summary']
+    const allowed = [...required, 'reportFile', 'sourceRevision', 'deploymentId']
+    requireObjectShape(run, required, allowed, 'Technischer Lauf')
+    for (const key of ['tool', 'generatedAt', 'targetUrl', 'environment', 'command']) {
+      requireText(run[key], `Technischer Lauf.${key}`)
+    }
+    if (Number.isNaN(new Date(run.generatedAt).valueOf()) || !Number.isInteger(run.assertionCount) || run.assertionCount < 0 || typeof run.usedForEvaluation !== 'boolean') {
+      throw new TypeError('Technischer Lauf enthält ungültige Zeit-, Zähler- oder Verwendungsdaten.')
+    }
+    requireObjectShape(run.toolPackage, ['version'], ['name', 'version'], 'Werkzeugpaket')
+    requireText(run.toolPackage.version, 'Werkzeugversion')
+    requireObjectShape(run.contextProvenance, ['targetUrl', 'sourceRevision', 'deploymentId'], ['targetUrl', 'sourceRevision', 'deploymentId'], 'Laufprovenienz')
+    if (run.contextProvenance.targetUrl !== 'matchedAgainstRedactedTechnicalReport'
+      || run.contextProvenance.sourceRevision !== 'projectDeclared'
+      || run.contextProvenance.deploymentId !== 'projectDeclared') {
+      throw new Error('Technischer Lauf enthält keine unterstützte Provenienz.')
+    }
+    requireObjectShape(run.summary, [], Object.keys(run.summary), 'Technische Zusammenfassung')
+  }
+  if (!Array.isArray(report.records) || !Array.isArray(report.items)) {
+    throw new TypeError('Records oder Checklistenpunkte sind keine Liste.')
+  }
+  for (const entry of report.records) {
+    requireObjectShape(entry, ['id', 'type', 'record'], ['id', 'type', 'record'], 'Normalisierter Record')
+    requireObjectShape(entry.record, [], Object.keys(entry.record), `Record ${entry.id}`)
+    if (entry.type === 'assertion') {
+      for (const key of ['assertionId', 'message']) {
+        requireText(entry.record[key], `Assertion ${entry.id}.${key}`)
+      }
+      if (!Number.isInteger(entry.record.assertionVersion) || entry.record.assertionVersion < 1
+        || !['pass', 'fail', 'inconclusive', 'notApplicable'].includes(entry.record.outcome)
+        || !entry.record.subject || typeof entry.record.subject !== 'object' || Array.isArray(entry.record.subject)) {
+        throw new TypeError(`Assertion ${entry.id} ist unvollständig.`)
+      }
+    }
+    else if (entry.type === 'evidence') {
+      const evidenceKeys = ['criterionId', 'outcome', 'checkedAt', 'checkedBy', 'note', 'reference', 'environment', 'sourceRevision']
+      requireObjectShape(entry.record, ['criterionId', 'outcome', 'checkedAt', 'checkedBy', 'note'], evidenceKeys, `Evidence ${entry.id}`)
+      for (const key of ['criterionId', 'checkedAt', 'checkedBy', 'note']) {
+        requireText(entry.record[key], `Evidence ${entry.id}.${key}`)
+      }
+      if (!validDate(entry.record.checkedAt) || !['pass', 'fail', 'inconclusive', 'notApplicable'].includes(entry.record.outcome)) {
+        throw new TypeError(`Evidence ${entry.id} ist unvollständig.`)
+      }
+    }
+    else {
+      throw new Error(`Normalisierter Record ${entry.id} verwendet den unbekannten Typ ${entry.type}.`)
+    }
+  }
+  for (const item of report.items) {
+    requireObjectShape(item, ['id', 'module', 'statement', 'evidenceOutcome', 'projectStatus', 'criteria'], ['id', 'module', 'statement', 'evidenceOutcome', 'projectStatus', 'workflow', 'criteria'], `Checklistenpunkt ${item.id || ''}`)
+    if (!Array.isArray(item.criteria) || item.criteria.length === 0) {
+      throw new TypeError(`Checklistenpunkt ${item.id} enthält keine Kriterien.`)
+    }
+    if (item.workflow !== undefined) {
+      const workflowKeys = ['itemId', 'status', 'recordedAt', 'recordedBy', 'note', 'responsible', 'reviewAt']
+      requireObjectShape(item.workflow, ['itemId', 'status', 'recordedAt', 'recordedBy', 'note'], workflowKeys, `Workflow ${item.id}`)
+      if (item.workflow.itemId !== item.id) {
+        throw new Error(`Workflow für ${item.id} verweist auf einen anderen Checklistenpunkt.`)
+      }
+      if (['acceptedDeviation', 'deferred', 'external'].includes(item.workflow.status) && !item.workflow.responsible?.trim()) {
+        throw new Error(`Workflow für ${item.id} benötigt eine Verantwortlichkeit.`)
+      }
+      if (['acceptedDeviation', 'deferred'].includes(item.workflow.status) && !validDate(item.workflow.reviewAt)) {
+        throw new Error(`Workflow für ${item.id} benötigt eine Wiedervorlage.`)
+      }
+    }
+    for (const criterion of item.criteria) {
+      const common = ['id', 'statement', 'mode', 'outcome', 'evidenceClass', 'evidenceInstructions', 'recordRefs']
+      const allowed = [...common, 'requiredAssertionIds']
+      requireObjectShape(criterion, ['id', 'statement', 'mode', 'outcome', 'recordRefs'], allowed, `Kriterium ${criterion.id || ''}`)
+      requireStringArray(criterion.recordRefs, `Recordreferenzen ${criterion.id}`)
+      if (criterion.mode === 'automatic') {
+        requireStringArray(criterion.requiredAssertionIds, `Erforderliche Assertions ${criterion.id}`, { nonEmpty: true })
+      }
+      else if (criterion.requiredAssertionIds !== undefined) {
+        throw new Error(`Nicht automatisches Kriterium ${criterion.id} nennt unerwartete Assertions.`)
+      }
+    }
+  }
+  requireObjectShape(report.summary, ['automaticCriteria', 'nonAutomaticCriteria', 'checklistItems'], ['automaticCriteria', 'nonAutomaticCriteria', 'checklistItems'], 'Zusammenfassung')
+  const criterionKeys = ['pass', 'fail', 'inconclusive', 'notApplicable', 'noEvidence', 'total']
+  requireCountObject(report.summary.automaticCriteria, criterionKeys, 'Automatische Kriterien')
+  requireCountObject(report.summary.nonAutomaticCriteria, criterionKeys, 'Nicht automatische Kriterien')
+  requireCountObject(report.summary.checklistItems, [...projectStatusOrder, 'total'], 'Checklistenpunkte')
+  requireStringArray(report.warnings, 'Warnungen')
+  requireStringArray(report.limitations, 'Grenzen', { nonEmpty: true })
 }
 
 function validateReportScopeAgainstCatalog(report, catalog) {
@@ -381,13 +588,15 @@ function validateReportScopeAgainstCatalog(report, catalog) {
   requireSameSequence(report.items.map(item => item.id), expectedItemIds, 'Berichtete Checklistenpunkte')
 }
 
-export function validatePilotProjectReportV3(report) {
-  if (report?.schemaVersion !== 3 || !Array.isArray(report.records) || !Array.isArray(report.items)) {
-    throw new Error('Projektbericht verwendet nicht das normalisierte Pilotschema 3.')
-  }
-  const catalog = loadPilotCatalog()
+export function validateProjectReport(report) {
+  validateProjectReportSchema(report)
+  validateProjectReportStructure(report)
+  const catalog = loadWebsiteCatalog()
+  const assertionRegistry = loadAssertionRegistry()
   validateReportScopeAgainstCatalog(report, catalog)
   const catalogItemsById = new Map(catalog.items.map(item => [item.id, item]))
+  const assertionsById = new Map(assertionRegistry.assertions.map(assertion => [assertion.id, assertion]))
+  const usedTechnicalRuns = report.technicalRuns.filter(run => run.usedForEvaluation)
   const recordsById = new Map()
   const canonicalRecords = new Set()
   for (const [index, entry] of report.records.entries()) {
@@ -402,6 +611,19 @@ export function validatePilotProjectReportV3(report) {
     if (canonicalRecords.has(canonical)) {
       throw new Error(`Normalisierter Record ${entry.id} dupliziert einen vorhandenen Record.`)
     }
+    if (entry.type === 'assertion') {
+      const registeredAssertion = assertionsById.get(entry.record.assertionId)
+      if (!registeredAssertion
+        || entry.record.assertionVersion !== registeredAssertion.version
+        || entry.record.tool !== registeredAssertion.tool
+        || entry.record.subject.tool !== entry.record.tool
+        || !usedTechnicalRuns.some(run => run.tool === entry.record.tool
+          && run.environment === entry.record.subject.environment
+          && run.sourceRevision === entry.record.subject.sourceRevision
+          && run.deploymentId === entry.record.subject.deploymentId)) {
+        throw new Error(`Normalisierter Record ${entry.id} verwendet keine passende registrierte Werkzeug-Assertion.`)
+      }
+    }
     canonicalRecords.add(canonical)
     recordsById.set(entry.id, entry)
   }
@@ -413,6 +635,11 @@ export function validatePilotProjectReportV3(report) {
       const catalogCriterion = catalogCriteria[criterionIndex]
       if (criterion.mode !== catalogCriterion.verification.mode) {
         throw new Error(`Kriterium ${criterion.id} verwendet nicht den Katalogmodus ${catalogCriterion.verification.mode}.`)
+      }
+      if (criterion.statement !== catalogCriterion.statement
+        || criterion.evidenceClass !== catalogCriterion.verification.evidenceClass
+        || criterion.evidenceInstructions !== catalogCriterion.verification.instructions) {
+        throw new Error(`Kriterium ${criterion.id} verwendet nicht die Nachweisdefinition des Basiskatalogs.`)
       }
       if (criterion.mode === 'automatic') {
         requireSameSequence(criterion.requiredAssertionIds, catalogCriterion.verification.assertions, `Erforderliche Assertions für ${criterion.id}`)
@@ -471,82 +698,18 @@ export function validatePilotProjectReportV3(report) {
   return true
 }
 
-export function convertPilotProjectReportToV3(inputReport) {
-  if (inputReport?.schemaVersion !== 2) {
-    throw new Error('Nur Pilotprojektberichte des Ausgabeschemas 2 können normalisiert werden.')
-  }
-  const report = redactReportData(structuredClone(inputReport))
-  const catalog = loadPilotCatalog()
-  validateReportScopeAgainstCatalog(report, catalog)
-  const catalogItemsById = new Map(catalog.items.map(item => [item.id, item]))
-  const records = []
-  const referencesByRecord = new Map()
-
-  function recordReference(type, record) {
-    const key = `${type}:${canonicalJson(record)}`
-    let reference = referencesByRecord.get(key)
-    if (!reference) {
-      reference = `R${String(records.length + 1).padStart(6, '0')}`
-      referencesByRecord.set(key, reference)
-      records.push({ id: reference, record: structuredClone(record), type })
-    }
-    return reference
-  }
-
-  const items = report.items.map((item) => {
-    const catalogCriteria = catalogCriteriaForItem(item, catalogItemsById)
-    return {
-      ...item,
-      criteria: item.criteria.map((criterion, criterionIndex) => {
-        const catalogCriterion = catalogCriteria[criterionIndex]
-        if (catalogCriterion.verification.mode !== criterion.mode) {
-          throw new Error(`Kriterium ${criterion.id} verwendet nicht den Katalogmodus ${catalogCriterion.verification.mode}.`)
-        }
-        const normalized = {
-          ...criterion,
-          recordRefs: [...new Set(criterion.records.map(record => recordReference(criterion.mode === 'automatic' ? 'assertion' : 'evidence', record)))],
-        }
-        delete normalized.records
-        if (criterion.mode === 'automatic') {
-          normalized.requiredAssertionIds = [...catalogCriterion.verification.assertions]
-        }
-        return normalized
-      }),
-    }
-  })
-
-  const normalized = {
-    ...report,
-    items,
-    records,
-    technicalRuns: report.technicalRuns.map(run => ({
-      ...run,
-      contextProvenance: {
-        ...run.contextProvenance,
-        targetUrl: 'matchedAgainstRedactedTechnicalReport',
-      },
-    })),
-    schemaVersion: 3,
-    summary: {
-      ...report.summary,
-      automaticCriteria: v3CriterionCounts(report.summary.automaticCriteria),
-      nonAutomaticCriteria: v3CriterionCounts(report.summary.nonAutomaticCriteria),
-    },
-  }
-  validatePilotProjectReportV3(normalized)
-  return normalized
-}
-
-export function createPilotProjectReportV3(options) {
-  return convertPilotProjectReportToV3(createPilotProjectReport(options))
-}
-
-export function createPilotProjectReportV3FromFiles(configFile) {
-  return convertPilotProjectReportToV3(createPilotProjectReportFromFiles(configFile))
-}
-
-function markdownText(value) {
+function escapeMarkdownText(value) {
   return String(value ?? '')
+    .replaceAll('\\', '\\\\')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('`', '\\`')
+    .replaceAll('*', '\\*')
+    .replaceAll('_', '\\_')
+    .replaceAll('~', '\\~')
+    .replaceAll('[', '\\[')
+    .replaceAll(']', '\\]')
     .replaceAll('|', '\\|')
     .replace(/\s+/g, ' ')
     .trim()
@@ -574,22 +737,24 @@ function resolvedCriterionCount(criteria) {
   return criteria.filter(criterion => ['notApplicable', 'pass'].includes(criterion.outcome)).length
 }
 
-export function renderPilotProjectReportMarkdown(report) {
+export function renderProjectReportMarkdown(report) {
+  validateProjectReport(report)
+  const recordsById = new Map(report.records.map(entry => [entry.id, entry]))
   const lines = [
-    `# Website-QA-Prüfbericht: ${markdownText(report.project.name)}`,
+    `# Website-QA-Prüfbericht: ${escapeMarkdownText(report.project.name)}`,
     '',
-    '> Strukturierter Pilotbericht. Er umfasst noch nicht die vollständige Website-Checkliste und ist kein vollständiger WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabenachweis.',
+    '> Bericht auf Basis des bewusst begrenzten stabilen Basiskatalogs. Er ist weder vollständige Website-Checkliste noch WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe.',
     '',
     '## Berichtsstand',
     '',
     '| Feld | Wert |',
     '|---|---|',
-    `| Erstellt | ${markdownText(report.generatedAt)} |`,
-    `| Katalog | ${markdownText(report.catalog.id)} ${markdownText(report.catalog.version)} (${markdownText(report.catalog.status)}) |`,
-    `| Auswertungsumgebung | ${markdownText(report.project.evaluationEnvironment)} |`,
-    `| Bevorzugte URL | ${markdownText(report.project.preferredUrl || 'nicht angegeben')} |`,
-    `| Quellstand | ${markdownText(report.project.sourceRevision || 'nicht angegeben')} |`,
-    `| Deployment | ${markdownText(report.project.deploymentId || 'nicht angegeben')} |`,
+    `| Erstellt | ${escapeMarkdownText(report.generatedAt)} |`,
+    `| Katalog | ${escapeMarkdownText(report.catalog.id)} ${escapeMarkdownText(report.catalog.version)} (${escapeMarkdownText(report.catalog.status)}) |`,
+    `| Auswertungsumgebung | ${escapeMarkdownText(report.project.evaluationEnvironment)} |`,
+    `| Bevorzugte URL | ${escapeMarkdownText(report.project.preferredUrl || 'nicht angegeben')} |`,
+    `| Quellstand | ${escapeMarkdownText(report.project.sourceRevision || 'nicht angegeben')} |`,
+    `| Deployment | ${escapeMarkdownText(report.project.deploymentId || 'nicht angegeben')} |`,
     '| Herkunft Quell-/Deploymentstand | projektseitig deklariert |',
     '',
     '## Zusammenfassung',
@@ -601,7 +766,7 @@ export function renderPilotProjectReportMarkdown(report) {
   for (const status of projectStatusOrder) {
     lines.push(`| ${statusLabel(status)} | ${report.summary.checklistItems[status]} |`)
   }
-  lines.push(`| **Ausgewählte Pilotpunkte** | **${report.summary.checklistItems.total}** |`)
+  lines.push(`| **Ausgewählte Basiskatalogpunkte** | **${report.summary.checklistItems.total}** |`)
   lines.push(
     '',
     criterionSummary('Automatische Kriterien', report.summary.automaticCriteria, 'bestanden'),
@@ -615,7 +780,7 @@ export function renderPilotProjectReportMarkdown(report) {
   )
 
   for (const run of report.technicalRuns) {
-    lines.push(`| ${markdownText(run.tool)} ${markdownText(run.toolPackage?.version || '')} | ${markdownText(run.targetUrl)} | ${markdownText(run.environment)} | ${run.usedForEvaluation ? 'ja' : 'nein'} | ${run.assertionCount} | <code>${markdownText(run.command)}</code> |`)
+    lines.push(`| ${escapeMarkdownText(run.tool)} ${escapeMarkdownText(run.toolPackage?.version || '')} | ${escapeMarkdownText(run.targetUrl)} | ${escapeMarkdownText(run.environment)} | ${run.usedForEvaluation ? 'ja' : 'nein'} | ${run.assertionCount} | <code>${escapeMarkdownText(run.command)}</code> |`)
   }
   if (report.technicalRuns.length === 0) {
     lines.push('| – | – | – | nein | 0 | Kein technischer Bericht eingebunden |')
@@ -631,13 +796,13 @@ export function renderPilotProjectReportMarkdown(report) {
   for (const item of report.items) {
     const automatic = item.criteria.filter(criterion => criterion.mode === 'automatic')
     const nonAutomatic = item.criteria.filter(criterion => criterion.mode !== 'automatic')
-    lines.push(`| ${item.id} | ${markdownText(item.module)} | ${statusLabel(item.projectStatus)} | ${resolvedCriterionCount(automatic)}/${automatic.length} | ${resolvedCriterionCount(nonAutomatic)}/${nonAutomatic.length} |`)
+    lines.push(`| ${item.id} | ${escapeMarkdownText(item.module)} | ${statusLabel(item.projectStatus)} | ${resolvedCriterionCount(automatic)}/${automatic.length} | ${resolvedCriterionCount(nonAutomatic)}/${nonAutomatic.length} |`)
   }
 
   for (const item of report.items) {
     lines.push('', `### ${item.id}: ${statusLabel(item.projectStatus)}`, '', item.statement, '')
     if (item.workflow) {
-      lines.push(`Workflow: **${statusLabel(item.workflow.status)}** – ${markdownText(item.workflow.note)}`, '')
+      lines.push(`Workflow: **${statusLabel(item.workflow.status)}** – ${escapeMarkdownText(item.workflow.note)}`, '')
     }
     for (const criterion of item.criteria) {
       const checked = ['notApplicable', 'pass'].includes(criterion.outcome)
@@ -645,23 +810,26 @@ export function renderPilotProjectReportMarkdown(report) {
       if (!checked && criterion.evidenceInstructions) {
         lines.push(`  - Erforderlicher Nachweis: ${criterion.evidenceInstructions}`)
       }
+      if (criterion.mode === 'automatic' && ['fail', 'inconclusive'].includes(criterion.outcome)) {
+        for (const reference of criterion.recordRefs) {
+          const entry = recordsById.get(reference)
+          if (entry?.type === 'assertion' && ['fail', 'inconclusive'].includes(entry.record.outcome)) {
+            lines.push(`  - Ursache [${reference}]: ${escapeMarkdownText(redactText(entry.record.message, 240))}`)
+          }
+        }
+      }
     }
   }
 
   if (report.warnings.length > 0) {
-    lines.push('', '## Warnungen', '', ...report.warnings.map(warning => `- ${warning}`))
+    lines.push('', '## Warnungen', '', ...report.warnings.map(warning => `- ${escapeMarkdownText(warning)}`))
   }
-  lines.push('', '## Grenzen', '', ...report.limitations.map(limitation => `- ${limitation}`), '')
+  lines.push('', '## Grenzen', '', ...report.limitations.map(limitation => `- ${escapeMarkdownText(limitation)}`), '')
   return lines.join('\n')
 }
 
 function publicLabelText(value) {
-  return markdownText(redactText(value, 200))
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('[', '\\[')
-    .replaceAll(']', '\\]')
+  return escapeMarkdownText(redactText(value, 200))
 }
 
 function publicSummaryUrl(value) {
@@ -682,7 +850,8 @@ function publicSummaryUrl(value) {
   return reported
 }
 
-export function renderPilotProjectSummaryMarkdown(report, options = {}) {
+export function renderProjectSummaryMarkdown(report, options = {}) {
+  validateProjectReport(report)
   const publicLabel = options.publicProject?.label
     ? publicLabelText(options.publicProject.label)
     : undefined
@@ -701,12 +870,12 @@ export function renderPilotProjectSummaryMarkdown(report, options = {}) {
     '',
     '| Feld | Wert |',
     '|---|---|',
-    `| Erstellt | ${markdownText(report.generatedAt)} |`,
-    `| Katalog | ${markdownText(report.catalog.id)} ${markdownText(report.catalog.version)} (${markdownText(report.catalog.status)}) |`,
+    `| Erstellt | ${escapeMarkdownText(report.generatedAt)} |`,
+    `| Katalog | ${escapeMarkdownText(report.catalog.id)} ${escapeMarkdownText(report.catalog.version)} (${escapeMarkdownText(report.catalog.status)}) |`,
   ]
 
   if (publicUrl) {
-    lines.push(`| Öffentlich freigegebene URL | ${markdownText(publicUrl)} |`)
+    lines.push(`| Öffentlich freigegebene URL | ${escapeMarkdownText(publicUrl)} |`)
   }
 
   lines.push(
@@ -720,7 +889,7 @@ export function renderPilotProjectSummaryMarkdown(report, options = {}) {
     lines.push(`| ${statusLabel(status)} | ${report.summary.checklistItems[status]} |`)
   }
   lines.push(
-    `| **Ausgewählte Pilotpunkte** | **${report.summary.checklistItems.total}** |`,
+    `| **Ausgewählte Basiskatalogpunkte** | **${report.summary.checklistItems.total}** |`,
     '',
     criterionSummary('Automatische Kriterien', report.summary.automaticCriteria, 'bestanden'),
     '',
@@ -733,7 +902,7 @@ export function renderPilotProjectSummaryMarkdown(report, options = {}) {
   )
 
   for (const run of report.technicalRuns) {
-    lines.push(`| ${markdownText(run.tool)} | ${markdownText(run.toolPackage?.version || 'nicht angegeben')} | ${run.usedForEvaluation ? 'ja' : 'nein'} | ${run.assertionCount} |`)
+    lines.push(`| ${escapeMarkdownText(run.tool)} | ${escapeMarkdownText(run.toolPackage?.version || 'nicht angegeben')} | ${run.usedForEvaluation ? 'ja' : 'nein'} | ${run.assertionCount} |`)
   }
   if (report.technicalRuns.length === 0) {
     lines.push('| – | – | nein | 0 |')
@@ -742,23 +911,23 @@ export function renderPilotProjectSummaryMarkdown(report, options = {}) {
   const unfinishedItems = report.items.filter(item => !['complete', 'notApplicable'].includes(item.projectStatus))
   lines.push(
     '',
-    '## Noch nicht vollständig nachgewiesene Pilotpunkte',
+    '## Noch nicht vollständig nachgewiesene Basiskatalogpunkte',
     '',
     '| ID | Status | Allgemeine Aussage |',
     '|---|---|---|',
   )
   for (const item of unfinishedItems) {
-    lines.push(`| ${item.id} | ${statusLabel(item.projectStatus)} | ${markdownText(item.statement)} |`)
+    lines.push(`| ${item.id} | ${statusLabel(item.projectStatus)} | ${escapeMarkdownText(item.statement)} |`)
   }
   if (unfinishedItems.length === 0) {
-    lines.push('| – | Keine offenen Pilotpunkte | – |')
+    lines.push('| – | Keine offenen Basiskatalogpunkte | – |')
   }
 
   lines.push(
     '',
     '## Grenzen',
     '',
-    '- Der strukturierte Katalog ist ein Pilot und umfasst noch nicht die vollständige Website-Checkliste.',
+    '- Der stabile Basiskatalog ist bewusst begrenzt und weder vollständige Website-Checkliste noch WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe.',
     '- Automatische Ergebnisse sind technische Teilnachweise und ersetzen keine manuellen, externen, rechtlichen oder organisatorischen Prüfungen.',
     '- Ein unauffälliger Axe-Lauf ist kein vollständiger WCAG-Nachweis.',
     '- Headless-Chromium-Profile sind keine Prüfung realer Geräte, Safari-Browser oder Screenreader.',
@@ -811,7 +980,7 @@ function jsonWithNewline(value) {
   return `${JSON.stringify(value, null, 2)}\n`
 }
 
-export function writePilotProjectReportBundle({
+export function writeProjectReportBundle({
   bundleDirectory = './.website-qa/reports',
   configFile = '',
   now = new Date(),
@@ -822,6 +991,7 @@ export function writePilotProjectReportBundle({
   const absoluteConfigFile = resolve(configFile)
   const configDirectory = dirname(absoluteConfigFile)
   const config = readJson(absoluteConfigFile)
+  validateProjectConfigurationSchema(config)
   const timestamp = bundleTimestamp(now)
   const absoluteBundleRoot = resolve(configDirectory, bundleDirectory)
   const absoluteSummaryRoot = resolve(configDirectory, summaryDirectory)
@@ -862,7 +1032,7 @@ export function writePilotProjectReportBundle({
       ? readJson(resolve(configDirectory, config.evidenceFile))
       : undefined
     const generatedAt = (now instanceof Date ? now : new Date(now)).toISOString()
-    const report = createPilotProjectReport({
+    const report = createProjectReport({
       config,
       evidenceDocument,
       generatedAt,
@@ -871,9 +1041,9 @@ export function writePilotProjectReportBundle({
     const reportJsonFile = join(temporaryBundleDirectory, 'report.json')
     const reportMarkdownFile = join(temporaryBundleDirectory, 'report.md')
     writeFileSync(reportJsonFile, jsonWithNewline(report), { encoding: 'utf8', mode: 0o600 })
-    writeFileSync(reportMarkdownFile, renderPilotProjectReportMarkdown(report), { encoding: 'utf8', mode: 0o600 })
+    writeFileSync(reportMarkdownFile, renderProjectReportMarkdown(report), { encoding: 'utf8', mode: 0o600 })
 
-    const summary = renderPilotProjectSummaryMarkdown(report, { publicProject })
+    const summary = renderProjectSummaryMarkdown(report, { publicProject })
     writeFileSync(temporarySummaryFile, summary, { encoding: 'utf8', flag: 'wx', mode: 0o600 })
 
     const technicalFiles = archivedRuns.map(run => manifestFile(run.archivedFile, temporaryBundleDirectory, 'technicalReport'))

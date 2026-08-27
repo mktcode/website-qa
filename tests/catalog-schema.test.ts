@@ -19,9 +19,10 @@ function validate(schemaName: string, documentName: string) {
 }
 
 describe('catalog schemas', () => {
-  it('validate the pilot catalog, evidence and project configuration examples', () => {
-    validate('website-catalog.schema.json', 'website-pilot.json')
+  it('validate the baseline catalog, evidence and project configuration examples', () => {
+    validate('website-catalog.schema.json', 'website-baseline.json')
     validate('project-evidence.schema.json', 'project-evidence.example.json')
+    validate('project-report.config.schema.json', 'project-report.config.example.json')
     validate('project-report.schema.json', 'project-report.example.json')
   })
 })

@@ -20,9 +20,9 @@
       "type": "object",
       "required": ["id", "version", "status"],
       "properties": {
-        "id": { "const": "website-qa-pilot" },
-        "version": { "type": "string", "minLength": 1 },
-        "status": { "const": "pilot" }
+        "id": { "const": "website-qa-baseline" },
+        "version": { "const": "1.0.0" },
+        "status": { "const": "stable" }
       },
       "additionalProperties": false
     },

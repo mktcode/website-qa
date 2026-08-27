@@ -7,7 +7,7 @@ import { fileTypeFromBuffer } from 'file-type'
 import { parse } from 'parse5'
 import robotsParser from 'robots-parser'
 import sharp from 'sharp'
-import { checklistItemIdsForTool, evaluatePilotChecklist } from './lib/checklist-report.mjs'
+import { checklistItemIdsForTool, evaluateChecklist } from './lib/checklist-report.mjs'
 import { fetchResource, normalizeMimeType, redactReportData, redactText, reportUrl, validateUrl } from './lib/http-client.mjs'
 import { writeJsonOutput } from './lib/json-output.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
@@ -1127,7 +1127,7 @@ function createSocialAssertions(result, options) {
 }
 
 function checklistCoverage(results) {
-  return evaluatePilotChecklist({
+  return evaluateChecklist({
     assertions: results.flatMap(result => result.assertions || []),
     itemIds: checklistItemIdsForTool('social-preview-check'),
   })
@@ -1237,7 +1237,7 @@ function printText(results, options) {
   const coverage = checklistCoverage(results)
   const checklistSummary = coverage.summary.checklistItems
   const nonAutomaticSummary = coverage.summary.nonAutomaticCriteria
-  console.log(`\nPilot-Checklistennachweis ${coverage.catalog.version}: ${checklistSummary.pass} Punkt(e) vollständig, ${checklistSummary.partial} teilweise, ${checklistSummary.fail} fehlgeschlagen, ${checklistSummary.open + checklistSummary.inconclusive} offen/unklar.`)
+  console.log(`\nChecklistennachweis ${coverage.catalog.version}: ${checklistSummary.pass} Punkt(e) vollständig, ${checklistSummary.partial} teilweise, ${checklistSummary.fail} fehlgeschlagen, ${checklistSummary.open + checklistSummary.inconclusive} offen/unklar.`)
   console.log(`Nicht automatische Kriterien im Social-Ausschnitt: ${nonAutomaticSummary.pass} belegt, ${nonAutomaticSummary.noEvidence} ohne Nachweis.`)
   console.log(`KI-Trainingsfreigabe: ${options.aiTrainingOptIn ? 'ausdrücklich für diese Prüfung bestätigt' : 'nicht bestätigt; Opt-out wird standardmäßig erwartet'}.`)
   console.log(`Robots-Matrix: ${robotsPolicies.length} Kennungen, Quellenstand ${robotsPolicyReviewedAt}.`)

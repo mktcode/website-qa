@@ -5,7 +5,7 @@
 
 import { XMLParser, XMLValidator } from 'fast-xml-parser'
 import { parse } from 'parse5'
-import { checklistItemIdsForTool, evaluatePilotChecklist } from './lib/checklist-report.mjs'
+import { checklistItemIdsForTool, evaluateChecklist } from './lib/checklist-report.mjs'
 import { fetchResource, normalizeMimeType, redactReportData, redactText, reportUrl, validateUrl } from './lib/http-client.mjs'
 import { writeJsonOutput } from './lib/json-output.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
@@ -1345,7 +1345,7 @@ async function inspectSite(inputUrl, options) {
 }
 
 function checklistCoverage(results) {
-  return evaluatePilotChecklist({
+  return evaluateChecklist({
     assertions: results.flatMap(result => result.assertions),
     itemIds: checklistItemIdsForTool('crawl-check'),
   })
@@ -1431,7 +1431,7 @@ function printText(results, options) {
   const coverage = checklistCoverage(results)
   const checklistSummary = coverage.summary.checklistItems
   const nonAutomaticSummary = coverage.summary.nonAutomaticCriteria
-  console.log(`\nPilot-Checklistennachweis ${coverage.catalog.version}: ${checklistSummary.pass} Punkt(e) vollständig, ${checklistSummary.partial} teilweise, ${checklistSummary.fail} fehlgeschlagen, ${checklistSummary.open + checklistSummary.inconclusive} offen/unklar.`)
+  console.log(`\nChecklistennachweis ${coverage.catalog.version}: ${checklistSummary.pass} Punkt(e) vollständig, ${checklistSummary.partial} teilweise, ${checklistSummary.fail} fehlgeschlagen, ${checklistSummary.open + checklistSummary.inconclusive} offen/unklar.`)
   console.log(`Nicht automatisch belegbare Kriterien: ${nonAutomaticSummary.pass} belegt, ${nonAutomaticSummary.total - nonAutomaticSummary.pass - nonAutomaticSummary.notApplicable} offen; sie werden durch diesen Lauf nicht stillschweigend abgeschlossen.`)
 
   const summary = summarize(results, options.strict)

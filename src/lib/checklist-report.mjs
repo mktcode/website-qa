@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { aggregateEvidenceOutcomes, aggregateItemOutcome } from './outcome-aggregation.mjs'
 
-const catalogUrl = new URL('../../catalog/website-pilot.json', import.meta.url)
+const catalogUrl = new URL('../../catalog/website-baseline.json', import.meta.url)
 const assertionRegistryUrl = new URL('../../catalog/assertions.json', import.meta.url)
 const allowedAssertionOutcomes = new Set(['fail', 'inconclusive', 'notApplicable', 'pass'])
 const allowedEvidenceModes = new Set(['automatic', 'external', 'manual'])
@@ -10,7 +10,7 @@ function readJson(url) {
   return JSON.parse(readFileSync(url, 'utf8'))
 }
 
-const pilotCatalog = readJson(catalogUrl)
+const websiteCatalog = readJson(catalogUrl)
 const assertionRegistry = readJson(assertionRegistryUrl)
 
 function duplicate(values) {
@@ -24,8 +24,8 @@ function duplicate(values) {
   })
 }
 
-export function validateChecklistCatalog(catalog = pilotCatalog, registry = assertionRegistry) {
-  if (catalog.schemaVersion !== 1 || !Array.isArray(catalog.items)) {
+export function validateChecklistCatalog(catalog = websiteCatalog, registry = assertionRegistry) {
+  if (catalog.schemaVersion !== 1 || catalog.status !== 'stable' || !Array.isArray(catalog.items)) {
     throw new Error('Prüfkatalog verwendet kein unterstütztes Schema.')
   }
   if (registry.schemaVersion !== 1 || !Array.isArray(registry.assertions)) {
@@ -110,7 +110,7 @@ function countOutcomes(entries) {
     .map(outcome => [outcome, entries.filter(entry => entry.outcome === outcome).length]))
 }
 
-export function checklistItemIdsForTool(tool, catalog = pilotCatalog, registry = assertionRegistry) {
+export function checklistItemIdsForTool(tool, catalog = websiteCatalog, registry = assertionRegistry) {
   const toolAssertions = new Set(registry.assertions
     .filter(assertion => assertion.tool === tool)
     .map(assertion => assertion.id))
@@ -121,7 +121,7 @@ export function checklistItemIdsForTool(tool, catalog = pilotCatalog, registry =
     .map(item => item.id)
 }
 
-export function evaluateChecklist(catalog, registry, options = {}) {
+function evaluateCatalog(catalog, registry, options = {}) {
   validateChecklistCatalog(catalog, registry)
   const assertions = options.assertions || []
   const evidence = options.evidence || []
@@ -212,16 +212,16 @@ export function evaluateChecklist(catalog, registry, options = {}) {
   }
 }
 
-export function evaluatePilotChecklist(options = {}) {
-  return evaluateChecklist(pilotCatalog, assertionRegistry, options)
+export function evaluateChecklist(options = {}) {
+  return evaluateCatalog(websiteCatalog, assertionRegistry, options)
 }
 
 export function loadAssertionRegistry() {
   return structuredClone(assertionRegistry)
 }
 
-export function loadPilotCatalog() {
-  return structuredClone(pilotCatalog)
+export function loadWebsiteCatalog() {
+  return structuredClone(websiteCatalog)
 }
 
 validateChecklistCatalog()

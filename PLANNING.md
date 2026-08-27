@@ -253,16 +253,16 @@ Relative Nachweisreferenzen benötigen eine eindeutig dokumentierte Basis. Beim 
 
 Die vorhandenen Funktionen sind erhalten geblieben:
 
-- `createPilotProjectReport`
-- `createPilotProjectReportFromFiles`
-- `renderPilotProjectReportMarkdown`
+- `createProjectReport`
+- `createProjectReportFromFiles`
+- `renderProjectReportMarkdown`
 
-Ergänzend wurde die Bundle-Funktion unter dem festgelegten Namen `writePilotProjectReportBundle` implementiert:
+Ergänzend wurde die Bundle-Funktion unter dem festgelegten Namen `writeProjectReportBundle` implementiert:
 
 ```js
-import { writePilotProjectReportBundle } from '@mktcode/website-qa/report'
+import { writeProjectReportBundle } from '@mktcode/website-qa/report'
 
-const result = writePilotProjectReportBundle({
+const result = writeProjectReportBundle({
   configFile: './website-qa.project.json',
   bundleDirectory: './.website-qa/reports',
   summaryDirectory: './docs/website-qa/berichte',
@@ -296,10 +296,10 @@ Das implementierte kopierbare Beispielskript bleibt bewusst klein:
 ```js
 #!/usr/bin/env node
 
-import { writePilotProjectReportBundle } from '@mktcode/website-qa/report'
+import { writeProjectReportBundle } from '@mktcode/website-qa/report'
 
 const configFile = process.argv[2] || './website-qa.project.json'
-const result = writePilotProjectReportBundle({ configFile })
+const result = writeProjectReportBundle({ configFile })
 
 console.info(`Vollständiger Bericht: ${result.bundleDirectory}`)
 console.info(`Versionierbare Zusammenfassung: ${result.summaryFile}`)
@@ -426,11 +426,11 @@ Die Beispiele dürfen keine reale Domain, projektspezifische Route, Seitenzahl, 
 
 - Die vier bestehenden Binärnamen bleiben unverändert.
 - Bestehende Text- und JSON-Ausgaben bleiben soweit möglich kompatibel.
-- `createPilotProjectReportFromFiles` bleibt verfügbar.
+- `createProjectReportFromFiles` bleibt verfügbar.
 - Die Bundle-API ist eine additive öffentliche Schnittstelle.
 - Ein neues Manifestschema wird separat versioniert.
 - Die versionierbare Markdown-Zusammenfassung erhält keinen Anspruch auf vollständige Reproduzierbarkeit; dafür dient das lokale Bundle.
-- Änderungen an `project-report.schema.json` und `project-report.output.schema.json` werden nur vorgenommen, wenn die Bundlepfade oder Freigaben für die öffentliche Zusammenfassung nicht außerhalb der bestehenden Projektkonfiguration abbildbar sind.
+- Änderungen an `project-report.schema.json` und `project-report.config.schema.json` werden nur vorgenommen, wenn die Bundlepfade oder Freigaben für die öffentliche Zusammenfassung nicht außerhalb der bestehenden Projektkonfiguration abbildbar sind.
 - Neue optionale Felder dürfen alte Konfigurationen nicht stillschweigend inhaltlich umdeuten.
 - Eine Katalogversion wird nur geändert, wenn Kriterien oder fachliche Bedeutungen geändert werden; reine Bundle- und Rendererfunktionen erhalten keine neue fachliche Checklistenbedeutung.
 
@@ -664,26 +664,17 @@ Systematischer Renderer- und Praxisreview vom 27. August 2026:
 - Die Statusursache ist in `report.json` und den technischen Berichten über die zugeordneten Records nachvollziehbar. `report.md` bleibt dagegen eine menschenlesbare Kriterien- und Workflowübersicht und wiederholt Assertionmessages oder Subjects nicht. Vor dem stabilen Vertrag ist bewusst zu entscheiden, ob ausgewählte redigierte Fehl-/Unklarheitsdetails ergänzt werden oder die Dokumentation diese Detailgrenze noch deutlicher benennt.
 - Das aktuelle Ausgabeschema führt bei Kriterienzählungen zusätzlich die Felder `partial` und `open`, obwohl einzelne Kriterien laut demselben Schema nur fünf atomare Ergebnisse besitzen und beide Zähler deshalb stets null sind. Dies wird nicht rückwirkend in 0.6.x entfernt, sondern als Vertragsbereinigung für Phase I behandelt.
 
-### Phase I – Verträge für eine spätere 1.0 stabilisieren
+### Phase I – Stabiler 1.0-Vertrag
 
-**Status 27. August 2026: begonnen.** Der erste Vertragsschnitt dokumentiert den gemeinsamen Kern und werkzeugspezifische JSON-Schemas aller vier technischen Berichte einschließlich der Fehlerhüllen für Exitcode 2. Kompatibilitäts-, Deprecation-, Assertion-, Katalog-, Node- und CLI-Regeln sind erstmals zusammenhängend festgehalten; eine versionierte Releasehistorie wurde begonnen. Diese Vorbereitungsartefakte stabilisieren noch nicht den Pilotkatalog oder die bisherigen `Pilot`-APIs.
+**Status 28. August 2026: implementiert, noch nicht veröffentlicht.** Der bewusste inkompatible Schnitt stabilisiert die vier getrennten CLI-Verträge und den begrenzten Basiskatalog, ohne neue Assertions oder Netzwerkpfade einzuführen.
 
-Node.js 24.19.0 wurde zusätzlich mit frischer Installation, Lint, Typecheck, allen 60 Tests einschließlich echtem Chromium-Nebenwirkungstest, Packprüfung, installiertem Tarball und allen vier Binärbefehlen validiert. Der vorbereitete unterstützte Bereich umfasst deshalb Node 22 ab 22.19 und Node 24 ab dessen LTS-Linie 24.11, jeweils nur bis vor den nächsten Major. Node 23 bleibt als ungerader, nicht unterstützter Zwischenmajor ausgeschlossen.
+Der Katalog heißt `website-qa-baseline`, besitzt Version `1.0.0` und Status `stable`. Stabilität bezeichnet IDs, Bedeutungen und Versionsregeln. Der Bestand von 34 Punkten, 93 Kriterien und 56 Assertions bleibt bewusst unvollständig und begründet keine WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe. Assertion-Versionierung bleibt eine getrennte Achse.
 
-Für den späteren stabilen Projektbericht ist als Vertragsrichtung entschieden: Das heutige Ausgabeschema 2 bleibt unverändert, während ein neues Schema Records einmalig auf Berichtsebene speichert und über eindeutige Referenzen zuordnet. Die stets null bleibenden Kriterienzähler `partial` und `open` entfallen erst dort. Der vollständige lokale Markdownbericht soll kurze redigierte Ursachen fehlgeschlagener oder unklarer automatischer Kriterien zeigen, ohne Evidence-Freitexte, Subjects oder vertrauliche Referenzen zusätzlich zu vervielfältigen. Allgemeine API-Namen werden erst gemeinsam mit diesem neuen Schema eingeführt; bestehende Pilotnamen bleiben während eines dokumentierten Übergangs erhalten.
+Projektkonfiguration und Ausgabe sind nun eindeutig getrennt: `project-report.config.schema.json` beschreibt Eingaben, `project-report.schema.json` den einzigen normalisierten Bericht mit `schemaVersion: 3`. Erzeugung, Renderer und Bundle arbeiten direkt mit deduplizierten Records und deterministischen berichtslokalen Referenzen. Konfiguration, Evidence, technische Berichte und Ausgabe werden mit den veröffentlichten JSON-Schemas geprüft; Katalog-, Scope-, Registry-, Werkzeug-, Workflow-, Typ-, Referenz-, Ergebnis- und Summenkonsistenz werden anschließend geschlossen validiert. Der vollständige Renderer nennt bei automatischem `fail` oder `inconclusive` nur kurze redigierte Ursachen mit Recordreferenz; Subjects, Evidence-Freitexte, Cookie-/Storagewerte und vertrauliche Referenzen werden nicht vervielfältigt.
 
-Das normalisierte Ausgabeschema 3 ist als opt-in Pilotvertrag implementiert, ohne Standardrenderer oder Bundleerzeugung umzustellen. Berichtslokale IDs werden deterministisch nach erstem Auftreten vergeben; gleiche Recordinhalte werden einmal gespeichert und über beliebig viele Kriterienreferenzen rückverfolgbar gehalten. Automatische Kriterien führen ihre erforderlichen Assertion-IDs mit. Die semantische Validierung lehnt unbekannte, doppelte, typfalsche und verwaiste Referenzen, unpassende Evidence-Zuordnungen, geänderte Ergebnisaggregation sowie nicht summengleiche Übersichten geschlossen ab. Im allgemeinen Beispiel werden 81 Recordeinbettungen aus Ausgabe 2 auf 46 eindeutige Records normalisiert, ohne Kriterien-, Punkt- oder Workflowergebnis zu verändern. Der bestehende reale Praxisbericht wurde ohne neue Netzwerkprüfung ebenfalls erfolgreich konvertiert: 239 Einbettungen werden als 239 Referenzen auf 166 eindeutige Records erhalten; die formatierten JSON-Daten sinken dabei von 219.335 auf 181.432 Byte, also um 17,3 %. Dabei wurden außerdem bisher zu enge JSON-Schema-Muster für IDs wie `CORE-A11Y-01`, nicht vollständig synchronisierte Evidence-Klassen und `$schema`-Beispielfelder sowie die unbeabsichtigte URL-Redaktion der deklarierten Zielbindungsprovenienz korrigiert.
+Die stabilen APIs verwenden allgemeine Namen. Frühere Projektberichtserzeuger, Konverter, Schemata und Namen werden weder exportiert noch als Alias erhalten. Der sichere getrennte Zusammenfassungsrenderer und der atomare Bundleworkflow mit bytegleichen technischen Eingaben, Dateirechten, Hashes und Whitelist-Zusammenfassung bleiben erhalten. Alte technische Berichte mit einer anderen Katalogkennung werden nicht still übernommen.
 
-Vor einer möglichen `1.0.0` werden mindestens folgende Entscheidungen vorbereitet:
-
-1. Maschinenlesbare JSON-Schemas für die technischen HTTP-, Crawl-, Browser- und Social-Berichte.
-2. Dokumentierte Kompatibilitäts- und Deprecation-Regeln für CLIs, Exitcodes, Assertions, Schemas und Reporting-API.
-3. Entscheidung, welche bislang mit `Pilot` bezeichneten Katalog- und API-Verträge einen stabilen allgemeinen Namen erhalten und welche experimentell bleiben.
-4. Nachweis in mindestens einem weiteren unabhängigen Verbraucherprojekt mit anderer Seiten- und Auslieferungsstruktur.
-5. Prüfung eines künftigen Node-LTS-Bereichs zusätzlich zum derzeit festgelegten Node-22-Bereich.
-6. Kompakte, versionierte Releasehistorie und weiterhin reproduzierbare manuelle Releaseabnahme ohne automatische Registry-, Token- oder CI-Infrastruktur.
-
-Eine `1.0.0` setzt weder die Automatisierung aller Checklistenpunkte noch eine vollständige Qualitätsfreigabe voraus. Sie setzt einen klar abgegrenzten, stabilen und praktisch mehrfach bestätigten öffentlichen Vertrag voraus.
+Paket und Lockfile sind auf 1.0.0 vorbereitet. Ein Commit, Tag, Push oder eine Veröffentlichung sowie die Migration benachbarter Verbraucher erfolgen erst nach gesonderter Abnahme. Der zweite unabhängige Verbraucher bleibt ein externer Freigabenachweis und ist durch diese Repositoryänderung nicht automatisch erbracht.
 
 ### Phase J – Nächste fachliche Automatisierung erst nach einer Abdeckungsmatrix
 

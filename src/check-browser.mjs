@@ -7,7 +7,7 @@ import { existsSync } from 'node:fs'
 import axe from 'axe-core'
 import puppeteer from 'puppeteer-core'
 import { parseSitemapXml, readOnlyNavigationConcern } from './check-crawl.mjs'
-import { checklistItemIdsForTool, evaluatePilotChecklist } from './lib/checklist-report.mjs'
+import { checklistItemIdsForTool, evaluateChecklist } from './lib/checklist-report.mjs'
 import { assertPublicResolution, fetchResource, normalizeMimeType, redactReportData, redactText, reportUrl, validateUrl } from './lib/http-client.mjs'
 import { writeJsonOutput } from './lib/json-output.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
@@ -454,7 +454,7 @@ function createBrowserAssertions(result) {
 }
 
 function checklistCoverage(result) {
-  return evaluatePilotChecklist({
+  return evaluateChecklist({
     assertions: result.assertions,
     itemIds: checklistItemIdsForTool('browser-check'),
   })
@@ -1176,7 +1176,7 @@ function printReport(report) {
 
   const checklistSummary = report.checklistCoverage.summary.checklistItems
   const nonAutomaticSummary = report.checklistCoverage.summary.nonAutomaticCriteria
-  console.log(`\nPilot-Checklistennachweis ${report.checklistCoverage.catalog.version}: ${checklistSummary.pass} Punkt(e) vollständig, ${checklistSummary.partial} teilweise, ${checklistSummary.fail} fehlgeschlagen, ${checklistSummary.open + checklistSummary.inconclusive} offen/unklar.`)
+  console.log(`\nChecklistennachweis ${report.checklistCoverage.catalog.version}: ${checklistSummary.pass} Punkt(e) vollständig, ${checklistSummary.partial} teilweise, ${checklistSummary.fail} fehlgeschlagen, ${checklistSummary.open + checklistSummary.inconclusive} offen/unklar.`)
   console.log(`Nicht automatisch belegbare Kriterien: ${nonAutomaticSummary.pass} belegt, ${nonAutomaticSummary.total - nonAutomaticSummary.pass - nonAutomaticSummary.notApplicable} offen; sie werden durch diesen Lauf nicht stillschweigend abgeschlossen.`)
   console.log('\nNur lesender Lauf: ausschließlich GET; externe Requests und alle anderen Methoden wurden blockiert; keine Klicks, Uploads oder Formularübermittlungen.')
   console.log(`Ergebnis: ${summary.errors} Fehler, ${summary.warnings} Warnung(en).`)

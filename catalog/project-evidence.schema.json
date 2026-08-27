@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/mktcode/website-qa/catalog/project-evidence.schema.json",
-  "title": "Projektnachweise für den Website-QA-Pilotkatalog",
+  "title": "Projektnachweise für den stabilen Website-QA-Basiskatalog",
   "type": "object",
   "required": ["schemaVersion", "catalog", "evidence"],
   "properties": {
@@ -11,8 +11,8 @@
       "type": "object",
       "required": ["id", "version"],
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
-        "version": { "type": "string", "minLength": 1 }
+        "id": { "const": "website-qa-baseline" },
+        "version": { "const": "1.0.0" }
       },
       "additionalProperties": false
     },

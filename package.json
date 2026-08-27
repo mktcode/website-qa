@@ -1,6 +1,6 @@
 {
   "name": "@mktcode/website-qa",
-  "version": "0.6.2",
+  "version": "1.0.0",
   "description": "Read-only HTTP, crawl, browser and social-preview checks for public websites",
   "license": "MIT",
   "type": "module",
@@ -51,6 +51,8 @@
     "website"
   ],
   "dependencies": {
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
     "axe-core": "4.13.0",
     "fast-xml-parser": "5.11.0",
     "file-type": "22.0.1",
@@ -62,8 +64,6 @@
   "devDependencies": {
     "@antfu/eslint-config": "9.3.0",
     "@types/node": "22.20.1",
-    "ajv": "8.20.0",
-    "ajv-formats": "3.0.1",
     "eslint": "10.8.1",
     "oxlint": "1.78.0",
     "typescript": "6.0.3",

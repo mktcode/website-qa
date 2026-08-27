@@ -1,13 +1,13 @@
 # Website-QA-Prüfbericht: Beispielwebsite
 
-> Strukturierter Pilotbericht. Er umfasst noch nicht die vollständige Website-Checkliste und ist kein vollständiger WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabenachweis.
+> Bericht auf Basis des bewusst begrenzten stabilen Basiskatalogs. Er ist weder vollständige Website-Checkliste noch WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe.
 
 ## Berichtsstand
 
 | Feld | Wert |
 |---|---|
 | Erstellt | 2026-08-24T12:30:00.000Z |
-| Katalog | website-qa-pilot 1.0.0-pilot.7 (pilot) |
+| Katalog | website-qa-baseline 1.0.0 (stable) |
 | Auswertungsumgebung | production |
 | Bevorzugte URL | https://example.com/ |
 | Quellstand | PROJEKT-COMMIT |
@@ -27,7 +27,7 @@
 | Externer Nachweis offen | 1 |
 | Zurückgestellt | 0 |
 | Akzeptierte Abweichung (offen) | 0 |
-| **Ausgewählte Pilotpunkte** | **34** |
+| **Ausgewählte Basiskatalogpunkte** | **34** |
 
 Automatische Kriterien (57 gesamt): 46 bestanden, 0 fehlgeschlagen, 0 unklar, 0 nicht zutreffend, 11 ohne Nachweis.
 
@@ -37,10 +37,10 @@ Nicht automatische Kriterien (36 gesamt): 1 belegt, 0 fehlgeschlagen, 0 unklar, 
 
 | Werkzeug | Ziel | Umgebung | Verwendet | Assertions | Befehl |
 |---|---|---|---:|---:|---|
-| http-check 0.6.2 | https://example.com/ | production | ja | 12 | <code>website-qa-http https://example.com/ --strict --json</code> |
-| crawl-check 0.6.2 | https://example.com/ | production | ja | 16 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
-| browser-check 0.6.2 | https://example.com/ | production | ja | 7 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
-| social-preview-check 0.6.2 | https://example.com/ | production | ja | 10 | <code>website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json</code> |
+| http-check 1.0.0 | https://example.com/ | production | ja | 12 | <code>website-qa-http https://example.com/ --strict --json</code> |
+| crawl-check 1.0.0 | https://example.com/ | production | ja | 16 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
+| browser-check 1.0.0 | https://example.com/ | production | ja | 7 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
+| social-preview-check 1.0.0 | https://example.com/ | production | ja | 10 | <code>website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json</code> |
 
 ## Checklistenpunkte
 
@@ -383,7 +383,7 @@ Inhalte, Logo, Bilder, Videos, Schriftarten, Testimonials und sonstige Materiali
 
 ## Grenzen
 
-- Der strukturierte Katalog ist ein Pilot und umfasst noch nicht die vollständige Website-Checkliste.
+- Der stabile Basiskatalog ist bewusst begrenzt und weder vollständige Website-Checkliste noch WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe.
 - Automatische Ergebnisse sind technische Teilnachweise und ersetzen keine manuellen, externen, rechtlichen oder organisatorischen Prüfungen.
 - Nur technische Läufe der festgelegten Auswertungsumgebung fließen in die Checklistenbewertung ein.
 - Quell- und Deploymentstand technischer Läufe sind projektseitig deklarierte Zuordnungen; das technische Werkzeug bestätigt sie nicht unabhängig.

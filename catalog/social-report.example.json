@@ -2,9 +2,9 @@
   "aiTrainingOptIn": false,
   "checklistCoverage": {
     "catalog": {
-      "id": "website-qa-pilot",
-      "status": "pilot",
-      "version": "1.0.0-pilot.7"
+      "id": "website-qa-baseline",
+      "status": "stable",
+      "version": "1.0.0"
     },
     "items": [
       {
@@ -886,6 +886,6 @@
   "tool": "social-preview-check",
   "toolPackage": {
     "name": "@mktcode/website-qa",
-    "version": "0.6.2"
+    "version": "1.0.0"
   }
 }
