@@ -22,7 +22,7 @@ const defaultOptions = {
   jsonFile: undefined,
   maxHtmlBytes: 2 * 1024 * 1024,
   maxImageBytes: 10 * 1024 * 1024,
-  maxPages: 50,
+  maxPages: 20,
   maxRedirects: 5,
   maxSitemaps: 20,
   sitemap: false,
@@ -271,7 +271,7 @@ Optionen:
   --strict               Warnungen führen ebenfalls zu Exitcode 1
   --sitemap              Zusätzlich URLs aus /sitemap.xml prüfen
   --sitemap-url=<URL>    Abweichende Sitemap-URL verwenden
-  --max-pages=<Anzahl>   Höchstens so viele Seiten prüfen (Standard: 50)
+  --max-pages=<Anzahl>   Höchstens so viele Seiten prüfen (Standard: 20)
   --max-sitemaps=<N>     Höchstens so viele Sitemap-Dateien abrufen (Standard: 20)
   --timeout=<Millisek.>  Timeout je Abruf (Standard: 15000)
   --max-redirects=<N>    Maximale Anzahl Weiterleitungen (Standard: 5)
@@ -1303,6 +1303,9 @@ export async function runSocialPreviewCheck(inputUrls, options = {}) {
       selectedPages: urls.length,
       skippedNavigation: sitemapSkippedNavigation,
       truncated: sitemapCoverageTruncated || discoveredUrls.length > urls.length,
+    }
+    if (results.length === 0 && discoveredUrls.length > urls.length) {
+      addIssue(result, 'warning', 'page-limit', `Seitenlimit von ${mergedOptions.maxPages} erreicht; ${discoveredUrls.length - urls.length} Ziel(e) wurden nicht geprüft.`, ['CORE-SOC-02'], result.requestedUrl)
     }
     result.assertions = createSocialAssertions(result)
     results.push(result)

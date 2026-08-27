@@ -75,6 +75,8 @@ Veröffentlichte Schemata und Beispiele liegen unter [`catalog/`](catalog/). Das
 
 ## Social- und Robots-Quellen
 
+`website-qa-social` prüft standardmäßig höchstens 20 Seiten. Größere Inventare benötigen einen ausdrücklich gewählten `--max-pages`-Wert; ein erreichtes Limit bleibt im Bericht sichtbar.
+
 `website-qa-social` dokumentiert für jede Crawlerkennung einen Quellenstatus: `currentOfficial` für eine aktuelle offizielle Quelle mit ausdrücklicher Tokenbestätigung, `officialContextOnly` für einen aktuellen offiziellen Sachkontext ohne ausdrückliche Tokenbestätigung und `historicalRedirect` für eine frühere offizielle Detailquelle, die heute nur noch allgemein weiterleitet. Technisch weiterhin relevante Social-Crawler werden bei begrenzter Quellenlage nicht stillschweigend entfernt; stattdessen wird `social.robots.policy-matrix-recorded` konservativ `inconclusive`. Daraus wird weder eine Freigabe noch eine Betreiberentscheidung abgeleitet.
 
 ## Lighthouse
@@ -165,10 +167,13 @@ Es gibt keine JavaScript-API für Checklistenbewertung oder Projektberichte. Dat
 npm ci
 npm run check
 npm run test:chromium
+npm run test:package
 npm pack --dry-run
 ```
 
 Die Tests verwenden lokale kurzlebige Server. Echte Chromium-Integrationstests weisen für Browser und Lighthouse nach, dass automatische POSTs, Formulare, externe Requests und weitere Nebenwirkungspfade keine Zielservereffekte auslösen. `npm run test:chromium` darf für Releaseprüfungen nicht übersprungen werden und schlägt fehl, wenn kein unterstütztes Browser-Binary gefunden wird.
+
+`npm run test:package` erzeugt das tatsächliche Tarball, installiert es in einem leeren temporären Verbraucherprojekt und ruft alle fünf installierten Binärdateien gegen einen lokalen Nur-GET-Server auf. Die erzeugten Berichte werden über die exportierten Paketschemata validiert. Der Lauf protokolliert Node-, npm-, Chromium- und Paketversion sowie den SHA-256-Hash des Tarballs; Exitcode 1 einzelner Prüfer ist als schemafähiger technischer Befund zulässig, Exitcode 2 nicht.
 
 ## Lizenz
 

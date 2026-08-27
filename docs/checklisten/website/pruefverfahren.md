@@ -70,7 +70,7 @@ Versionierte Dateien und öffentlich ausgelieferte Verzeichnisse werden mit geei
 Die wiederverwendbaren öffentlichen Prüfer werden im MIT-lizenzierten Repository [`mktcode/website-qa`](https://github.com/mktcode/website-qa) gepflegt. Das Zielprojekt bindet einen geprüften Commit oder Release unveränderlich als Entwicklungsabhängigkeit ein und stellt für die benötigten Einzelbefehle lokale npm-Aliase bereit. Die Prüfung wird aus dem Zielprojekt ausgeführt:
 
 ```bash
-npm run ops:social:check -- https://example.de/ --sitemap --max-pages=50 --max-sitemaps=20 --strict
+npm run ops:social:check -- https://example.de/ --sitemap --max-pages=20 --max-sitemaps=20 --strict
 ```
 
 Vor der ersten Verwendung beziehungsweise nach Änderungen an der Lockdatei wird im Zielprojekt mit dessen vorgesehenem Node-/npm-Stand eine saubere Installation ausgeführt:
@@ -89,7 +89,7 @@ Wichtige Optionen:
 
 - `--sitemap` prüft zusätzlich die URLs der Standard-Sitemap.
 - `--sitemap-url=<URL>` verwendet eine abweichende Sitemap.
-- `--max-pages=<N>` begrenzt den Seitenumfang bewusst; der Wert muss alle erwarteten Sitemapseiten abdecken oder die bewusste Stichprobe und ausgelassene Seiten werden dokumentiert.
+- `--max-pages=<N>` begrenzt den Seitenumfang bewusst; der konservative Werkzeugstandard und die allgemeine Beispielkonfiguration verwenden 20 Seiten. Ein größerer Wert wird ausdrücklich gewählt. Der Wert muss alle erwarteten Sitemapseiten abdecken oder die bewusste Stichprobe und ausgelassene Seiten werden dokumentiert.
 - `--max-sitemaps=<N>` begrenzt die Zahl abgerufener Sitemap-Dateien; ein erreichtes Limit bleibt als unvollständige Coverage sichtbar.
 - `--json` erzeugt maschinenlesbare Ausgabe auf stdout; `--json-file=<Pfad>` schreibt sie atomar in eine lokale Datei und legt Elternverzeichnisse an.
 - `--strict` behandelt Warnungen als fehlgeschlagene Prüfung.
@@ -259,19 +259,19 @@ Preload-, Idle-, Scroll- und Proximity-Ladevorgänge werden anhand realer Reques
 
 ## 10. Formulare, APIs und sichere Produktionsstichproben
 
-Ohne gesonderte Freigabe nur Anfragen verwenden, die nachweislich vor einer Nebenwirkung abgewiesen werden. Keine gültigen Formulare absenden, keine E-Mails, Telegram-Nachrichten, Kalender- oder Datenbankeinträge erzeugen und keine Object-Storage-Objekte anlegen.
+Ohne gesonderte Freigabe ausschließlich GET-Anfragen verwenden, die nachweislich vor einer Nebenwirkung enden. Keine Formulare absenden, keine E-Mails, Telegram-Nachrichten, Kalender- oder Datenbankeinträge erzeugen und keine Object-Storage-Objekte anlegen.
 
-Sichere Stichproben umfassen je nach Projekt:
+Nicht-GET-Anfragen und Anfragen mit Body gehören nicht zum allgemeinen Produktionsprüfverfahren. Sie benötigen eine ausdrückliche projektspezifische Freigabe und werden bevorzugt lokal oder auf einer dafür vorgesehenen Staging-Umgebung geprüft. Dazu können je nach Projekt gehören:
 
 - falsche HTTP-Methode,
-- unzulässigen Content-Type,
-- leeren oder strukturell ungültigen Body,
-- fremden beziehungsweise fehlenden Origin,
+- unzulässiger Content-Type,
+- leerer oder strukturell ungültiger Body,
+- fremder beziehungsweise fehlender Origin,
 - ungültige Koordinaten oder IDs,
 - fehlendes Webhook-Secret,
 - Rate-Limit-Verhalten ohne gültige Fachdaten.
 
-Vorher aus Quellcode und Tests bestätigen, dass der gewählte Fehlerpfad keine Nebenwirkung erreicht. Ein gültiger End-to-end-Produktionslauf erfordert ausdrückliche Freigabe, kontrollierte Empfänger, eindeutige Testdaten und einen Bereinigungsnachweis.
+Vorher aus Quellcode und Tests bestätigen, dass der gewählte Fehlerpfad keine Nebenwirkung erreicht. Für jede öffentliche Nicht-GET-Stichprobe zusätzlich serverseitig nachweisen, dass keine Nebenwirkung eingetreten ist. Ein gültiger End-to-end-Produktionslauf erfordert ausdrückliche Freigabe, kontrollierte Empfänger, eindeutige Testdaten und einen Bereinigungsnachweis.
 
 ## 11. Container, Deployment und Infrastruktur
 

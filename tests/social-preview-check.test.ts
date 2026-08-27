@@ -38,6 +38,7 @@ describe('social preview checker', () => {
       '--timeout=5000',
     ])
 
+    expect(parseArguments(['https://example.com/']).options.maxPages).toBe(20)
     expect(parsed.urls).toEqual(['https://example.com/'])
     expect(parsed.options).toMatchObject({
       json: true,
@@ -340,9 +341,20 @@ describe('social preview checker', () => {
     const limitedResult = limitedReport.results[0] as unknown as {
       assertions: Array<{ assertionId: string, outcome: string }>
       coverage: { discoveredPages: number, selectedPages: number, skippedNavigation: number, truncated: boolean }
+      issues: Array<{ code: string, severity: string }>
     }
+    expect(limitedReport.summary).toMatchObject({ failed: false, warnings: 1 })
     expect(limitedResult.coverage).toMatchObject({ discoveredPages: 2, selectedPages: 1, skippedNavigation: 0, truncated: true })
+    expect(limitedResult.issues).toContainEqual(expect.objectContaining({ code: 'page-limit', severity: 'warning' }))
     expect(limitedResult.assertions.find(assertion => assertion.assertionId === 'social.metadata.canonical-open-graph-consistent')?.outcome).toBe('inconclusive')
+
+    const strictLimitedReport = await runSocialPreviewCheck([url, `${url}second`], {
+      allowHttp: true,
+      allowPrivate: true,
+      maxPages: 1,
+      strict: true,
+    })
+    expect(strictLimitedReport.summary.failed).toBe(true)
 
     const jsonReport = createJsonReport(report.results, report.options)
     expect(jsonReport).toMatchObject({

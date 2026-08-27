@@ -14,8 +14,8 @@ afterEach(() => {
   temporaryDirectories.clear()
 })
 
-describe('installed package commands', () => {
-  it('run through package-manager-style symbolic links', () => {
+describe('package binary entry points', () => {
+  it('run source entry points through package-manager-style symbolic links', () => {
     const directory = mkdtempSync(join(tmpdir(), 'website-qa-bin-'))
     temporaryDirectories.add(directory)
     const commands = [
@@ -36,6 +36,9 @@ describe('installed package commands', () => {
       expect(execution.stdout).toContain(`${packageMetadata.name} ${packageMetadata.version}`)
       expect(execution.stdout).toContain(`website-qa-${command.split('-').at(-1)}`)
       expect(execution.stdout).toContain('--json-file=<Pfad>')
+      if (command === 'website-qa-social') {
+        expect(execution.stdout).toContain('--max-pages=<Anzahl>   Höchstens so viele Seiten prüfen (Standard: 20)')
+      }
       expect(realpathSync(link)).toBe(resolve(source))
     }
   })
