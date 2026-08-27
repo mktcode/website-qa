@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-24T21:00:00.000Z",
+  "generatedAt": "2026-08-27T18:50:00.000Z",
   "options": {
     "maxPages": 20,
     "maxRedirects": 5,
@@ -106,11 +106,12 @@
           {
             "allowed": true,
             "category": "social",
-            "documentation": "https://developers.facebook.com/docs/sharing/webmasters/web-crawlers/",
+            "documentation": "https://developers.facebook.com/documentation/sharing/webmasters/web-crawlers",
             "key": "facebookexternalhit",
             "label": "FacebookExternalHit",
             "productTokenOnly": false,
             "robotsMayNotApply": false,
+            "sourceVerification": "currentOfficial",
             "token": "facebookexternalhit"
           },
           {
@@ -121,6 +122,7 @@
             "label": "Twitterbot",
             "productTokenOnly": false,
             "robotsMayNotApply": false,
+            "sourceVerification": "historicalRedirect",
             "token": "Twitterbot"
           },
           {
@@ -131,106 +133,117 @@
             "label": "LinkedInBot",
             "productTokenOnly": false,
             "robotsMayNotApply": false,
+            "sourceVerification": "officialContextOnly",
             "token": "LinkedInBot"
           },
           {
             "allowed": true,
             "category": "ai-search",
-            "documentation": "https://platform.openai.com/docs/bots",
+            "documentation": "https://developers.openai.com/api/docs/bots",
             "key": "openai-search",
             "label": "OAI-SearchBot",
             "productTokenOnly": false,
             "robotsMayNotApply": false,
+            "sourceVerification": "currentOfficial",
             "token": "OAI-SearchBot"
           },
           {
             "allowed": true,
             "category": "ai-user",
-            "documentation": "https://platform.openai.com/docs/bots",
+            "documentation": "https://developers.openai.com/api/docs/bots",
             "key": "openai-user",
             "label": "ChatGPT-User",
             "productTokenOnly": false,
             "robotsMayNotApply": true,
+            "sourceVerification": "currentOfficial",
             "token": "ChatGPT-User"
           },
           {
             "allowed": false,
             "category": "ai-training",
-            "documentation": "https://platform.openai.com/docs/bots",
+            "documentation": "https://developers.openai.com/api/docs/bots",
             "key": "openai-training",
             "label": "GPTBot",
             "productTokenOnly": false,
             "robotsMayNotApply": false,
+            "sourceVerification": "currentOfficial",
             "token": "GPTBot"
           },
           {
             "allowed": true,
             "category": "ai-search",
-            "documentation": "https://support.anthropic.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler",
+            "documentation": "https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler",
             "key": "anthropic-search",
             "label": "Claude-SearchBot",
             "productTokenOnly": false,
             "robotsMayNotApply": false,
+            "sourceVerification": "currentOfficial",
             "token": "Claude-SearchBot"
           },
           {
             "allowed": true,
             "category": "ai-user",
-            "documentation": "https://support.anthropic.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler",
+            "documentation": "https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler",
             "key": "anthropic-user",
             "label": "Claude-User",
             "productTokenOnly": false,
             "robotsMayNotApply": false,
+            "sourceVerification": "currentOfficial",
             "token": "Claude-User"
           },
           {
             "allowed": false,
             "category": "ai-training",
-            "documentation": "https://support.anthropic.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler",
+            "documentation": "https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler",
             "key": "anthropic-training",
             "label": "ClaudeBot",
             "productTokenOnly": false,
             "robotsMayNotApply": false,
+            "sourceVerification": "currentOfficial",
             "token": "ClaudeBot"
           },
           {
             "allowed": true,
             "category": "ai-search",
-            "documentation": "https://developers.google.com/search/docs/crawling-indexing/google-common-crawlers",
+            "documentation": "https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers",
             "key": "google-search",
             "label": "Googlebot (Search/Gemini-Grounding)",
             "productTokenOnly": false,
             "robotsMayNotApply": false,
+            "sourceVerification": "currentOfficial",
             "token": "Googlebot"
           },
           {
             "allowed": true,
             "category": "ai-search",
-            "documentation": "https://developers.google.com/search/docs/crawling-indexing/google-common-crawlers",
+            "documentation": "https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers",
             "key": "google-vertex",
             "label": "Google-CloudVertexBot",
             "productTokenOnly": false,
             "robotsMayNotApply": false,
+            "sourceVerification": "currentOfficial",
             "token": "Google-CloudVertexBot"
           },
           {
             "allowed": false,
             "category": "ai-training",
-            "documentation": "https://developers.google.com/search/docs/crawling-indexing/google-common-crawlers",
+            "documentation": "https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers",
             "key": "google-extended",
             "label": "Google-Extended",
             "productTokenOnly": true,
             "robotsMayNotApply": false,
+            "sourceVerification": "currentOfficial",
             "token": "Google-Extended"
           },
           {
             "allowed": true,
             "category": "ai-search",
-            "documentation": "https://blogs.bing.com/webmaster/september-2025/Introducing-new-publishing-controls-for-Bing-Search-and-Copilot",
+            "documentation": "https://www.bing.com/webmasters/help/which-crawlers-does-bing-use-8c184ec0",
             "key": "microsoft-copilot",
             "label": "Bingbot (Search/Copilot)",
             "productTokenOnly": false,
             "robotsMayNotApply": false,
+            "sourceVerification": "currentOfficial",
             "token": "bingbot"
           },
           {
@@ -241,6 +254,7 @@
             "label": "MistralAI-Index",
             "productTokenOnly": false,
             "robotsMayNotApply": false,
+            "sourceVerification": "currentOfficial",
             "token": "MistralAI-Index"
           },
           {
@@ -251,6 +265,7 @@
             "label": "MistralAI-User",
             "productTokenOnly": false,
             "robotsMayNotApply": false,
+            "sourceVerification": "currentOfficial",
             "token": "MistralAI-User"
           },
           {
@@ -261,46 +276,51 @@
             "label": "MistralAI-Training",
             "productTokenOnly": false,
             "robotsMayNotApply": false,
+            "sourceVerification": "currentOfficial",
             "token": "MistralAI-Training"
           },
           {
             "allowed": true,
             "category": "ai-search",
-            "documentation": "https://docs.perplexity.ai/guides/bots",
+            "documentation": "https://docs.perplexity.ai/docs/resources/perplexity-crawlers",
             "key": "perplexity-search",
             "label": "PerplexityBot",
             "productTokenOnly": false,
             "robotsMayNotApply": false,
+            "sourceVerification": "currentOfficial",
             "token": "PerplexityBot"
           },
           {
             "allowed": true,
             "category": "ai-user",
-            "documentation": "https://docs.perplexity.ai/guides/bots",
+            "documentation": "https://docs.perplexity.ai/docs/resources/perplexity-crawlers",
             "key": "perplexity-user",
             "label": "Perplexity-User",
             "productTokenOnly": false,
             "robotsMayNotApply": true,
+            "sourceVerification": "currentOfficial",
             "token": "Perplexity-User"
           },
           {
             "allowed": true,
             "category": "ai-user",
-            "documentation": "https://developers.facebook.com/docs/sharing/webmasters/web-crawlers/",
+            "documentation": "https://developers.facebook.com/documentation/sharing/webmasters/web-crawlers",
             "key": "meta-fetcher",
             "label": "Meta-ExternalFetcher",
             "productTokenOnly": false,
             "robotsMayNotApply": true,
+            "sourceVerification": "currentOfficial",
             "token": "meta-externalfetcher"
           },
           {
             "allowed": false,
             "category": "ai-training",
-            "documentation": "https://developers.facebook.com/docs/sharing/webmasters/web-crawlers/",
+            "documentation": "https://developers.facebook.com/documentation/sharing/webmasters/web-crawlers",
             "key": "meta-training",
             "label": "Meta-ExternalAgent",
             "productTokenOnly": false,
             "robotsMayNotApply": false,
+            "sourceVerification": "currentOfficial",
             "token": "meta-externalagent"
           },
           {
@@ -311,6 +331,7 @@
             "label": "Applebot",
             "productTokenOnly": false,
             "robotsMayNotApply": false,
+            "sourceVerification": "currentOfficial",
             "token": "Applebot"
           },
           {
@@ -321,6 +342,7 @@
             "label": "Applebot-Extended",
             "productTokenOnly": true,
             "robotsMayNotApply": false,
+            "sourceVerification": "currentOfficial",
             "token": "Applebot-Extended"
           }
         ],
@@ -346,8 +368,13 @@
               "linkedin"
             ],
             "checkedImages": 1,
-            "robotsPolicyReviewedAt": "2026-08-22",
-            "url": "https://example.com/"
+            "robotsPolicyReviewedAt": "2026-08-27",
+            "url": "https://example.com/",
+            "robotsPolicySourceSummary": {
+              "currentOfficial": 20,
+              "historicalRedirect": 1,
+              "officialContextOnly": 1
+            }
           }
         },
         {
@@ -368,8 +395,13 @@
               "linkedin"
             ],
             "checkedImages": 1,
-            "robotsPolicyReviewedAt": "2026-08-22",
-            "url": "https://example.com/"
+            "robotsPolicyReviewedAt": "2026-08-27",
+            "url": "https://example.com/",
+            "robotsPolicySourceSummary": {
+              "currentOfficial": 20,
+              "historicalRedirect": 1,
+              "officialContextOnly": 1
+            }
           }
         },
         {
@@ -391,8 +423,13 @@
               "linkedin"
             ],
             "checkedImages": 1,
-            "robotsPolicyReviewedAt": "2026-08-22",
-            "url": "https://example.com/"
+            "robotsPolicyReviewedAt": "2026-08-27",
+            "url": "https://example.com/",
+            "robotsPolicySourceSummary": {
+              "currentOfficial": 20,
+              "historicalRedirect": 1,
+              "officialContextOnly": 1
+            }
           }
         },
         {
@@ -413,8 +450,13 @@
               "linkedin"
             ],
             "checkedImages": 1,
-            "robotsPolicyReviewedAt": "2026-08-22",
-            "url": "https://example.com/"
+            "robotsPolicyReviewedAt": "2026-08-27",
+            "url": "https://example.com/",
+            "robotsPolicySourceSummary": {
+              "currentOfficial": 20,
+              "historicalRedirect": 1,
+              "officialContextOnly": 1
+            }
           }
         },
         {
@@ -435,8 +477,13 @@
               "linkedin"
             ],
             "checkedImages": 1,
-            "robotsPolicyReviewedAt": "2026-08-22",
-            "url": "https://example.com/"
+            "robotsPolicyReviewedAt": "2026-08-27",
+            "url": "https://example.com/",
+            "robotsPolicySourceSummary": {
+              "currentOfficial": 20,
+              "historicalRedirect": 1,
+              "officialContextOnly": 1
+            }
           }
         },
         {
@@ -457,8 +504,13 @@
               "linkedin"
             ],
             "checkedImages": 1,
-            "robotsPolicyReviewedAt": "2026-08-22",
-            "url": "https://example.com/"
+            "robotsPolicyReviewedAt": "2026-08-27",
+            "url": "https://example.com/",
+            "robotsPolicySourceSummary": {
+              "currentOfficial": 20,
+              "historicalRedirect": 1,
+              "officialContextOnly": 1
+            }
           }
         },
         {
@@ -479,20 +531,26 @@
               "linkedin"
             ],
             "checkedImages": 1,
-            "robotsPolicyReviewedAt": "2026-08-22",
-            "url": "https://example.com/"
+            "robotsPolicyReviewedAt": "2026-08-27",
+            "url": "https://example.com/",
+            "robotsPolicySourceSummary": {
+              "currentOfficial": 20,
+              "historicalRedirect": 1,
+              "officialContextOnly": 1
+            }
           }
         },
         {
           "checklistRefs": [
             "CORE-ROB-02",
             "CORE-ROB-03",
-            "CORE-ROB-04"
+            "CORE-ROB-04",
+            "CORE-ROB-05"
           ],
           "id": "social.robots.policy-matrix-recorded",
-          "message": "Crawler-/Produktkennungen, Kategorien, erlaubte und blockierte Trainings-/Datennutzungstokens, offizielle Quellen und Quellenstand sind im technischen Bericht dokumentiert. Ob die beobachtete Policy der freigegebenen Betreiberentscheidung entspricht, bleibt manuell zu prüfen.",
+          "message": "Crawler-/Produktkennungen und Quellenstand sind dokumentiert, aber mindestens ein Token besitzt keine aktuelle offizielle Quelle, die den Token ausdrücklich bestätigt.",
           "signalVersion": 1,
-          "status": "positive",
+          "status": "inconclusive",
           "subject": {
             "allowedTrainingTokens": 0,
             "blockedTrainingTokens": 6,
@@ -503,14 +561,19 @@
               "linkedin"
             ],
             "checkedImages": 1,
-            "robotsPolicyReviewedAt": "2026-08-22",
-            "url": "https://example.com/"
+            "robotsPolicyReviewedAt": "2026-08-27",
+            "url": "https://example.com/",
+            "robotsPolicySourceSummary": {
+              "currentOfficial": 20,
+              "historicalRedirect": 1,
+              "officialContextOnly": 1
+            }
           }
         }
       ]
     }
   ],
-  "robotsPolicyReviewedAt": "2026-08-22",
+  "robotsPolicyReviewedAt": "2026-08-27",
   "schemaVersion": 2,
   "summary": {
     "errors": 0,
@@ -526,5 +589,10 @@
   "checklist": {
     "id": "website-qa-checklist",
     "version": "2.0.0"
+  },
+  "robotsPolicySourceSummary": {
+    "currentOfficial": 20,
+    "historicalRedirect": 1,
+    "officialContextOnly": 1
   }
 }

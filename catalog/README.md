@@ -16,4 +16,6 @@ Signalstatus bedeuten ausschließlich:
 
 Kein Status hakt einen Checklistenpunkt ab. Eine Checklistenreferenz ist nur ein Hinweis für die anschließende manuelle QA-Arbeit. Änderungen an nicht betroffenen Checklistenformulierungen machen technische Berichte nicht automatisch ungültig; fachlich neu verwendete IDs oder Signalbedeutungen benötigen neue stabile Kennungen beziehungsweise Versionen.
 
+Der Social-Bericht kennzeichnet Crawlerquellen zusätzlich mit `currentOfficial`, `officialContextOnly` oder `historicalRedirect`. Eine begrenzte Quellenbestätigung bleibt sichtbar und führt beim Matrixsignal zu `inconclusive`; der Token wird dadurch weder stillschweigend entfernt noch als aktuell offiziell bestätigt ausgegeben.
+
 Die Beispiele enthalten bewusst keine Roh-Lighthouse-Berichte, Screenshots, Cookie-/Storagewerte oder unredigierte Querywerte.

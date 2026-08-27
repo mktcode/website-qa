@@ -85,6 +85,21 @@ describe('technical report schemas', () => {
     }
   })
 
+  it('requires bounded Social policy source verification', () => {
+    const validate = validators().get('social')!
+    const missingSummary = structuredClone(json('social-report.example.json'))
+    delete missingSummary.robotsPolicySourceSummary
+    expect(validate(missingSummary)).toBe(false)
+
+    const missingPolicyStatus = structuredClone(json('social-report.example.json'))
+    delete missingPolicyStatus.results[0].robots.policies[0].sourceVerification
+    expect(validate(missingPolicyStatus)).toBe(false)
+
+    const unknownPolicyStatus = structuredClone(json('social-report.example.json'))
+    unknownPolicyStatus.results[0].robots.policies[0].sourceVerification = 'assumedCurrent'
+    expect(validate(unknownPolicyStatus)).toBe(false)
+  })
+
   it('rejects weakened or incomplete Lighthouse contracts and oversized URLs', () => {
     const validate = validators().get('lighthouse')!
     const weakened = structuredClone(json('lighthouse-report.example.json'))

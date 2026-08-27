@@ -50,12 +50,12 @@ const userAgents = [
   },
 ]
 
-export const robotsPolicyReviewedAt = '2026-08-22'
+export const robotsPolicyReviewedAt = '2026-08-27'
 
-export const robotsPolicies = [
+const robotsPolicyDefinitions = [
   {
     category: 'social',
-    documentation: 'https://developers.facebook.com/docs/sharing/webmasters/web-crawlers/',
+    documentation: 'https://developers.facebook.com/documentation/sharing/webmasters/web-crawlers',
     key: 'facebookexternalhit',
     label: 'FacebookExternalHit',
     token: 'facebookexternalhit',
@@ -76,14 +76,14 @@ export const robotsPolicies = [
   },
   {
     category: 'ai-search',
-    documentation: 'https://platform.openai.com/docs/bots',
+    documentation: 'https://developers.openai.com/api/docs/bots',
     key: 'openai-search',
     label: 'OAI-SearchBot',
     token: 'OAI-SearchBot',
   },
   {
     category: 'ai-user',
-    documentation: 'https://platform.openai.com/docs/bots',
+    documentation: 'https://developers.openai.com/api/docs/bots',
     key: 'openai-user',
     label: 'ChatGPT-User',
     robotsMayNotApply: true,
@@ -91,49 +91,49 @@ export const robotsPolicies = [
   },
   {
     category: 'ai-training',
-    documentation: 'https://platform.openai.com/docs/bots',
+    documentation: 'https://developers.openai.com/api/docs/bots',
     key: 'openai-training',
     label: 'GPTBot',
     token: 'GPTBot',
   },
   {
     category: 'ai-search',
-    documentation: 'https://support.anthropic.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler',
+    documentation: 'https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler',
     key: 'anthropic-search',
     label: 'Claude-SearchBot',
     token: 'Claude-SearchBot',
   },
   {
     category: 'ai-user',
-    documentation: 'https://support.anthropic.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler',
+    documentation: 'https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler',
     key: 'anthropic-user',
     label: 'Claude-User',
     token: 'Claude-User',
   },
   {
     category: 'ai-training',
-    documentation: 'https://support.anthropic.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler',
+    documentation: 'https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler',
     key: 'anthropic-training',
     label: 'ClaudeBot',
     token: 'ClaudeBot',
   },
   {
     category: 'ai-search',
-    documentation: 'https://developers.google.com/search/docs/crawling-indexing/google-common-crawlers',
+    documentation: 'https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers',
     key: 'google-search',
     label: 'Googlebot (Search/Gemini-Grounding)',
     token: 'Googlebot',
   },
   {
     category: 'ai-search',
-    documentation: 'https://developers.google.com/search/docs/crawling-indexing/google-common-crawlers',
+    documentation: 'https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers',
     key: 'google-vertex',
     label: 'Google-CloudVertexBot',
     token: 'Google-CloudVertexBot',
   },
   {
     category: 'ai-training',
-    documentation: 'https://developers.google.com/search/docs/crawling-indexing/google-common-crawlers',
+    documentation: 'https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers',
     key: 'google-extended',
     label: 'Google-Extended',
     productTokenOnly: true,
@@ -141,7 +141,7 @@ export const robotsPolicies = [
   },
   {
     category: 'ai-search',
-    documentation: 'https://blogs.bing.com/webmaster/september-2025/Introducing-new-publishing-controls-for-Bing-Search-and-Copilot',
+    documentation: 'https://www.bing.com/webmasters/help/which-crawlers-does-bing-use-8c184ec0',
     key: 'microsoft-copilot',
     label: 'Bingbot (Search/Copilot)',
     token: 'bingbot',
@@ -169,14 +169,14 @@ export const robotsPolicies = [
   },
   {
     category: 'ai-search',
-    documentation: 'https://docs.perplexity.ai/guides/bots',
+    documentation: 'https://docs.perplexity.ai/docs/resources/perplexity-crawlers',
     key: 'perplexity-search',
     label: 'PerplexityBot',
     token: 'PerplexityBot',
   },
   {
     category: 'ai-user',
-    documentation: 'https://docs.perplexity.ai/guides/bots',
+    documentation: 'https://docs.perplexity.ai/docs/resources/perplexity-crawlers',
     key: 'perplexity-user',
     label: 'Perplexity-User',
     robotsMayNotApply: true,
@@ -184,7 +184,7 @@ export const robotsPolicies = [
   },
   {
     category: 'ai-user',
-    documentation: 'https://developers.facebook.com/docs/sharing/webmasters/web-crawlers/',
+    documentation: 'https://developers.facebook.com/documentation/sharing/webmasters/web-crawlers',
     key: 'meta-fetcher',
     label: 'Meta-ExternalFetcher',
     robotsMayNotApply: true,
@@ -192,7 +192,7 @@ export const robotsPolicies = [
   },
   {
     category: 'ai-training',
-    documentation: 'https://developers.facebook.com/docs/sharing/webmasters/web-crawlers/',
+    documentation: 'https://developers.facebook.com/documentation/sharing/webmasters/web-crawlers',
     key: 'meta-training',
     label: 'Meta-ExternalAgent',
     token: 'meta-externalagent',
@@ -213,6 +213,20 @@ export const robotsPolicies = [
     token: 'Applebot-Extended',
   },
 ]
+
+const limitedSourceVerification = {
+  linkedinbot: 'officialContextOnly',
+  twitterbot: 'historicalRedirect',
+}
+
+export const robotsPolicies = robotsPolicyDefinitions.map(policy => Object.assign(policy, {
+  sourceVerification: limitedSourceVerification[policy.key] || 'currentOfficial',
+}))
+
+function robotsPolicySourceSummary() {
+  return Object.fromEntries(['currentOfficial', 'officialContextOnly', 'historicalRedirect']
+    .map(status => [status, robotsPolicies.filter(policy => policy.sourceVerification === status).length]))
+}
 
 const robotsCategoryLabels = {
   'social': 'Social-Vorschau',
@@ -730,6 +744,7 @@ async function checkRobots(result, pageUrl, agentResults, options) {
         label: policy.label,
         productTokenOnly: policy.productTokenOnly || false,
         robotsMayNotApply: policy.robotsMayNotApply || false,
+        sourceVerification: policy.sourceVerification,
         token: policy.token,
       }
     })
@@ -948,6 +963,7 @@ function createSocialAssertions(result) {
     checkedAgents: result.agents.map(agent => agent.key),
     checkedImages: result.images.length,
     robotsPolicyReviewedAt,
+    robotsPolicySourceSummary: robotsPolicySourceSummary(),
     url: reportUrl(result.finalUrl || result.requestedUrl).url,
   }
   const assertions = []
@@ -1108,15 +1124,18 @@ function createSocialAssertions(result) {
     outcome = 'inconclusive'
   }
   else {
-    const policyKeys = new Set(policies.map(policy => policy.key))
-    outcome = robotsPolicies.every(policy => policyKeys.has(policy.key)
-      && policy.documentation.startsWith('https://'))
+    const policiesByKey = new Map(policies.map(policy => [policy.key, policy]))
+    outcome = robotsPolicies.every((policy) => {
+      const reportedPolicy = policiesByKey.get(policy.key)
+      return reportedPolicy?.documentation.startsWith('https://')
+        && reportedPolicy.sourceVerification === 'currentOfficial'
+    })
       ? 'pass'
       : 'inconclusive'
   }
   add('social.robots.policy-matrix-recorded', outcome, {
-    inconclusive: 'Crawler-/Produktkennungen, Kategorien oder offizielle Quellen sind im technischen Bericht nicht vollständig dokumentiert.',
-    pass: 'Crawler-/Produktkennungen, Kategorien, erlaubte und blockierte Trainings-/Datennutzungstokens, offizielle Quellen und Quellenstand sind im technischen Bericht dokumentiert. Ob die beobachtete Policy der freigegebenen Betreiberentscheidung entspricht, bleibt manuell zu prüfen.',
+    inconclusive: 'Crawler-/Produktkennungen und Quellenstand sind dokumentiert, aber mindestens ein Token besitzt keine aktuelle offizielle Quelle, die den Token ausdrücklich bestätigt.',
+    pass: 'Crawler-/Produktkennungen, Kategorien, erlaubte und blockierte Trainings-/Datennutzungstokens, aktuelle offizielle Quellen und Quellenstand sind im technischen Bericht dokumentiert. Ob die beobachtete Policy der freigegebenen Betreiberentscheidung entspricht, bleibt manuell zu prüfen.',
   }[outcome])
 
   return assertions
@@ -1186,6 +1205,7 @@ export function createJsonReport(results, options) {
     },
     results: reportedResults,
     robotsPolicyReviewedAt,
+    robotsPolicySourceSummary: robotsPolicySourceSummary(),
     schemaVersion: 2,
     summary: summarize(reportedResults, options.strict),
     tool: 'social-preview-check',
@@ -1230,7 +1250,8 @@ function printText(results, options) {
   console.log(`\nTechnische Signale: ${signals.positive} positiv, ${signals.defect} Defekt(e), ${signals.inconclusive} unklar, ${signals.notApplicable} nicht anwendbar.`)
   console.log('Checklistenreferenzen dienen nur der manuellen QA-Arbeit und ändern keinen Checklistenstatus.')
   console.log('KI-Training/Datennutzung: beobachtete robots.txt-Regeln werden dokumentiert, aber nicht als Freigabeentscheidung bewertet.')
-  console.log(`Robots-Matrix: ${robotsPolicies.length} Kennungen, Quellenstand ${robotsPolicyReviewedAt}.`)
+  const sourceSummary = robotsPolicySourceSummary()
+  console.log(`Robots-Matrix: ${robotsPolicies.length} Kennungen, Quellenstand ${robotsPolicyReviewedAt}; ${sourceSummary.currentOfficial} aktuell offiziell, ${sourceSummary.officialContextOnly} nur offizieller Kontext, ${sourceSummary.historicalRedirect} historischer Redirect.`)
   console.log(`Ergebnis: ${summary.pages} Seite(n), ${summary.errors} Fehler, ${summary.warnings} Warnung(en).`)
   if (summary.failed) {
     console.log(options.strict && summary.errors === 0

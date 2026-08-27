@@ -21,7 +21,8 @@
           "required": [
             "privateTargetsRedacted",
             "results",
-            "robotsPolicyReviewedAt"
+            "robotsPolicyReviewedAt",
+            "robotsPolicySourceSummary"
           ],
           "properties": {
             "tool": {
@@ -33,6 +34,26 @@
             "robotsPolicyReviewedAt": {
               "type": "string",
               "format": "date"
+            },
+            "robotsPolicySourceSummary": {
+              "type": "object",
+              "required": [
+                "currentOfficial",
+                "historicalRedirect",
+                "officialContextOnly"
+              ],
+              "properties": {
+                "currentOfficial": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                },
+                "historicalRedirect": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                },
+                "officialContextOnly": {
+                  "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                }
+              },
+              "additionalProperties": false
             },
             "options": {
               "type": "object",
@@ -107,7 +128,39 @@
               "type": "array",
               "minItems": 1,
               "items": {
-                "$ref": "technical-report.common.schema.json#/$defs/result"
+                "allOf": [
+                  {
+                    "$ref": "technical-report.common.schema.json#/$defs/result"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "robots": {
+                        "type": "object",
+                        "properties": {
+                          "policies": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": [
+                                "sourceVerification"
+                              ],
+                              "properties": {
+                                "sourceVerification": {
+                                  "enum": [
+                                    "currentOfficial",
+                                    "historicalRedirect",
+                                    "officialContextOnly"
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
               }
             },
             "summary": {

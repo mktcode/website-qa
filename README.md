@@ -73,6 +73,10 @@ Sie enthalten keine automatische Checklistenbewertung, Projektstatus, Evidence-D
 
 Veröffentlichte Schemata und Beispiele liegen unter [`catalog/`](catalog/). Das neutrale [`checklist-index.json`](catalog/checklist-index.json) spiegelt alle 215 stabilen Checklisten-IDs. [`signals.json`](catalog/signals.json) registriert ausschließlich technische Signale und deren Informationsreferenzen. Beide Dateien enthalten keine Ergebnisse.
 
+## Social- und Robots-Quellen
+
+`website-qa-social` dokumentiert für jede Crawlerkennung einen Quellenstatus: `currentOfficial` für eine aktuelle offizielle Quelle mit ausdrücklicher Tokenbestätigung, `officialContextOnly` für einen aktuellen offiziellen Sachkontext ohne ausdrückliche Tokenbestätigung und `historicalRedirect` für eine frühere offizielle Detailquelle, die heute nur noch allgemein weiterleitet. Technisch weiterhin relevante Social-Crawler werden bei begrenzter Quellenlage nicht stillschweigend entfernt; stattdessen wird `social.robots.policy-matrix-recorded` konservativ `inconclusive`. Daraus wird weder eine Freigabe noch eine Betreiberentscheidung abgeleitet.
+
 ## Lighthouse
 
 `website-qa-lighthouse` führt genau einen festen mobilen Navigationstest mit den Lighthouse-Kategorien Performance, Accessibility, Best Practices und SEO aus. Es gibt keine projektspezifischen Scorebudgets.

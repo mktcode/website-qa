@@ -588,11 +588,12 @@
       "id": "social.robots.policy-matrix-recorded",
       "version": 1,
       "tool": "social-preview-check",
-      "description": "Crawler-/Produktkennungen, Kategorien, erlaubte und blockierte Trainings-/Datennutzungstokens, offizielle Quellen und Quellenstand sind dokumentiert; die Freigabeentscheidung bleibt manuell.",
+      "description": "Crawler-/Produktkennungen, Kategorien, erlaubte und blockierte Trainings-/Datennutzungstokens, Quellenstatus und Quellenstand sind dokumentiert; nicht aktuell offiziell belegte Tokens machen das Signal unklar und die Freigabeentscheidung bleibt manuell.",
       "checklistRefs": [
         "CORE-ROB-02",
         "CORE-ROB-03",
-        "CORE-ROB-04"
+        "CORE-ROB-04",
+        "CORE-ROB-05"
       ]
     },
     {

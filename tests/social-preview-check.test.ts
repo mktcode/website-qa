@@ -64,7 +64,7 @@ describe('social preview checker', () => {
     expect(metadata.metadata['twitter:card']).toEqual(['summary_large_image'])
   })
 
-  it('contains verified policies for major AI providers', () => {
+  it('documents current and limited source verification for major crawler policies', () => {
     const tokens = robotsPolicies.map(policy => policy.token)
 
     expect(tokens).toEqual(expect.arrayContaining([
@@ -89,6 +89,13 @@ describe('social preview checker', () => {
       'Applebot-Extended',
     ]))
     expect(robotsPolicies.every(policy => policy.documentation.startsWith('https://'))).toBe(true)
+    expect(robotsPolicies.filter(policy => policy.sourceVerification !== 'currentOfficial').map(policy => ({
+      sourceVerification: policy.sourceVerification,
+      token: policy.token,
+    }))).toEqual([
+      { sourceVerification: 'historicalRedirect', token: 'Twitterbot' },
+      { sourceVerification: 'officialContextOnly', token: 'LinkedInBot' },
+    ])
   })
 
   it('marks assertions inconclusive when crawler, image, or robots observations are unavailable', async () => {
@@ -211,8 +218,16 @@ describe('social preview checker', () => {
     expect(result.assertions).toHaveLength(8)
     expect(result.assertions.find(assertion => assertion.assertionId === 'social.crawlers.html-metadata-consistent')?.outcome).toBe('pass')
     expect(result.assertions.find(assertion => assertion.assertionId === 'social.robots.policy-matrix-recorded')).toMatchObject({
-      outcome: 'pass',
-      subject: { allowedTrainingTokens: 6, blockedTrainingTokens: 0 },
+      outcome: 'inconclusive',
+      subject: {
+        allowedTrainingTokens: 6,
+        blockedTrainingTokens: 0,
+        robotsPolicySourceSummary: {
+          currentOfficial: 20,
+          historicalRedirect: 1,
+          officialContextOnly: 1,
+        },
+      },
     })
     const limitedReport = await runSocialPreviewCheck([url, `${url}second`], {
       allowHttp: true,
@@ -233,6 +248,11 @@ describe('social preview checker', () => {
         browserInteractions: false,
         formsSubmitted: false,
         methods: ['GET'],
+      },
+      robotsPolicySourceSummary: {
+        currentOfficial: 20,
+        historicalRedirect: 1,
+        officialContextOnly: 1,
       },
       schemaVersion: 2,
     })
