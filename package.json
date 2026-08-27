@@ -38,6 +38,7 @@
     "lint": "oxlint --deny-warnings -D correctness -D suspicious -D perf src tests && eslint --max-warnings 0 src tests",
     "test": "vitest run",
     "test:chromium": "WEBSITE_QA_REQUIRE_CHROMIUM=1 vitest run tests/browser-check.test.ts tests/lighthouse-check.test.ts",
+    "test:package": "node tests/package-install.mjs",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "check": "npm run lint && npm run typecheck && npm test",
