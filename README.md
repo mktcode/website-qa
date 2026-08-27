@@ -4,7 +4,7 @@ Wiederverwendbare, ausschließlich lesende Qualitätsprüfungen für öffentlich
 
 ## Voraussetzungen
 
-- Node.js `>=22.19 <23`
+- Node.js `>=22.19 <23` oder `>=24.11 <25`
 - für den Browser-Check ein lokal installiertes Chromium oder Google Chrome
 - Netzwerkzugriff auf die ausdrücklich gewählte öffentliche Ziel-URL
 
@@ -52,6 +52,8 @@ website-qa-http https://example.com/ \
 - `0`: Prüfung bestanden;
 - `1`: technischer Befund beziehungsweise Warnung mit `--strict`;
 - `2`: Aufruf- oder Laufzeitfehler; der erzeugte Fehleroutput ist kein vollständiger Checklistennachweis.
+
+Maschinenlesbare Schemata für vollständige technische Berichte und redigierte Fehlerhüllen liegen unter [`catalog/http-report.schema.json`](catalog/http-report.schema.json), [`catalog/crawl-report.schema.json`](catalog/crawl-report.schema.json), [`catalog/browser-report.schema.json`](catalog/browser-report.schema.json) und [`catalog/social-report.schema.json`](catalog/social-report.schema.json). Die vorbereiteten Kompatibilitäts-, Schema-, Assertion- und Deprecation-Regeln sind unter [`docs/compatibility.md`](docs/compatibility.md) dokumentiert; veröffentlichte Paketstände fasst das [`CHANGELOG.md`](CHANGELOG.md) zusammen.
 
 ## Vorgesehener Arbeitsablauf
 

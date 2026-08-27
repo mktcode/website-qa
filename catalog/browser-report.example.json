@@ -16,6 +16,7 @@
   "options": {
     "maxPages": 10,
     "maxRequests": 300,
+    "privateTargetsRedacted": false,
     "profiles": ["desktop", "mobile", "narrow", "reduced-motion", "zoom-200"],
     "settleMilliseconds": 750,
     "sitemap": false,

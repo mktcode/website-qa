@@ -6,6 +6,7 @@ Dieses Verzeichnis enthält allgemeine, wiederverwendbare Unterlagen für Websit
 
 - [`checklisten/website/`](checklisten/website/) – modulare Ausgangsvorlage mit verpflichtendem Kern, bedingten Fachmodulen und wiederholbaren Prüfverfahren.
 - [`prompts/website-checkliste.md`](prompts/website-checkliste.md) – wiederverwendbarer Arbeitsauftrag zur kontrollierten Anwendung der modularen Vorlage.
+- [`compatibility.md`](compatibility.md) – vorbereitete Kompatibilitäts-, Schema-, Assertion-, API- und Deprecation-Regeln für eine spätere stabile Paketversion.
 
 ## Verwendung
 

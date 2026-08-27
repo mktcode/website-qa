@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mktcode/website-qa/catalog/technical-report.common.schema.json",
+  "title": "Gemeinsamer Kern technischer Website-QA-Berichte",
+  "$defs": {
+    "schemaVersion": { "const": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "reportedUrl": {
+      "type": "string",
+      "minLength": 1
+    },
+    "toolPackage": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "const": "@mktcode/website-qa" },
+        "version": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": true
+    },
+    "catalogReference": {
+      "type": "object",
+      "required": ["id", "version", "status"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["pilot", "stable"] }
+      },
+      "additionalProperties": true
+    },
+    "checklistCoverage": {
+      "type": "object",
+      "required": ["catalog"],
+      "properties": {
+        "catalog": { "$ref": "#/$defs/catalogReference" },
+        "items": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "summary": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+    "assertion": {
+      "type": "object",
+      "required": ["assertionId", "assertionVersion", "outcome", "message", "subject"],
+      "properties": {
+        "assertionId": { "type": "string", "minLength": 1 },
+        "assertionVersion": { "type": "integer", "minimum": 1 },
+        "outcome": { "enum": ["pass", "fail", "inconclusive", "notApplicable"] },
+        "message": { "type": "string", "minLength": 1 },
+        "subject": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+    "issue": {
+      "type": "object",
+      "required": ["code", "message", "severity"],
+      "properties": {
+        "code": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 },
+        "severity": { "enum": ["error", "warning"] },
+        "checklistIds": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "url": { "$ref": "#/$defs/reportedUrl" }
+      },
+      "additionalProperties": true
+    },
+    "result": {
+      "type": "object",
+      "required": ["requestedUrl", "assertions", "issues"],
+      "properties": {
+        "requestedUrl": { "$ref": "#/$defs/reportedUrl" },
+        "requestedUrlParameterNames": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "finalUrl": { "$ref": "#/$defs/reportedUrl" },
+        "assertions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/assertion" }
+        },
+        "issues": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/issue" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "successEnvelope": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "generatedAt",
+        "tool",
+        "toolPackage",
+        "checklistCoverage",
+        "options",
+        "readOnlyGuarantees",
+        "summary"
+      ],
+      "properties": {
+        "schemaVersion": { "$ref": "#/$defs/schemaVersion" },
+        "generatedAt": { "$ref": "#/$defs/generatedAt" },
+        "tool": { "type": "string", "minLength": 1 },
+        "toolPackage": { "$ref": "#/$defs/toolPackage" },
+        "checklistCoverage": { "$ref": "#/$defs/checklistCoverage" },
+        "options": { "type": "object" },
+        "readOnlyGuarantees": { "type": "object" },
+        "summary": { "type": "object" }
+      }
+    },
+    "errorEnvelope": {
+      "type": "object",
+      "required": ["schemaVersion", "tool", "error"],
+      "properties": {
+        "schemaVersion": { "$ref": "#/$defs/schemaVersion" },
+        "tool": { "type": "string", "minLength": 1 },
+        "error": { "type": "string", "minLength": 1 },
+        "toolPackage": { "$ref": "#/$defs/toolPackage" },
+        "readOnlyGuarantees": { "type": "object" },
+        "summary": { "type": "object" }
+      }
+    },
+    "nonNegativeInteger": { "type": "integer", "minimum": 0 }
+  }
+}

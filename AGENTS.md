@@ -65,7 +65,7 @@ npm run check
 npm pack --dry-run
 ```
 
-Bei Änderungen an Binaries, Paketmetadaten oder Installationsverhalten zusätzlich das erzeugte Tarball in einem temporären Verbraucherprojekt installieren und alle betroffenen installierten Befehle ausführen. Der unterstützte Bereich ist derzeit Node.js `>=22.19 <23`; für den Browser-Check wird lokal Chromium oder Google Chrome benötigt.
+Bei Änderungen an Binaries, Paketmetadaten oder Installationsverhalten zusätzlich das erzeugte Tarball in einem temporären Verbraucherprojekt installieren und alle betroffenen installierten Befehle ausführen. Der unterstützte Bereich ist derzeit Node.js `>=22.19 <23 || >=24.11 <25`; für den Browser-Check wird lokal Chromium oder Google Chrome benötigt.
 
 Öffentliche Live-Smoke-Tests bleiben ausschließlich lesend. Ziele, exakte Befehle, Werkzeugcommit und Befunde dokumentieren; keine öffentlichen Formulare absenden.
 

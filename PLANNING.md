@@ -666,6 +666,12 @@ Systematischer Renderer- und Praxisreview vom 27. August 2026:
 
 ### Phase I – Verträge für eine spätere 1.0 stabilisieren
 
+**Status 27. August 2026: begonnen.** Der erste Vertragsschnitt dokumentiert den gemeinsamen Kern und werkzeugspezifische JSON-Schemas aller vier technischen Berichte einschließlich der Fehlerhüllen für Exitcode 2. Kompatibilitäts-, Deprecation-, Assertion-, Katalog-, Node- und CLI-Regeln sind erstmals zusammenhängend festgehalten; eine versionierte Releasehistorie wurde begonnen. Diese Vorbereitungsartefakte stabilisieren noch nicht den Pilotkatalog oder die bisherigen `Pilot`-APIs.
+
+Node.js 24.19.0 wurde zusätzlich mit frischer Installation, Lint, Typecheck, allen 60 Tests einschließlich echtem Chromium-Nebenwirkungstest, Packprüfung, installiertem Tarball und allen vier Binärbefehlen validiert. Der vorbereitete unterstützte Bereich umfasst deshalb Node 22 ab 22.19 und Node 24 ab dessen LTS-Linie 24.11, jeweils nur bis vor den nächsten Major. Node 23 bleibt als ungerader, nicht unterstützter Zwischenmajor ausgeschlossen.
+
+Für den späteren stabilen Projektbericht ist als Vertragsrichtung entschieden: Das heutige Ausgabeschema 2 bleibt unverändert, während ein neues Schema Records einmalig auf Berichtsebene speichert und über eindeutige Referenzen zuordnet. Die stets null bleibenden Kriterienzähler `partial` und `open` entfallen erst dort. Der vollständige lokale Markdownbericht soll kurze redigierte Ursachen fehlgeschlagener oder unklarer automatischer Kriterien zeigen, ohne Evidence-Freitexte, Subjects oder vertrauliche Referenzen zusätzlich zu vervielfältigen. Allgemeine API-Namen werden erst gemeinsam mit diesem neuen Schema eingeführt; bestehende Pilotnamen bleiben während eines dokumentierten Übergangs erhalten.
+
 Vor einer möglichen `1.0.0` werden mindestens folgende Entscheidungen vorbereitet:
 
 1. Maschinenlesbare JSON-Schemas für die technischen HTTP-, Crawl-, Browser- und Social-Berichte.

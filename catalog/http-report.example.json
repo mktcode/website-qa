@@ -13,6 +13,18 @@
       "version": "1.0.0-pilot.7"
     }
   },
+  "options": {
+    "checkHttpRedirect": true,
+    "maxRedirects": 5,
+    "notFoundPath": "/.well-known/ops-http-check-not-found",
+    "privateTargetsRedacted": false,
+    "strict": true,
+    "timeoutMilliseconds": 15000
+  },
+  "readOnlyGuarantees": {
+    "methods": ["GET"],
+    "mutatingActionsInvoked": false
+  },
   "results": [
     {
       "requestedUrl": "https://example.com/",

@@ -13,6 +13,22 @@
       "version": "1.0.0-pilot.7"
     }
   },
+  "options": {
+    "maxPages": 50,
+    "maxRedirects": 5,
+    "maxResources": 500,
+    "privateTargetsRedacted": false,
+    "sitemap": true,
+    "strict": true,
+    "timeoutMilliseconds": 15000
+  },
+  "readOnlyGuarantees": {
+    "buttonsActivated": false,
+    "externalLinksFetched": false,
+    "formActionsFetched": false,
+    "formsSubmitted": false,
+    "methods": ["GET"]
+  },
   "results": [
     {
       "requestedUrl": "https://example.com/",
