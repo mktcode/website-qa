@@ -1,18 +1,769 @@
 {
-  "schemaVersion": 1,
-  "generatedAt": "2026-08-24T12:20:00.000Z",
-  "tool": "browser-check",
-  "toolPackage": {
-    "name": "@mktcode/website-qa",
-    "version": "1.1.0"
-  },
   "checklistCoverage": {
     "catalog": {
       "id": "website-qa-baseline",
       "status": "stable",
-      "version": "1.1.0"
+      "version": "1.2.0"
+    },
+    "items": [
+      {
+        "criteria": [
+          {
+            "id": "CORE-A11Y-01/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "browser.document.main-landmark-single",
+                "assertionVersion": 1,
+                "message": "Alle geprüften Seiten-/Profil-Läufe besitzen genau ein Main-Landmark.",
+                "outcome": "pass",
+                "subject": {
+                  "browserProduct": "Chromium",
+                  "browserVersion": "Chrome/140.0.0.0",
+                  "checkedPages": 1,
+                  "profileRuns": 5,
+                  "profiles": [
+                    "desktop",
+                    "mobile",
+                    "narrow",
+                    "reduced-motion",
+                    "zoom-200"
+                  ],
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Alle geprüften Seiten-/Profil-Läufe besitzen genau ein Main-Landmark."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Semantische Struktur auf repräsentativen Seitentypen im DOM und Accessibility Tree fachlich prüfen.",
+            "id": "CORE-A11Y-01/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Navigation, Hauptinhalt, ergänzende Bereiche und Footer sind semantisch passend und verständlich ausgezeichnet."
+          }
+        ],
+        "id": "CORE-A11Y-01",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Semantische HTML-Elemente werden passend eingesetzt; Navigation, Hauptinhalt, ergänzende Bereiche und Footer sind sinnvoll ausgezeichnet."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-A11Y-03/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "browser.accessibility.control-names-no-detected-violations",
+                "assertionVersion": 1,
+                "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine fehlenden zugänglichen Namen für Links und Schaltflächen erkannt.",
+                "outcome": "pass",
+                "subject": {
+                  "browserProduct": "Chromium",
+                  "browserVersion": "Chrome/140.0.0.0",
+                  "checkedPages": 1,
+                  "profileRuns": 5,
+                  "profiles": [
+                    "desktop",
+                    "mobile",
+                    "narrow",
+                    "reduced-motion",
+                    "zoom-200"
+                  ],
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Axe erkennt auf den geprüften Seiten-/Profil-Läufen keine Links, Schaltflächen oder vergleichbaren Bedienelemente ohne zugänglichen Namen."
+          },
+          {
+            "id": "CORE-A11Y-03/C2",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "browser.accessibility.links-not-color-only-no-detected-violations",
+                "assertionVersion": 1,
+                "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine ausschließlich durch Farbe unterscheidbaren Links erkannt.",
+                "outcome": "pass",
+                "subject": {
+                  "browserProduct": "Chromium",
+                  "browserVersion": "Chrome/140.0.0.0",
+                  "checkedPages": 1,
+                  "profileRuns": 5,
+                  "profiles": [
+                    "desktop",
+                    "mobile",
+                    "narrow",
+                    "reduced-motion",
+                    "zoom-200"
+                  ],
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Axe erkennt im passiven Zustand keine Links, die sich vom umgebenden Text ausschließlich durch Farbe unterscheiden."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Links, Schaltflächen, reine Icons und ihre dynamischen Zustände im DOM und Accessibility Tree auf verständliche, kontextgerechte Namen prüfen; bloße technische Namenspräsenz genügt nicht.",
+            "id": "CORE-A11Y-03/C3",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Die zugänglichen Namen sind im jeweiligen Kontext verständlich und bilden auch dynamische Zustände passend ab."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Repräsentative Normal-, Fokus-, Hover-, Aktiv-, Fehler- und Erfolgszustände visuell sowie soweit erforderlich mit unterstützender Technik prüfen; der passive Axe-Teilnachweis deckt diese Zustände nicht vollständig ab.",
+            "id": "CORE-A11Y-03/C4",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Zustände und Informationen werden auch außerhalb der automatisiert erkannten Linkfälle nicht ausschließlich über Farbe vermittelt."
+          }
+        ],
+        "id": "CORE-A11Y-03",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Links, Schaltflächen und reine Icons besitzen verständliche zugängliche Namen; Zustände und Informationen werden nicht ausschließlich über Farbe vermittelt."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-A11Y-04/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "browser.accessibility.visually-hidden-focusable-controls-no-detected-violations",
+                "assertionVersion": 1,
+                "message": "Axe hat im passiven Initialzustand keine fokussierbaren Bedienelemente innerhalb vor assistiver Technik verborgener Bereiche erkannt.",
+                "outcome": "pass",
+                "subject": {
+                  "browserProduct": "Chromium",
+                  "browserVersion": "Chrome/140.0.0.0",
+                  "checkedPages": 1,
+                  "profileRuns": 5,
+                  "profiles": [
+                    "desktop",
+                    "mobile",
+                    "narrow",
+                    "reduced-motion",
+                    "zoom-200"
+                  ],
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Axe erkennt im passiven Initialzustand keine fokussierbaren Bedienelemente innerhalb vor assistiver Technik verborgener Bereiche."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Repräsentative responsive und dynamische Zustände in einer gesondert freigegebenen Interaktionsprüfung untersuchen; der passive Axe-Befund deckt CSS-Sichtbarkeit und Übergänge nicht vollständig ab.",
+            "id": "CORE-A11Y-04/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Dynamische Sichtbarkeitswechsel, beabsichtigte Sprunglinks, Fokusverhalten sowie Opacity-, Transformations-, Offscreen- und Animationsfälle sind visuell und im Accessibility Tree geprüft."
+          }
+        ],
+        "id": "CORE-A11Y-04",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Per Opacity, Transformation, Offscreen-Position oder Animation unsichtbare Bedienelemente sind bis zu ihrer Sichtbarkeit weder fokussierbar noch irreführend im Accessibility Tree vorhanden."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-A11Y-06/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "browser.accessibility.form-control-labels-no-detected-violations",
+                "assertionVersion": 1,
+                "message": "Axe hat im passiven Initialzustand keine fehlenden oder mehrdeutigen programmatischen Formularbeschriftungen erkannt.",
+                "outcome": "pass",
+                "subject": {
+                  "browserProduct": "Chromium",
+                  "browserVersion": "Chrome/140.0.0.0",
+                  "checkedPages": 1,
+                  "profileRuns": 5,
+                  "profiles": [
+                    "desktop",
+                    "mobile",
+                    "narrow",
+                    "reduced-motion",
+                    "zoom-200"
+                  ],
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Axe erkennt im passiven Initialzustand keine fehlenden oder mehrdeutigen programmatischen Beschriftungen für Formularbedienelemente."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Sichtbare Verständlichkeit, Tastaturverhalten und dynamische Zustände kontrolliert prüfen; keine Formularübermittlung mit den passiven Paketprüfern auslösen.",
+            "id": "CORE-A11Y-06/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Verständliche Pflichtfeldhinweise sowie zugängliche Validierungs-, Erfolgs- und Fehlerzustände sind in einer gesondert freigegebenen Interaktionsprüfung geprüft."
+          }
+        ],
+        "id": "CORE-A11Y-06",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Formulare besitzen zugeordnete Labels, verständliche Pflichtfeldhinweise, zugängliche Fehlermeldungen und nachvollziehbare Erfolgs- und Fehlerzustände."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-A11Y-08/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "browser.accessibility.image-alternatives-no-detected-violations",
+                "assertionVersion": 1,
+                "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine technisch fehlenden Bildalternativen erkannt.",
+                "outcome": "pass",
+                "subject": {
+                  "browserProduct": "Chromium",
+                  "browserVersion": "Chrome/140.0.0.0",
+                  "checkedPages": 1,
+                  "profileRuns": 5,
+                  "profiles": [
+                    "desktop",
+                    "mobile",
+                    "narrow",
+                    "reduced-motion",
+                    "zoom-200"
+                  ],
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Axe erkennt auf den geprüften Seiten-/Profil-Läufen keine technisch fehlenden Textalternativen für Bilder, Bildobjekte oder als Bild ausgezeichnete Elemente."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Bedeutungstragende Bilder auf repräsentativen Seitentypen gegen sichtbaren Inhalt, Funktion und Kontext prüfen; vorhandene oder technisch akzeptierte Alternativtexte nicht automatisch als inhaltlich geeignet behandeln.",
+            "id": "CORE-A11Y-08/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Alternativtexte bedeutungstragender Bilder sind im jeweiligen Seitenkontext redaktionell passend."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Dekorative Absicht fachlich bestätigen und DOM sowie Accessibility Tree einschließlich CSS-Hintergründen stichprobenartig prüfen; ein leerer Alternativtext allein beweist die dekorative Funktion nicht.",
+            "id": "CORE-A11Y-08/C3",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Dekorative Bilder und Hintergründe sind entsprechend ihrer redaktionell bestätigten Funktion vor assistiver Ausgabe verborgen."
+          }
+        ],
+        "id": "CORE-A11Y-08",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Bilder besitzen redaktionell passende Alternativtexte; dekorative Bilder und Hintergründe werden nicht unnötig vorgelesen."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-A11Y-09/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "browser.accessibility.text-contrast-no-detected-violations",
+                "assertionVersion": 1,
+                "message": "Axe hat im passiven Zustand der geprüften Seiten-/Profil-Läufe keine Textkontrastverstöße erkannt.",
+                "outcome": "pass",
+                "subject": {
+                  "browserProduct": "Chromium",
+                  "browserVersion": "Chrome/140.0.0.0",
+                  "checkedPages": 1,
+                  "profileRuns": 5,
+                  "profiles": [
+                    "desktop",
+                    "mobile",
+                    "narrow",
+                    "reduced-motion",
+                    "zoom-200"
+                  ],
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Axe erkennt im passiven Zustand der geprüften Seiten-/Profil-Läufe keine Textkontrastverstöße unter den geprüften WCAG-AA-Schwellenwerten."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Repräsentative Bedienelemente und Zustände einschließlich sichtbarer Fokusanzeige in realen Browsern prüfen; der passive Textkontrastbefund ersetzt weder Zustandswechsel noch bildbasierte oder manuell zu bewertende Sonderfälle.",
+            "id": "CORE-A11Y-09/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Bedienelemente, Fokus sowie wichtige Hover-, Aktiv-, Fehler-, Erfolgs- und dynamische Zustände besitzen ausreichenden Kontrast."
+          }
+        ],
+        "id": "CORE-A11Y-09",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Text, Bedienelemente, Fokus und wichtige Zustände besitzen ausreichenden Kontrast."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-A11Y-10/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "browser.viewport.narrow-zoom-no-horizontal-overflow",
+                "assertionVersion": 1,
+                "message": "Die schmalen und 200-%-Näherungsprofile weisen auf allen geprüften Seiten keinen horizontalen Dokumentüberlauf auf.",
+                "outcome": "pass",
+                "subject": {
+                  "browserProduct": "Chromium",
+                  "browserVersion": "Chrome/140.0.0.0",
+                  "checkedPages": 1,
+                  "profileRuns": 5,
+                  "profiles": [
+                    "desktop",
+                    "mobile",
+                    "narrow",
+                    "reduced-motion",
+                    "zoom-200"
+                  ],
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Die technischen 320-Pixel- und 200-%-Näherungsprofile erkennen auf den geprüften Seiten keinen horizontalen Dokumentüberlauf."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Repräsentative Seiten in einem realen Browser bei 320 CSS-Pixeln und 200 Prozent reiner Textvergrößerung visuell und funktional prüfen; die technische Näherung allein genügt nicht.",
+            "id": "CORE-A11Y-10/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Inhalt und Funktionen bleiben bei 320 CSS-Pixeln und tatsächlicher reiner Textvergrößerung sinnvoll sichtbar und bedienbar."
+          }
+        ],
+        "id": "CORE-A11Y-10",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Bei 320 CSS-Pixeln und bei 200 Prozent reiner Textvergrößerung bleibt der Inhalt ohne zweidimensionales Scrollen sinnvoll nutzbar; lange URLs, E-Mail-Adressen und Komposita verursachen keinen Dokumentüberlauf."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-A11Y-13/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "browser.accessibility.axe-no-detected-violations",
+                "assertionVersion": 1,
+                "message": "Der automatisierte Axe-Audit hat auf den geprüften Seiten-/Profil-Läufen keine Verstöße erkannt.",
+                "outcome": "pass",
+                "subject": {
+                  "browserProduct": "Chromium",
+                  "browserVersion": "Chrome/140.0.0.0",
+                  "checkedPages": 1,
+                  "profileRuns": 5,
+                  "profiles": [
+                    "desktop",
+                    "mobile",
+                    "narrow",
+                    "reduced-motion",
+                    "zoom-200"
+                  ],
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Der Axe-Audit wurde auf allen vorgesehenen Seiten-/Profil-Läufen ausgeführt und hat keine automatisiert erkennbaren Verstöße gemeldet."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Tastaturprüfung ohne Maus auf repräsentativen Seiten und Funktionen durchführen und separat protokollieren.",
+            "id": "CORE-A11Y-13/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Eine eigenständige Tastaturprüfung ist mit Datum, Werkzeug beziehungsweise Browser und Ergebnis dokumentiert."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Realen Mobilbrowser und Gerät verwenden; Headless- oder Desktop-Emulation nicht als reale Mobilbrowserprüfung ausgeben.",
+            "id": "CORE-A11Y-13/C3",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Eine Prüfung in mindestens einem realen Mobilbrowser ist mit Gerät, Browser, Datum und Ergebnis dokumentiert."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Screenreader-Stichprobe risikogerecht durchführen; bei vereinbarter Konformität ist sie verpflichtend und nicht als nicht anwendbar zu behandeln.",
+            "id": "CORE-A11Y-13/C4",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Die risikogerechte Screenreader-Stichprobe beziehungsweise ihre begründete Nichtanwendbarkeit ist dokumentiert."
+          }
+        ],
+        "id": "CORE-A11Y-13",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Tastaturprüfung, automatisierter Accessibility-Audit und reale Mobilbrowserprüfung sind getrennt mit Datum und Werkzeug dokumentiert; eine Screenreader-Stichprobe erfolgt risikogerecht und bei vereinbarter Konformität zwingend."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-QA-02/C1",
+            "mode": "automatic",
+            "outcome": "inconclusive",
+            "records": [
+              {
+                "assertionId": "browser.context.chromium-headless-recorded",
+                "assertionVersion": 1,
+                "message": "Browserengine, Version oder ausgeführte Emulationsprofile sind nicht vollständig dokumentiert.",
+                "outcome": "inconclusive",
+                "subject": {
+                  "browserProduct": "Chromium",
+                  "browserVersion": "Chrome/140.0.0.0",
+                  "checkedPages": 1,
+                  "profileRuns": 5,
+                  "profiles": [
+                    "desktop",
+                    "mobile",
+                    "narrow",
+                    "reduced-motion",
+                    "zoom-200"
+                  ],
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Der technische Browserbericht dokumentiert Chromium-Version und ausgeführte Headless-Emulationsprofile."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Ausgeführte und nicht ausgeführte Browser-/Geräteprüfungen korrekt deklarieren; Chromium nicht als Safari und Emulation nicht als reales Gerät bezeichnen.",
+            "id": "CORE-QA-02/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Der Projektnachweis unterscheidet Headless-Emulationen, Browserengines und reale Browser beziehungsweise Geräte und benennt nicht geprüfte Plattformen."
+          }
+        ],
+        "id": "CORE-QA-02",
+        "module": "core",
+        "outcome": "inconclusive",
+        "statement": "Browserengine, Headless-Emulation und reale Browser beziehungsweise Geräte werden im Nachweis korrekt unterschieden; eine WebKit-Prüfung wird nicht als Safari-Prüfung bezeichnet."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-QA-07/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "browser.runtime.no-observed-errors",
+                "assertionVersion": 1,
+                "message": "In den geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet.",
+                "outcome": "pass",
+                "subject": {
+                  "browserProduct": "Chromium",
+                  "browserVersion": "Chrome/140.0.0.0",
+                  "checkedPages": 1,
+                  "profileRuns": 5,
+                  "profiles": [
+                    "desktop",
+                    "mobile",
+                    "narrow",
+                    "reduced-motion",
+                    "zoom-200"
+                  ],
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "In den automatisch geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Vereinbarte interaktive Zustände manuell aufrufen und Browserkonsole sowie Netzwerkprotokoll beobachten; keine schreibenden Produktionsaktionen ausführen.",
+            "id": "CORE-QA-07/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Interaktionsabhängige und vom beobachtenden Browserlauf nicht erreichte Zustände wurden zusätzlich auf Konsolen-, Netzwerk- und Hydrationsfehler geprüft."
+          }
+        ],
+        "id": "CORE-QA-07",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Die Seiten wurden ohne sichtbare JavaScript-, Netzwerk- oder Hydrationsfehler in der Browserkonsole geprüft."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-PRIV-02/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "browser.privacy.external-request-observation-complete",
+                "assertionVersion": 1,
+                "message": "Externe Requestversuche wurden innerhalb der deklarierten passiven Prüfumgebung vollständig inventarisiert und weiterhin blockiert.",
+                "outcome": "pass",
+                "subject": {
+                  "browserProduct": "Chromium",
+                  "browserVersion": "Chrome/140.0.0.0",
+                  "checkedPages": 1,
+                  "profileRuns": 5,
+                  "profiles": [
+                    "desktop",
+                    "mobile",
+                    "narrow",
+                    "reduced-motion",
+                    "zoom-200"
+                  ],
+                  "url": "https://example.com/",
+                  "observationMode": "passive-initial-load-isolated",
+                  "observedExternalRequestAttempts": 0,
+                  "settleMilliseconds": 750
+                }
+              }
+            ],
+            "statement": "Externe Requestversuche wurden innerhalb der deklarierten passiven und isolierten Browserprüfumgebung vollständig inventarisiert und weiterhin blockiert."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Blockierte Requestversuche und Browseraktionen mit Quellcode, Konfiguration und dokumentierten Drittanbietern vergleichen; externe Links nicht mit tatsächlich initiierten Requests verwechseln und rechtliche Eignung getrennt bewerten.",
+            "id": "CORE-PRIV-02/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Das technische Browserinventar wurde mit Quellcode, Build- und Laufzeitkonfiguration sowie der projektspezifisch dokumentierten Liste externer Dienste abgeglichen."
+          }
+        ],
+        "id": "CORE-PRIV-02",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Tatsächliche externe Schriftarten, CDNs, Karten, Videos, Tracker, Analyse-, Fehlertracking- und sonstige Drittanbieteranfragen wurden per Quellprüfung und Browsernetzwerk kontrolliert."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-PRIV-04/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "browser.privacy.initial-storage-observation-complete",
+                "assertionVersion": 1,
+                "message": "Cookies und Browser-Storage wurden im passiven Initialzustand ohne Werte vollständig inventarisiert.",
+                "outcome": "pass",
+                "subject": {
+                  "browserProduct": "Chromium",
+                  "browserVersion": "Chrome/140.0.0.0",
+                  "checkedPages": 1,
+                  "profileRuns": 5,
+                  "profiles": [
+                    "desktop",
+                    "mobile",
+                    "narrow",
+                    "reduced-motion",
+                    "zoom-200"
+                  ],
+                  "url": "https://example.com/",
+                  "cookieObservations": 0,
+                  "indexedDatabaseObservations": 0,
+                  "localStorageObservations": 0,
+                  "observationMode": "passive-initial-load-isolated",
+                  "sessionStorageObservations": 0,
+                  "settleMilliseconds": 750,
+                  "valuesRecorded": false
+                }
+              }
+            ],
+            "statement": "Cookies, Local Storage, Session Storage und IndexedDB wurden im passiven Initialzustand frischer isolierter Browserkontexte ohne Speicherung ihrer Werte vollständig inventarisiert."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Cookie- und Storage-Bezeichner sowie Setzzeitpunkt mit Dokumentation und Einwilligungslogik vergleichen; notwendige reale Interaktionszustände in einem gesondert freigegebenen manuellen Verfahren prüfen.",
+            "id": "CORE-PRIV-04/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Das technische Initialinventar stimmt mit Dokumentation und Einwilligungslogik überein; interaktionsabhängige Zustände wurden gesondert bewertet."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Zweck und Zugriffspfad jedes sicherheitsrelevanten Cookies bestimmen und die beobachteten Attribute fachlich bewerten; bloße Attributpräsenz oder -abwesenheit genügt nicht.",
+            "id": "CORE-PRIV-04/C3",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Für sicherheitsrelevante Cookies wurde projektspezifisch bewertet, ob `Secure`, `HttpOnly` und die beobachtete `SameSite`-Richtlinie angemessen sind."
+          }
+        ],
+        "id": "CORE-PRIV-04",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Cookies sowie Local- und Session-Storage stimmen mit Dokumentation und Einwilligungslogik überein. Sicherheitsrelevante Cookies verwenden soweit einschlägig `Secure`, `HttpOnly` und eine passende `SameSite`-Richtlinie."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-SEC-07/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "browser.runtime.no-observed-errors",
+                "assertionVersion": 1,
+                "message": "In den geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet.",
+                "outcome": "pass",
+                "subject": {
+                  "browserProduct": "Chromium",
+                  "browserVersion": "Chrome/140.0.0.0",
+                  "checkedPages": 1,
+                  "profileRuns": 5,
+                  "profiles": [
+                    "desktop",
+                    "mobile",
+                    "narrow",
+                    "reduced-motion",
+                    "zoom-200"
+                  ],
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Auf den passiv geprüften Seiten und Profilen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet."
+          },
+          {
+            "id": "CORE-SEC-07/C2",
+            "mode": "automatic",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Die Stichprobe einer unbekannten Route antwortet mit 404 und offenbart keine typischen technischen Interna."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Projektinventar der zentralen Pfade und Fehlerfälle getrennt prüfen; die passiven Seitenprofile und die einzelne 404-Stichprobe sind keine Sicherheitsprüfung oder vollständige Funktionsabdeckung.",
+            "id": "CORE-SEC-07/C3",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Die tatsächlichen zentralen Nutzerpfade und funktionsspezifischen Fehlerfälle des Projekts einschließlich interaktionsabhängiger Zustände sind geprüft."
+          }
+        ],
+        "id": "CORE-SEC-07",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Zentrale Nutzerpfade und Fehlerfälle funktionieren ohne interne Fehlermeldungen, unerwartete Browserkonsolenfehler oder fehlgeschlagene Netzwerkanfragen."
+      },
+      {
+        "criteria": [
+          {
+            "id": "FORM-TEST-04/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "browser.run.read-only-boundaries-enforced",
+                "assertionVersion": 1,
+                "message": "Alle ausgeführten Seiten-/Profil-Läufe belegen vor Navigation installierte DOM- und Requestgrenzen; kein Nicht-GET- oder externer Request wurde zugelassen.",
+                "outcome": "pass",
+                "subject": {
+                  "browserProduct": "Chromium",
+                  "browserVersion": "Chrome/140.0.0.0",
+                  "checkedPages": 1,
+                  "profileRuns": 5,
+                  "profiles": [
+                    "desktop",
+                    "mobile",
+                    "narrow",
+                    "reduced-motion",
+                    "zoom-200"
+                  ],
+                  "url": "https://example.com/",
+                  "destinationSideEffectsVerified": false,
+                  "mode": "passive-get-only-isolated"
+                }
+              }
+            ],
+            "statement": "Der paketierte passive Browserprüfer belegt seine Nur-Lese-Grenze: keine Buttons, Uploads oder Formular-Actions werden aufgerufen; nur GET ist erlaubt und verbotene Versuche werden vor Netzwerknebenwirkungen blockiert."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Die vier dokumentierten Paketläufe und alle projektspezifischen Skripte getrennt inventarisieren; der technische Browsernachweis behauptet weder beliebige GET-Semantik noch unveränderte Zielsystemspeicher.",
+            "id": "FORM-TEST-04/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Alle übrigen projektlokalen Testskripte, Wrapper und Crawler sowie gegebenenfalls serverseitige Nebenwirkungsnachweise sind auf ausbleibende Formularsendungen, E-Mails, Nachrichten und Speicherobjekte geprüft."
+          }
+        ],
+        "id": "FORM-TEST-04",
+        "module": "formulare-api-daten",
+        "outcome": "partial",
+        "statement": "Prüfskripte und Crawler senden nicht unbeabsichtigt Formulare ab und erzeugen keine E-Mails, Nachrichten oder Speicherobjekte."
+      }
+    ],
+    "summary": {
+      "automaticCriteria": {
+        "pass": 14,
+        "fail": 0,
+        "partial": 0,
+        "open": 0,
+        "inconclusive": 1,
+        "notApplicable": 0,
+        "noEvidence": 1,
+        "total": 16
+      },
+      "checklistItems": {
+        "pass": 0,
+        "fail": 0,
+        "partial": 13,
+        "open": 0,
+        "inconclusive": 1,
+        "notApplicable": 0,
+        "noEvidence": 0,
+        "automaticallyPassed": 0,
+        "total": 14
+      },
+      "nonAutomaticCriteria": {
+        "pass": 0,
+        "fail": 0,
+        "partial": 0,
+        "open": 0,
+        "inconclusive": 0,
+        "notApplicable": 0,
+        "noEvidence": 19,
+        "total": 19
+      }
     }
   },
+  "generatedAt": "2026-08-24T12:20:00.000Z",
   "options": {
     "maxPages": 10,
     "maxRequests": 300,
@@ -55,238 +806,6 @@
       "product": "Chromium",
       "version": "Chrome/140.0.0.0"
     },
-    "assertions": [
-      {
-        "assertionId": "browser.document.main-landmark-single",
-        "assertionVersion": 1,
-        "outcome": "pass",
-        "message": "Alle geprüften Seiten-/Profil-Läufe besitzen genau ein Main-Landmark.",
-        "subject": {
-          "url": "https://example.com/",
-          "checkedPages": 1,
-          "profileRuns": 5,
-          "profiles": [
-            "desktop",
-            "mobile",
-            "narrow",
-            "reduced-motion",
-            "zoom-200"
-          ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0"
-        }
-      },
-      {
-        "assertionId": "browser.viewport.narrow-zoom-no-horizontal-overflow",
-        "assertionVersion": 1,
-        "outcome": "pass",
-        "message": "Die schmalen und 200-%-Näherungsprofile weisen auf allen geprüften Seiten keinen horizontalen Dokumentüberlauf auf.",
-        "subject": {
-          "url": "https://example.com/",
-          "checkedPages": 1,
-          "profileRuns": 5,
-          "profiles": [
-            "desktop",
-            "mobile",
-            "narrow",
-            "reduced-motion",
-            "zoom-200"
-          ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0"
-        }
-      },
-      {
-        "assertionId": "browser.accessibility.axe-no-detected-violations",
-        "assertionVersion": 1,
-        "outcome": "pass",
-        "message": "Der automatisierte Axe-Audit hat auf den geprüften Seiten-/Profil-Läufen keine Verstöße erkannt.",
-        "subject": {
-          "url": "https://example.com/",
-          "checkedPages": 1,
-          "profileRuns": 5,
-          "profiles": [
-            "desktop",
-            "mobile",
-            "narrow",
-            "reduced-motion",
-            "zoom-200"
-          ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0"
-        }
-      },
-      {
-        "assertionId": "browser.accessibility.control-names-no-detected-violations",
-        "assertionVersion": 1,
-        "outcome": "pass",
-        "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine fehlenden zugänglichen Namen für Links und Schaltflächen erkannt.",
-        "subject": {
-          "url": "https://example.com/",
-          "checkedPages": 1,
-          "profileRuns": 5,
-          "profiles": [
-            "desktop",
-            "mobile",
-            "narrow",
-            "reduced-motion",
-            "zoom-200"
-          ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0"
-        }
-      },
-      {
-        "assertionId": "browser.accessibility.links-not-color-only-no-detected-violations",
-        "assertionVersion": 1,
-        "outcome": "pass",
-        "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine ausschließlich durch Farbe unterscheidbaren Links erkannt.",
-        "subject": {
-          "url": "https://example.com/",
-          "checkedPages": 1,
-          "profileRuns": 5,
-          "profiles": [
-            "desktop",
-            "mobile",
-            "narrow",
-            "reduced-motion",
-            "zoom-200"
-          ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0"
-        }
-      },
-      {
-        "assertionId": "browser.accessibility.image-alternatives-no-detected-violations",
-        "assertionVersion": 1,
-        "outcome": "pass",
-        "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine technisch fehlenden Bildalternativen erkannt.",
-        "subject": {
-          "url": "https://example.com/",
-          "checkedPages": 1,
-          "profileRuns": 5,
-          "profiles": [
-            "desktop",
-            "mobile",
-            "narrow",
-            "reduced-motion",
-            "zoom-200"
-          ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0"
-        }
-      },
-      {
-        "assertionId": "browser.accessibility.text-contrast-no-detected-violations",
-        "assertionVersion": 1,
-        "outcome": "pass",
-        "message": "Axe hat im passiven Zustand der geprüften Seiten-/Profil-Läufe keine Textkontrastverstöße erkannt.",
-        "subject": {
-          "url": "https://example.com/",
-          "checkedPages": 1,
-          "profileRuns": 5,
-          "profiles": [
-            "desktop",
-            "mobile",
-            "narrow",
-            "reduced-motion",
-            "zoom-200"
-          ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0"
-        }
-      },
-      {
-        "assertionId": "browser.context.chromium-headless-recorded",
-        "assertionVersion": 1,
-        "outcome": "pass",
-        "message": "Chromium-Version und ausgeführte Headless-Emulationsprofile sind dokumentiert.",
-        "subject": {
-          "url": "https://example.com/",
-          "checkedPages": 1,
-          "profileRuns": 5,
-          "profiles": [
-            "desktop",
-            "mobile",
-            "narrow",
-            "reduced-motion",
-            "zoom-200"
-          ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0"
-        }
-      },
-      {
-        "assertionId": "browser.runtime.no-observed-errors",
-        "assertionVersion": 1,
-        "outcome": "pass",
-        "message": "In den geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet.",
-        "subject": {
-          "url": "https://example.com/",
-          "checkedPages": 1,
-          "profileRuns": 5,
-          "profiles": [
-            "desktop",
-            "mobile",
-            "narrow",
-            "reduced-motion",
-            "zoom-200"
-          ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0"
-        }
-      },
-      {
-        "assertionId": "browser.privacy.external-request-observation-complete",
-        "assertionVersion": 1,
-        "outcome": "pass",
-        "message": "Externe Requestversuche wurden innerhalb der deklarierten passiven Prüfumgebung vollständig inventarisiert und weiterhin blockiert.",
-        "subject": {
-          "url": "https://example.com/",
-          "checkedPages": 1,
-          "profileRuns": 5,
-          "profiles": [
-            "desktop",
-            "mobile",
-            "narrow",
-            "reduced-motion",
-            "zoom-200"
-          ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0",
-          "observationMode": "passive-initial-load-isolated",
-          "observedExternalRequestAttempts": 0,
-          "settleMilliseconds": 750
-        }
-      },
-      {
-        "assertionId": "browser.privacy.initial-storage-observation-complete",
-        "assertionVersion": 1,
-        "outcome": "pass",
-        "message": "Cookies und Browser-Storage wurden im passiven Initialzustand ohne Werte vollständig inventarisiert.",
-        "subject": {
-          "url": "https://example.com/",
-          "checkedPages": 1,
-          "profileRuns": 5,
-          "profiles": [
-            "desktop",
-            "mobile",
-            "narrow",
-            "reduced-motion",
-            "zoom-200"
-          ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0",
-          "cookieObservations": 0,
-          "indexedDatabaseObservations": 0,
-          "localStorageObservations": 0,
-          "observationMode": "passive-initial-load-isolated",
-          "sessionStorageObservations": 0,
-          "settleMilliseconds": 750,
-          "valuesRecorded": false
-        }
-      }
-    ],
     "blockedRequests": [],
     "issues": [],
     "privacyObservations": {
@@ -350,30 +869,448 @@
       {
         "accessibilityIncompleteRuleIds": [],
         "profile": "desktop",
-        "url": "https://example.com/"
+        "url": "https://example.com/",
+        "readOnlyExecution": {
+          "allowedGetRequests": 1,
+          "allowedNonGetOrExternalRequests": 0,
+          "blockedActionCountsByKind": {},
+          "blockedRequestCountsByCode": {},
+          "domGuardsInstalledBeforeNavigation": true,
+          "interceptedRequests": 1,
+          "profile": "desktop",
+          "requestInterceptionInstalledBeforeNavigation": true,
+          "url": "https://example.com/"
+        }
       },
       {
         "accessibilityIncompleteRuleIds": [],
         "profile": "mobile",
-        "url": "https://example.com/"
+        "url": "https://example.com/",
+        "readOnlyExecution": {
+          "allowedGetRequests": 1,
+          "allowedNonGetOrExternalRequests": 0,
+          "blockedActionCountsByKind": {},
+          "blockedRequestCountsByCode": {},
+          "domGuardsInstalledBeforeNavigation": true,
+          "interceptedRequests": 1,
+          "profile": "mobile",
+          "requestInterceptionInstalledBeforeNavigation": true,
+          "url": "https://example.com/"
+        }
       },
       {
         "accessibilityIncompleteRuleIds": [],
         "profile": "narrow",
-        "url": "https://example.com/"
+        "url": "https://example.com/",
+        "readOnlyExecution": {
+          "allowedGetRequests": 1,
+          "allowedNonGetOrExternalRequests": 0,
+          "blockedActionCountsByKind": {},
+          "blockedRequestCountsByCode": {},
+          "domGuardsInstalledBeforeNavigation": true,
+          "interceptedRequests": 1,
+          "profile": "narrow",
+          "requestInterceptionInstalledBeforeNavigation": true,
+          "url": "https://example.com/"
+        }
       },
       {
         "accessibilityIncompleteRuleIds": [],
         "profile": "reduced-motion",
-        "url": "https://example.com/"
+        "url": "https://example.com/",
+        "readOnlyExecution": {
+          "allowedGetRequests": 1,
+          "allowedNonGetOrExternalRequests": 0,
+          "blockedActionCountsByKind": {},
+          "blockedRequestCountsByCode": {},
+          "domGuardsInstalledBeforeNavigation": true,
+          "interceptedRequests": 1,
+          "profile": "reduced-motion",
+          "requestInterceptionInstalledBeforeNavigation": true,
+          "url": "https://example.com/"
+        }
       },
       {
         "accessibilityIncompleteRuleIds": [],
         "profile": "zoom-200",
-        "url": "https://example.com/"
+        "url": "https://example.com/",
+        "readOnlyExecution": {
+          "allowedGetRequests": 1,
+          "allowedNonGetOrExternalRequests": 0,
+          "blockedActionCountsByKind": {},
+          "blockedRequestCountsByCode": {},
+          "domGuardsInstalledBeforeNavigation": true,
+          "interceptedRequests": 1,
+          "profile": "zoom-200",
+          "requestInterceptionInstalledBeforeNavigation": true,
+          "url": "https://example.com/"
+        }
+      }
+    ],
+    "readOnlyExecutionEvidence": {
+      "destinationSideEffectsVerified": false,
+      "mode": "passive-get-only-isolated",
+      "profileRuns": [
+        {
+          "allowedGetRequests": 1,
+          "allowedNonGetOrExternalRequests": 0,
+          "blockedActionCountsByKind": {},
+          "blockedRequestCountsByCode": {},
+          "domGuardsInstalledBeforeNavigation": true,
+          "interceptedRequests": 1,
+          "profile": "desktop",
+          "requestInterceptionInstalledBeforeNavigation": true,
+          "url": "https://example.com/"
+        },
+        {
+          "allowedGetRequests": 1,
+          "allowedNonGetOrExternalRequests": 0,
+          "blockedActionCountsByKind": {},
+          "blockedRequestCountsByCode": {},
+          "domGuardsInstalledBeforeNavigation": true,
+          "interceptedRequests": 1,
+          "profile": "mobile",
+          "requestInterceptionInstalledBeforeNavigation": true,
+          "url": "https://example.com/"
+        },
+        {
+          "allowedGetRequests": 1,
+          "allowedNonGetOrExternalRequests": 0,
+          "blockedActionCountsByKind": {},
+          "blockedRequestCountsByCode": {},
+          "domGuardsInstalledBeforeNavigation": true,
+          "interceptedRequests": 1,
+          "profile": "narrow",
+          "requestInterceptionInstalledBeforeNavigation": true,
+          "url": "https://example.com/"
+        },
+        {
+          "allowedGetRequests": 1,
+          "allowedNonGetOrExternalRequests": 0,
+          "blockedActionCountsByKind": {},
+          "blockedRequestCountsByCode": {},
+          "domGuardsInstalledBeforeNavigation": true,
+          "interceptedRequests": 1,
+          "profile": "reduced-motion",
+          "requestInterceptionInstalledBeforeNavigation": true,
+          "url": "https://example.com/"
+        },
+        {
+          "allowedGetRequests": 1,
+          "allowedNonGetOrExternalRequests": 0,
+          "blockedActionCountsByKind": {},
+          "blockedRequestCountsByCode": {},
+          "domGuardsInstalledBeforeNavigation": true,
+          "interceptedRequests": 1,
+          "profile": "zoom-200",
+          "requestInterceptionInstalledBeforeNavigation": true,
+          "url": "https://example.com/"
+        }
+      ],
+      "requestedProfiles": [
+        "desktop",
+        "mobile",
+        "narrow",
+        "reduced-motion",
+        "zoom-200"
+      ]
+    },
+    "assertions": [
+      {
+        "assertionId": "browser.document.main-landmark-single",
+        "assertionVersion": 1,
+        "message": "Alle geprüften Seiten-/Profil-Läufe besitzen genau ein Main-Landmark.",
+        "outcome": "pass",
+        "subject": {
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "url": "https://example.com/"
+        }
+      },
+      {
+        "assertionId": "browser.viewport.narrow-zoom-no-horizontal-overflow",
+        "assertionVersion": 1,
+        "message": "Die schmalen und 200-%-Näherungsprofile weisen auf allen geprüften Seiten keinen horizontalen Dokumentüberlauf auf.",
+        "outcome": "pass",
+        "subject": {
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "url": "https://example.com/"
+        }
+      },
+      {
+        "assertionId": "browser.accessibility.axe-no-detected-violations",
+        "assertionVersion": 1,
+        "message": "Der automatisierte Axe-Audit hat auf den geprüften Seiten-/Profil-Läufen keine Verstöße erkannt.",
+        "outcome": "pass",
+        "subject": {
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "url": "https://example.com/"
+        }
+      },
+      {
+        "assertionId": "browser.accessibility.control-names-no-detected-violations",
+        "assertionVersion": 1,
+        "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine fehlenden zugänglichen Namen für Links und Schaltflächen erkannt.",
+        "outcome": "pass",
+        "subject": {
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "url": "https://example.com/"
+        }
+      },
+      {
+        "assertionId": "browser.accessibility.visually-hidden-focusable-controls-no-detected-violations",
+        "assertionVersion": 1,
+        "message": "Axe hat im passiven Initialzustand keine fokussierbaren Bedienelemente innerhalb vor assistiver Technik verborgener Bereiche erkannt.",
+        "outcome": "pass",
+        "subject": {
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "url": "https://example.com/"
+        }
+      },
+      {
+        "assertionId": "browser.accessibility.form-control-labels-no-detected-violations",
+        "assertionVersion": 1,
+        "message": "Axe hat im passiven Initialzustand keine fehlenden oder mehrdeutigen programmatischen Formularbeschriftungen erkannt.",
+        "outcome": "pass",
+        "subject": {
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "url": "https://example.com/"
+        }
+      },
+      {
+        "assertionId": "browser.accessibility.links-not-color-only-no-detected-violations",
+        "assertionVersion": 1,
+        "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine ausschließlich durch Farbe unterscheidbaren Links erkannt.",
+        "outcome": "pass",
+        "subject": {
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "url": "https://example.com/"
+        }
+      },
+      {
+        "assertionId": "browser.accessibility.image-alternatives-no-detected-violations",
+        "assertionVersion": 1,
+        "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine technisch fehlenden Bildalternativen erkannt.",
+        "outcome": "pass",
+        "subject": {
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "url": "https://example.com/"
+        }
+      },
+      {
+        "assertionId": "browser.accessibility.text-contrast-no-detected-violations",
+        "assertionVersion": 1,
+        "message": "Axe hat im passiven Zustand der geprüften Seiten-/Profil-Läufe keine Textkontrastverstöße erkannt.",
+        "outcome": "pass",
+        "subject": {
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "url": "https://example.com/"
+        }
+      },
+      {
+        "assertionId": "browser.context.chromium-headless-recorded",
+        "assertionVersion": 1,
+        "message": "Browserengine, Version oder ausgeführte Emulationsprofile sind nicht vollständig dokumentiert.",
+        "outcome": "inconclusive",
+        "subject": {
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "url": "https://example.com/"
+        }
+      },
+      {
+        "assertionId": "browser.runtime.no-observed-errors",
+        "assertionVersion": 1,
+        "message": "In den geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet.",
+        "outcome": "pass",
+        "subject": {
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "url": "https://example.com/"
+        }
+      },
+      {
+        "assertionId": "browser.run.read-only-boundaries-enforced",
+        "assertionVersion": 1,
+        "message": "Alle ausgeführten Seiten-/Profil-Läufe belegen vor Navigation installierte DOM- und Requestgrenzen; kein Nicht-GET- oder externer Request wurde zugelassen.",
+        "outcome": "pass",
+        "subject": {
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "url": "https://example.com/",
+          "destinationSideEffectsVerified": false,
+          "mode": "passive-get-only-isolated"
+        }
+      },
+      {
+        "assertionId": "browser.privacy.external-request-observation-complete",
+        "assertionVersion": 1,
+        "message": "Externe Requestversuche wurden innerhalb der deklarierten passiven Prüfumgebung vollständig inventarisiert und weiterhin blockiert.",
+        "outcome": "pass",
+        "subject": {
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "url": "https://example.com/",
+          "observationMode": "passive-initial-load-isolated",
+          "observedExternalRequestAttempts": 0,
+          "settleMilliseconds": 750
+        }
+      },
+      {
+        "assertionId": "browser.privacy.initial-storage-observation-complete",
+        "assertionVersion": 1,
+        "message": "Cookies und Browser-Storage wurden im passiven Initialzustand ohne Werte vollständig inventarisiert.",
+        "outcome": "pass",
+        "subject": {
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "url": "https://example.com/",
+          "cookieObservations": 0,
+          "indexedDatabaseObservations": 0,
+          "localStorageObservations": 0,
+          "observationMode": "passive-initial-load-isolated",
+          "sessionStorageObservations": 0,
+          "settleMilliseconds": 750,
+          "valuesRecorded": false
+        }
       }
     ]
   },
+  "schemaVersion": 1,
   "summary": {
     "blockedRequests": 0,
     "errors": 0,
@@ -381,5 +1318,10 @@
     "pages": 1,
     "profileRuns": 5,
     "warnings": 0
+  },
+  "tool": "browser-check",
+  "toolPackage": {
+    "name": "@mktcode/website-qa",
+    "version": "1.2.0"
   }
 }

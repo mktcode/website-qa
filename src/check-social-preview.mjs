@@ -241,7 +241,9 @@ const socialMetadataKeys = [
 ]
 
 function usage() {
-  return `Social-Metadaten und Vorschaubilder gegen öffentliche URLs prüfen.
+  return `${packageName} ${packageVersion}
+
+Social-Metadaten und Vorschaubilder gegen öffentliche URLs prüfen.
 
 Aufruf:
   website-qa-social <URL> [weitere URL ...] [Optionen]
@@ -870,8 +872,13 @@ async function discoverSitemapUrls(baseUrl, options) {
   const queue = [{ depth: 0, url: initialSitemap }]
   const visitedSitemaps = new Set()
   const pages = []
+  let truncated = false
 
-  while (queue.length > 0 && pages.length < options.maxPages) {
+  while (queue.length > 0) {
+    if (pages.length >= options.maxPages) {
+      truncated = true
+      break
+    }
     const current = queue.shift()
     if (visitedSitemaps.has(current.url)) {
       continue
@@ -898,15 +905,16 @@ async function discoverSitemapUrls(baseUrl, options) {
         queue.push({ depth: current.depth + 1, url: locationUrl.href })
       }
       else if (!pages.includes(locationUrl.href)) {
-        pages.push(locationUrl.href)
         if (pages.length >= options.maxPages) {
+          truncated = true
           break
         }
+        pages.push(locationUrl.href)
       }
     }
   }
 
-  return pages
+  return { pages, truncated }
 }
 
 function summarize(results, strict) {
@@ -932,7 +940,13 @@ function metadataUrlIsSecure(value) {
 }
 
 function createSocialAssertions(result, options) {
+  const trainingPolicies = Array.isArray(result.robots?.policies)
+    ? result.robots.policies.filter(policy => policy.category === 'ai-training')
+    : []
   const subject = {
+    aiTrainingOptInDeclaredForRun: Boolean(options.aiTrainingOptIn),
+    allowedTrainingTokens: trainingPolicies.filter(policy => policy.allowed).length,
+    blockedTrainingTokens: trainingPolicies.filter(policy => !policy.allowed).length,
     checkedAgents: result.agents.map(agent => agent.key),
     checkedImages: result.images.length,
     robotsPolicyReviewedAt,
@@ -998,10 +1012,13 @@ function createSocialAssertions(result, options) {
       && normalizeComparableUrl(canonical) === normalizeComparableUrl(openGraphUrl)
       ? 'pass'
       : 'fail'
+    if (outcome === 'pass' && result.coverage?.truncated) {
+      outcome = 'inconclusive'
+    }
   }
   add('social.metadata.canonical-open-graph-consistent', outcome, {
     fail: 'Canonical, finale Seiten-URL und og:url sind nicht eindeutig oder stimmen nicht überein.',
-    inconclusive: 'Canonical-/OpenGraph-Konsistenz konnte ohne erfolgreichen HTML-Abruf nicht ausgewertet werden.',
+    inconclusive: 'Canonical-/OpenGraph-Konsistenz konnte wegen fehlender Antworten oder begrenzter Seitenabdeckung nicht abschließend ausgewertet werden.',
     pass: 'Canonical, finale Seiten-URL und og:url sind eindeutig und stimmen überein.',
   }[outcome])
 
@@ -1155,6 +1172,7 @@ function compactMetadata(metadataResult) {
 export function createJsonReport(results, options) {
   const compactResults = results.map(result => ({
     agents: result.agents,
+    coverage: result.coverage,
     assertions: result.assertions || createSocialAssertions(result, options),
     finalUrl: result.finalUrl,
     images: result.images,
@@ -1256,18 +1274,26 @@ export async function runSocialPreviewCheck(inputUrls, options = {}) {
   const mergedOptions = { ...defaultOptions, ...options }
   const validatedInputs = inputUrls.map(value => validateUrl(value, mergedOptions).href)
   let urls = [...validatedInputs]
+  let sitemapCoverageTruncated = false
 
   if (mergedOptions.sitemap) {
     for (const input of validatedInputs) {
       const discovered = await discoverSitemapUrls(input, mergedOptions)
-      urls.push(...discovered)
+      urls.push(...discovered.pages)
+      sitemapCoverageTruncated ||= discovered.truncated
     }
   }
 
-  urls = [...new Set(urls)].slice(0, mergedOptions.maxPages)
+  const discoveredUrls = [...new Set(urls)]
+  urls = discoveredUrls.slice(0, mergedOptions.maxPages)
   const results = []
   for (const url of urls) {
     const result = await inspectPage(url, mergedOptions)
+    result.coverage = {
+      discoveredPages: discoveredUrls.length,
+      selectedPages: urls.length,
+      truncated: sitemapCoverageTruncated || discoveredUrls.length > urls.length,
+    }
     result.assertions = createSocialAssertions(result, mergedOptions)
     results.push(result)
   }

@@ -54,7 +54,7 @@
                 { "$ref": "technical-report.common.schema.json#/$defs/result" },
                 {
                   "type": "object",
-                  "required": ["blockedRequests", "browser", "privacyObservations", "profiles", "requestedProfiles", "settleMilliseconds"],
+                  "required": ["blockedRequests", "browser", "privacyObservations", "profiles", "readOnlyExecutionEvidence", "requestedProfiles", "settleMilliseconds"],
                   "properties": {
                     "blockedRequests": { "type": "array" },
                     "browser": {
@@ -68,6 +68,40 @@
                     },
                     "privacyObservations": { "type": "object" },
                     "profiles": { "type": "array" },
+                    "readOnlyExecutionEvidence": {
+                      "type": "object",
+                      "required": ["destinationSideEffectsVerified", "mode", "profileRuns", "requestedProfiles"],
+                      "properties": {
+                        "destinationSideEffectsVerified": { "const": false },
+                        "mode": { "const": "passive-get-only-isolated" },
+                        "profileRuns": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": ["allowedGetRequests", "allowedNonGetOrExternalRequests", "blockedActionCountsByKind", "blockedRequestCountsByCode", "domGuardsInstalledBeforeNavigation", "interceptedRequests", "profile", "requestInterceptionInstalledBeforeNavigation", "url"],
+                            "properties": {
+                              "allowedGetRequests": { "type": "integer", "minimum": 0 },
+                              "allowedNonGetOrExternalRequests": { "type": "integer", "minimum": 0 },
+                              "blockedActionCountsByKind": { "$ref": "#/$defs/countsByKey" },
+                              "blockedRequestCountsByCode": { "$ref": "#/$defs/countsByKey" },
+                              "domGuardsInstalledBeforeNavigation": { "type": "boolean" },
+                              "interceptedRequests": { "type": "integer", "minimum": 0 },
+                              "profile": { "type": "string", "minLength": 1 },
+                              "requestInterceptionInstalledBeforeNavigation": { "type": "boolean" },
+                              "url": { "type": "string", "minLength": 1 }
+                            },
+                            "additionalProperties": true
+                          }
+                        },
+                        "requestedProfiles": {
+                          "type": "array",
+                          "minItems": 1,
+                          "items": { "type": "string", "minLength": 1 },
+                          "uniqueItems": true
+                        }
+                      },
+                      "additionalProperties": true
+                    },
                     "requestedProfiles": {
                       "type": "array",
                       "minItems": 1,
@@ -111,6 +145,10 @@
           "additionalProperties": true
         }
       ]
+    },
+    "countsByKey": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
     }
   }
 }

@@ -21,7 +21,7 @@
       "required": ["id", "version", "status"],
       "properties": {
         "id": { "const": "website-qa-baseline" },
-        "version": { "const": "1.1.0" },
+        "version": { "const": "1.2.0" },
         "status": { "const": "stable" }
       },
       "additionalProperties": false

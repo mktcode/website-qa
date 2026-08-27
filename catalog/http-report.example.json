@@ -1,18 +1,899 @@
 {
-  "schemaVersion": 1,
-  "generatedAt": "2026-08-24T12:00:00.000Z",
-  "tool": "http-check",
-  "toolPackage": {
-    "name": "@mktcode/website-qa",
-    "version": "1.1.0"
-  },
   "checklistCoverage": {
     "catalog": {
       "id": "website-qa-baseline",
       "status": "stable",
-      "version": "1.1.0"
+      "version": "1.2.0"
+    },
+    "items": [
+      {
+        "criteria": [
+          {
+            "id": "CORE-DOM-02/C1",
+            "mode": "automatic",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Die geprüfte HTTP-Variante verwendet eine permanente Weiterleitung auf HTTPS."
+          },
+          {
+            "id": "CORE-DOM-02/C2",
+            "mode": "automatic",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Pfad und Query bleiben bei der geprüften HTTP-zu-HTTPS-Weiterleitung erhalten."
+          }
+        ],
+        "id": "CORE-DOM-02",
+        "module": "core",
+        "outcome": "open",
+        "statement": "HTTP leitet dauerhaft, pfad- und queryerhaltend und möglichst ohne unnötige Zwischenstation auf HTTPS um."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-DOM-07/C1",
+            "mode": "automatic",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Die geprüfte HTTPS-Navigation enthält keinen Downgrade auf HTTP."
+          },
+          {
+            "id": "CORE-DOM-07/C2",
+            "mode": "automatic",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Die geprüfte Zielnavigation enthält keine unnötige Weiterleitungskette."
+          },
+          {
+            "id": "CORE-DOM-07/C3",
+            "mode": "automatic",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Die geprüfte HTTP-zu-HTTPS-Navigation enthält keine unnötige Weiterleitungskette."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Geprüfte Hosts und projektspezifische Redirectrouten mit Ergebnis dokumentieren.",
+            "id": "CORE-DOM-07/C4",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Alle veröffentlichten Host- und Routenvarianten, die zum Projektumfang gehören, wurden inventarisiert und geprüft."
+          }
+        ],
+        "id": "CORE-DOM-07",
+        "module": "core",
+        "outcome": "open",
+        "statement": "Weiterleitungen wurden auf Statuscode, Pfad- und Queryerhalt, Schleifen und unnötige Ketten geprüft."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-DOM-08/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "http.security.selected-response-coverage-complete",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Die relevanten Sicherheitsheader wurden auf allen ausgewählten Antwortklassen beobachtet.",
+                "subject": {
+                  "checkedResponseClasses": [
+                    "HTML",
+                    "CSS",
+                    "JavaScript",
+                    "404-Antwort"
+                  ],
+                  "expectedResponseClasses": [
+                    "HTML",
+                    "404-Antwort",
+                    "CSS",
+                    "JavaScript"
+                  ],
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.hsts.present",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "HSTS ist auf den ausgewählten HTTPS-Antworten vorhanden.",
+                "subject": {
+                  "responseClass": "ausgewählte HTTPS-Antworten",
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "HSTS ist auf allen vom HTTP-Prüfer untersuchten HTTPS-Antwortklassen vorhanden."
+          },
+          {
+            "id": "CORE-DOM-08/C2",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "http.security.selected-response-coverage-complete",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Die relevanten Sicherheitsheader wurden auf allen ausgewählten Antwortklassen beobachtet.",
+                "subject": {
+                  "checkedResponseClasses": [
+                    "HTML",
+                    "CSS",
+                    "JavaScript",
+                    "404-Antwort"
+                  ],
+                  "expectedResponseClasses": [
+                    "HTML",
+                    "404-Antwort",
+                    "CSS",
+                    "JavaScript"
+                  ],
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.hsts.max-age-adequate",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "HSTS max-age beträgt mindestens 180 Tage.",
+                "subject": {
+                  "responseClass": "ausgewählte HTTPS-Antworten",
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Der HSTS-max-age ist syntaktisch gültig und beträgt mindestens 180 Tage."
+          },
+          {
+            "evidenceClass": "infrastructure-access",
+            "evidenceInstructions": "Antwortklassen, Hosts und nicht erreichbare Infrastrukturgrenzen dokumentieren.",
+            "id": "CORE-DOM-08/C3",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Relevante HTTPS-Antwortklassen und vorgeschaltete Weiterleitungshosts wurden projektspezifisch bestimmt."
+          },
+          {
+            "evidenceClass": "administrative",
+            "evidenceInstructions": "Entscheidung, Subdomaininventar und verantwortliche Stelle dokumentieren.",
+            "id": "CORE-DOM-08/C4",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "includeSubDomains und preload wurden anhand aller betroffenen Subdomains bewusst entschieden."
+          }
+        ],
+        "id": "CORE-DOM-08",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "HSTS-Wert und Reichweite sind bewusst gewählt und auf allen relevanten HTTPS-Antworten einschließlich vorgeschalteter Weiterleitungshosts geprüft. `includeSubDomains` und `preload` werden nur nach Prüfung aller betroffenen Subdomains aktiviert."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-ERR-01/C1",
+            "mode": "automatic",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Der geprüfte unbekannte Pfad antwortet mit HTTP 404."
+          },
+          {
+            "id": "CORE-ERR-01/C2",
+            "mode": "automatic",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Die automatische Stichprobe erkennt keine typischen Stacktraces oder internen Dateipfade."
+          },
+          {
+            "evidenceClass": "editorial",
+            "evidenceInstructions": "Fehlerseite visuell und redaktionell prüfen; automatische Mustererkennung genügt nicht.",
+            "id": "CORE-ERR-01/C3",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Die Fehlerseite ist für die vorgesehenen Nutzer verständlich und enthält keine projektspezifisch sensiblen Details."
+          }
+        ],
+        "id": "CORE-ERR-01",
+        "module": "core",
+        "outcome": "open",
+        "statement": "Eine unbekannte Browserroute liefert eine verständliche HTML-Fehlerseite mit tatsächlichem HTTP-404-Status und ohne interne technische Details."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-ERR-02/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "error.not-found.noindex",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "404-Antwort enthält noindex.",
+                "subject": {
+                  "url": "https://example.com/.well-known/ops-http-check-not-found"
+                }
+              }
+            ],
+            "statement": "Die geprüfte 404-Antwort enthält eine noindex-Anweisung."
+          },
+          {
+            "id": "CORE-ERR-02/C2",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "error.not-found.no-url-metadata",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "404-Antwort enthält weder Canonical noch og:url.",
+                "subject": {
+                  "url": "https://example.com/.well-known/ops-http-check-not-found"
+                }
+              }
+            ],
+            "statement": "Die geprüfte 404-Antwort enthält weder Canonical noch og:url."
+          }
+        ],
+        "id": "CORE-ERR-02",
+        "module": "core",
+        "outcome": "pass",
+        "statement": "Nicht indexierbare Fehlerseiten senden `noindex` und enthalten weder einen irreführenden Canonical noch `og:url` auf die Fehleradresse."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-ERR-04/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "http.security.selected-response-coverage-complete",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Die relevanten Sicherheitsheader wurden auf allen ausgewählten Antwortklassen beobachtet.",
+                "subject": {
+                  "checkedResponseClasses": [
+                    "HTML",
+                    "CSS",
+                    "JavaScript",
+                    "404-Antwort"
+                  ],
+                  "expectedResponseClasses": [
+                    "HTML",
+                    "404-Antwort",
+                    "CSS",
+                    "JavaScript"
+                  ],
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "error.not-found.noindex",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "404-Antwort enthält noindex.",
+                "subject": {
+                  "url": "https://example.com/.well-known/ops-http-check-not-found"
+                }
+              },
+              {
+                "assertionId": "cache.not-found.not-publicly-cacheable",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "404-Antwort ist nicht ausdrücklich öffentlich cachebar.",
+                "subject": {
+                  "responseClass": "404-Antwort",
+                  "url": "https://example.com/.well-known/ops-http-check-not-found"
+                }
+              },
+              {
+                "assertionId": "http.hsts.present",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "HSTS ist auf den ausgewählten HTTPS-Antworten vorhanden.",
+                "subject": {
+                  "responseClass": "ausgewählte HTTPS-Antworten",
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.hsts.max-age-adequate",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "HSTS max-age beträgt mindestens 180 Tage.",
+                "subject": {
+                  "responseClass": "ausgewählte HTTPS-Antworten",
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.security.csp-declared",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Content-Security-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
+                "subject": {
+                  "responseClass": "HTML und 404-Antwort",
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.security.framing-protection-present",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "CSP frame-ancestors oder X-Frame-Options begrenzt Framing.",
+                "subject": {
+                  "responseClass": "HTML und 404-Antwort",
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.security.nosniff-valid",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "X-Content-Type-Options ist auf den ausgewählten Antworten wirksam als nosniff deklariert.",
+                "subject": {
+                  "responseClass": "ausgewählte Antworten",
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.security.referrer-policy-declared",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Referrer-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
+                "subject": {
+                  "responseClass": "HTML und 404-Antwort",
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.security.permissions-policy-declared",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Permissions-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
+                "subject": {
+                  "responseClass": "HTML und 404-Antwort",
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Die geprüfte 404-Antwort enthält noindex und ist nicht ausdrücklich öffentlich cachebar; alle automatisch ausgewählten Antworten besitzen ihre einschlägige beobachtbare Sicherheitsheaderbasis."
+          },
+          {
+            "evidenceClass": "infrastructure-access",
+            "evidenceInstructions": "App- und proxyseitige Redirectklassen, alternative Hosts und erwartete Sicherheits-, Indexierungs- und Cacheheader mit Infrastrukturbezug dokumentieren; die öffentliche 404-/Seitenstichprobe allein genügt nicht.",
+            "id": "CORE-ERR-04/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Sicherheits-, Indexierungs- und Cacheheader auf projektspezifischen app- und proxyseitigen Weiterleitungen wurden vollständig bewertet."
+          }
+        ],
+        "id": "CORE-ERR-04",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Sicherheits-, Indexierungs- und Cacheheader wurden auch auf Fehlerantworten und app- sowie proxyseitigen Weiterleitungen geprüft."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-PERF-01/C1",
+            "mode": "automatic",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Identity-Antworten der ausgewählten textbasierten Ressourcen sind unverändert auslieferbar."
+          },
+          {
+            "id": "CORE-PERF-01/C2",
+            "mode": "automatic",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Geeignete ausgewählte Ressourcen handeln wirksames Gzip mit passendem Vary aus."
+          },
+          {
+            "id": "CORE-PERF-01/C3",
+            "mode": "automatic",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Geeignete ausgewählte Ressourcen handeln wirksames Brotli mit passendem Vary aus."
+          },
+          {
+            "evidenceClass": "infrastructure-access",
+            "evidenceInstructions": "Produktive Router-/Proxyzuordnung oder begründete Nichtanwendbarkeit dokumentieren.",
+            "id": "CORE-PERF-01/C4",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Die Kompressionszuständigkeit der produktiven Anwendung beziehungsweise des Reverse Proxys wurde bestätigt."
+          }
+        ],
+        "id": "CORE-PERF-01",
+        "module": "core",
+        "outcome": "open",
+        "statement": "Geeignete textbasierte Antworten wie HTML, CSS, JavaScript, JSON und größere SVG-Dateien werden per HTTP komprimiert. Produktion wurde mindestens für HTML, CSS und JavaScript mit Identity, Gzip und Brotli geprüft; `Content-Encoding`, `Vary` und tatsächliche Größenreduktion sind plausibel. Erfolgt die Kompression am Reverse Proxy, sind Middlewarekonfiguration und Zuordnung zum produktiven HTTPS-Router bestätigt."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-PERF-05/C1",
+            "mode": "automatic",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Vom HTTP-Prüfer ausgewählte versioniert wirkende Assets besitzen einen langfristigen unveränderlichen Cache."
+          },
+          {
+            "id": "CORE-PERF-05/C2",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "cache.not-found.not-publicly-cacheable",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "404-Antwort ist nicht ausdrücklich öffentlich cachebar.",
+                "subject": {
+                  "responseClass": "404-Antwort",
+                  "url": "https://example.com/.well-known/ops-http-check-not-found"
+                }
+              }
+            ],
+            "statement": "Die geprüfte 404-Antwort ist nicht ausdrücklich langfristig öffentlich cachebar."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Antwortklassen, erwartete Cachepolitik und tatsächliche Header dokumentieren.",
+            "id": "CORE-PERF-05/C3",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Die Cachepolitik für veränderliche, sensible und weitere projektspezifische Antwortklassen wurde bewertet."
+          }
+        ],
+        "id": "CORE-PERF-05",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Cacheheader passen zur Ressource: versionierte unveränderliche Assets dürfen langfristig cachen, veränderliche öffentliche Dateien bleiben aktualisierbar und sensible Antworten werden nicht öffentlich gespeichert."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-SEC-04/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "http.security.selected-response-coverage-complete",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Die relevanten Sicherheitsheader wurden auf allen ausgewählten Antwortklassen beobachtet.",
+                "subject": {
+                  "checkedResponseClasses": [
+                    "HTML",
+                    "CSS",
+                    "JavaScript",
+                    "404-Antwort"
+                  ],
+                  "expectedResponseClasses": [
+                    "HTML",
+                    "404-Antwort",
+                    "CSS",
+                    "JavaScript"
+                  ],
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.hsts.present",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "HSTS ist auf den ausgewählten HTTPS-Antworten vorhanden.",
+                "subject": {
+                  "responseClass": "ausgewählte HTTPS-Antworten",
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.hsts.max-age-adequate",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "HSTS max-age beträgt mindestens 180 Tage.",
+                "subject": {
+                  "responseClass": "ausgewählte HTTPS-Antworten",
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.security.csp-declared",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Content-Security-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
+                "subject": {
+                  "responseClass": "HTML und 404-Antwort",
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.security.framing-protection-present",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "CSP frame-ancestors oder X-Frame-Options begrenzt Framing.",
+                "subject": {
+                  "responseClass": "HTML und 404-Antwort",
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.security.nosniff-valid",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "X-Content-Type-Options ist auf den ausgewählten Antworten wirksam als nosniff deklariert.",
+                "subject": {
+                  "responseClass": "ausgewählte Antworten",
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.security.referrer-policy-declared",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Referrer-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
+                "subject": {
+                  "responseClass": "HTML und 404-Antwort",
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.security.permissions-policy-declared",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Permissions-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
+                "subject": {
+                  "responseClass": "HTML und 404-Antwort",
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Die automatisch ausgewählten HTML-, CSS-, JavaScript- und 404-Antworten wurden vollständig auf die jeweils einschlägige öffentlich beobachtbare Sicherheitsheaderbasis geprüft."
+          },
+          {
+            "evidenceClass": "infrastructure-access",
+            "evidenceInstructions": "Vollständige projektspezifische Antwortklassen und Proxyzuständigkeiten inventarisieren, öffentliche Headerstichproben gegen Anwendung und Proxy abgleichen und Abweichungen dokumentieren.",
+            "id": "CORE-SEC-04/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Projektspezifische APIs, weitere Assets, sensible Antworten, alternative Hosts, app- und proxyseitige Weiterleitungen sowie die tatsächlichen Proxygrenzen wurden zusätzlich bewertet."
+          }
+        ],
+        "id": "CORE-SEC-04",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Sicherheitsheader und Proxygrenzen wurden passend zum Projekt für HTML, statische Assets, APIs, Fehler, appseitige sowie proxyseitige Weiterleitungen geprüft. Anwendung und Proxy entfernen oder widersprechen sich nicht unbeabsichtigt."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-SEC-05/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "http.security.document-response-coverage-complete",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Die dokumentartigen Sicherheitsheaderantworten wurden vollständig beobachtet.",
+                "subject": {
+                  "checkedResponseClasses": [
+                    "HTML",
+                    "CSS",
+                    "JavaScript",
+                    "404-Antwort"
+                  ],
+                  "expectedResponseClasses": [
+                    "HTML",
+                    "404-Antwort"
+                  ],
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.security.csp-declared",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Content-Security-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
+                "subject": {
+                  "responseClass": "HTML und 404-Antwort",
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Content-Security-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert."
+          },
+          {
+            "id": "CORE-SEC-05/C2",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "http.security.document-response-coverage-complete",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Die dokumentartigen Sicherheitsheaderantworten wurden vollständig beobachtet.",
+                "subject": {
+                  "checkedResponseClasses": [
+                    "HTML",
+                    "CSS",
+                    "JavaScript",
+                    "404-Antwort"
+                  ],
+                  "expectedResponseClasses": [
+                    "HTML",
+                    "404-Antwort"
+                  ],
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.security.framing-protection-present",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "CSP frame-ancestors oder X-Frame-Options begrenzt Framing.",
+                "subject": {
+                  "responseClass": "HTML und 404-Antwort",
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "CSP frame-ancestors oder X-Frame-Options begrenzt Framing auf den ausgewählten dokumentartigen Antworten."
+          },
+          {
+            "id": "CORE-SEC-05/C3",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "http.security.selected-response-coverage-complete",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Die relevanten Sicherheitsheader wurden auf allen ausgewählten Antwortklassen beobachtet.",
+                "subject": {
+                  "checkedResponseClasses": [
+                    "HTML",
+                    "CSS",
+                    "JavaScript",
+                    "404-Antwort"
+                  ],
+                  "expectedResponseClasses": [
+                    "HTML",
+                    "404-Antwort",
+                    "CSS",
+                    "JavaScript"
+                  ],
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.security.nosniff-valid",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "X-Content-Type-Options ist auf den ausgewählten Antworten wirksam als nosniff deklariert.",
+                "subject": {
+                  "responseClass": "ausgewählte Antworten",
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "X-Content-Type-Options ist auf allen ausgewählten Antworten wirksam als nosniff deklariert."
+          },
+          {
+            "id": "CORE-SEC-05/C4",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "http.security.document-response-coverage-complete",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Die dokumentartigen Sicherheitsheaderantworten wurden vollständig beobachtet.",
+                "subject": {
+                  "checkedResponseClasses": [
+                    "HTML",
+                    "CSS",
+                    "JavaScript",
+                    "404-Antwort"
+                  ],
+                  "expectedResponseClasses": [
+                    "HTML",
+                    "404-Antwort"
+                  ],
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.security.referrer-policy-declared",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Referrer-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
+                "subject": {
+                  "responseClass": "HTML und 404-Antwort",
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Referrer-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert."
+          },
+          {
+            "id": "CORE-SEC-05/C5",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "http.security.document-response-coverage-complete",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Die dokumentartigen Sicherheitsheaderantworten wurden vollständig beobachtet.",
+                "subject": {
+                  "checkedResponseClasses": [
+                    "HTML",
+                    "CSS",
+                    "JavaScript",
+                    "404-Antwort"
+                  ],
+                  "expectedResponseClasses": [
+                    "HTML",
+                    "404-Antwort"
+                  ],
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.security.permissions-policy-declared",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Permissions-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
+                "subject": {
+                  "responseClass": "HTML und 404-Antwort",
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Permissions-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert."
+          },
+          {
+            "id": "CORE-SEC-05/C6",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "http.security.selected-response-coverage-complete",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Die relevanten Sicherheitsheader wurden auf allen ausgewählten Antwortklassen beobachtet.",
+                "subject": {
+                  "checkedResponseClasses": [
+                    "HTML",
+                    "CSS",
+                    "JavaScript",
+                    "404-Antwort"
+                  ],
+                  "expectedResponseClasses": [
+                    "HTML",
+                    "404-Antwort",
+                    "CSS",
+                    "JavaScript"
+                  ],
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.hsts.present",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "HSTS ist auf den ausgewählten HTTPS-Antworten vorhanden.",
+                "subject": {
+                  "responseClass": "ausgewählte HTTPS-Antworten",
+                  "url": "https://example.com/"
+                }
+              },
+              {
+                "assertionId": "http.hsts.max-age-adequate",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "HSTS max-age beträgt mindestens 180 Tage.",
+                "subject": {
+                  "responseClass": "ausgewählte HTTPS-Antworten",
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "HSTS ist auf den ausgewählten HTTPS-Antworten vorhanden und besitzt einen gültigen max-age von mindestens 180 Tagen."
+          },
+          {
+            "evidenceClass": "security-review",
+            "evidenceInstructions": "CSP-Direktiven, erlaubte Quellen, Framingbedarf, Referrer- und Featureanforderungen sowie HSTS-Reichweite einschließlich includeSubDomains/preload risikogerecht bewerten; bloße Headerpräsenz genügt nicht.",
+            "id": "CORE-SEC-05/C7",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Inhalt, Reichweite, Widerspruchsfreiheit und risikogerechte Eignung der Richtlinien wurden für das Projekt bewertet, ohne eine begrenzte Richtlinie als Vollschutz auszugeben."
+          }
+        ],
+        "id": "CORE-SEC-05",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "CSP, Framing-Schutz, MIME-Sniffing-Schutz, Referrer Policy, Permissions Policy und HSTS wurden risikogerecht bewertet; eine bewusst begrenzte Richtlinie wird nicht als Vollschutz ausgegeben."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-SEC-07/C1",
+            "mode": "automatic",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Auf den passiv geprüften Seiten und Profilen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet."
+          },
+          {
+            "id": "CORE-SEC-07/C2",
+            "mode": "automatic",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Die Stichprobe einer unbekannten Route antwortet mit 404 und offenbart keine typischen technischen Interna."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Projektinventar der zentralen Pfade und Fehlerfälle getrennt prüfen; die passiven Seitenprofile und die einzelne 404-Stichprobe sind keine Sicherheitsprüfung oder vollständige Funktionsabdeckung.",
+            "id": "CORE-SEC-07/C3",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Die tatsächlichen zentralen Nutzerpfade und funktionsspezifischen Fehlerfälle des Projekts einschließlich interaktionsabhängiger Zustände sind geprüft."
+          }
+        ],
+        "id": "CORE-SEC-07",
+        "module": "core",
+        "outcome": "open",
+        "statement": "Zentrale Nutzerpfade und Fehlerfälle funktionieren ohne interne Fehlermeldungen, unerwartete Browserkonsolenfehler oder fehlgeschlagene Netzwerkanfragen."
+      }
+    ],
+    "summary": {
+      "automaticCriteria": {
+        "pass": 13,
+        "fail": 0,
+        "partial": 0,
+        "open": 0,
+        "inconclusive": 0,
+        "notApplicable": 0,
+        "noEvidence": 13,
+        "total": 26
+      },
+      "checklistItems": {
+        "pass": 1,
+        "fail": 0,
+        "partial": 5,
+        "open": 5,
+        "inconclusive": 0,
+        "notApplicable": 0,
+        "noEvidence": 0,
+        "automaticallyPassed": 1,
+        "total": 11
+      },
+      "nonAutomaticCriteria": {
+        "pass": 0,
+        "fail": 0,
+        "partial": 0,
+        "open": 0,
+        "inconclusive": 0,
+        "notApplicable": 0,
+        "noEvidence": 10,
+        "total": 10
+      }
     }
   },
+  "generatedAt": "2026-08-24T12:00:00.000Z",
   "options": {
     "checkHttpRedirect": true,
     "maxRedirects": 5,
@@ -22,7 +903,9 @@
     "timeoutMilliseconds": 15000
   },
   "readOnlyGuarantees": {
-    "methods": ["GET"],
+    "methods": [
+      "GET"
+    ],
     "mutatingActionsInvoked": false
   },
   "results": [
@@ -133,8 +1016,16 @@
           "outcome": "pass",
           "message": "Die dokumentartigen Sicherheitsheaderantworten wurden vollständig beobachtet.",
           "subject": {
-            "checkedResponseClasses": ["HTML", "CSS", "JavaScript", "404-Antwort"],
-            "expectedResponseClasses": ["HTML", "404-Antwort"],
+            "checkedResponseClasses": [
+              "HTML",
+              "CSS",
+              "JavaScript",
+              "404-Antwort"
+            ],
+            "expectedResponseClasses": [
+              "HTML",
+              "404-Antwort"
+            ],
             "url": "https://example.com/"
           }
         },
@@ -144,8 +1035,18 @@
           "outcome": "pass",
           "message": "Die relevanten Sicherheitsheader wurden auf allen ausgewählten Antwortklassen beobachtet.",
           "subject": {
-            "checkedResponseClasses": ["HTML", "CSS", "JavaScript", "404-Antwort"],
-            "expectedResponseClasses": ["HTML", "404-Antwort", "CSS", "JavaScript"],
+            "checkedResponseClasses": [
+              "HTML",
+              "CSS",
+              "JavaScript",
+              "404-Antwort"
+            ],
+            "expectedResponseClasses": [
+              "HTML",
+              "404-Antwort",
+              "CSS",
+              "JavaScript"
+            ],
             "url": "https://example.com/"
           }
         }
@@ -153,10 +1054,16 @@
       "issues": []
     }
   ],
+  "schemaVersion": 1,
   "summary": {
     "errors": 0,
     "failed": false,
     "targets": 1,
     "warnings": 0
+  },
+  "tool": "http-check",
+  "toolPackage": {
+    "name": "@mktcode/website-qa",
+    "version": "1.2.0"
   }
 }

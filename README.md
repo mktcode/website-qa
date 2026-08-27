@@ -247,6 +247,12 @@ Kriterien verwenden ausschließlich `pass`, `fail`, `inconclusive`, `notApplicab
 
 Alle Records in einer Evidence-Datei gelten als gleichzeitig aktive Nachweise; es gibt kein stilles „neuester Eintrag gewinnt“ und keinen automatischen Ablauf allein aufgrund des Datums. Mehrere Records für dasselbe Kriterium werden konservativ zusammengeführt: Ein aktives `fail` hat Vorrang, ein aktives `inconclusive` verhindert ein eindeutiges Ergebnis, und eine Mischung aus `pass` und `notApplicable` bleibt `pass`. Ersetzte oder fachlich nicht mehr geltende Records müssen deshalb bewusst aus der aktiven Projektkopie entfernt und bei Bedarf über deren Versionshistorie beziehungsweise Projektakte erhalten werden. Freie Notizen und Referenzen werden nur als Nachweisdaten übernommen; das Werkzeug öffnet oder bestätigt referenzierte Unterlagen nicht. Vertrauliche Unterlagen werden weiterhin ausschließlich außerhalb empfohlener Berichte verwahrt und nur redigiert referenziert.
 
+### Migration von 1.1.0 auf 1.2.0
+
+Version 1.2.0 ergänzt genau sieben passive Teilnachweise für URL-Konsistenz, Trainingsrichtlinien, verborgene fokussierbare Bereiche, Formularbeschriftungen, Laufzeit-/404-Fehlerfälle, Browser-Nur-Lese-Grenzen und echte GET-Beobachtungen interner Medien. Projektkonfiguration und Evidence müssen gemeinsam auf `website-qa-baseline` 1.2.0 umgestellt werden; alle in der jeweiligen Projektkonfiguration verwendeten technischen Berichte sind neu zu erzeugen. Technische Berichte behalten `schemaVersion: 1`, Projektberichte `schemaVersion: 3` und Assertions `assertionVersion: 1`.
+
+Die Browserassertion zu `FORM-TEST-04` belegt ausschließlich die installierten Grenzen der paketierten passiven Browserläufe und keine beliebigen projektspezifischen Skripte oder unveränderten Zielsystemspeicher. Eine Laufzeitdeklaration von `--ai-training-opt-in` ist kein Zustimmungsnachweis. URL- und Medienbefunde gelten nur für bereits beobachtete, innerhalb der Limits vollständig erfasste Ziele; dynamische Zustände, externe Einbettungen, Projektinventare und fachliche Freigaben bleiben manuell.
+
 ### Migration von 1.0.0 auf 1.1.0
 
 Version 1.1.0 ergänzt drei bewusst begrenzte Accessibility-Punkte mit vier passiven Axe-Assertions. Projektkonfiguration, Evidence, technische Berichte und Projektberichte müssen gemeinsam auf `website-qa-baseline` 1.1.0 umgestellt und neu erzeugt werden. Die technischen Berichte behalten `schemaVersion: 1`; die neuen Assertions behalten davon unabhängig `assertionVersion: 1`.

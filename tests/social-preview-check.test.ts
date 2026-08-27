@@ -225,15 +225,30 @@ describe('social preview checker', () => {
     expect(result.assertions.find(assertion => assertion.assertionId === 'social.robots.training-access-blocked-or-declared')?.outcome).toBe('fail')
     expect(result.assertions.find(assertion => assertion.assertionId === 'social.run.strict-mode-recorded')?.outcome).toBe('fail')
     const optedInAssertions = (optedInReport.results[0] as unknown as {
-      assertions: Array<{ assertionId: string, outcome: string }>
+      assertions: Array<{ assertionId: string, outcome: string, subject: { aiTrainingOptInDeclaredForRun: boolean, allowedTrainingTokens: number, blockedTrainingTokens: number } }>
     })?.assertions || []
-    expect(optedInAssertions.find(assertion => assertion.assertionId === 'social.robots.training-access-blocked-or-declared')?.outcome).toBe('pass')
+    expect(optedInAssertions.find(assertion => assertion.assertionId === 'social.robots.training-access-blocked-or-declared')).toMatchObject({
+      outcome: 'pass',
+      subject: { aiTrainingOptInDeclaredForRun: true, allowedTrainingTokens: 6, blockedTrainingTokens: 0 },
+    })
     expect(optedInAssertions.find(assertion => assertion.assertionId === 'social.run.strict-mode-recorded')?.outcome).toBe('pass')
+    const limitedReport = await runSocialPreviewCheck([url, `${url}second`], {
+      allowHttp: true,
+      allowPrivate: true,
+      maxPages: 1,
+    })
+    const limitedResult = limitedReport.results[0] as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
+      coverage: { discoveredPages: number, selectedPages: number, truncated: boolean }
+    }
+    expect(limitedResult.coverage).toMatchObject({ discoveredPages: 2, selectedPages: 1, truncated: true })
+    expect(limitedResult.assertions.find(assertion => assertion.assertionId === 'social.metadata.canonical-open-graph-consistent')?.outcome).toBe('inconclusive')
+
     const jsonReport = createJsonReport(report.results, report.options)
     expect(jsonReport).toMatchObject({
       checklistCoverage: {
-        catalog: { version: '1.1.0' },
-        summary: { checklistItems: { total: 5 } },
+        catalog: { version: '1.2.0' },
+        summary: { checklistItems: { total: 7 } },
       },
       readOnlyGuarantees: {
         browserInteractions: false,

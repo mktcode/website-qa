@@ -41,8 +41,8 @@ describe('normalized project report schema 3', () => {
 
     expect(first).toEqual(second)
     expect(first.schemaVersion).toBe(3)
-    expect(first.records).toHaveLength(50)
-    expect(references).toHaveLength(85)
+    expect(first.records).toHaveLength(54)
+    expect(references).toHaveLength(93)
     expect(new Set(references).size).toBe(first.records.length)
     expect(first.records.map((entry: { id: string }) => entry.id)).toEqual(
       first.records.map((_: unknown, index: number) => `R${String(index + 1).padStart(6, '0')}`),

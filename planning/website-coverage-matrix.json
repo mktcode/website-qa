@@ -5,7 +5,7 @@
   "checklistRevision": "cd105c834d2f27f4a065ed67aca6622b0d90ef22",
   "catalogReference": {
     "id": "website-qa-baseline",
-    "version": "1.1.0"
+    "version": "1.2.0"
   },
   "scope": {
     "sources": [
@@ -41,27 +41,27 @@
   },
   "summary": {
     "total": 215,
-    "existingCatalogItems": 37,
+    "existingCatalogItems": 44,
     "byClassification": {
-      "existing-baseline": 34,
-      "direct-get-candidate": 22,
+      "existing-baseline": 41,
+      "direct-get-candidate": 15,
       "observation-candidate": 19,
       "project-local-or-manifest": 79,
       "manual-external-administrative": 41,
       "unsafe-or-mutating": 20
     },
     "byCandidatePriority": {
-      "high": 14,
-      "medium": 23,
+      "high": 11,
+      "medium": 19,
       "low": 4,
-      "none": 174
+      "none": 181
     },
     "byModule": {
       "core": {
         "total": 98,
         "byClassification": {
-          "existing-baseline": 34,
-          "direct-get-candidate": 11,
+          "existing-baseline": 39,
+          "direct-get-candidate": 6,
           "observation-candidate": 7,
           "project-local-or-manifest": 27,
           "manual-external-administrative": 15,
@@ -82,8 +82,8 @@
       "formulare-api-daten": {
         "total": 30,
         "byClassification": {
-          "existing-baseline": 0,
-          "direct-get-candidate": 2,
+          "existing-baseline": 1,
+          "direct-get-candidate": 1,
           "observation-candidate": 3,
           "project-local-or-manifest": 16,
           "manual-external-administrative": 1,
@@ -93,8 +93,8 @@
       "medien-animationen": {
         "total": 20,
         "byClassification": {
-          "existing-baseline": 0,
-          "direct-get-candidate": 6,
+          "existing-baseline": 1,
+          "direct-get-candidate": 5,
           "observation-candidate": 6,
           "project-local-or-manifest": 6,
           "manual-external-administrative": 0,
@@ -343,13 +343,13 @@
       "id": "CORE-DOM-06",
       "source": "docs/checklisten/website/kern.md",
       "module": "core",
-      "classification": "direct-get-candidate",
-      "existingCatalog": false,
+      "classification": "existing-baseline",
+      "existingCatalog": true,
       "contextNeeds": [
         "url-get",
         "project-manifest"
       ],
-      "v1_1Priority": "high",
+      "v1_1Priority": "none",
       "rationale": "Ein begrenzter Crawl kann Canonicals, interne Links, Sitemap- und OpenGraph-URLs sowie beobachtete Redirectziele gegen einen deklarierten öffentlichen Origin abgleichen. Nicht entdeckte Routen und Hosts bleiben offen."
     },
     {
@@ -556,13 +556,13 @@
       "id": "CORE-ROB-03",
       "source": "docs/checklisten/website/kern.md",
       "module": "core",
-      "classification": "direct-get-candidate",
-      "existingCatalog": false,
+      "classification": "existing-baseline",
+      "existingCatalog": true,
       "contextNeeds": [
         "url-get",
         "human-review"
       ],
-      "v1_1Priority": "high",
+      "v1_1Priority": "none",
       "rationale": "Die bereits abgerufene robots.txt kann automatisch auf bekannte Trainings- und Datennutzungstokens sowie wirksame Ausschlussregeln geprüft werden. Betreiberzustimmung und unabhängige Entscheidungen für Suche oder Nutzerabruf bleiben administrativ."
     },
     {
@@ -688,13 +688,13 @@
       "id": "CORE-A11Y-04",
       "source": "docs/checklisten/website/kern.md",
       "module": "core",
-      "classification": "direct-get-candidate",
-      "existingCatalog": false,
+      "classification": "existing-baseline",
+      "existingCatalog": true,
       "contextNeeds": [
         "browser-passive",
         "human-review"
       ],
-      "v1_1Priority": "medium",
+      "v1_1Priority": "none",
       "rationale": "Im passiven Initialzustand lassen sich visuell versteckte, dennoch fokussierbare oder im Accessibility Tree vorhandene Elemente technisch erkennen. Erst nach Interaktion entstehende Sichtbarkeitszustände bleiben offen."
     },
     {
@@ -714,14 +714,14 @@
       "id": "CORE-A11Y-06",
       "source": "docs/checklisten/website/kern.md",
       "module": "core",
-      "classification": "direct-get-candidate",
-      "existingCatalog": false,
+      "classification": "existing-baseline",
+      "existingCatalog": true,
       "contextNeeds": [
         "browser-passive",
         "human-review",
         "mutating-test"
       ],
-      "v1_1Priority": "medium",
+      "v1_1Priority": "none",
       "rationale": "Passives DOM und Axe können Labelzuordnung, required-Markierung und statisch vorhandene Beschreibungen technisch prüfen. Fehler- und Erfolgszustände erfordern Formularinteraktion und bleiben einem gesonderten Test vorbehalten."
     },
     {
@@ -1052,15 +1052,15 @@
       "id": "CORE-SEC-07",
       "source": "docs/checklisten/website/kern.md",
       "module": "core",
-      "classification": "direct-get-candidate",
-      "existingCatalog": false,
+      "classification": "existing-baseline",
+      "existingCatalog": true,
       "contextNeeds": [
         "url-get",
         "browser-passive",
         "project-manifest",
         "human-review"
       ],
-      "v1_1Priority": "medium",
+      "v1_1Priority": "none",
       "rationale": "Sichere GETs und passive Browserläufe können deklarierte zentrale Seiten und Fehlerproben auf HTTP-, Netzwerk-, JavaScript- und Konsolenfehler prüfen. Funktionsspezifische Erwartungen und interaktionsabhängige Nutzerpfade bleiben offen."
     },
     {
@@ -2098,13 +2098,13 @@
       "id": "FORM-TEST-04",
       "source": "docs/checklisten/website/module/formulare-api-daten.md",
       "module": "formulare-api-daten",
-      "classification": "direct-get-candidate",
-      "existingCatalog": false,
+      "classification": "existing-baseline",
+      "existingCatalog": true,
       "contextNeeds": [
         "url-get",
         "browser-passive"
       ],
-      "v1_1Priority": "high",
+      "v1_1Priority": "none",
       "rationale": "Ein passiver Browserlauf kann direkt nachweisen, dass Navigation nur per GET erfolgt, Nicht-GET-Anfragen, Formularaktionen, Popups und externe Requests blockiert wurden und kein Absenden simuliert wurde. Die Aussage gilt nur für den dokumentierten begrenzten Lauf, nicht für fremde oder projektspezifische Skripte."
     },
     {
@@ -2307,13 +2307,13 @@
       "id": "MEDIA-PERF-04",
       "source": "docs/checklisten/website/module/medien-animationen.md",
       "module": "medien-animationen",
-      "classification": "direct-get-candidate",
-      "existingCatalog": false,
+      "classification": "existing-baseline",
+      "existingCatalog": true,
       "contextNeeds": [
         "url-get",
         "browser-passive"
       ],
-      "v1_1Priority": "medium",
+      "v1_1Priority": "none",
       "rationale": "Der bestehende Crawler verwendet bereits GET und berichtet Status, MIME-Typ, Bytes, Cacheheader und Redirects interner Ressourcen; der Browser zeichnet passive Requests und Antworten auf. Eine neue atomare Assertion könnte diese vorhandene GET-Abdeckung dem Medienpunkt zuordnen, ohne zusätzliche Requests auszulösen."
     },
     {
@@ -3117,6 +3117,50 @@
       ],
       "v1_1Priority": "none",
       "rationale": "Welche Checklistenpunkte, Rechtstexte, Datenflüsse, Metadaten, Medien und Fachmodule von einer Änderung betroffen sind, erfordert Projektquellen und eine Impactanalyse. Lokale Werkzeuge können Änderungen inventarisieren, aber weder rechtliche Neubewertung noch vollständige fachliche Wiederprüfung ersetzen."
+    }
+  ],
+  "v1_2ReleaseSlice": [
+    {
+      "id": "CORE-SEC-07",
+      "stage": "v1.2-unreleased",
+      "requestImpact": "Keine neuen Zielklassen, Methoden oder Interaktionen; vorhandene passive GET-/Browserbeobachtungen werden atomar zugeordnet.",
+      "manualRemainder": "Projektinventar, dynamische beziehungsweise administrative Bewertung und nicht beobachtete Zustände bleiben ausdrücklich manuell."
+    },
+    {
+      "id": "MEDIA-PERF-04",
+      "stage": "v1.2-unreleased",
+      "requestImpact": "Keine neuen Zielklassen, Methoden oder Interaktionen; vorhandene passive GET-/Browserbeobachtungen werden atomar zugeordnet.",
+      "manualRemainder": "Projektinventar, dynamische beziehungsweise administrative Bewertung und nicht beobachtete Zustände bleiben ausdrücklich manuell."
+    },
+    {
+      "id": "FORM-TEST-04",
+      "stage": "v1.2-unreleased",
+      "requestImpact": "Keine neuen Zielklassen, Methoden oder Interaktionen; vorhandene passive GET-/Browserbeobachtungen werden atomar zugeordnet.",
+      "manualRemainder": "Projektinventar, dynamische beziehungsweise administrative Bewertung und nicht beobachtete Zustände bleiben ausdrücklich manuell."
+    },
+    {
+      "id": "CORE-ROB-03",
+      "stage": "v1.2-unreleased",
+      "requestImpact": "Keine neuen Zielklassen, Methoden oder Interaktionen; vorhandene passive GET-/Browserbeobachtungen werden atomar zugeordnet.",
+      "manualRemainder": "Projektinventar, dynamische beziehungsweise administrative Bewertung und nicht beobachtete Zustände bleiben ausdrücklich manuell."
+    },
+    {
+      "id": "CORE-DOM-06",
+      "stage": "v1.2-unreleased",
+      "requestImpact": "Keine neuen Zielklassen, Methoden oder Interaktionen; vorhandene passive GET-/Browserbeobachtungen werden atomar zugeordnet.",
+      "manualRemainder": "Projektinventar, dynamische beziehungsweise administrative Bewertung und nicht beobachtete Zustände bleiben ausdrücklich manuell."
+    },
+    {
+      "id": "CORE-A11Y-04",
+      "stage": "v1.2-unreleased",
+      "requestImpact": "Keine neuen Zielklassen, Methoden oder Interaktionen; vorhandene passive GET-/Browserbeobachtungen werden atomar zugeordnet.",
+      "manualRemainder": "Projektinventar, dynamische beziehungsweise administrative Bewertung und nicht beobachtete Zustände bleiben ausdrücklich manuell."
+    },
+    {
+      "id": "CORE-A11Y-06",
+      "stage": "v1.2-unreleased",
+      "requestImpact": "Keine neuen Zielklassen, Methoden oder Interaktionen; vorhandene passive GET-/Browserbeobachtungen werden atomar zugeordnet.",
+      "manualRemainder": "Projektinventar, dynamische beziehungsweise administrative Bewertung und nicht beobachtete Zustände bleiben ausdrücklich manuell."
     }
   ]
 }

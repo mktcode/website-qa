@@ -49,6 +49,17 @@ function completeProfile(profile: string, width: number) {
     indexedDatabases: [],
     privacyObservation: emptyPrivacyObservation(),
     profile,
+    readOnlyExecution: {
+      allowedGetRequests: 1,
+      allowedNonGetOrExternalRequests: 0,
+      blockedActionCountsByKind: {},
+      blockedRequestCountsByCode: {},
+      domGuardsInstalledBeforeNavigation: true,
+      interceptedRequests: 1,
+      profile,
+      requestInterceptionInstalledBeforeNavigation: true,
+      url: 'https://example.com/',
+    },
     url: 'https://example.com/',
   }
 }
@@ -138,7 +149,7 @@ describe('browser check', () => {
     })
     expect(report).toMatchObject({
       checklistCoverage: {
-        summary: { checklistItems: { partial: 10, total: 10 } },
+        summary: { checklistItems: { partial: 14, total: 14 } },
       },
       schemaVersion: 1,
       summary: { errors: 0, failed: false, pages: 1, warnings: 0 },
@@ -148,8 +159,28 @@ describe('browser check', () => {
       requestedUrlParameterNames: ['session'],
     })
     expect(JSON.stringify(report)).not.toContain('private-value')
-    expect(report.result.assertions).toHaveLength(11)
+    expect(report.result.assertions).toHaveLength(14)
     expect(report.result.assertions.every((assertion: { outcome: string }) => assertion.outcome === 'pass')).toBe(true)
+
+    const prohibitedProfile = completeProfile('desktop', 1280)
+    prohibitedProfile.readOnlyExecution.allowedNonGetOrExternalRequests = 1
+    const prohibitedReport = createJsonReport({
+      blockedRequests: [],
+      browser: { product: 'Chromium', version: 'Chromium 140.0' },
+      finalUrl: 'https://example.com/',
+      issues: [],
+      profiles: [prohibitedProfile],
+      requestedUrl: 'https://example.com/',
+    }, {
+      maxPages: 1,
+      maxRequests: 10,
+      profiles: ['desktop'],
+      settleMilliseconds: 0,
+      sitemap: false,
+      strict: true,
+      timeoutMilliseconds: 20_000,
+    })
+    expect(prohibitedReport.result.assertions.find((entry: { assertionId: string }) => entry.assertionId === 'browser.run.read-only-boundaries-enforced')?.outcome).toBe('fail')
   })
 
   it('marks bounded storage inventories as inconclusive when identifiers are truncated', () => {
@@ -214,7 +245,7 @@ describe('browser check', () => {
     expect(outcomes.get('browser.runtime.no-observed-errors')).toBe('fail')
     expect(outcomes.get('browser.privacy.external-request-observation-complete')).toBe('inconclusive')
     expect(outcomes.get('browser.privacy.initial-storage-observation-complete')).toBe('inconclusive')
-    expect(report.checklistCoverage.summary.checklistItems).toMatchObject({ fail: 4, partial: 4, total: 10 })
+    expect(report.checklistCoverage.summary.checklistItems).toMatchObject({ fail: 5, partial: 6, total: 14 })
   })
 
   it('maps bounded Axe rule families to atomic accessibility assertions', () => {
@@ -228,6 +259,8 @@ describe('browser check', () => {
         { code: 'axe-link-in-text-block', severity: 'error' },
         { code: 'axe-image-alt', severity: 'error' },
         { code: 'axe-color-contrast', severity: 'error' },
+        { code: 'axe-aria-hidden-focus', severity: 'error' },
+        { code: 'axe-label', severity: 'error' },
       ],
       profiles: [profile],
       requestedUrl: 'https://example.com/',
@@ -248,10 +281,12 @@ describe('browser check', () => {
     expect(outcomes.get('browser.accessibility.links-not-color-only-no-detected-violations')).toBe('fail')
     expect(outcomes.get('browser.accessibility.image-alternatives-no-detected-violations')).toBe('fail')
     expect(outcomes.get('browser.accessibility.text-contrast-no-detected-violations')).toBe('fail')
+    expect(outcomes.get('browser.accessibility.visually-hidden-focusable-controls-no-detected-violations')).toBe('fail')
+    expect(outcomes.get('browser.accessibility.form-control-labels-no-detected-violations')).toBe('fail')
 
     const incompleteProfile = {
       ...profile,
-      accessibilityIncompleteRuleIds: ['color-contrast'],
+      accessibilityIncompleteRuleIds: ['color-contrast', 'aria-hidden-focus', 'select-name'],
     }
     const incompleteReport = createJsonReport({
       blockedRequests: [],
@@ -274,6 +309,26 @@ describe('browser check', () => {
     ))
     expect(incompleteOutcomes.get('browser.accessibility.text-contrast-no-detected-violations')).toBe('inconclusive')
     expect(incompleteOutcomes.get('browser.accessibility.control-names-no-detected-violations')).toBe('pass')
+    expect(incompleteOutcomes.get('browser.accessibility.visually-hidden-focusable-controls-no-detected-violations')).toBe('inconclusive')
+    expect(incompleteOutcomes.get('browser.accessibility.form-control-labels-no-detected-violations')).toBe('inconclusive')
+
+    const precedenceReport = createJsonReport({
+      blockedRequests: [],
+      browser: { product: 'Chromium', version: 'Chromium 140.0' },
+      finalUrl: 'https://example.com/',
+      issues: [{ code: 'axe-label', severity: 'error' }],
+      profiles: [{ ...profile, accessibilityIncompleteRuleIds: ['label'] }],
+      requestedUrl: 'https://example.com/',
+    }, {
+      maxPages: 10,
+      maxRequests: 300,
+      profiles: ['desktop'],
+      settleMilliseconds: 750,
+      sitemap: false,
+      strict: true,
+      timeoutMilliseconds: 20_000,
+    })
+    expect(precedenceReport.result.assertions.find((entry: { assertionId: string }) => entry.assertionId === 'browser.accessibility.form-control-labels-no-detected-violations')?.outcome).toBe('fail')
 
     for (const ruleId of ['area-alt', 'input-image-alt']) {
       const overlappingReport = createJsonReport({
@@ -327,6 +382,7 @@ describe('browser check', () => {
     const outcomes = new Map(result.assertions.map(assertion => [assertion.assertionId, assertion.outcome]))
 
     expect(result.profiles[0]?.accessibilityIncompleteRuleIds).toContain('color-contrast')
+    expect(outcomes.get('browser.accessibility.axe-no-detected-violations')).toBe('inconclusive')
     expect(outcomes.get('browser.accessibility.text-contrast-no-detected-violations')).toBe('inconclusive')
   }, 30_000)
 
@@ -382,6 +438,8 @@ describe('browser check', () => {
 <html lang="de"><head><title>Accessibility-Regelfamilien</title><style>a, a:hover, a:focus { color:#555; text-decoration:none; }</style></head>
 <body><main><h1>Testseite</h1>
 <button><span aria-hidden="true">×</span></button>
+<div aria-hidden="true"><button>Verborgen fokussierbar</button></div>
+<input type="text">
 <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==">
 <p style="color:#aaa;background:#fff">Zu geringer Kontrast</p>
 <p style="color:#000">Dies ist ein <a href="/target">nur farblich markierter Link</a> im längeren umgebenden Fließtext.</p>
@@ -407,13 +465,19 @@ describe('browser check', () => {
     expect(issueCodes).toContain('axe-image-alt')
     expect(issueCodes).toContain('axe-color-contrast')
     expect(issueCodes).toContain('axe-link-in-text-block')
+    expect(issueCodes).toContain('axe-aria-hidden-focus')
+    expect(issueCodes).toContain('axe-label')
     expect(outcomes.get('browser.accessibility.control-names-no-detected-violations')).toBe('fail')
     expect(outcomes.get('browser.accessibility.links-not-color-only-no-detected-violations')).toBe('fail')
     expect(outcomes.get('browser.accessibility.image-alternatives-no-detected-violations')).toBe('fail')
     expect(outcomes.get('browser.accessibility.text-contrast-no-detected-violations')).toBe('fail')
+    expect(outcomes.get('browser.accessibility.visually-hidden-focusable-controls-no-detected-violations')).toBe('fail')
+    expect(outcomes.get('browser.accessibility.form-control-labels-no-detected-violations')).toBe('fail')
     expect(result.issues.find(issue => issue.code === 'axe-button-name')?.checklistIds).toContain('CORE-A11Y-03')
     expect(result.issues.find(issue => issue.code === 'axe-image-alt')?.checklistIds).toContain('CORE-A11Y-08')
     expect(result.issues.find(issue => issue.code === 'axe-color-contrast')?.checklistIds).toContain('CORE-A11Y-09')
+    expect(result.issues.find(issue => issue.code === 'axe-aria-hidden-focus')?.checklistIds).toContain('CORE-A11Y-04')
+    expect(result.issues.find(issue => issue.code === 'axe-label')?.checklistIds).toContain('CORE-A11Y-06')
   }, 30_000)
 
   chromiumIt('blocks side effects while inventorying external attempts, cookies and storage without values', async () => {
@@ -463,10 +527,12 @@ describe('browser check', () => {
         initialStorage: Record<string, { observations: number }>
         valuesRecorded: boolean
       }
+      readOnlyExecutionEvidence: { destinationSideEffectsVerified: boolean }
       profiles: Array<{
         cookies: Array<{ httpOnly: boolean, name: string }>
         facts: { forms: Array<{ action: string, method: string }>, storage: { localStorage: string[], sessionStorage: string[] }, title: string }
         indexedDatabases: string[]
+        readOnlyExecution: { allowedNonGetOrExternalRequests: number, blockedActionCountsByKind: Record<string, number>, domGuardsInstalledBeforeNavigation: boolean, requestInterceptionInstalledBeforeNavigation: boolean }
       }>
     }
     const issueCodes = typedResult.issues.map(issue => issue.code)
@@ -482,7 +548,8 @@ describe('browser check', () => {
     expect(outcomes.get('browser.context.chromium-headless-recorded')).toBe('pass')
     expect(outcomes.get('browser.privacy.external-request-observation-complete')).toBe('pass')
     expect(outcomes.get('browser.privacy.initial-storage-observation-complete')).toBe('pass')
-    expect(typedResult.assertions.filter(assertion => !assertion.assertionId.startsWith('browser.privacy.') && assertion.assertionId !== 'browser.context.chromium-headless-recorded').every(assertion => assertion.outcome === 'inconclusive')).toBe(true)
+    expect(outcomes.get('browser.run.read-only-boundaries-enforced')).toBe('pass')
+    expect(typedResult.assertions.filter(assertion => !assertion.assertionId.startsWith('browser.privacy.') && !['browser.context.chromium-headless-recorded', 'browser.run.read-only-boundaries-enforced'].includes(assertion.assertionId)).every(assertion => assertion.outcome === 'inconclusive')).toBe(true)
     expect(typedResult.privacyObservations).toMatchObject({
       externalRequestAttempts: { total: 2 },
       initialStorage: {
@@ -493,6 +560,10 @@ describe('browser check', () => {
       },
       valuesRecorded: false,
     })
+    expect(typedResult.readOnlyExecutionEvidence.destinationSideEffectsVerified).toBe(false)
+    expect(typedResult.profiles.every(profile => profile.readOnlyExecution.domGuardsInstalledBeforeNavigation && profile.readOnlyExecution.requestInterceptionInstalledBeforeNavigation)).toBe(true)
+    expect(typedResult.profiles.every(profile => profile.readOnlyExecution.allowedNonGetOrExternalRequests === 0)).toBe(true)
+    expect(typedResult.profiles.every(profile => profile.readOnlyExecution.blockedActionCountsByKind['form-submit'] === 1)).toBe(true)
     expect(typedResult.profiles.every(profile => profile.cookies.some(cookie => cookie.httpOnly && cookie.name === 'qa_session'))).toBe(true)
     expect(typedResult.profiles.every(profile => profile.facts.title === 'Frischer Kontext')).toBe(true)
     expect(typedResult.profiles[0]?.facts.forms).toEqual([{ action: `${origin}/submit`, method: 'POST' }])

@@ -104,7 +104,7 @@ describe('website checklist coverage matrix', () => {
       .map((item: any) => item.id)
 
     expect(new Set(flaggedIds)).toEqual(new Set(baselineItems.keys()))
-    expect(flaggedIds).toHaveLength(37)
+    expect(flaggedIds).toHaveLength(44)
 
     for (const item of matrix.items) {
       const baselineItem: any = baselineItems.get(item.id)
@@ -156,11 +156,32 @@ describe('website checklist coverage matrix', () => {
           v1_1Priority: 'none',
         })
       }
+      else if (matrix.v1_2ReleaseSlice.some((entry: any) => entry.id === candidate.id)) {
+        expect(item).toMatchObject({
+          classification: 'existing-baseline',
+          existingCatalog: true,
+          v1_1Priority: 'none',
+        })
+      }
       else {
         expect(['direct-get-candidate', 'observation-candidate']).toContain(item.classification)
         expect(item.v1_1Priority).not.toBe('none')
       }
       expect(candidate.requestImpact).toMatch(/vorhanden|keine neuen/i)
+      expect(candidate.manualRemainder.length).toBeGreaterThan(20)
+    }
+
+    const v1_2Ids = matrix.v1_2ReleaseSlice.map((candidate: any) => candidate.id)
+    expect(v1_2Ids).toHaveLength(7)
+    expect(new Set(v1_2Ids).size).toBe(7)
+    for (const candidate of matrix.v1_2ReleaseSlice) {
+      expect(matrix.items.find((item: any) => item.id === candidate.id)).toMatchObject({
+        classification: 'existing-baseline',
+        existingCatalog: true,
+        v1_1Priority: 'none',
+      })
+      expect(candidate.stage).toBe('v1.2-unreleased')
+      expect(candidate.requestImpact).toMatch(/keine neuen/i)
       expect(candidate.manualRemainder.length).toBeGreaterThan(20)
     }
   })

@@ -1,18 +1,681 @@
 {
-  "schemaVersion": 1,
-  "generatedAt": "2026-08-24T12:10:00.000Z",
-  "tool": "crawl-check",
-  "toolPackage": {
-    "name": "@mktcode/website-qa",
-    "version": "1.1.0"
-  },
   "checklistCoverage": {
     "catalog": {
       "id": "website-qa-baseline",
       "status": "stable",
-      "version": "1.1.0"
+      "version": "1.2.0"
+    },
+    "items": [
+      {
+        "criteria": [
+          {
+            "id": "CORE-DOM-05/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "crawl.canonical.single-absolute",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften indexierbaren Seiten besitzen genau einen absoluten Canonical.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              }
+            ],
+            "statement": "Alle vom Crawl geprüften indexierbaren Seiten besitzen genau einen absoluten Canonical."
+          },
+          {
+            "id": "CORE-DOM-05/C2",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "crawl.canonical.matches-final-url",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften Canonicals entsprechen der jeweiligen finalen Seiten-URL.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              }
+            ],
+            "statement": "Die geprüften Canonicals entsprechen der jeweiligen finalen Seiten-URL."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Crawlziel und finale URL-Stichprobe mit der dokumentierten öffentlichen URL-Strategie des Projekts abgleichen.",
+            "id": "CORE-DOM-05/C3",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Die finalen Seiten-URLs entsprechen der projektspezifisch festgelegten öffentlichen Host-, HTTPS- und Pfadstrategie."
+          }
+        ],
+        "id": "CORE-DOM-05",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Jede indexierbare Seite enthält genau einen absoluten Canonical auf der festgelegten Host- und HTTPS-Variante."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-DOM-06/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "crawl.canonical.matches-final-url",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften Canonicals entsprechen der jeweiligen finalen Seiten-URL.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              }
+            ],
+            "statement": "Die Canonicals der vom Crawl geprüften indexierbaren Seiten entsprechen ihrer jeweiligen finalen Seiten-URL."
+          },
+          {
+            "id": "CORE-DOM-06/C2",
+            "mode": "automatic",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Canonical, finale Seiten-URL und `og:url` stimmen auf allen vom Social-Check geprüften Seiten eindeutig überein."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Nur bereits beobachtete URLs aus Crawl-, HTTP- und Social-Berichten gegen das vollständige projektspezifische Host- und Routeninventar abgleichen; Limits, ausgelassene Klassen und nicht beobachtete Varianten ausdrücklich offenhalten.",
+            "id": "CORE-DOM-06/C3",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Interne Links, Sitemap-URLs, beobachtete Weiterleitungsziele und alle vorgesehenen Hosts und Routen entsprechen der dokumentierten öffentlichen URL-Strategie."
+          }
+        ],
+        "id": "CORE-DOM-06",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Canonicals, interne Links, Sitemap, OpenGraph-URLs und Weiterleitungen verwenden konsistent die vorgesehene öffentliche URL."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-ERR-03/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "crawl.resources.status-valid",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften internen Ressourcen antworten erfolgreich.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              },
+              {
+                "assertionId": "crawl.resources.mime-valid",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften internen Ressourcen verwenden zum Einbindungszweck passende MIME-Typen.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              }
+            ],
+            "statement": "Alle vom Crawl geprüften internen Seitenressourcen antworten erfolgreich und verwenden einen zum Einbindungszweck passenden MIME-Typ."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Einschlägige API- und Content-Negotiation-Fehler mit nebenwirkungsfreien Anfragen prüfen oder ihre begründete Nichtanwendbarkeit dokumentieren; der Ressourcenlauf allein genügt nicht.",
+            "id": "CORE-ERR-03/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "API- und projektspezifische Content-Negotiation-Fehler liefern die vorgesehenen Statuscodes und Medientypen statt einer scheinbar erfolgreichen HTML-Antwort."
+          }
+        ],
+        "id": "CORE-ERR-03",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "API-, Asset- und Content-Negotiation-Fehler liefern passende Statuscodes und Medientypen statt einer scheinbar erfolgreichen HTML-Antwort."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-SEO-01/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "crawl.metadata.title-present",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften Seiten besitzen einen Seitentitel.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              }
+            ],
+            "statement": "Alle vom Crawl geprüften Seiten besitzen einen Seitentitel."
+          },
+          {
+            "id": "CORE-SEO-01/C2",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "crawl.metadata.description-single",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften Seiten besitzen genau eine Meta-Beschreibung.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              }
+            ],
+            "statement": "Alle vom Crawl geprüften Seiten besitzen genau eine Meta-Beschreibung."
+          },
+          {
+            "id": "CORE-SEO-01/C3",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "crawl.metadata.unique",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Die geprüften indexierbaren Seiten verwenden eindeutige Titel und Meta-Beschreibungen.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              }
+            ],
+            "statement": "Titel und Meta-Beschreibungen sind unter den geprüften indexierbaren Seiten eindeutig."
+          },
+          {
+            "evidenceClass": "editorial",
+            "evidenceInstructions": "Titel und Meta-Beschreibungen redaktionell gegen Seiteninhalt, Suchintention und Projektvorgaben prüfen.",
+            "id": "CORE-SEO-01/C4",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Titel und Meta-Beschreibungen sind für die vorgesehenen Seiten inhaltlich passend."
+          }
+        ],
+        "id": "CORE-SEO-01",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Jede relevante Seite besitzt einen eindeutigen, inhaltlich passenden Titel und eine passende Meta-Beschreibung."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-SEO-02/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "crawl.document.language-present",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften Seiten besitzen ein lang-Attribut.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              }
+            ],
+            "statement": "Alle vom Crawl geprüften Seiten besitzen ein lang-Attribut."
+          },
+          {
+            "id": "CORE-SEO-02/C2",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "crawl.document.single-h1",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften Seiten besitzen genau eine H1-Überschrift.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              }
+            ],
+            "statement": "Alle vom Crawl geprüften Seiten besitzen genau eine H1-Überschrift."
+          },
+          {
+            "evidenceClass": "editorial",
+            "evidenceInstructions": "Sprachcode und Überschriftenstruktur auf repräsentativen Seitentypen redaktionell und semantisch prüfen.",
+            "id": "CORE-SEO-02/C3",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Seitensprache, Überschriftenhierarchie und Hauptüberschrift sind inhaltlich passend und verständlich."
+          }
+        ],
+        "id": "CORE-SEO-02",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Die Seitensprache ist mit einem passenden `lang`-Attribut angegeben; Überschriften bilden eine nachvollziehbare Hierarchie mit verständlicher Hauptüberschrift."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-MAP-01/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "crawl.sitemap.file-valid",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften Sitemap-Dateien sind direkt als erfolgreiche, gültige XML-Antworten mit passendem Medientyp verfügbar.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              },
+              {
+                "assertionId": "crawl.sitemap.robots-reference-present",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "robots.txt referenziert die geprüfte Sitemap.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              }
+            ],
+            "statement": "Die geprüften Sitemap-Dateien sind als gültiges XML erreichbar und die Einstiegssitemap ist in robots.txt referenziert."
+          },
+          {
+            "id": "CORE-MAP-01/C2",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "crawl.sitemap.entries-valid",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Die geprüfte Sitemap enthält ausschließlich eindeutige, absolute, kanonische, indexierbare 200-URLs des Zielorigins.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              }
+            ],
+            "statement": "Die geprüfte Sitemap enthält ausschließlich eindeutige, absolute, kanonische, indexierbare 200-URLs des Zielorigins."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Sinnhaftigkeit der Sitemap und erwartete indexierbare Routen mit dem Projektinventar abgleichen; der begrenzte Crawl kennt nicht selbständig alle vorgesehenen Seiten.",
+            "id": "CORE-MAP-01/C3",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Vorhandensein und erwarteter Seitenumfang der Sitemap entsprechen dem projektspezifischen Routen- und Indexierungsinventar."
+          }
+        ],
+        "id": "CORE-MAP-01",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Soweit sinnvoll, ist eine Sitemap vorhanden und in `robots.txt` referenziert. Sie enthält ausschließlich absolute, kanonische, indexierbare 200-URLs und keine Fehler-, Redirect- oder `noindex`-Ziele."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-MAP-02/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "crawl.sitemap.file-valid",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften Sitemap-Dateien sind direkt als erfolgreiche, gültige XML-Antworten mit passendem Medientyp verfügbar.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              },
+              {
+                "assertionId": "crawl.sitemap.entries-valid",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Die geprüfte Sitemap enthält ausschließlich eindeutige, absolute, kanonische, indexierbare 200-URLs des Zielorigins.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              }
+            ],
+            "statement": "Sitemap-XML, Medientyp, Zielorigin, eindeutige Einträge und Canonical-Abgleich sind technisch unauffällig."
+          },
+          {
+            "id": "CORE-MAP-02/C2",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "crawl.sitemap.coverage-complete",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle gültig erfassten Sitemap-URLs wurden innerhalb der dokumentierten Limits geprüft.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              }
+            ],
+            "statement": "Alle gültig erfassten Sitemap-URLs wurden innerhalb der dokumentierten Limits vollständig geprüft."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Optionale Sitemap-Metadaten und eine vorhandene XSL-Ausgabe fachlich prüfen; fehlen alle optionalen Angaben, ihre Nichtanwendbarkeit ausdrücklich dokumentieren.",
+            "id": "CORE-MAP-02/C3",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Optionale lastmod-, changefreq-, priority- und XSL-Angaben wurden auf tatsächliche Belastbarkeit beziehungsweise sichtbare Fehler geprüft oder begründet als nicht anwendbar dokumentiert."
+          }
+        ],
+        "id": "CORE-MAP-02",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Die öffentlich erzeugte Sitemap wurde als XML geparst, auf Medientyp, Hosts, Duplikate und Canonical-Abgleich geprüft. Nicht belastbare `lastmod`-, `changefreq`- oder `priority`-Werte werden nicht künstlich gesetzt; eine vorhandene XSL-Darstellung enthält keine Platzhalter oder sichtbaren Fehler."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-SEO-04/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "crawl.navigation.internal-valid",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften internen Seiten- und Fragmentziele sind erfolgreich erreichbar.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              },
+              {
+                "assertionId": "crawl.navigation.internal-direct",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften internen Seitenziele sind ohne Weiterleitung direkt erreichbar.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              }
+            ],
+            "statement": "Die geprüften internen Seiten- und Fragmentziele sind erfolgreich und ohne Weiterleitung erreichbar."
+          },
+          {
+            "id": "CORE-SEO-04/C2",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "crawl.resources.status-valid",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften internen Ressourcen antworten erfolgreich.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              },
+              {
+                "assertionId": "crawl.resources.mime-valid",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften internen Ressourcen verwenden zum Einbindungszweck passende MIME-Typen.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              }
+            ],
+            "statement": "Die geprüften internen Seitenressourcen antworten erfolgreich und mit passendem MIME-Typ."
+          },
+          {
+            "id": "CORE-SEO-04/C3",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "crawl.run.coverage-complete",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Der ausschließlich lesende Crawl blieb innerhalb der dokumentierten Seiten-, Ressourcen- und Sitemapgrenzen und musste keine Navigation aus Sicherheitsgründen auslassen.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              }
+            ],
+            "statement": "Der ausschließlich lesende Crawl blieb innerhalb seiner dokumentierten Grenzen und ließ keine Navigation aus Sicherheitsgründen aus."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Crawlbericht und ausgelassene Navigationen gegen das Projektinventar abgleichen; externe Links, dynamische Interaktionspfade und sicherheitsbedingt übersprungene Ziele getrennt bewerten.",
+            "id": "CORE-SEO-04/C4",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Der geprüfte Seiten-, Download- und Ressourcenumfang entspricht dem projektspezifisch vorgesehenen öffentlichen Inventar; bewusst ausgelassene Pfade sind bewertet."
+          }
+        ],
+        "id": "CORE-SEO-04",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Statuscodes, Weiterleitungen, Canonicals, Robots-Angaben, interne Links, Downloads und notwendige Seitenressourcen wurden mit einem technischen Crawl und echten GET-Abrufen kontrolliert. Standardverfahren mit lokal eingebundenem `@mktcode/website-qa`: `npm run ops:crawl:check -- https://[DOMAIN]/ --sitemap --max-pages=50 --max-resources=500 --strict`; Paket-/Werkzeugcommit und Bericht werden protokolliert. Der zentrale Social-Check ersetzt diesen allgemeinen Crawl nicht."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-QA-05/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "crawl.navigation.internal-valid",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften internen Seiten- und Fragmentziele sind erfolgreich erreichbar.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              },
+              {
+                "assertionId": "crawl.resources.status-valid",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften internen Ressourcen antworten erfolgreich.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              }
+            ],
+            "statement": "Die geprüften internen Seiten-, Fragment- und Ressourcenziele sind technisch erfolgreich erreichbar."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Medien und Einbettungen visuell prüfen und externe Links mit einem gesondert freigegebenen Verfahren bewerten; der allgemeine Crawler ruft externe Ziele bewusst nicht ab.",
+            "id": "CORE-QA-05/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Darstellung von Medien und Einbettungen sowie nur inventarisierte externe Links wurden risikogerecht zusätzlich geprüft."
+          }
+        ],
+        "id": "CORE-QA-05",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Bilder, Videos, Dokumente und externe Einbettungen laden wie erwartet; defekte interne und externe Links wurden automatisiert oder manuell gesucht."
+      },
+      {
+        "criteria": [
+          {
+            "id": "CORE-QA-08/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "crawl.resources.status-valid",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften internen Ressourcen antworten erfolgreich.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              },
+              {
+                "assertionId": "crawl.resources.mime-valid",
+                "assertionVersion": 1,
+                "outcome": "pass",
+                "message": "Alle geprüften internen Ressourcen verwenden zum Einbindungszweck passende MIME-Typen.",
+                "subject": {
+                  "url": "https://example.com/",
+                  "checkedPages": 3,
+                  "skippedNavigations": 0
+                }
+              }
+            ],
+            "statement": "Die vom Crawl entdeckten und mit GET abgerufenen internen Seitenressourcen besitzen erfolgreiche Statuscodes und passende MIME-Typen."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Browsernetzwerk für dynamische und interaktionsabhängige Ressourcen prüfen, ohne schreibende Produktionsaktionen auszuführen; serverseitiger HTML-/CSS-Crawl allein genügt nicht.",
+            "id": "CORE-QA-08/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Dynamische, browserabhängige und erst nach vereinbarter Interaktion geladene Ressourcen wurden zusätzlich geprüft oder mit ihrer Grenze dokumentiert."
+          }
+        ],
+        "id": "CORE-QA-08",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Der öffentliche Ressourcenlauf erfasst neben HTML auch tatsächlich angeforderte CSS-, JavaScript-, Schrift-, Bild- und Downloadressourcen mit Status und MIME-Typ; dynamische Pfade und erst nach Interaktion geladene Ressourcen werden zusätzlich im Browser geprüft."
+      },
+      {
+        "criteria": [
+          {
+            "id": "MEDIA-PERF-04/C1",
+            "mode": "automatic",
+            "outcome": "notApplicable",
+            "records": [
+              {
+                "assertionId": "crawl.media.get-observation-complete",
+                "assertionVersion": 1,
+                "message": "Im vollständig geprüften Seitenumfang wurden keine anwendbaren internen Bild- oder Medienressourcen entdeckt.",
+                "outcome": "notApplicable",
+                "subject": {
+                  "checkedPages": 3,
+                  "checkedResources": 2,
+                  "checkedSitemaps": 1,
+                  "skippedNavigations": 0,
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Entdeckte interne Bild- und Medienressourcen wurden mit echten begrenzten GET-Anfragen abgerufen und ihre Antwortbeobachtungen sind vollständig."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Externe, lazy geladene und erst nach Interaktion sichtbare Medien gegen das Projektinventar prüfen, ohne die passiven Paketwerkzeuge um neue Ziele oder Methoden zu erweitern.",
+            "id": "MEDIA-PERF-04/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Externe Einbettungen, browser- oder interaktionsabhängige Medien und die Vollständigkeit des Projektinventars sind geprüft; die Grenzen von HEAD sind bei Bedarf dokumentiert."
+          }
+        ],
+        "id": "MEDIA-PERF-04",
+        "module": "medien-animationen",
+        "outcome": "partial",
+        "statement": "Bilder und Einbettungen wurden mit echten GET-Abrufen beziehungsweise im Browser geprüft, wenn HEAD-Anfragen das tatsächliche Transformations- oder Cacheverhalten nicht zuverlässig abbilden."
+      }
+    ],
+    "summary": {
+      "automaticCriteria": {
+        "pass": 18,
+        "fail": 0,
+        "partial": 0,
+        "open": 0,
+        "inconclusive": 0,
+        "notApplicable": 1,
+        "noEvidence": 1,
+        "total": 20
+      },
+      "checklistItems": {
+        "pass": 0,
+        "fail": 0,
+        "partial": 11,
+        "open": 0,
+        "inconclusive": 0,
+        "notApplicable": 0,
+        "noEvidence": 0,
+        "automaticallyPassed": 0,
+        "total": 11
+      },
+      "nonAutomaticCriteria": {
+        "pass": 0,
+        "fail": 0,
+        "partial": 0,
+        "open": 0,
+        "inconclusive": 0,
+        "notApplicable": 0,
+        "noEvidence": 11,
+        "total": 11
+      }
     }
   },
+  "generatedAt": "2026-08-24T12:10:00.000Z",
   "options": {
     "maxPages": 50,
     "maxRedirects": 5,
@@ -27,10 +690,15 @@
     "externalLinksFetched": false,
     "formActionsFetched": false,
     "formsSubmitted": false,
-    "methods": ["GET"]
+    "methods": [
+      "GET"
+    ]
   },
   "results": [
     {
+      "externalLinks": [],
+      "forms": [],
+      "skippedLinks": [],
       "requestedUrl": "https://example.com/",
       "finalUrl": "https://example.com/",
       "assertions": [
@@ -39,130 +707,247 @@
           "assertionVersion": 1,
           "outcome": "pass",
           "message": "Alle geprüften indexierbaren Seiten besitzen genau einen absoluten Canonical.",
-          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+          "subject": {
+            "url": "https://example.com/",
+            "checkedPages": 3,
+            "skippedNavigations": 0
+          }
         },
         {
           "assertionId": "crawl.canonical.matches-final-url",
           "assertionVersion": 1,
           "outcome": "pass",
           "message": "Alle geprüften Canonicals entsprechen der jeweiligen finalen Seiten-URL.",
-          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+          "subject": {
+            "url": "https://example.com/",
+            "checkedPages": 3,
+            "skippedNavigations": 0
+          }
         },
         {
           "assertionId": "crawl.metadata.title-present",
           "assertionVersion": 1,
           "outcome": "pass",
           "message": "Alle geprüften Seiten besitzen einen Seitentitel.",
-          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+          "subject": {
+            "url": "https://example.com/",
+            "checkedPages": 3,
+            "skippedNavigations": 0
+          }
         },
         {
           "assertionId": "crawl.metadata.description-single",
           "assertionVersion": 1,
           "outcome": "pass",
           "message": "Alle geprüften Seiten besitzen genau eine Meta-Beschreibung.",
-          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+          "subject": {
+            "url": "https://example.com/",
+            "checkedPages": 3,
+            "skippedNavigations": 0
+          }
         },
         {
           "assertionId": "crawl.metadata.unique",
           "assertionVersion": 1,
           "outcome": "pass",
           "message": "Die geprüften indexierbaren Seiten verwenden eindeutige Titel und Meta-Beschreibungen.",
-          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+          "subject": {
+            "url": "https://example.com/",
+            "checkedPages": 3,
+            "skippedNavigations": 0
+          }
         },
         {
           "assertionId": "crawl.document.language-present",
           "assertionVersion": 1,
           "outcome": "pass",
           "message": "Alle geprüften Seiten besitzen ein lang-Attribut.",
-          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+          "subject": {
+            "url": "https://example.com/",
+            "checkedPages": 3,
+            "skippedNavigations": 0
+          }
         },
         {
           "assertionId": "crawl.document.single-h1",
           "assertionVersion": 1,
           "outcome": "pass",
           "message": "Alle geprüften Seiten besitzen genau eine H1-Überschrift.",
-          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+          "subject": {
+            "url": "https://example.com/",
+            "checkedPages": 3,
+            "skippedNavigations": 0
+          }
         },
         {
           "assertionId": "crawl.sitemap.file-valid",
           "assertionVersion": 1,
           "outcome": "pass",
           "message": "Alle geprüften Sitemap-Dateien sind direkt als erfolgreiche, gültige XML-Antworten mit passendem Medientyp verfügbar.",
-          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+          "subject": {
+            "url": "https://example.com/",
+            "checkedPages": 3,
+            "skippedNavigations": 0
+          }
         },
         {
           "assertionId": "crawl.sitemap.robots-reference-present",
           "assertionVersion": 1,
           "outcome": "pass",
           "message": "robots.txt referenziert die geprüfte Sitemap.",
-          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+          "subject": {
+            "url": "https://example.com/",
+            "checkedPages": 3,
+            "skippedNavigations": 0
+          }
         },
         {
           "assertionId": "crawl.sitemap.entries-valid",
           "assertionVersion": 1,
           "outcome": "pass",
           "message": "Die geprüfte Sitemap enthält ausschließlich eindeutige, absolute, kanonische, indexierbare 200-URLs des Zielorigins.",
-          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+          "subject": {
+            "url": "https://example.com/",
+            "checkedPages": 3,
+            "skippedNavigations": 0
+          }
         },
         {
           "assertionId": "crawl.sitemap.coverage-complete",
           "assertionVersion": 1,
           "outcome": "pass",
           "message": "Alle gültig erfassten Sitemap-URLs wurden innerhalb der dokumentierten Limits geprüft.",
-          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+          "subject": {
+            "url": "https://example.com/",
+            "checkedPages": 3,
+            "skippedNavigations": 0
+          }
         },
         {
           "assertionId": "crawl.navigation.internal-valid",
           "assertionVersion": 1,
           "outcome": "pass",
           "message": "Alle geprüften internen Seiten- und Fragmentziele sind erfolgreich erreichbar.",
-          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+          "subject": {
+            "url": "https://example.com/",
+            "checkedPages": 3,
+            "skippedNavigations": 0
+          }
         },
         {
           "assertionId": "crawl.navigation.internal-direct",
           "assertionVersion": 1,
           "outcome": "pass",
           "message": "Alle geprüften internen Seitenziele sind ohne Weiterleitung direkt erreichbar.",
-          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+          "subject": {
+            "url": "https://example.com/",
+            "checkedPages": 3,
+            "skippedNavigations": 0
+          }
         },
         {
           "assertionId": "crawl.resources.status-valid",
           "assertionVersion": 1,
           "outcome": "pass",
           "message": "Alle geprüften internen Ressourcen antworten erfolgreich.",
-          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+          "subject": {
+            "url": "https://example.com/",
+            "checkedPages": 3,
+            "skippedNavigations": 0
+          }
         },
         {
           "assertionId": "crawl.resources.mime-valid",
           "assertionVersion": 1,
           "outcome": "pass",
           "message": "Alle geprüften internen Ressourcen verwenden zum Einbindungszweck passende MIME-Typen.",
-          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+          "subject": {
+            "url": "https://example.com/",
+            "checkedPages": 3,
+            "skippedNavigations": 0
+          }
         },
         {
           "assertionId": "crawl.run.coverage-complete",
           "assertionVersion": 1,
           "outcome": "pass",
           "message": "Der ausschließlich lesende Crawl blieb innerhalb der dokumentierten Seiten-, Ressourcen- und Sitemapgrenzen und musste keine Navigation aus Sicherheitsgründen auslassen.",
-          "subject": { "url": "https://example.com/", "checkedPages": 3, "skippedNavigations": 0 }
+          "subject": {
+            "url": "https://example.com/",
+            "checkedPages": 3,
+            "skippedNavigations": 0
+          }
+        },
+        {
+          "assertionId": "crawl.media.get-observation-complete",
+          "assertionVersion": 1,
+          "message": "Im vollständig geprüften Seitenumfang wurden keine anwendbaren internen Bild- oder Medienressourcen entdeckt.",
+          "outcome": "notApplicable",
+          "subject": {
+            "checkedPages": 3,
+            "checkedResources": 2,
+            "checkedSitemaps": 1,
+            "skippedNavigations": 0,
+            "url": "https://example.com/"
+          }
         }
       ],
       "issues": [],
       "pages": [
-        { "requestedUrl": "https://example.com/", "finalUrl": "https://example.com/", "status": 200 },
-        { "requestedUrl": "https://example.com/about", "finalUrl": "https://example.com/about", "status": 200 },
-        { "requestedUrl": "https://example.com/contact", "finalUrl": "https://example.com/contact", "status": 200 }
+        {
+          "requestedUrl": "https://example.com/",
+          "finalUrl": "https://example.com/",
+          "status": 200
+        },
+        {
+          "requestedUrl": "https://example.com/about",
+          "finalUrl": "https://example.com/about",
+          "status": 200
+        },
+        {
+          "requestedUrl": "https://example.com/contact",
+          "finalUrl": "https://example.com/contact",
+          "status": 200
+        }
       ],
       "resources": [
-        { "requestedUrl": "https://example.com/assets/site.12345678.css", "finalUrl": "https://example.com/assets/site.12345678.css", "status": 200, "contentType": "text/css" },
-        { "requestedUrl": "https://example.com/assets/site.12345678.js", "finalUrl": "https://example.com/assets/site.12345678.js", "status": 200, "contentType": "application/javascript" }
+        {
+          "requestedUrl": "https://example.com/assets/site.12345678.css",
+          "finalUrl": "https://example.com/assets/site.12345678.css",
+          "status": 200,
+          "contentType": "text/css",
+          "types": [
+            "style"
+          ]
+        },
+        {
+          "requestedUrl": "https://example.com/assets/site.12345678.js",
+          "finalUrl": "https://example.com/assets/site.12345678.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "types": [
+            "script"
+          ]
+        }
       ],
-      "robots": { "finalUrl": "https://example.com/robots.txt", "status": 200, "contentType": "text/plain" },
+      "robots": {
+        "finalUrl": "https://example.com/robots.txt",
+        "status": 200,
+        "contentType": "text/plain"
+      },
       "sitemaps": [
-        { "requestedUrl": "https://example.com/sitemap.xml", "finalUrl": "https://example.com/sitemap.xml", "status": 200, "contentType": "application/xml", "kind": "urlset", "locations": 3 }
+        {
+          "requestedUrl": "https://example.com/sitemap.xml",
+          "finalUrl": "https://example.com/sitemap.xml",
+          "status": 200,
+          "contentType": "application/xml",
+          "kind": "urlset",
+          "locations": 3
+        }
       ]
     }
   ],
+  "schemaVersion": 1,
   "summary": {
     "errors": 0,
     "externalLinks": 0,
@@ -172,5 +957,10 @@
     "resources": 2,
     "skippedNavigation": 0,
     "warnings": 0
+  },
+  "tool": "crawl-check",
+  "toolPackage": {
+    "name": "@mktcode/website-qa",
+    "version": "1.2.0"
   }
 }

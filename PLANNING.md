@@ -693,6 +693,12 @@ Von ursprünglich 44 möglichen neuen technischen Teilbeobachtungen wurden nur s
 
 Vor der Veröffentlichung installierte ein temporärer Snapshot des bestehenden Nuxt-Verbrauchers den exakten Implementierungscommit `ea8db0802996bd5e66dfa9a384d95c6037bf00d5`. Alle vier unabhängigen öffentlichen Prüfer liefen ausschließlich mit GET und Exitcode 0. Von 140 technischen Assertions waren 139 bestanden; die neue Textkontrastassertion blieb wegen realer Axe-`incomplete`-Ergebnisse erwartungsgemäß `inconclusive`. Projektbericht, Manifest, Bytekopien und Whitelist-Zusammenfassung wurden validiert; Lint, Typecheck, 22 Unit-Tests und Produktionsbuild des Verbrauchers bestanden.
 
+### Phase K – begrenzte passive v1.2-Scheibe
+
+**Status: unveröffentlicht.** Der nächste Katalogstand 1.2.0 ergänzt genau `CORE-SEC-07`, `MEDIA-PERF-04`, `FORM-TEST-04`, `CORE-ROB-03`, `CORE-DOM-06`, `CORE-A11Y-04` und `CORE-A11Y-06`. Er verwendet vorhandene passive GET-, Crawl-, Social-, Browser- und Axe-Beobachtungen; vier neue atomare Assertions trennen Formularbeschriftungen, verborgen-fokussierbare Bereiche, Browser-Nur-Lese-Grenzen und GET-Medienabdeckung. Relevante unvollständige Axe-Befunde und abhängige Abdeckungslimits bleiben unklar, während beobachtete Fehler Vorrang haben.
+
+Projektinventare, CSS-/Interaktionszustände, externe oder lazy Medien, Betreiber-/Kundenzustimmung, projektlokale Skripte und serverseitige Nebenwirkungsnachweise bleiben manuell. Die vier Paketprüfer erhalten keine neuen Zielklassen, Methoden, Klicks, Formularsendungen oder gelockerten SSRF-, Redirect-, Redaktions- und Limitgrenzen. Technische Berichte bleiben bei Schema 1, Projektberichte bei Schema 3 und Assertions bei Version 1.
+
 ### Unveränderte Grenzen
 
 Auch in den nächsten Phasen gibt es keinen allgemeinen Sammelprüfer, keine automatische Checklistenänderung, keine Consent-Simulation, keine Formular- oder Produktionsmutation, keine stillen Browser-Retries und keine Behauptung einer vollständigen WCAG-, Rechts-, Datenschutz-, Sicherheits- oder Produktionsfreigabe.

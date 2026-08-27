@@ -42,7 +42,9 @@ const defaultOptions = {
 }
 
 function usage() {
-  return `Öffentliche Websites in einem isolierten Browser ausschließlich beobachtend prüfen.
+  return `${packageName} ${packageVersion}
+
+Öffentliche Websites in einem isolierten Browser ausschließlich beobachtend prüfen.
 
 Aufruf:
   website-qa-browser <URL> [Optionen]
@@ -213,6 +215,14 @@ const axeRuleGroups = {
     'link-name',
     'summary-name',
   ]),
+  formControlLabels: new Set([
+    'aria-input-field-name',
+    'aria-toggle-field-name',
+    'form-field-multiple-labels',
+    'label',
+    'select-name',
+  ]),
+  hiddenFocusable: new Set(['aria-hidden-focus']),
   imageAlternatives: new Set([
     'area-alt',
     'image-alt',
@@ -283,6 +293,12 @@ function axeViolationChecklistIds(ruleId) {
   const checklistIds = ['CORE-A11Y-01', 'CORE-A11Y-13']
   if (axeRuleGroups.controlNames.has(ruleId) || axeRuleGroups.linkColorIndependence.has(ruleId)) {
     checklistIds.push('CORE-A11Y-03')
+  }
+  if (axeRuleGroups.hiddenFocusable.has(ruleId)) {
+    checklistIds.push('CORE-A11Y-04')
+  }
+  if (axeRuleGroups.formControlLabels.has(ruleId)) {
+    checklistIds.push('CORE-A11Y-06')
   }
   if (axeRuleGroups.imageAlternatives.has(ruleId)) {
     checklistIds.push('CORE-A11Y-08')
@@ -412,6 +428,39 @@ function privacyObservationOutcome(result, area) {
     : 'inconclusive'
 }
 
+function createReadOnlyExecutionEvidence(result, options = {}) {
+  const profiles = result.profiles || []
+  return {
+    destinationSideEffectsVerified: false,
+    mode: 'passive-get-only-isolated',
+    profileRuns: profiles.map(profile => profile.readOnlyExecution).filter(Boolean),
+    requestedProfiles: result.requestedProfiles || options.profiles || [...new Set(profiles.map(profile => profile.profile))],
+  }
+}
+
+function readOnlyExecutionOutcome(result) {
+  const evidence = result.readOnlyExecutionEvidence
+  const runs = evidence?.profileRuns || []
+  const requestedProfiles = evidence?.requestedProfiles || []
+  if (runs.some(run => run.allowedNonGetOrExternalRequests > 0)) {
+    return 'fail'
+  }
+  if (!evidence
+    || result.profiles.length === 0
+    || requestedProfiles.length === 0
+    || result.issues.some(issue => issue.code === 'browser-page-failed')
+    || !profilesCoverEveryPage(result, requestedProfiles)
+    || runs.length !== result.profiles.length
+    || runs.some(run => !run.domGuardsInstalledBeforeNavigation
+      || !run.requestInterceptionInstalledBeforeNavigation
+      || !Number.isSafeInteger(run.interceptedRequests)
+      || !Number.isSafeInteger(run.allowedGetRequests)
+      || !Number.isSafeInteger(run.allowedNonGetOrExternalRequests))) {
+    return 'inconclusive'
+  }
+  return 'pass'
+}
+
 function createBrowserAssertions(result) {
   const subject = {
     browserProduct: result.browser?.product,
@@ -448,7 +497,9 @@ function createBrowserAssertions(result) {
   }[outcome])
 
   outcome = browserAssertionOutcome(result, issue => issue.code.startsWith('axe-') && issue.code !== 'axe-runtime')
-  if (outcome === 'pass' && result.issues.some(issue => issue.code === 'axe-runtime')) {
+  if (outcome === 'pass' && (result.issues.some(issue => issue.code === 'axe-runtime')
+    || result.profiles.some(profile => !Array.isArray(profile.accessibilityIncompleteRuleIds)
+      || profile.accessibilityIncompleteRuleIds.length > 0))) {
     outcome = 'inconclusive'
   }
   add('browser.accessibility.axe-no-detected-violations', outcome, {
@@ -462,6 +513,20 @@ function createBrowserAssertions(result) {
     fail: 'Axe hat mindestens einen Link, eine Schaltfläche oder ein vergleichbares Bedienelement ohne zugänglichen Namen erkannt.',
     inconclusive: 'Die passive Prüfung zugänglicher Namen war nicht für alle Seiten-/Profil-Läufe eindeutig auswertbar.',
     pass: 'Axe hat auf den geprüften Seiten-/Profil-Läufen keine fehlenden zugänglichen Namen für Links und Schaltflächen erkannt.',
+  }[outcome])
+
+  outcome = axeRuleOutcome(result, axeRuleGroups.hiddenFocusable)
+  add('browser.accessibility.visually-hidden-focusable-controls-no-detected-violations', outcome, {
+    fail: 'Axe hat mindestens ein fokussierbares Bedienelement innerhalb eines vor assistiver Technik verborgenen Bereichs erkannt.',
+    inconclusive: 'Die passive Axe-Prüfung verborgener fokussierbarer Bedienelemente war nicht für alle Seiten-/Profil-Läufe eindeutig auswertbar.',
+    pass: 'Axe hat im passiven Initialzustand keine fokussierbaren Bedienelemente innerhalb vor assistiver Technik verborgener Bereiche erkannt.',
+  }[outcome])
+
+  outcome = axeRuleOutcome(result, axeRuleGroups.formControlLabels)
+  add('browser.accessibility.form-control-labels-no-detected-violations', outcome, {
+    fail: 'Axe hat mindestens ein Formularbedienelement ohne programmatisch zugeordneten Namen oder mit mehrdeutiger Label-Zuordnung erkannt.',
+    inconclusive: 'Die passive Axe-Prüfung programmatischer Formularbeschriftungen war nicht für alle Seiten-/Profil-Läufe eindeutig auswertbar.',
+    pass: 'Axe hat im passiven Initialzustand keine fehlenden oder mehrdeutigen programmatischen Formularbeschriftungen erkannt.',
   }[outcome])
 
   outcome = axeRuleOutcome(result, axeRuleGroups.linkColorIndependence)
@@ -501,6 +566,17 @@ function createBrowserAssertions(result) {
     inconclusive: 'Die Laufzeitfehlerprüfung ist wegen eines unvollständigen oder sicherheitsbedingt begrenzten Browserlaufs nicht abschließend.',
     pass: 'In den geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet.',
   }[outcome])
+
+  outcome = readOnlyExecutionOutcome(result)
+  add('browser.run.read-only-boundaries-enforced', outcome, {
+    fail: 'Mindestens ein Browserlauf ließ entgegen der Nur-Lese-Grenze einen Nicht-GET- oder externen Request zu.',
+    inconclusive: 'Die vor Navigation installierten DOM- und Requestgrenzen sind nicht für alle vorgesehenen Seiten-/Profil-Läufe vollständig belegt.',
+    pass: 'Alle ausgeführten Seiten-/Profil-Läufe belegen vor Navigation installierte DOM- und Requestgrenzen; kein Nicht-GET- oder externer Request wurde zugelassen.',
+  }[outcome], {
+    ...subject,
+    destinationSideEffectsVerified: false,
+    mode: result.readOnlyExecutionEvidence?.mode,
+  })
 
   outcome = privacyObservationOutcome(result, 'external')
   add('browser.privacy.external-request-observation-complete', outcome, {
@@ -769,6 +845,16 @@ async function inspectProfile(browser, result, options, url, profileName, discov
   const blockedActions = []
   const popupUrls = []
   const safeResolutions = new Map()
+  const readOnlyExecution = {
+    allowedGetRequests: 0,
+    allowedNonGetOrExternalRequests: 0,
+    blockedRequestCountsByCode: {},
+    domGuardsInstalledBeforeNavigation: false,
+    interceptedRequests: 0,
+    profile: profileName,
+    requestInterceptionInstalledBeforeNavigation: false,
+    url,
+  }
   let requestNumber = 0
 
   try {
@@ -854,10 +940,13 @@ async function inspectProfile(browser, result, options, url, profileName, discov
         blockForm(event.target)
       }, true)
     })
+    readOnlyExecution.domGuardsInstalledBeforeNavigation = true
     await page.setRequestInterception(true)
+    readOnlyExecution.requestInterceptionInstalledBeforeNavigation = true
 
     page.on('request', async (request) => {
       requestNumber += 1
+      readOnlyExecution.interceptedRequests += 1
       try {
         const requestUrl = new URL(request.url())
         const decision = classifyBrowserRequest({
@@ -874,9 +963,16 @@ async function inspectProfile(browser, result, options, url, profileName, discov
           origin: result.origin,
         })
         if (decision.action === 'block') {
+          readOnlyExecution.blockedRequestCountsByCode[decision.code] = (readOnlyExecution.blockedRequestCountsByCode[decision.code] || 0) + 1
           addBlockedRequest(result, url, profileName, request, decision.reason, decision.code, decision.severity)
           await request.abort('blockedbyclient')
           return
+        }
+        if (request.method() === 'GET' && requestUrl.origin === result.origin) {
+          readOnlyExecution.allowedGetRequests += 1
+        }
+        else {
+          readOnlyExecution.allowedNonGetOrExternalRequests += 1
         }
         if (['http:', 'https:'].includes(requestUrl.protocol)) {
           validateUrl(requestUrl.href, options, 'Browser-Request')
@@ -888,6 +984,7 @@ async function inspectProfile(browser, result, options, url, profileName, discov
         await request.continue()
       }
       catch (error) {
+        readOnlyExecution.blockedRequestCountsByCode['unsafe-request-blocked'] = (readOnlyExecution.blockedRequestCountsByCode['unsafe-request-blocked'] || 0) + 1
         addBlockedRequest(result, url, profileName, request, `Browser-Request wurde durch die URL-Sicherheitsprüfung blockiert: ${redactText(error.message)}`, 'unsafe-request-blocked', 'error')
         await request.abort('blockedbyclient').catch(() => {})
       }
@@ -1018,6 +1115,10 @@ async function inspectProfile(browser, result, options, url, profileName, discov
       popupUrls,
       privacyObservation,
       profile: profileName,
+      readOnlyExecution: {
+        ...readOnlyExecution,
+        blockedActionCountsByKind: Object.fromEntries([...new Set(blockedActions.map(action => action.kind))].map(kind => [kind, blockedActions.filter(action => action.kind === kind).length])),
+      },
       requests: requestNumber,
       url,
     })
@@ -1179,6 +1280,7 @@ export async function runBrowserCheck(input, suppliedOptions = {}) {
   }
 
   result.privacyObservations = createPrivacyObservations(result, options)
+  result.readOnlyExecutionEvidence = createReadOnlyExecutionEvidence(result, options)
   result.assertions = createBrowserAssertions(result)
   delete result.blockedRequestKeys
   delete result.issueMap
@@ -1187,9 +1289,11 @@ export async function runBrowserCheck(input, suppliedOptions = {}) {
 }
 
 export function createJsonReport(inputResult, options) {
-  const preparedResult = inputResult.privacyObservations
-    ? inputResult
-    : { ...inputResult, privacyObservations: createPrivacyObservations(inputResult, options) }
+  const preparedResult = {
+    ...inputResult,
+    privacyObservations: inputResult.privacyObservations || createPrivacyObservations(inputResult, options),
+    readOnlyExecutionEvidence: inputResult.readOnlyExecutionEvidence || createReadOnlyExecutionEvidence(inputResult, options),
+  }
   const assertionResult = Array.isArray(preparedResult.assertions)
     ? preparedResult
     : { ...preparedResult, assertions: createBrowserAssertions(preparedResult) }

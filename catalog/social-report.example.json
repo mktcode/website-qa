@@ -4,9 +4,61 @@
     "catalog": {
       "id": "website-qa-baseline",
       "status": "stable",
-      "version": "1.1.0"
+      "version": "1.2.0"
     },
     "items": [
+      {
+        "criteria": [
+          {
+            "id": "CORE-DOM-06/C1",
+            "mode": "automatic",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Die Canonicals der vom Crawl geprüften indexierbaren Seiten entsprechen ihrer jeweiligen finalen Seiten-URL."
+          },
+          {
+            "id": "CORE-DOM-06/C2",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "social.metadata.canonical-open-graph-consistent",
+                "assertionVersion": 1,
+                "message": "Canonical, finale Seiten-URL und og:url sind eindeutig und stimmen überein.",
+                "outcome": "pass",
+                "subject": {
+                  "aiTrainingOptInDeclaredForRun": false,
+                  "allowedTrainingTokens": 0,
+                  "blockedTrainingTokens": 6,
+                  "checkedAgents": [
+                    "browser",
+                    "facebook",
+                    "x",
+                    "linkedin"
+                  ],
+                  "checkedImages": 1,
+                  "robotsPolicyReviewedAt": "2026-08-22",
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Canonical, finale Seiten-URL und `og:url` stimmen auf allen vom Social-Check geprüften Seiten eindeutig überein."
+          },
+          {
+            "evidenceClass": "project-review",
+            "evidenceInstructions": "Nur bereits beobachtete URLs aus Crawl-, HTTP- und Social-Berichten gegen das vollständige projektspezifische Host- und Routeninventar abgleichen; Limits, ausgelassene Klassen und nicht beobachtete Varianten ausdrücklich offenhalten.",
+            "id": "CORE-DOM-06/C3",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Interne Links, Sitemap-URLs, beobachtete Weiterleitungsziele und alle vorgesehenen Hosts und Routen entsprechen der dokumentierten öffentlichen URL-Strategie."
+          }
+        ],
+        "id": "CORE-DOM-06",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "Canonicals, interne Links, Sitemap, OpenGraph-URLs und Weiterleitungen verwenden konsistent die vorgesehene öffentliche URL."
+      },
       {
         "criteria": [
           {
@@ -20,6 +72,9 @@
                 "message": "Die geprüfte Seite besitzt eindeutige OpenGraph-Pflichtfelder mit absoluten HTTPS-URLs für og:url und og:image.",
                 "outcome": "pass",
                 "subject": {
+                  "aiTrainingOptInDeclaredForRun": false,
+                  "allowedTrainingTokens": 0,
+                  "blockedTrainingTokens": 6,
                   "checkedAgents": [
                     "browser",
                     "facebook",
@@ -45,6 +100,9 @@
                 "message": "twitter:card sowie die erforderlichen X-/Twitter-Werte oder OpenGraph-Fallbacks sind technisch verwendbar.",
                 "outcome": "pass",
                 "subject": {
+                  "aiTrainingOptInDeclaredForRun": false,
+                  "allowedTrainingTokens": 0,
+                  "blockedTrainingTokens": 6,
                   "checkedAgents": [
                     "browser",
                     "facebook",
@@ -87,6 +145,9 @@
                 "message": "Browser, Facebook, X/Twitter und LinkedIn erhalten erfolgreiche, konsistente HTML-Antworten und Social-Metadaten.",
                 "outcome": "pass",
                 "subject": {
+                  "aiTrainingOptInDeclaredForRun": false,
+                  "allowedTrainingTokens": 0,
+                  "blockedTrainingTokens": 6,
                   "checkedAgents": [
                     "browser",
                     "facebook",
@@ -112,6 +173,9 @@
                 "message": "Canonical, finale Seiten-URL und og:url sind eindeutig und stimmen überein.",
                 "outcome": "pass",
                 "subject": {
+                  "aiTrainingOptInDeclaredForRun": false,
+                  "allowedTrainingTokens": 0,
+                  "blockedTrainingTokens": 6,
                   "checkedAgents": [
                     "browser",
                     "facebook",
@@ -137,6 +201,9 @@
                 "message": "Die vorgesehenen Vorschaubilder erfüllen die geprüften technischen Anforderungen.",
                 "outcome": "pass",
                 "subject": {
+                  "aiTrainingOptInDeclaredForRun": false,
+                  "allowedTrainingTokens": 0,
+                  "blockedTrainingTokens": 6,
                   "checkedAgents": [
                     "browser",
                     "facebook",
@@ -162,6 +229,9 @@
                 "message": "Der Social-Lauf dokumentiert den strikten Modus, in dem Warnungen den Exitcode 1 auslösen.",
                 "outcome": "pass",
                 "subject": {
+                  "aiTrainingOptInDeclaredForRun": false,
+                  "allowedTrainingTokens": 0,
+                  "blockedTrainingTokens": 6,
                   "checkedAgents": [
                     "browser",
                     "facebook",
@@ -195,6 +265,9 @@
                 "message": "robots.txt wurde erfolgreich abgerufen und ausgewertet.",
                 "outcome": "pass",
                 "subject": {
+                  "aiTrainingOptInDeclaredForRun": false,
+                  "allowedTrainingTokens": 0,
+                  "blockedTrainingTokens": 6,
                   "checkedAgents": [
                     "browser",
                     "facebook",
@@ -212,6 +285,9 @@
                 "message": "Die vorgesehenen Social-Crawler sind für die geprüfte Seite nicht durch robots.txt oder Robots-Anweisungen blockiert.",
                 "outcome": "pass",
                 "subject": {
+                  "aiTrainingOptInDeclaredForRun": false,
+                  "allowedTrainingTokens": 0,
+                  "blockedTrainingTokens": 6,
                   "checkedAgents": [
                     "browser",
                     "facebook",
@@ -254,6 +330,9 @@
                 "message": "Crawler-/Produktkennungen, Kategorien, offizielle Quellen und Quellenstand sind im technischen Bericht dokumentiert.",
                 "outcome": "pass",
                 "subject": {
+                  "aiTrainingOptInDeclaredForRun": false,
+                  "allowedTrainingTokens": 0,
+                  "blockedTrainingTokens": 6,
                   "checkedAgents": [
                     "browser",
                     "facebook",
@@ -286,6 +365,51 @@
       {
         "criteria": [
           {
+            "id": "CORE-ROB-03/C1",
+            "mode": "automatic",
+            "outcome": "pass",
+            "records": [
+              {
+                "assertionId": "social.robots.training-access-blocked-or-declared",
+                "assertionVersion": 1,
+                "message": "Trainings-/Datennutzungstokens sind blockiert oder der Lauf deklariert ausdrücklich ein separat nachzuweisendes Opt-in.",
+                "outcome": "pass",
+                "subject": {
+                  "aiTrainingOptInDeclaredForRun": false,
+                  "allowedTrainingTokens": 0,
+                  "blockedTrainingTokens": 6,
+                  "checkedAgents": [
+                    "browser",
+                    "facebook",
+                    "x",
+                    "linkedin"
+                  ],
+                  "checkedImages": 1,
+                  "robotsPolicyReviewedAt": "2026-08-22",
+                  "url": "https://example.com/"
+                }
+              }
+            ],
+            "statement": "Trainings-/Datennutzungstokens sind blockiert oder der technische Lauf deklariert ein separat nachzuweisendes Opt-in."
+          },
+          {
+            "evidenceClass": "administrative",
+            "evidenceInstructions": "Tatsächliche Tokenblockierung und eine bloße Laufzeitdeklaration getrennt auswerten; bei erlaubten Trainings-/Datennutzungstokens ist die ausdrückliche Zustimmung mit verantwortlicher Stelle, Umfang und Datum unabhängig vom CLI-Schalter nachzuweisen.",
+            "id": "CORE-ROB-03/C2",
+            "mode": "manual",
+            "outcome": "noEvidence",
+            "records": [],
+            "statement": "Die tatsächliche Trainings-/Datennutzungskonfiguration entspricht entweder dem standardmäßigen Opt-out oder einer ausdrücklichen dokumentierten Betreiber-/Kundenzustimmung; Geltungsbereich, Datum und getrennte Entscheidungen zu Suche/Indexierung sowie nutzerinitiierten Abrufen sind belegt."
+          }
+        ],
+        "id": "CORE-ROB-03",
+        "module": "core",
+        "outcome": "partial",
+        "statement": "KI-Training und vergleichbare Datennutzung sind standardmäßig per `robots.txt` ausgeschlossen. Eine Freigabe erfolgt nur nach ausdrücklicher dokumentierter Betreiber- beziehungsweise Kundenzustimmung; Such-/Indexbots und nutzerinitiierte Abrufe werden unabhängig entschieden."
+      },
+      {
+        "criteria": [
+          {
             "id": "CORE-ROB-04/C1",
             "mode": "automatic",
             "outcome": "pass",
@@ -296,6 +420,9 @@
                 "message": "Trainings-/Datennutzungstokens sind blockiert oder der Lauf deklariert ausdrücklich ein separat nachzuweisendes Opt-in.",
                 "outcome": "pass",
                 "subject": {
+                  "aiTrainingOptInDeclaredForRun": false,
+                  "allowedTrainingTokens": 0,
+                  "blockedTrainingTokens": 6,
                   "checkedAgents": [
                     "browser",
                     "facebook",
@@ -313,6 +440,9 @@
                 "message": "Der Social-Lauf dokumentiert den strikten Modus, in dem Warnungen den Exitcode 1 auslösen.",
                 "outcome": "pass",
                 "subject": {
+                  "aiTrainingOptInDeclaredForRun": false,
+                  "allowedTrainingTokens": 0,
+                  "blockedTrainingTokens": 6,
                   "checkedAgents": [
                     "browser",
                     "facebook",
@@ -345,25 +475,25 @@
     ],
     "summary": {
       "automaticCriteria": {
-        "pass": 9,
+        "pass": 11,
         "fail": 0,
         "partial": 0,
         "open": 0,
         "inconclusive": 0,
         "notApplicable": 0,
-        "noEvidence": 0,
-        "total": 9
+        "noEvidence": 1,
+        "total": 12
       },
       "checklistItems": {
         "pass": 1,
         "fail": 0,
-        "partial": 4,
+        "partial": 6,
         "open": 0,
         "inconclusive": 0,
         "notApplicable": 0,
         "noEvidence": 0,
         "automaticallyPassed": 1,
-        "total": 5
+        "total": 7
       },
       "nonAutomaticCriteria": {
         "pass": 0,
@@ -372,8 +502,8 @@
         "open": 0,
         "inconclusive": 0,
         "notApplicable": 0,
-        "noEvidence": 4,
-        "total": 4
+        "noEvidence": 6,
+        "total": 6
       }
     }
   },
@@ -433,6 +563,11 @@
           "status": 200
         }
       ],
+      "coverage": {
+        "discoveredPages": 1,
+        "selectedPages": 1,
+        "truncated": false
+      },
       "assertions": [
         {
           "assertionId": "social.metadata.open-graph-complete",
@@ -440,6 +575,9 @@
           "message": "Die geprüfte Seite besitzt eindeutige OpenGraph-Pflichtfelder mit absoluten HTTPS-URLs für og:url und og:image.",
           "outcome": "pass",
           "subject": {
+            "aiTrainingOptInDeclaredForRun": false,
+            "allowedTrainingTokens": 0,
+            "blockedTrainingTokens": 6,
             "checkedAgents": [
               "browser",
               "facebook",
@@ -457,6 +595,9 @@
           "message": "twitter:card sowie die erforderlichen X-/Twitter-Werte oder OpenGraph-Fallbacks sind technisch verwendbar.",
           "outcome": "pass",
           "subject": {
+            "aiTrainingOptInDeclaredForRun": false,
+            "allowedTrainingTokens": 0,
+            "blockedTrainingTokens": 6,
             "checkedAgents": [
               "browser",
               "facebook",
@@ -474,6 +615,9 @@
           "message": "Canonical, finale Seiten-URL und og:url sind eindeutig und stimmen überein.",
           "outcome": "pass",
           "subject": {
+            "aiTrainingOptInDeclaredForRun": false,
+            "allowedTrainingTokens": 0,
+            "blockedTrainingTokens": 6,
             "checkedAgents": [
               "browser",
               "facebook",
@@ -491,6 +635,9 @@
           "message": "Browser, Facebook, X/Twitter und LinkedIn erhalten erfolgreiche, konsistente HTML-Antworten und Social-Metadaten.",
           "outcome": "pass",
           "subject": {
+            "aiTrainingOptInDeclaredForRun": false,
+            "allowedTrainingTokens": 0,
+            "blockedTrainingTokens": 6,
             "checkedAgents": [
               "browser",
               "facebook",
@@ -508,6 +655,9 @@
           "message": "Die vorgesehenen Vorschaubilder erfüllen die geprüften technischen Anforderungen.",
           "outcome": "pass",
           "subject": {
+            "aiTrainingOptInDeclaredForRun": false,
+            "allowedTrainingTokens": 0,
+            "blockedTrainingTokens": 6,
             "checkedAgents": [
               "browser",
               "facebook",
@@ -525,6 +675,9 @@
           "message": "robots.txt wurde erfolgreich abgerufen und ausgewertet.",
           "outcome": "pass",
           "subject": {
+            "aiTrainingOptInDeclaredForRun": false,
+            "allowedTrainingTokens": 0,
+            "blockedTrainingTokens": 6,
             "checkedAgents": [
               "browser",
               "facebook",
@@ -542,6 +695,9 @@
           "message": "Die vorgesehenen Social-Crawler sind für die geprüfte Seite nicht durch robots.txt oder Robots-Anweisungen blockiert.",
           "outcome": "pass",
           "subject": {
+            "aiTrainingOptInDeclaredForRun": false,
+            "allowedTrainingTokens": 0,
+            "blockedTrainingTokens": 6,
             "checkedAgents": [
               "browser",
               "facebook",
@@ -559,6 +715,9 @@
           "message": "Crawler-/Produktkennungen, Kategorien, offizielle Quellen und Quellenstand sind im technischen Bericht dokumentiert.",
           "outcome": "pass",
           "subject": {
+            "aiTrainingOptInDeclaredForRun": false,
+            "allowedTrainingTokens": 0,
+            "blockedTrainingTokens": 6,
             "checkedAgents": [
               "browser",
               "facebook",
@@ -576,6 +735,9 @@
           "message": "Trainings-/Datennutzungstokens sind blockiert oder der Lauf deklariert ausdrücklich ein separat nachzuweisendes Opt-in.",
           "outcome": "pass",
           "subject": {
+            "aiTrainingOptInDeclaredForRun": false,
+            "allowedTrainingTokens": 0,
+            "blockedTrainingTokens": 6,
             "checkedAgents": [
               "browser",
               "facebook",
@@ -593,6 +755,9 @@
           "message": "Der Social-Lauf dokumentiert den strikten Modus, in dem Warnungen den Exitcode 1 auslösen.",
           "outcome": "pass",
           "subject": {
+            "aiTrainingOptInDeclaredForRun": false,
+            "allowedTrainingTokens": 0,
+            "blockedTrainingTokens": 6,
             "checkedAgents": [
               "browser",
               "facebook",
@@ -886,6 +1051,6 @@
   "tool": "social-preview-check",
   "toolPackage": {
     "name": "@mktcode/website-qa",
-    "version": "1.1.0"
+    "version": "1.2.0"
   }
 }

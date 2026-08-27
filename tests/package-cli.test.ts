@@ -1,9 +1,10 @@
 import { spawnSync } from 'node:child_process'
-import { mkdtempSync, realpathSync, rmSync, symlinkSync } from 'node:fs'
+import { mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 
+const packageMetadata = JSON.parse(readFileSync(resolve(import.meta.dirname, '..', 'package.json'), 'utf8'))
 const temporaryDirectories = new Set<string>()
 
 afterEach(() => {
@@ -31,6 +32,7 @@ describe('installed package commands', () => {
 
       expect(execution.status).toBe(0)
       expect(execution.stderr).toBe('')
+      expect(execution.stdout).toContain(`${packageMetadata.name} ${packageMetadata.version}`)
       expect(execution.stdout).toContain(`website-qa-${command.split('-').at(-1)}`)
       expect(execution.stdout).toContain('--json-file=<Pfad>')
       expect(realpathSync(link)).toBe(resolve(source))

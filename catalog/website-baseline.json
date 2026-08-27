@@ -2,7 +2,7 @@
   "$schema": "./website-catalog.schema.json",
   "schemaVersion": 1,
   "catalogId": "website-qa-baseline",
-  "catalogVersion": "1.1.0",
+  "catalogVersion": "1.2.0",
   "status": "stable",
   "description": "Bewusst begrenzter stabiler Basiskatalog für HTTP-, Crawl-, Browser- und Social-bezogene sowie bewusst nicht automatisierbare Website-Prüfnachweise.",
   "items": [
@@ -86,6 +86,40 @@
             "mode": "manual",
             "evidenceClass": "project-review",
             "instructions": "Crawlziel und finale URL-Stichprobe mit der dokumentierten öffentlichen URL-Strategie des Projekts abgleichen."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-DOM-06",
+      "module": "core",
+      "statement": "Canonicals, interne Links, Sitemap, OpenGraph-URLs und Weiterleitungen verwenden konsistent die vorgesehene öffentliche URL.",
+      "criteria": [
+        {
+          "id": "CORE-DOM-06/C1",
+          "statement": "Die Canonicals der vom Crawl geprüften indexierbaren Seiten entsprechen ihrer jeweiligen finalen Seiten-URL.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.canonical.matches-final-url"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-DOM-06/C2",
+          "statement": "Canonical, finale Seiten-URL und `og:url` stimmen auf allen vom Social-Check geprüften Seiten eindeutig überein.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["social.metadata.canonical-open-graph-consistent"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-DOM-06/C3",
+          "statement": "Interne Links, Sitemap-URLs, beobachtete Weiterleitungsziele und alle vorgesehenen Hosts und Routen entsprechen der dokumentierten öffentlichen URL-Strategie.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Nur bereits beobachtete URLs aus Crawl-, HTTP- und Social-Berichten gegen das vollständige projektspezifische Host- und Routeninventar abgleichen; Limits, ausgelassene Klassen und nicht beobachtete Varianten ausdrücklich offenhalten."
           }
         }
       ]
@@ -270,18 +304,7 @@
           "statement": "Die geprüfte 404-Antwort enthält noindex und ist nicht ausdrücklich öffentlich cachebar; alle automatisch ausgewählten Antworten besitzen ihre einschlägige beobachtbare Sicherheitsheaderbasis.",
           "verification": {
             "mode": "automatic",
-            "assertions": [
-              "http.security.selected-response-coverage-complete",
-              "error.not-found.noindex",
-              "cache.not-found.not-publicly-cacheable",
-              "http.hsts.present",
-              "http.hsts.max-age-adequate",
-              "http.security.csp-declared",
-              "http.security.framing-protection-present",
-              "http.security.nosniff-valid",
-              "http.security.referrer-policy-declared",
-              "http.security.permissions-policy-declared"
-            ],
+            "assertions": ["http.security.selected-response-coverage-complete", "error.not-found.noindex", "cache.not-found.not-publicly-cacheable", "http.hsts.present", "http.hsts.max-age-adequate", "http.security.csp-declared", "http.security.framing-protection-present", "http.security.nosniff-valid", "http.security.referrer-policy-declared", "http.security.permissions-policy-declared"],
             "aggregation": "all"
           }
         },
@@ -517,6 +540,31 @@
       ]
     },
     {
+      "id": "CORE-ROB-03",
+      "module": "core",
+      "statement": "KI-Training und vergleichbare Datennutzung sind standardmäßig per `robots.txt` ausgeschlossen. Eine Freigabe erfolgt nur nach ausdrücklicher dokumentierter Betreiber- beziehungsweise Kundenzustimmung; Such-/Indexbots und nutzerinitiierte Abrufe werden unabhängig entschieden.",
+      "criteria": [
+        {
+          "id": "CORE-ROB-03/C1",
+          "statement": "Trainings-/Datennutzungstokens sind blockiert oder der technische Lauf deklariert ein separat nachzuweisendes Opt-in.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["social.robots.training-access-blocked-or-declared"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-ROB-03/C2",
+          "statement": "Die tatsächliche Trainings-/Datennutzungskonfiguration entspricht entweder dem standardmäßigen Opt-out oder einer ausdrücklichen dokumentierten Betreiber-/Kundenzustimmung; Geltungsbereich, Datum und getrennte Entscheidungen zu Suche/Indexierung sowie nutzerinitiierten Abrufen sind belegt.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "administrative",
+            "instructions": "Tatsächliche Tokenblockierung und eine bloße Laufzeitdeklaration getrennt auswerten; bei erlaubten Trainings-/Datennutzungstokens ist die ausdrückliche Zustimmung mit verantwortlicher Stelle, Umfang und Datum unabhängig vom CLI-Schalter nachzuweisen."
+          }
+        }
+      ]
+    },
+    {
       "id": "CORE-ROB-04",
       "module": "core",
       "statement": "Die automatisierte Prüfung warnt vor jedem ohne dokumentiertes Opt-in erlaubten Training-/Datennutzungstoken und behandelt diese Warnungen im Standardaufruf mit `--strict` als Fehler. `--ai-training-opt-in` wird ausschließlich nach ausdrücklicher dokumentierter Freigabe verwendet und verändert keine Robots-Regel. `robots.txt` wird nicht als Zugriffsschutz, Rechtsgarantie oder rückwirkende Löschung dargestellt.",
@@ -716,6 +764,56 @@
             "mode": "manual",
             "evidenceClass": "project-review",
             "instructions": "Repräsentative Normal-, Fokus-, Hover-, Aktiv-, Fehler- und Erfolgszustände visuell sowie soweit erforderlich mit unterstützender Technik prüfen; der passive Axe-Teilnachweis deckt diese Zustände nicht vollständig ab."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-A11Y-04",
+      "module": "core",
+      "statement": "Per Opacity, Transformation, Offscreen-Position oder Animation unsichtbare Bedienelemente sind bis zu ihrer Sichtbarkeit weder fokussierbar noch irreführend im Accessibility Tree vorhanden.",
+      "criteria": [
+        {
+          "id": "CORE-A11Y-04/C1",
+          "statement": "Axe erkennt im passiven Initialzustand keine fokussierbaren Bedienelemente innerhalb vor assistiver Technik verborgener Bereiche.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["browser.accessibility.visually-hidden-focusable-controls-no-detected-violations"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-A11Y-04/C2",
+          "statement": "Dynamische Sichtbarkeitswechsel, beabsichtigte Sprunglinks, Fokusverhalten sowie Opacity-, Transformations-, Offscreen- und Animationsfälle sind visuell und im Accessibility Tree geprüft.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Repräsentative responsive und dynamische Zustände in einer gesondert freigegebenen Interaktionsprüfung untersuchen; der passive Axe-Befund deckt CSS-Sichtbarkeit und Übergänge nicht vollständig ab."
+          }
+        }
+      ]
+    },
+    {
+      "id": "CORE-A11Y-06",
+      "module": "core",
+      "statement": "Formulare besitzen zugeordnete Labels, verständliche Pflichtfeldhinweise, zugängliche Fehlermeldungen und nachvollziehbare Erfolgs- und Fehlerzustände.",
+      "criteria": [
+        {
+          "id": "CORE-A11Y-06/C1",
+          "statement": "Axe erkennt im passiven Initialzustand keine fehlenden oder mehrdeutigen programmatischen Beschriftungen für Formularbedienelemente.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["browser.accessibility.form-control-labels-no-detected-violations"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-A11Y-06/C2",
+          "statement": "Verständliche Pflichtfeldhinweise sowie zugängliche Validierungs-, Erfolgs- und Fehlerzustände sind in einer gesondert freigegebenen Interaktionsprüfung geprüft.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Sichtbare Verständlichkeit, Tastaturverhalten und dynamische Zustände kontrolliert prüfen; keine Formularübermittlung mit den passiven Paketprüfern auslösen."
           }
         }
       ]
@@ -1093,16 +1191,7 @@
           "statement": "Die automatisch ausgewählten HTML-, CSS-, JavaScript- und 404-Antworten wurden vollständig auf die jeweils einschlägige öffentlich beobachtbare Sicherheitsheaderbasis geprüft.",
           "verification": {
             "mode": "automatic",
-            "assertions": [
-              "http.security.selected-response-coverage-complete",
-              "http.hsts.present",
-              "http.hsts.max-age-adequate",
-              "http.security.csp-declared",
-              "http.security.framing-protection-present",
-              "http.security.nosniff-valid",
-              "http.security.referrer-policy-declared",
-              "http.security.permissions-policy-declared"
-            ],
+            "assertions": ["http.security.selected-response-coverage-complete", "http.hsts.present", "http.hsts.max-age-adequate", "http.security.csp-declared", "http.security.framing-protection-present", "http.security.nosniff-valid", "http.security.referrer-policy-declared", "http.security.permissions-policy-declared"],
             "aggregation": "all"
           }
         },
@@ -1188,6 +1277,40 @@
       ]
     },
     {
+      "id": "CORE-SEC-07",
+      "module": "core",
+      "statement": "Zentrale Nutzerpfade und Fehlerfälle funktionieren ohne interne Fehlermeldungen, unerwartete Browserkonsolenfehler oder fehlgeschlagene Netzwerkanfragen.",
+      "criteria": [
+        {
+          "id": "CORE-SEC-07/C1",
+          "statement": "Auf den passiv geprüften Seiten und Profilen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["browser.runtime.no-observed-errors"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SEC-07/C2",
+          "statement": "Die Stichprobe einer unbekannten Route antwortet mit 404 und offenbart keine typischen technischen Interna.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["error.not-found.status-404", "error.not-found.no-technical-details"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "CORE-SEC-07/C3",
+          "statement": "Die tatsächlichen zentralen Nutzerpfade und funktionsspezifischen Fehlerfälle des Projekts einschließlich interaktionsabhängiger Zustände sind geprüft.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Projektinventar der zentralen Pfade und Fehlerfälle getrennt prüfen; die passiven Seitenprofile und die einzelne 404-Stichprobe sind keine Sicherheitsprüfung oder vollständige Funktionsabdeckung."
+          }
+        }
+      ]
+    },
+    {
       "id": "GOV-RGT-02",
       "module": "auftrag-recht-uebergabe",
       "statement": "Inhalte, Logo, Bilder, Videos, Schriftarten, Testimonials und sonstige Materialien sind freigegeben oder ihre Nutzungs- und Veröffentlichungsrechte sind dokumentiert.",
@@ -1199,6 +1322,56 @@
             "mode": "external",
             "evidenceClass": "communication",
             "instructions": "Freigabe oder Rechteverweis mit zuständiger Stelle, Datum und Umfang dokumentieren; vertrauliche Vertragsinhalte nicht in den technischen Bericht kopieren."
+          }
+        }
+      ]
+    },
+    {
+      "id": "FORM-TEST-04",
+      "module": "formulare-api-daten",
+      "statement": "Prüfskripte und Crawler senden nicht unbeabsichtigt Formulare ab und erzeugen keine E-Mails, Nachrichten oder Speicherobjekte.",
+      "criteria": [
+        {
+          "id": "FORM-TEST-04/C1",
+          "statement": "Der paketierte passive Browserprüfer belegt seine Nur-Lese-Grenze: keine Buttons, Uploads oder Formular-Actions werden aufgerufen; nur GET ist erlaubt und verbotene Versuche werden vor Netzwerknebenwirkungen blockiert.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["browser.run.read-only-boundaries-enforced"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "FORM-TEST-04/C2",
+          "statement": "Alle übrigen projektlokalen Testskripte, Wrapper und Crawler sowie gegebenenfalls serverseitige Nebenwirkungsnachweise sind auf ausbleibende Formularsendungen, E-Mails, Nachrichten und Speicherobjekte geprüft.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Die vier dokumentierten Paketläufe und alle projektspezifischen Skripte getrennt inventarisieren; der technische Browsernachweis behauptet weder beliebige GET-Semantik noch unveränderte Zielsystemspeicher."
+          }
+        }
+      ]
+    },
+    {
+      "id": "MEDIA-PERF-04",
+      "module": "medien-animationen",
+      "statement": "Bilder und Einbettungen wurden mit echten GET-Abrufen beziehungsweise im Browser geprüft, wenn HEAD-Anfragen das tatsächliche Transformations- oder Cacheverhalten nicht zuverlässig abbilden.",
+      "criteria": [
+        {
+          "id": "MEDIA-PERF-04/C1",
+          "statement": "Entdeckte interne Bild- und Medienressourcen wurden mit echten begrenzten GET-Anfragen abgerufen und ihre Antwortbeobachtungen sind vollständig.",
+          "verification": {
+            "mode": "automatic",
+            "assertions": ["crawl.media.get-observation-complete"],
+            "aggregation": "all"
+          }
+        },
+        {
+          "id": "MEDIA-PERF-04/C2",
+          "statement": "Externe Einbettungen, browser- oder interaktionsabhängige Medien und die Vollständigkeit des Projektinventars sind geprüft; die Grenzen von HEAD sind bei Bedarf dokumentiert.",
+          "verification": {
+            "mode": "manual",
+            "evidenceClass": "project-review",
+            "instructions": "Externe, lazy geladene und erst nach Interaktion sichtbare Medien gegen das Projektinventar prüfen, ohne die passiven Paketwerkzeuge um neue Ziele oder Methoden zu erweitern."
           }
         }
       ]

@@ -2,6 +2,13 @@
 
 Dieses Changelog dokumentiert veröffentlichte Paketstände von `@mktcode/website-qa`. Planungs- und reine Dokumentationscommits ohne Paketveröffentlichung erscheinen nicht als eigene Version.
 
+## Unveröffentlicht
+
+- Basiskatalog 1.2.0 um `CORE-SEC-07`, `MEDIA-PERF-04`, `FORM-TEST-04`, `CORE-ROB-03`, `CORE-DOM-06`, `CORE-A11Y-04` und `CORE-A11Y-06` mit konservativen automatischen Teilnachweisen und ausdrücklich manuellen Restkriterien erweitert.
+- Vier atomare Assertions für passive Formularbeschriftungen, verborgen-fokussierbare Bereiche, pro Lauf belegte Browser-Nur-Lese-Grenzen und vollständige GET-Beobachtung entdeckter interner Medien ergänzt.
+- Automatisch entdeckte verdächtige Navigationsziele einschließlich Sitemap-Einträgen werden vor einem Abruf übersprungen; jeder unvollständige Axe-Regelbefund macht auch das allgemeine Audit-Ergebnis unklar.
+- Technische Berichte behalten Schema 1, Projektberichte Schema 3 und Assertions Version 1; neue Zielklassen, Methoden, Interaktionen oder gelockerte Sicherheitsgrenzen wurden nicht eingeführt.
+
 ## 1.1.0 – 2026-08-27
 
 - Basiskatalog 1.1.0 um `CORE-A11Y-03`, `CORE-A11Y-08` und `CORE-A11Y-09` mit neun getrennten automatischen und manuellen Kriterien erweitert.

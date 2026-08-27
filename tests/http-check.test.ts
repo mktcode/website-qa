@@ -140,7 +140,7 @@ describe('http checker', () => {
     expect(report.checklistCoverage.summary.checklistItems).toMatchObject({
       automaticallyPassed: 1,
       pass: 1,
-      total: 10,
+      total: 11,
     })
     expect(result.notFound).toMatchObject({ status: 404 })
     expect(result.page).toMatchObject({

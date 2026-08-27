@@ -38,7 +38,9 @@ const textMimeTypes = new Set([
 ])
 
 function usage() {
-  return `HTTP-Auslieferung öffentlicher Websites prüfen.
+  return `${packageName} ${packageVersion}
+
+HTTP-Auslieferung öffentlicher Websites prüfen.
 
 Aufruf:
   website-qa-http <URL> [weitere URL ...] [Optionen]

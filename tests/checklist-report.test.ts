@@ -33,10 +33,10 @@ describe('structured baseline checklist', () => {
     const registry = loadAssertionRegistry()
 
     expect(validateChecklistCatalog(catalog, registry)).toBe(true)
-    expect(catalog).toMatchObject({ catalogVersion: '1.1.0' })
-    expect(catalog.items).toHaveLength(37)
-    expect(catalog.items.flatMap((item: { criteria: unknown[] }) => item.criteria)).toHaveLength(102)
-    expect(registry.assertions).toHaveLength(60)
+    expect(catalog).toMatchObject({ catalogVersion: '1.2.0' })
+    expect(catalog.items).toHaveLength(44)
+    expect(catalog.items.flatMap((item: { criteria: unknown[] }) => item.criteria)).toHaveLength(118)
+    expect(registry.assertions).toHaveLength(64)
     expect(checklistItemIdsForTool('http-check', catalog, registry)).toEqual([
       'CORE-DOM-02',
       'CORE-DOM-07',
@@ -48,9 +48,11 @@ describe('structured baseline checklist', () => {
       'CORE-PERF-05',
       'CORE-SEC-04',
       'CORE-SEC-05',
+      'CORE-SEC-07',
     ])
     expect(checklistItemIdsForTool('crawl-check', catalog, registry)).toEqual([
       'CORE-DOM-05',
+      'CORE-DOM-06',
       'CORE-ERR-03',
       'CORE-SEO-01',
       'CORE-SEO-02',
@@ -59,10 +61,13 @@ describe('structured baseline checklist', () => {
       'CORE-SEO-04',
       'CORE-QA-05',
       'CORE-QA-08',
+      'MEDIA-PERF-04',
     ])
     expect(checklistItemIdsForTool('browser-check', catalog, registry)).toEqual([
       'CORE-A11Y-01',
       'CORE-A11Y-03',
+      'CORE-A11Y-04',
+      'CORE-A11Y-06',
       'CORE-A11Y-08',
       'CORE-A11Y-09',
       'CORE-A11Y-10',
@@ -71,12 +76,16 @@ describe('structured baseline checklist', () => {
       'CORE-QA-07',
       'CORE-PRIV-02',
       'CORE-PRIV-04',
+      'CORE-SEC-07',
+      'FORM-TEST-04',
     ])
     expect(checklistItemIdsForTool('social-preview-check', catalog, registry)).toEqual([
+      'CORE-DOM-06',
       'CORE-SOC-01',
       'CORE-SOC-02',
       'CORE-ROB-01',
       'CORE-ROB-02',
+      'CORE-ROB-03',
       'CORE-ROB-04',
     ])
     expect(() => evaluateChecklist({ assertions: [assertion('unknown.assertion')] })).toThrow(/unbekannte Assertion/)
@@ -148,7 +157,7 @@ describe('structured baseline checklist', () => {
     })).toThrow(/gültiges Datum/)
 
     const evidenceExample = JSON.parse(readFileSync(new URL('../catalog/project-evidence.example.json', import.meta.url), 'utf8'))
-    expect(evidenceExample.catalog).toEqual({ id: 'website-qa-baseline', version: '1.1.0' })
+    expect(evidenceExample.catalog).toEqual({ id: 'website-qa-baseline', version: '1.2.0' })
     const evidencedRights = evaluateChecklist({
       evidence: evidenceExample.evidence,
       itemIds: ['GOV-RGT-02'],
@@ -245,6 +254,31 @@ describe('structured baseline checklist', () => {
     })
   })
 
+  it('keeps the seven passive slice items partial while manual remainders are open', () => {
+    const report = evaluateChecklist({
+      assertions: [
+        'crawl.canonical.matches-final-url',
+        'social.metadata.canonical-open-graph-consistent',
+        'social.robots.training-access-blocked-or-declared',
+        'browser.accessibility.visually-hidden-focusable-controls-no-detected-violations',
+        'browser.accessibility.form-control-labels-no-detected-violations',
+        'browser.runtime.no-observed-errors',
+        'error.not-found.status-404',
+        'error.not-found.no-technical-details',
+        'browser.run.read-only-boundaries-enforced',
+        'crawl.media.get-observation-complete',
+      ].map(assertionId => assertion(assertionId)),
+      itemIds: ['CORE-DOM-06', 'CORE-ROB-03', 'CORE-A11Y-04', 'CORE-A11Y-06', 'CORE-SEC-07', 'FORM-TEST-04', 'MEDIA-PERF-04'],
+    })
+
+    expect(report.items.every((item: { outcome: string }) => item.outcome === 'partial')).toBe(true)
+    expect(report.summary).toMatchObject({
+      automaticCriteria: { pass: 9, total: 9 },
+      checklistItems: { pass: 0, partial: 7, total: 7 },
+      nonAutomaticCriteria: { noEvidence: 7, total: 7 },
+    })
+  })
+
   it('can fully substantiate a point whose required criteria are automatic', () => {
     const report = evaluateChecklist({
       assertions: [
@@ -262,6 +296,8 @@ describe('structured baseline checklist', () => {
     const markdown = [
       readFileSync(new URL('../docs/checklisten/website/kern.md', import.meta.url), 'utf8'),
       readFileSync(new URL('../docs/checklisten/website/module/auftrag-recht-uebergabe.md', import.meta.url), 'utf8'),
+      readFileSync(new URL('../docs/checklisten/website/module/formulare-api-daten.md', import.meta.url), 'utf8'),
+      readFileSync(new URL('../docs/checklisten/website/module/medien-animationen.md', import.meta.url), 'utf8'),
     ].join('\n')
 
     for (const item of loadWebsiteCatalog().items) {

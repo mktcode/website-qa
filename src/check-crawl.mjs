@@ -68,7 +68,9 @@ const sensitiveNavigationParameters = new Set([
 ])
 
 function usage() {
-  return `Öffentliche Seiten, interne Links und Ressourcen ausschließlich lesend prüfen.
+  return `${packageName} ${packageVersion}
+
+Öffentliche Seiten, interne Links und Ressourcen ausschließlich lesend prüfen.
 
 Aufruf:
   website-qa-crawl <URL> [Optionen]
@@ -225,6 +227,22 @@ function sitemapPageInvalid(page) {
   return !canonical || page.canonical[0] !== canonical.href || normalizedComparableUrl(canonical.href) !== normalizedComparableUrl(page.finalUrl)
 }
 
+function addMediaGetObservationAssertion(result) {
+  const mediaTypes = new Set(['audio', 'image', 'video'])
+  const observedMedia = result.resources.filter(resource => (resource.types || []).some(type => mediaTypes.has(type)))
+  let outcome = outcomeFromIssueCodes(result, {
+    inconclusiveCodes: [...incompletePageCrawlIssueCodes, 'resource-fetch-failed', 'resource-limit-reached'],
+  })
+  if (outcome === 'pass' && observedMedia.length === 0) {
+    outcome = 'notApplicable'
+  }
+  addAssertion(result, 'crawl.media.get-observation-complete', outcome, {
+    inconclusive: 'Interne Bild- und Medienressourcen konnten wegen fehlender Antworten oder eines unvollständigen Seiten- oder Ressourcenlaufs nicht vollständig mit GET beobachtet werden.',
+    notApplicable: 'Im vollständig geprüften Seitenumfang wurden keine anwendbaren internen Bild- oder Medienressourcen entdeckt.',
+    pass: 'Für alle im geprüften Seitenumfang entdeckten internen Bild- und Medienressourcen liegt eine begrenzte GET-Antwortbeobachtung vor.',
+  }[outcome])
+}
+
 function addExtendedCrawlAssertions(result, options) {
   const incompletePageCodes = [...incompletePageCrawlIssueCodes]
   const sitemapEnabled = Boolean(options.sitemap)
@@ -343,6 +361,8 @@ function addExtendedCrawlAssertions(result, options) {
     notApplicable: 'Im vollständig geprüften Seitenumfang wurden keine gesonderten internen Ressourcen entdeckt.',
     pass: 'Alle geprüften internen Ressourcen verwenden zum Einbindungszweck passende MIME-Typen.',
   }[outcome])
+
+  addMediaGetObservationAssertion(result)
 
   const coverageCodes = [
     'initial-fetch-failed',
@@ -913,14 +933,15 @@ function enqueuePage(state, value, source, linkSourceUrl) {
     return
   }
 
-  if (source === 'internal-link') {
+  if (source !== 'input') {
     const concern = readOnlyNavigationConcern(url)
     if (concern) {
-      const key = `${linkSourceUrl}\n${url.href}`
+      const sourceUrl = linkSourceUrl || (source === 'sitemap' ? state.sitemapUrl : state.finalUrl)
+      const key = `${sourceUrl}\n${url.href}`
       if (!state.skippedLinkKeys.has(key)) {
         state.skippedLinkKeys.add(key)
-        state.result.skippedLinks.push({ reason: concern, sourceUrl: linkSourceUrl, targetUrl: url.href })
-        addIssue(state.result, 'warning', 'navigation-skipped-read-only', `Internes Linkziel wurde wegen ${concern} nicht abgerufen.`, ['CORE-SEO-04', 'FORM-TEST-04'], linkSourceUrl)
+        state.result.skippedLinks.push({ reason: concern, sourceUrl, targetUrl: url.href })
+        addIssue(state.result, 'warning', 'navigation-skipped-read-only', `Automatisch entdecktes Seitenziel wurde wegen ${concern} nicht abgerufen.`, ['CORE-SEO-04', 'FORM-TEST-04'], sourceUrl)
       }
       return
     }
@@ -1374,6 +1395,9 @@ export function createJsonReport(results, options) {
     if (parameterNames.length > 0) {
       reportedResults[index].requestedUrlParameterNames = parameterNames
     }
+    reportedResults[index].assertions = reportedResults[index].assertions
+      .filter(assertion => assertion.assertionId !== 'crawl.media.get-observation-complete')
+    addMediaGetObservationAssertion(reportedResults[index])
   }
   return {
     checklistCoverage: checklistCoverage(reportedResults),

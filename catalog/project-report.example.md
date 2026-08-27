@@ -7,7 +7,7 @@
 | Feld | Wert |
 |---|---|
 | Erstellt | 2026-08-24T12:30:00.000Z |
-| Katalog | website-qa-baseline 1.1.0 (stable) |
+| Katalog | website-qa-baseline 1.2.0 (stable) |
 | Auswertungsumgebung | production |
 | Bevorzugte URL | https://example.com/ |
 | Quellstand | PROJEKT-COMMIT |
@@ -20,27 +20,27 @@
 |---|---:|
 | Vollständig nachgewiesen | 3 |
 | Fehlgeschlagen | 0 |
-| Teilweise nachgewiesen | 28 |
+| Teilweise nachgewiesen | 34 |
 | Offen | 5 |
-| Unklar | 0 |
+| Unklar | 1 |
 | Nicht zutreffend | 0 |
 | Externer Nachweis offen | 1 |
 | Zurückgestellt | 0 |
 | Akzeptierte Abweichung (offen) | 0 |
-| **Ausgewählte Basiskatalogpunkte** | **37** |
+| **Ausgewählte Basiskatalogpunkte** | **44** |
 
-Automatische Kriterien (61 gesamt): 50 bestanden, 0 fehlgeschlagen, 0 unklar, 0 nicht zutreffend, 11 ohne Nachweis.
+Automatische Kriterien (70 gesamt): 56 bestanden, 0 fehlgeschlagen, 1 unklar, 1 nicht zutreffend, 12 ohne Nachweis.
 
-Nicht automatische Kriterien (41 gesamt): 1 belegt, 0 fehlgeschlagen, 0 unklar, 0 nicht zutreffend, 40 ohne Nachweis.
+Nicht automatische Kriterien (48 gesamt): 1 belegt, 0 fehlgeschlagen, 0 unklar, 0 nicht zutreffend, 47 ohne Nachweis.
 
 ## Technische Läufe
 
 | Werkzeug | Ziel | Umgebung | Verwendet | Assertions | Befehl |
 |---|---|---|---:|---:|---|
-| http-check 1.1.0 | https://example.com/ | production | ja | 12 | <code>website-qa-http https://example.com/ --strict --json</code> |
-| crawl-check 1.1.0 | https://example.com/ | production | ja | 16 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
-| browser-check 1.1.0 | https://example.com/ | production | ja | 11 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
-| social-preview-check 1.1.0 | https://example.com/ | production | ja | 10 | <code>website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json</code> |
+| http-check 1.2.0 | https://example.com/ | production | ja | 12 | <code>website-qa-http https://example.com/ --strict --json</code> |
+| crawl-check 1.2.0 | https://example.com/ | production | ja | 17 | <code>website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json</code> |
+| browser-check 1.2.0 | https://example.com/ | production | ja | 14 | <code>website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json</code> |
+| social-preview-check 1.2.0 | https://example.com/ | production | ja | 10 | <code>website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json</code> |
 
 ## Checklistenpunkte
 
@@ -49,6 +49,7 @@ Nicht automatische Kriterien (41 gesamt): 1 belegt, 0 fehlgeschlagen, 0 unklar, 
 | CORE-DOM-02 | core | Offen | 0/2 | 0/0 |
 | CORE-DOM-04 | core | Externer Nachweis offen | 0/0 | 0/2 |
 | CORE-DOM-05 | core | Teilweise nachgewiesen | 2/2 | 0/1 |
+| CORE-DOM-06 | core | Teilweise nachgewiesen | 2/2 | 0/1 |
 | CORE-DOM-07 | core | Offen | 0/3 | 0/1 |
 | CORE-DOM-08 | core | Teilweise nachgewiesen | 2/2 | 0/2 |
 | CORE-ERR-01 | core | Offen | 0/2 | 0/1 |
@@ -62,17 +63,20 @@ Nicht automatische Kriterien (41 gesamt): 1 belegt, 0 fehlgeschlagen, 0 unklar, 
 | CORE-SOC-03 | core | Offen | 0/0 | 0/1 |
 | CORE-ROB-01 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-ROB-02 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
+| CORE-ROB-03 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-ROB-04 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-MAP-01 | core | Teilweise nachgewiesen | 2/2 | 0/1 |
 | CORE-MAP-02 | core | Teilweise nachgewiesen | 2/2 | 0/1 |
 | CORE-SEO-04 | core | Teilweise nachgewiesen | 3/3 | 0/1 |
 | CORE-A11Y-01 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-A11Y-03 | core | Teilweise nachgewiesen | 2/2 | 0/2 |
+| CORE-A11Y-04 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
+| CORE-A11Y-06 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-A11Y-08 | core | Teilweise nachgewiesen | 1/1 | 0/2 |
 | CORE-A11Y-09 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-A11Y-10 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-A11Y-13 | core | Teilweise nachgewiesen | 1/1 | 0/3 |
-| CORE-QA-02 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
+| CORE-QA-02 | core | Unklar | 0/1 | 0/1 |
 | CORE-QA-05 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-QA-07 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-QA-08 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
@@ -82,7 +86,10 @@ Nicht automatische Kriterien (41 gesamt): 1 belegt, 0 fehlgeschlagen, 0 unklar, 
 | CORE-PRIV-04 | core | Teilweise nachgewiesen | 1/1 | 0/2 |
 | CORE-SEC-04 | core | Teilweise nachgewiesen | 1/1 | 0/1 |
 | CORE-SEC-05 | core | Teilweise nachgewiesen | 6/6 | 0/1 |
+| CORE-SEC-07 | core | Teilweise nachgewiesen | 1/2 | 0/1 |
 | GOV-RGT-02 | auftrag-recht-uebergabe | Vollständig nachgewiesen | 0/0 | 1/1 |
+| FORM-TEST-04 | formulare-api-daten | Teilweise nachgewiesen | 1/1 | 0/1 |
+| MEDIA-PERF-04 | medien-animationen | Teilweise nachgewiesen | 1/1 | 0/1 |
 
 ### CORE-DOM-02: Offen
 
@@ -110,6 +117,15 @@ Jede indexierbare Seite enthält genau einen absoluten Canonical auf der festgel
 - [x] `CORE-DOM-05/C2` Die geprüften Canonicals entsprechen der jeweiligen finalen Seiten-URL. — automatic, pass
 - [ ] `CORE-DOM-05/C3` Die finalen Seiten-URLs entsprechen der projektspezifisch festgelegten öffentlichen Host-, HTTPS- und Pfadstrategie. — manual, noEvidence
   - Erforderlicher Nachweis: Crawlziel und finale URL-Stichprobe mit der dokumentierten öffentlichen URL-Strategie des Projekts abgleichen.
+
+### CORE-DOM-06: Teilweise nachgewiesen
+
+Canonicals, interne Links, Sitemap, OpenGraph-URLs und Weiterleitungen verwenden konsistent die vorgesehene öffentliche URL.
+
+- [x] `CORE-DOM-06/C1` Die Canonicals der vom Crawl geprüften indexierbaren Seiten entsprechen ihrer jeweiligen finalen Seiten-URL. — automatic, pass
+- [x] `CORE-DOM-06/C2` Canonical, finale Seiten-URL und `og:url` stimmen auf allen vom Social-Check geprüften Seiten eindeutig überein. — automatic, pass
+- [ ] `CORE-DOM-06/C3` Interne Links, Sitemap-URLs, beobachtete Weiterleitungsziele und alle vorgesehenen Hosts und Routen entsprechen der dokumentierten öffentlichen URL-Strategie. — manual, noEvidence
+  - Erforderlicher Nachweis: Nur bereits beobachtete URLs aus Crawl-, HTTP- und Social-Berichten gegen das vollständige projektspezifische Host- und Routeninventar abgleichen; Limits, ausgelassene Klassen und nicht beobachtete Varianten ausdrücklich offenhalten.
 
 ### CORE-DOM-07: Offen
 
@@ -224,6 +240,14 @@ Aktuelle, offiziell dokumentierte Kennungen wichtiger Social-, Such-, KI-Such-, 
 - [ ] `CORE-ROB-02/C2` Quellenstand und Auswahl der Kennungen wurden auf ausreichende Aktualität und projektspezifische Relevanz bewertet. — manual, noEvidence
   - Erforderlicher Nachweis: Quellenstand, relevante Anbieter und erkennbare Richtlinienänderungen prüfen; der im Werkzeug eingebettete Stand ist kein automatischer Aktualitätsnachweis.
 
+### CORE-ROB-03: Teilweise nachgewiesen
+
+KI-Training und vergleichbare Datennutzung sind standardmäßig per `robots.txt` ausgeschlossen. Eine Freigabe erfolgt nur nach ausdrücklicher dokumentierter Betreiber- beziehungsweise Kundenzustimmung; Such-/Indexbots und nutzerinitiierte Abrufe werden unabhängig entschieden.
+
+- [x] `CORE-ROB-03/C1` Trainings-/Datennutzungstokens sind blockiert oder der technische Lauf deklariert ein separat nachzuweisendes Opt-in. — automatic, pass
+- [ ] `CORE-ROB-03/C2` Die tatsächliche Trainings-/Datennutzungskonfiguration entspricht entweder dem standardmäßigen Opt-out oder einer ausdrücklichen dokumentierten Betreiber-/Kundenzustimmung; Geltungsbereich, Datum und getrennte Entscheidungen zu Suche/Indexierung sowie nutzerinitiierten Abrufen sind belegt. — manual, noEvidence
+  - Erforderlicher Nachweis: Tatsächliche Tokenblockierung und eine bloße Laufzeitdeklaration getrennt auswerten; bei erlaubten Trainings-/Datennutzungstokens ist die ausdrückliche Zustimmung mit verantwortlicher Stelle, Umfang und Datum unabhängig vom CLI-Schalter nachzuweisen.
+
 ### CORE-ROB-04: Teilweise nachgewiesen
 
 Die automatisierte Prüfung warnt vor jedem ohne dokumentiertes Opt-in erlaubten Training-/Datennutzungstoken und behandelt diese Warnungen im Standardaufruf mit `--strict` als Fehler. `--ai-training-opt-in` wird ausschließlich nach ausdrücklicher dokumentierter Freigabe verwendet und verändert keine Robots-Regel. `robots.txt` wird nicht als Zugriffsschutz, Rechtsgarantie oder rückwirkende Löschung dargestellt.
@@ -279,6 +303,22 @@ Links, Schaltflächen und reine Icons besitzen verständliche zugängliche Namen
 - [ ] `CORE-A11Y-03/C4` Zustände und Informationen werden auch außerhalb der automatisiert erkannten Linkfälle nicht ausschließlich über Farbe vermittelt. — manual, noEvidence
   - Erforderlicher Nachweis: Repräsentative Normal-, Fokus-, Hover-, Aktiv-, Fehler- und Erfolgszustände visuell sowie soweit erforderlich mit unterstützender Technik prüfen; der passive Axe-Teilnachweis deckt diese Zustände nicht vollständig ab.
 
+### CORE-A11Y-04: Teilweise nachgewiesen
+
+Per Opacity, Transformation, Offscreen-Position oder Animation unsichtbare Bedienelemente sind bis zu ihrer Sichtbarkeit weder fokussierbar noch irreführend im Accessibility Tree vorhanden.
+
+- [x] `CORE-A11Y-04/C1` Axe erkennt im passiven Initialzustand keine fokussierbaren Bedienelemente innerhalb vor assistiver Technik verborgener Bereiche. — automatic, pass
+- [ ] `CORE-A11Y-04/C2` Dynamische Sichtbarkeitswechsel, beabsichtigte Sprunglinks, Fokusverhalten sowie Opacity-, Transformations-, Offscreen- und Animationsfälle sind visuell und im Accessibility Tree geprüft. — manual, noEvidence
+  - Erforderlicher Nachweis: Repräsentative responsive und dynamische Zustände in einer gesondert freigegebenen Interaktionsprüfung untersuchen; der passive Axe-Befund deckt CSS-Sichtbarkeit und Übergänge nicht vollständig ab.
+
+### CORE-A11Y-06: Teilweise nachgewiesen
+
+Formulare besitzen zugeordnete Labels, verständliche Pflichtfeldhinweise, zugängliche Fehlermeldungen und nachvollziehbare Erfolgs- und Fehlerzustände.
+
+- [x] `CORE-A11Y-06/C1` Axe erkennt im passiven Initialzustand keine fehlenden oder mehrdeutigen programmatischen Beschriftungen für Formularbedienelemente. — automatic, pass
+- [ ] `CORE-A11Y-06/C2` Verständliche Pflichtfeldhinweise sowie zugängliche Validierungs-, Erfolgs- und Fehlerzustände sind in einer gesondert freigegebenen Interaktionsprüfung geprüft. — manual, noEvidence
+  - Erforderlicher Nachweis: Sichtbare Verständlichkeit, Tastaturverhalten und dynamische Zustände kontrolliert prüfen; keine Formularübermittlung mit den passiven Paketprüfern auslösen.
+
 ### CORE-A11Y-08: Teilweise nachgewiesen
 
 Bilder besitzen redaktionell passende Alternativtexte; dekorative Bilder und Hintergründe werden nicht unnötig vorgelesen.
@@ -317,11 +357,12 @@ Tastaturprüfung, automatisierter Accessibility-Audit und reale Mobilbrowserprü
 - [ ] `CORE-A11Y-13/C4` Die risikogerechte Screenreader-Stichprobe beziehungsweise ihre begründete Nichtanwendbarkeit ist dokumentiert. — manual, noEvidence
   - Erforderlicher Nachweis: Screenreader-Stichprobe risikogerecht durchführen; bei vereinbarter Konformität ist sie verpflichtend und nicht als nicht anwendbar zu behandeln.
 
-### CORE-QA-02: Teilweise nachgewiesen
+### CORE-QA-02: Unklar
 
 Browserengine, Headless-Emulation und reale Browser beziehungsweise Geräte werden im Nachweis korrekt unterschieden; eine WebKit-Prüfung wird nicht als Safari-Prüfung bezeichnet.
 
-- [x] `CORE-QA-02/C1` Der technische Browserbericht dokumentiert Chromium-Version und ausgeführte Headless-Emulationsprofile. — automatic, pass
+- [ ] `CORE-QA-02/C1` Der technische Browserbericht dokumentiert Chromium-Version und ausgeführte Headless-Emulationsprofile. — automatic, inconclusive
+  - Ursache [R000047]: Browserengine, Version oder ausgeführte Emulationsprofile sind nicht vollständig dokumentiert.
 - [ ] `CORE-QA-02/C2` Der Projektnachweis unterscheidet Headless-Emulationen, Browserengines und reale Browser beziehungsweise Geräte und benennt nicht geprüfte Plattformen. — manual, noEvidence
   - Erforderlicher Nachweis: Ausgeführte und nicht ausgeführte Browser-/Geräteprüfungen korrekt deklarieren; Chromium nicht als Safari und Emulation nicht als reales Gerät bezeichnen.
 
@@ -407,11 +448,36 @@ CSP, Framing-Schutz, MIME-Sniffing-Schutz, Referrer Policy, Permissions Policy u
 - [ ] `CORE-SEC-05/C7` Inhalt, Reichweite, Widerspruchsfreiheit und risikogerechte Eignung der Richtlinien wurden für das Projekt bewertet, ohne eine begrenzte Richtlinie als Vollschutz auszugeben. — manual, noEvidence
   - Erforderlicher Nachweis: CSP-Direktiven, erlaubte Quellen, Framingbedarf, Referrer- und Featureanforderungen sowie HSTS-Reichweite einschließlich includeSubDomains/preload risikogerecht bewerten; bloße Headerpräsenz genügt nicht.
 
+### CORE-SEC-07: Teilweise nachgewiesen
+
+Zentrale Nutzerpfade und Fehlerfälle funktionieren ohne interne Fehlermeldungen, unerwartete Browserkonsolenfehler oder fehlgeschlagene Netzwerkanfragen.
+
+- [x] `CORE-SEC-07/C1` Auf den passiv geprüften Seiten und Profilen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet. — automatic, pass
+- [ ] `CORE-SEC-07/C2` Die Stichprobe einer unbekannten Route antwortet mit 404 und offenbart keine typischen technischen Interna. — automatic, noEvidence
+- [ ] `CORE-SEC-07/C3` Die tatsächlichen zentralen Nutzerpfade und funktionsspezifischen Fehlerfälle des Projekts einschließlich interaktionsabhängiger Zustände sind geprüft. — manual, noEvidence
+  - Erforderlicher Nachweis: Projektinventar der zentralen Pfade und Fehlerfälle getrennt prüfen; die passiven Seitenprofile und die einzelne 404-Stichprobe sind keine Sicherheitsprüfung oder vollständige Funktionsabdeckung.
+
 ### GOV-RGT-02: Vollständig nachgewiesen
 
 Inhalte, Logo, Bilder, Videos, Schriftarten, Testimonials und sonstige Materialien sind freigegeben oder ihre Nutzungs- und Veröffentlichungsrechte sind dokumentiert.
 
 - [x] `GOV-RGT-02/C1` Die zuständige Stelle hat die Nutzungs- und Veröffentlichungsrechte der eingesetzten Materialien bestätigt oder dokumentiert. — external, pass
+
+### FORM-TEST-04: Teilweise nachgewiesen
+
+Prüfskripte und Crawler senden nicht unbeabsichtigt Formulare ab und erzeugen keine E-Mails, Nachrichten oder Speicherobjekte.
+
+- [x] `FORM-TEST-04/C1` Der paketierte passive Browserprüfer belegt seine Nur-Lese-Grenze: keine Buttons, Uploads oder Formular-Actions werden aufgerufen; nur GET ist erlaubt und verbotene Versuche werden vor Netzwerknebenwirkungen blockiert. — automatic, pass
+- [ ] `FORM-TEST-04/C2` Alle übrigen projektlokalen Testskripte, Wrapper und Crawler sowie gegebenenfalls serverseitige Nebenwirkungsnachweise sind auf ausbleibende Formularsendungen, E-Mails, Nachrichten und Speicherobjekte geprüft. — manual, noEvidence
+  - Erforderlicher Nachweis: Die vier dokumentierten Paketläufe und alle projektspezifischen Skripte getrennt inventarisieren; der technische Browsernachweis behauptet weder beliebige GET-Semantik noch unveränderte Zielsystemspeicher.
+
+### MEDIA-PERF-04: Teilweise nachgewiesen
+
+Bilder und Einbettungen wurden mit echten GET-Abrufen beziehungsweise im Browser geprüft, wenn HEAD-Anfragen das tatsächliche Transformations- oder Cacheverhalten nicht zuverlässig abbilden.
+
+- [x] `MEDIA-PERF-04/C1` Entdeckte interne Bild- und Medienressourcen wurden mit echten begrenzten GET-Anfragen abgerufen und ihre Antwortbeobachtungen sind vollständig. — automatic, notApplicable
+- [ ] `MEDIA-PERF-04/C2` Externe Einbettungen, browser- oder interaktionsabhängige Medien und die Vollständigkeit des Projektinventars sind geprüft; die Grenzen von HEAD sind bei Bedarf dokumentiert. — manual, noEvidence
+  - Erforderlicher Nachweis: Externe, lazy geladene und erst nach Interaktion sichtbare Medien gegen das Projektinventar prüfen, ohne die passiven Paketwerkzeuge um neue Ziele oder Methoden zu erweitern.
 
 ## Grenzen
 

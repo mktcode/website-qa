@@ -40,23 +40,22 @@ describe('technical report schemas', () => {
     }
   })
 
-  it('validate reports produced by all four JSON report creators', () => {
+  it('regenerates all published reports byte for byte without trusting assertions changed in this slice', () => {
     const schemas = validators()
-    const httpExample = json('http-report.example.json')
-    const crawlExample = json('crawl-report.example.json')
-    const browserExample = json('browser-report.example.json')
-    const socialExample = json('social-report.example.json')
+    const examples = Object.fromEntries(tools.map(({ name }) => [name, json(`${name}-report.example.json`)]))
+    const browserInput = structuredClone(examples.browser.result)
+    delete browserInput.assertions
+    const crawlInput = structuredClone(examples.crawl.results)
+    for (const result of crawlInput) {
+      result.assertions = result.assertions.filter((assertion: { assertionId: string }) => assertion.assertionId !== 'crawl.media.get-observation-complete')
+    }
     const reports = {
-      browser: createBrowserReport(browserExample.result, browserExample.options),
-      crawl: createCrawlReport(crawlExample.results.map((result: Record<string, unknown>) => ({
-        externalLinks: [],
-        forms: [],
-        skippedLinks: [],
+      browser: createBrowserReport(browserInput, examples.browser.options),
+      crawl: createCrawlReport(crawlInput, examples.crawl.options),
+      http: createHttpReport(examples.http.results, examples.http.options),
+      social: createSocialReport(examples.social.results.map((result: Record<string, any>) => ({
         ...result,
-      })), crawlExample.options),
-      http: createHttpReport(httpExample.results, httpExample.options),
-      social: createSocialReport(socialExample.results.map((result: Record<string, any>) => ({
-        ...result,
+        assertions: undefined,
         metadata: result.metadata
           ? {
               canonicals: result.metadata.canonical ? [result.metadata.canonical] : [],
@@ -64,12 +63,16 @@ describe('technical report schemas', () => {
                 .map(([key, value]) => [key, Array.isArray(value) ? value : [value]])),
             }
           : undefined,
-      })), socialExample.options),
+      })), examples.social.options),
     }
 
+    expect(reports.crawl.results[0].assertions.find((assertion: { assertionId: string }) => assertion.assertionId === 'crawl.media.get-observation-complete')?.outcome).toBe('notApplicable')
     for (const { name } of tools) {
+      const report = reports[name as keyof typeof reports]
+      report.generatedAt = examples[name].generatedAt
       const validate = schemas.get(name)!
-      expect(validate(reports[name as keyof typeof reports]), validationMessage(validate.errors)).toBe(true)
+      expect(validate(report), validationMessage(validate.errors)).toBe(true)
+      expect(`${JSON.stringify(report, null, 2)}\n`).toBe(readFileSync(join(catalogDirectory, `${name}-report.example.json`), 'utf8'))
     }
   })
 
@@ -121,6 +124,21 @@ describe('technical report schemas', () => {
       const validate = schemas.get(name)!
       expect(validate(reports[name as keyof typeof reports]), validationMessage(validate.errors)).toBe(true)
     }
+  })
+
+  it('rejects missing or overstated browser read-only execution evidence', () => {
+    const validate = validators().get('browser')!
+    const missing = structuredClone(json('browser-report.example.json'))
+    delete missing.result.readOnlyExecutionEvidence
+    expect(validate(missing)).toBe(false)
+
+    const overstated = structuredClone(json('browser-report.example.json'))
+    overstated.result.readOnlyExecutionEvidence.destinationSideEffectsVerified = true
+    expect(validate(overstated)).toBe(false)
+
+    const malformed = structuredClone(json('browser-report.example.json'))
+    malformed.result.readOnlyExecutionEvidence.profileRuns[0].interceptedRequests = -1
+    expect(validate(malformed)).toBe(false)
   })
 
   it('rejects another tool and weakened read-only guarantees', () => {

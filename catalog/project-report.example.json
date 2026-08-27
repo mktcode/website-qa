@@ -2,7 +2,7 @@
   "catalog": {
     "id": "website-qa-baseline",
     "status": "stable",
-    "version": "1.1.0"
+    "version": "1.2.0"
   },
   "generatedAt": "2026-08-24T12:30:00.000Z",
   "items": [
@@ -115,6 +115,48 @@
     {
       "criteria": [
         {
+          "id": "CORE-DOM-06/C1",
+          "mode": "automatic",
+          "outcome": "pass",
+          "recordRefs": [
+            "R000002"
+          ],
+          "statement": "Die Canonicals der vom Crawl geprüften indexierbaren Seiten entsprechen ihrer jeweiligen finalen Seiten-URL.",
+          "requiredAssertionIds": [
+            "crawl.canonical.matches-final-url"
+          ]
+        },
+        {
+          "id": "CORE-DOM-06/C2",
+          "mode": "automatic",
+          "outcome": "pass",
+          "recordRefs": [
+            "R000003"
+          ],
+          "statement": "Canonical, finale Seiten-URL und `og:url` stimmen auf allen vom Social-Check geprüften Seiten eindeutig überein.",
+          "requiredAssertionIds": [
+            "social.metadata.canonical-open-graph-consistent"
+          ]
+        },
+        {
+          "evidenceClass": "project-review",
+          "evidenceInstructions": "Nur bereits beobachtete URLs aus Crawl-, HTTP- und Social-Berichten gegen das vollständige projektspezifische Host- und Routeninventar abgleichen; Limits, ausgelassene Klassen und nicht beobachtete Varianten ausdrücklich offenhalten.",
+          "id": "CORE-DOM-06/C3",
+          "mode": "manual",
+          "outcome": "noEvidence",
+          "recordRefs": [],
+          "statement": "Interne Links, Sitemap-URLs, beobachtete Weiterleitungsziele und alle vorgesehenen Hosts und Routen entsprechen der dokumentierten öffentlichen URL-Strategie."
+        }
+      ],
+      "evidenceOutcome": "partial",
+      "id": "CORE-DOM-06",
+      "module": "core",
+      "projectStatus": "partial",
+      "statement": "Canonicals, interne Links, Sitemap, OpenGraph-URLs und Weiterleitungen verwenden konsistent die vorgesehene öffentliche URL."
+    },
+    {
+      "criteria": [
+        {
           "id": "CORE-DOM-07/C1",
           "mode": "automatic",
           "outcome": "noEvidence",
@@ -167,8 +209,8 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000003",
-            "R000004"
+            "R000004",
+            "R000005"
           ],
           "statement": "HSTS ist auf allen vom HTTP-Prüfer untersuchten HTTPS-Antwortklassen vorhanden.",
           "requiredAssertionIds": [
@@ -181,8 +223,8 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000003",
-            "R000005"
+            "R000004",
+            "R000006"
           ],
           "statement": "Der HSTS-max-age ist syntaktisch gültig und beträgt mindestens 180 Tage.",
           "requiredAssertionIds": [
@@ -260,7 +302,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000006"
+            "R000007"
           ],
           "statement": "Die geprüfte 404-Antwort enthält eine noindex-Anweisung.",
           "requiredAssertionIds": [
@@ -272,7 +314,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000007"
+            "R000008"
           ],
           "statement": "Die geprüfte 404-Antwort enthält weder Canonical noch og:url.",
           "requiredAssertionIds": [
@@ -293,8 +335,8 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000008",
-            "R000009"
+            "R000009",
+            "R000010"
           ],
           "statement": "Alle vom Crawl geprüften internen Seitenressourcen antworten erfolgreich und verwenden einen zum Einbindungszweck passenden MIME-Typ.",
           "requiredAssertionIds": [
@@ -325,16 +367,16 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000003",
-            "R000006",
-            "R000010",
             "R000004",
-            "R000005",
+            "R000007",
             "R000011",
+            "R000005",
+            "R000006",
             "R000012",
             "R000013",
             "R000014",
-            "R000015"
+            "R000015",
+            "R000016"
           ],
           "statement": "Die geprüfte 404-Antwort enthält noindex und ist nicht ausdrücklich öffentlich cachebar; alle automatisch ausgewählten Antworten besitzen ihre einschlägige beobachtbare Sicherheitsheaderbasis.",
           "requiredAssertionIds": [
@@ -373,7 +415,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000016"
+            "R000017"
           ],
           "statement": "Alle vom Crawl geprüften Seiten besitzen einen Seitentitel.",
           "requiredAssertionIds": [
@@ -385,7 +427,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000017"
+            "R000018"
           ],
           "statement": "Alle vom Crawl geprüften Seiten besitzen genau eine Meta-Beschreibung.",
           "requiredAssertionIds": [
@@ -397,7 +439,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000018"
+            "R000019"
           ],
           "statement": "Titel und Meta-Beschreibungen sind unter den geprüften indexierbaren Seiten eindeutig.",
           "requiredAssertionIds": [
@@ -427,7 +469,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000019"
+            "R000020"
           ],
           "statement": "Alle vom Crawl geprüften Seiten besitzen ein lang-Attribut.",
           "requiredAssertionIds": [
@@ -439,7 +481,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000020"
+            "R000021"
           ],
           "statement": "Alle vom Crawl geprüften Seiten besitzen genau eine H1-Überschrift.",
           "requiredAssertionIds": [
@@ -469,7 +511,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000021"
+            "R000022"
           ],
           "statement": "Alle vom Social-Check geprüften Seiten besitzen eindeutige OpenGraph-Pflichtfelder mit absoluten HTTPS-URLs für og:url und og:image.",
           "requiredAssertionIds": [
@@ -481,7 +523,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000022"
+            "R000023"
           ],
           "statement": "twitter:card sowie erforderliche X-/Twitter-Werte oder geeignete OpenGraph-Fallbacks sind technisch verwendbar.",
           "requiredAssertionIds": [
@@ -511,7 +553,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000023"
+            "R000024"
           ],
           "statement": "Browser, Facebook, X/Twitter und LinkedIn erhalten erfolgreiche, konsistente HTML-Antworten und Social-Metadaten.",
           "requiredAssertionIds": [
@@ -523,7 +565,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000024"
+            "R000003"
           ],
           "statement": "Canonical, finale Seiten-URL und og:url sind auf allen geprüften Seiten eindeutig und konsistent.",
           "requiredAssertionIds": [
@@ -640,6 +682,36 @@
       "module": "core",
       "projectStatus": "partial",
       "statement": "Aktuelle, offiziell dokumentierte Kennungen wichtiger Social-, Such-, KI-Such-, Nutzerabruf- und Trainingsdienste sowie reine Produkt- beziehungsweise Datennutzungstokens werden mit dokumentiertem Quellenstand getrennt bewertet."
+    },
+    {
+      "criteria": [
+        {
+          "id": "CORE-ROB-03/C1",
+          "mode": "automatic",
+          "outcome": "pass",
+          "recordRefs": [
+            "R000030"
+          ],
+          "statement": "Trainings-/Datennutzungstokens sind blockiert oder der technische Lauf deklariert ein separat nachzuweisendes Opt-in.",
+          "requiredAssertionIds": [
+            "social.robots.training-access-blocked-or-declared"
+          ]
+        },
+        {
+          "evidenceClass": "administrative",
+          "evidenceInstructions": "Tatsächliche Tokenblockierung und eine bloße Laufzeitdeklaration getrennt auswerten; bei erlaubten Trainings-/Datennutzungstokens ist die ausdrückliche Zustimmung mit verantwortlicher Stelle, Umfang und Datum unabhängig vom CLI-Schalter nachzuweisen.",
+          "id": "CORE-ROB-03/C2",
+          "mode": "manual",
+          "outcome": "noEvidence",
+          "recordRefs": [],
+          "statement": "Die tatsächliche Trainings-/Datennutzungskonfiguration entspricht entweder dem standardmäßigen Opt-out oder einer ausdrücklichen dokumentierten Betreiber-/Kundenzustimmung; Geltungsbereich, Datum und getrennte Entscheidungen zu Suche/Indexierung sowie nutzerinitiierten Abrufen sind belegt."
+        }
+      ],
+      "evidenceOutcome": "partial",
+      "id": "CORE-ROB-03",
+      "module": "core",
+      "projectStatus": "partial",
+      "statement": "KI-Training und vergleichbare Datennutzung sind standardmäßig per `robots.txt` ausgeschlossen. Eine Freigabe erfolgt nur nach ausdrücklicher dokumentierter Betreiber- beziehungsweise Kundenzustimmung; Such-/Indexbots und nutzerinitiierte Abrufe werden unabhängig entschieden."
     },
     {
       "criteria": [
@@ -782,8 +854,8 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000008",
-            "R000009"
+            "R000009",
+            "R000010"
           ],
           "statement": "Die geprüften internen Seitenressourcen antworten erfolgreich und mit passendem MIME-Typ.",
           "requiredAssertionIds": [
@@ -903,11 +975,71 @@
     {
       "criteria": [
         {
-          "id": "CORE-A11Y-08/C1",
+          "id": "CORE-A11Y-04/C1",
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
             "R000041"
+          ],
+          "statement": "Axe erkennt im passiven Initialzustand keine fokussierbaren Bedienelemente innerhalb vor assistiver Technik verborgener Bereiche.",
+          "requiredAssertionIds": [
+            "browser.accessibility.visually-hidden-focusable-controls-no-detected-violations"
+          ]
+        },
+        {
+          "evidenceClass": "project-review",
+          "evidenceInstructions": "Repräsentative responsive und dynamische Zustände in einer gesondert freigegebenen Interaktionsprüfung untersuchen; der passive Axe-Befund deckt CSS-Sichtbarkeit und Übergänge nicht vollständig ab.",
+          "id": "CORE-A11Y-04/C2",
+          "mode": "manual",
+          "outcome": "noEvidence",
+          "recordRefs": [],
+          "statement": "Dynamische Sichtbarkeitswechsel, beabsichtigte Sprunglinks, Fokusverhalten sowie Opacity-, Transformations-, Offscreen- und Animationsfälle sind visuell und im Accessibility Tree geprüft."
+        }
+      ],
+      "evidenceOutcome": "partial",
+      "id": "CORE-A11Y-04",
+      "module": "core",
+      "projectStatus": "partial",
+      "statement": "Per Opacity, Transformation, Offscreen-Position oder Animation unsichtbare Bedienelemente sind bis zu ihrer Sichtbarkeit weder fokussierbar noch irreführend im Accessibility Tree vorhanden."
+    },
+    {
+      "criteria": [
+        {
+          "id": "CORE-A11Y-06/C1",
+          "mode": "automatic",
+          "outcome": "pass",
+          "recordRefs": [
+            "R000042"
+          ],
+          "statement": "Axe erkennt im passiven Initialzustand keine fehlenden oder mehrdeutigen programmatischen Beschriftungen für Formularbedienelemente.",
+          "requiredAssertionIds": [
+            "browser.accessibility.form-control-labels-no-detected-violations"
+          ]
+        },
+        {
+          "evidenceClass": "project-review",
+          "evidenceInstructions": "Sichtbare Verständlichkeit, Tastaturverhalten und dynamische Zustände kontrolliert prüfen; keine Formularübermittlung mit den passiven Paketprüfern auslösen.",
+          "id": "CORE-A11Y-06/C2",
+          "mode": "manual",
+          "outcome": "noEvidence",
+          "recordRefs": [],
+          "statement": "Verständliche Pflichtfeldhinweise sowie zugängliche Validierungs-, Erfolgs- und Fehlerzustände sind in einer gesondert freigegebenen Interaktionsprüfung geprüft."
+        }
+      ],
+      "evidenceOutcome": "partial",
+      "id": "CORE-A11Y-06",
+      "module": "core",
+      "projectStatus": "partial",
+      "statement": "Formulare besitzen zugeordnete Labels, verständliche Pflichtfeldhinweise, zugängliche Fehlermeldungen und nachvollziehbare Erfolgs- und Fehlerzustände."
+    },
+    {
+      "criteria": [
+        {
+          "id": "CORE-A11Y-08/C1",
+          "mode": "automatic",
+          "outcome": "pass",
+          "recordRefs": [
+            "R000043"
           ],
           "statement": "Axe erkennt auf den geprüften Seiten-/Profil-Läufen keine technisch fehlenden Textalternativen für Bilder, Bildobjekte oder als Bild ausgezeichnete Elemente.",
           "requiredAssertionIds": [
@@ -946,7 +1078,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000042"
+            "R000044"
           ],
           "statement": "Axe erkennt im passiven Zustand der geprüften Seiten-/Profil-Läufe keine Textkontrastverstöße unter den geprüften WCAG-AA-Schwellenwerten.",
           "requiredAssertionIds": [
@@ -976,7 +1108,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000043"
+            "R000045"
           ],
           "statement": "Die technischen 320-Pixel- und 200-%-Näherungsprofile erkennen auf den geprüften Seiten keinen horizontalen Dokumentüberlauf.",
           "requiredAssertionIds": [
@@ -1006,7 +1138,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000044"
+            "R000046"
           ],
           "statement": "Der Axe-Audit wurde auf allen vorgesehenen Seiten-/Profil-Läufen ausgeführt und hat keine automatisiert erkennbaren Verstöße gemeldet.",
           "requiredAssertionIds": [
@@ -1052,9 +1184,9 @@
         {
           "id": "CORE-QA-02/C1",
           "mode": "automatic",
-          "outcome": "pass",
+          "outcome": "inconclusive",
           "recordRefs": [
-            "R000045"
+            "R000047"
           ],
           "statement": "Der technische Browserbericht dokumentiert Chromium-Version und ausgeführte Headless-Emulationsprofile.",
           "requiredAssertionIds": [
@@ -1071,10 +1203,10 @@
           "statement": "Der Projektnachweis unterscheidet Headless-Emulationen, Browserengines und reale Browser beziehungsweise Geräte und benennt nicht geprüfte Plattformen."
         }
       ],
-      "evidenceOutcome": "partial",
+      "evidenceOutcome": "inconclusive",
       "id": "CORE-QA-02",
       "module": "core",
-      "projectStatus": "partial",
+      "projectStatus": "inconclusive",
       "statement": "Browserengine, Headless-Emulation und reale Browser beziehungsweise Geräte werden im Nachweis korrekt unterschieden; eine WebKit-Prüfung wird nicht als Safari-Prüfung bezeichnet."
     },
     {
@@ -1085,7 +1217,7 @@
           "outcome": "pass",
           "recordRefs": [
             "R000035",
-            "R000008"
+            "R000009"
           ],
           "statement": "Die geprüften internen Seiten-, Fragment- und Ressourcenziele sind technisch erfolgreich erreichbar.",
           "requiredAssertionIds": [
@@ -1116,7 +1248,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000046"
+            "R000048"
           ],
           "statement": "In den automatisch geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet.",
           "requiredAssertionIds": [
@@ -1146,8 +1278,8 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000008",
-            "R000009"
+            "R000009",
+            "R000010"
           ],
           "statement": "Die vom Crawl entdeckten und mit GET abgerufenen internen Seitenressourcen besitzen erfolgreiche Statuscodes und passende MIME-Typen.",
           "requiredAssertionIds": [
@@ -1236,7 +1368,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000010"
+            "R000011"
           ],
           "statement": "Die geprüfte 404-Antwort ist nicht ausdrücklich langfristig öffentlich cachebar.",
           "requiredAssertionIds": [
@@ -1266,7 +1398,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000047"
+            "R000049"
           ],
           "statement": "Externe Requestversuche wurden innerhalb der deklarierten passiven und isolierten Browserprüfumgebung vollständig inventarisiert und weiterhin blockiert.",
           "requiredAssertionIds": [
@@ -1296,7 +1428,7 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000048"
+            "R000050"
           ],
           "statement": "Cookies, Local Storage, Session Storage und IndexedDB wurden im passiven Initialzustand frischer isolierter Browserkontexte ohne Speicherung ihrer Werte vollständig inventarisiert.",
           "requiredAssertionIds": [
@@ -1335,14 +1467,14 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000003",
             "R000004",
             "R000005",
-            "R000011",
+            "R000006",
             "R000012",
             "R000013",
             "R000014",
-            "R000015"
+            "R000015",
+            "R000016"
           ],
           "statement": "Die automatisch ausgewählten HTML-, CSS-, JavaScript- und 404-Antworten wurden vollständig auf die jeweils einschlägige öffentlich beobachtbare Sicherheitsheaderbasis geprüft.",
           "requiredAssertionIds": [
@@ -1379,8 +1511,8 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000049",
-            "R000011"
+            "R000051",
+            "R000012"
           ],
           "statement": "Content-Security-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
           "requiredAssertionIds": [
@@ -1393,8 +1525,8 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000049",
-            "R000012"
+            "R000051",
+            "R000013"
           ],
           "statement": "CSP frame-ancestors oder X-Frame-Options begrenzt Framing auf den ausgewählten dokumentartigen Antworten.",
           "requiredAssertionIds": [
@@ -1407,8 +1539,8 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000003",
-            "R000013"
+            "R000004",
+            "R000014"
           ],
           "statement": "X-Content-Type-Options ist auf allen ausgewählten Antworten wirksam als nosniff deklariert.",
           "requiredAssertionIds": [
@@ -1421,8 +1553,8 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000049",
-            "R000014"
+            "R000051",
+            "R000015"
           ],
           "statement": "Referrer-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
           "requiredAssertionIds": [
@@ -1435,8 +1567,8 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000049",
-            "R000015"
+            "R000051",
+            "R000016"
           ],
           "statement": "Permissions-Policy ist auf den ausgewählten dokumentartigen Antworten deklariert.",
           "requiredAssertionIds": [
@@ -1449,9 +1581,9 @@
           "mode": "automatic",
           "outcome": "pass",
           "recordRefs": [
-            "R000003",
             "R000004",
-            "R000005"
+            "R000005",
+            "R000006"
           ],
           "statement": "HSTS ist auf den ausgewählten HTTPS-Antworten vorhanden und besitzt einen gültigen max-age von mindestens 180 Tagen.",
           "requiredAssertionIds": [
@@ -1479,13 +1611,54 @@
     {
       "criteria": [
         {
+          "id": "CORE-SEC-07/C1",
+          "mode": "automatic",
+          "outcome": "pass",
+          "recordRefs": [
+            "R000048"
+          ],
+          "statement": "Auf den passiv geprüften Seiten und Profilen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet.",
+          "requiredAssertionIds": [
+            "browser.runtime.no-observed-errors"
+          ]
+        },
+        {
+          "id": "CORE-SEC-07/C2",
+          "mode": "automatic",
+          "outcome": "noEvidence",
+          "recordRefs": [],
+          "statement": "Die Stichprobe einer unbekannten Route antwortet mit 404 und offenbart keine typischen technischen Interna.",
+          "requiredAssertionIds": [
+            "error.not-found.status-404",
+            "error.not-found.no-technical-details"
+          ]
+        },
+        {
+          "evidenceClass": "project-review",
+          "evidenceInstructions": "Projektinventar der zentralen Pfade und Fehlerfälle getrennt prüfen; die passiven Seitenprofile und die einzelne 404-Stichprobe sind keine Sicherheitsprüfung oder vollständige Funktionsabdeckung.",
+          "id": "CORE-SEC-07/C3",
+          "mode": "manual",
+          "outcome": "noEvidence",
+          "recordRefs": [],
+          "statement": "Die tatsächlichen zentralen Nutzerpfade und funktionsspezifischen Fehlerfälle des Projekts einschließlich interaktionsabhängiger Zustände sind geprüft."
+        }
+      ],
+      "evidenceOutcome": "partial",
+      "id": "CORE-SEC-07",
+      "module": "core",
+      "projectStatus": "partial",
+      "statement": "Zentrale Nutzerpfade und Fehlerfälle funktionieren ohne interne Fehlermeldungen, unerwartete Browserkonsolenfehler oder fehlgeschlagene Netzwerkanfragen."
+    },
+    {
+      "criteria": [
+        {
           "evidenceClass": "communication",
           "evidenceInstructions": "Freigabe oder Rechteverweis mit zuständiger Stelle, Datum und Umfang dokumentieren; vertrauliche Vertragsinhalte nicht in den technischen Bericht kopieren.",
           "id": "GOV-RGT-02/C1",
           "mode": "external",
           "outcome": "pass",
           "recordRefs": [
-            "R000050"
+            "R000052"
           ],
           "statement": "Die zuständige Stelle hat die Nutzungs- und Veröffentlichungsrechte der eingesetzten Materialien bestätigt oder dokumentiert."
         }
@@ -1495,6 +1668,66 @@
       "module": "auftrag-recht-uebergabe",
       "projectStatus": "complete",
       "statement": "Inhalte, Logo, Bilder, Videos, Schriftarten, Testimonials und sonstige Materialien sind freigegeben oder ihre Nutzungs- und Veröffentlichungsrechte sind dokumentiert."
+    },
+    {
+      "criteria": [
+        {
+          "id": "FORM-TEST-04/C1",
+          "mode": "automatic",
+          "outcome": "pass",
+          "recordRefs": [
+            "R000053"
+          ],
+          "statement": "Der paketierte passive Browserprüfer belegt seine Nur-Lese-Grenze: keine Buttons, Uploads oder Formular-Actions werden aufgerufen; nur GET ist erlaubt und verbotene Versuche werden vor Netzwerknebenwirkungen blockiert.",
+          "requiredAssertionIds": [
+            "browser.run.read-only-boundaries-enforced"
+          ]
+        },
+        {
+          "evidenceClass": "project-review",
+          "evidenceInstructions": "Die vier dokumentierten Paketläufe und alle projektspezifischen Skripte getrennt inventarisieren; der technische Browsernachweis behauptet weder beliebige GET-Semantik noch unveränderte Zielsystemspeicher.",
+          "id": "FORM-TEST-04/C2",
+          "mode": "manual",
+          "outcome": "noEvidence",
+          "recordRefs": [],
+          "statement": "Alle übrigen projektlokalen Testskripte, Wrapper und Crawler sowie gegebenenfalls serverseitige Nebenwirkungsnachweise sind auf ausbleibende Formularsendungen, E-Mails, Nachrichten und Speicherobjekte geprüft."
+        }
+      ],
+      "evidenceOutcome": "partial",
+      "id": "FORM-TEST-04",
+      "module": "formulare-api-daten",
+      "projectStatus": "partial",
+      "statement": "Prüfskripte und Crawler senden nicht unbeabsichtigt Formulare ab und erzeugen keine E-Mails, Nachrichten oder Speicherobjekte."
+    },
+    {
+      "criteria": [
+        {
+          "id": "MEDIA-PERF-04/C1",
+          "mode": "automatic",
+          "outcome": "notApplicable",
+          "recordRefs": [
+            "R000054"
+          ],
+          "statement": "Entdeckte interne Bild- und Medienressourcen wurden mit echten begrenzten GET-Anfragen abgerufen und ihre Antwortbeobachtungen sind vollständig.",
+          "requiredAssertionIds": [
+            "crawl.media.get-observation-complete"
+          ]
+        },
+        {
+          "evidenceClass": "project-review",
+          "evidenceInstructions": "Externe, lazy geladene und erst nach Interaktion sichtbare Medien gegen das Projektinventar prüfen, ohne die passiven Paketwerkzeuge um neue Ziele oder Methoden zu erweitern.",
+          "id": "MEDIA-PERF-04/C2",
+          "mode": "manual",
+          "outcome": "noEvidence",
+          "recordRefs": [],
+          "statement": "Externe Einbettungen, browser- oder interaktionsabhängige Medien und die Vollständigkeit des Projektinventars sind geprüft; die Grenzen von HEAD sind bei Bedarf dokumentiert."
+        }
+      ],
+      "evidenceOutcome": "partial",
+      "id": "MEDIA-PERF-04",
+      "module": "medien-animationen",
+      "projectStatus": "partial",
+      "statement": "Bilder und Einbettungen wurden mit echten GET-Abrufen beziehungsweise im Browser geprüft, wenn HEAD-Anfragen das tatsächliche Transformations- oder Cacheverhalten nicht zuverlässig abbilden."
     }
   ],
   "limitations": [
@@ -1559,6 +1792,35 @@
     {
       "id": "R000003",
       "record": {
+        "assertionId": "social.metadata.canonical-open-graph-consistent",
+        "assertionVersion": 1,
+        "message": "Canonical, finale Seiten-URL und og:url sind eindeutig und stimmen überein.",
+        "outcome": "pass",
+        "subject": {
+          "aiTrainingOptInDeclaredForRun": false,
+          "allowedTrainingTokens": 0,
+          "blockedTrainingTokens": 6,
+          "checkedAgents": [
+            "browser",
+            "facebook",
+            "x",
+            "linkedin"
+          ],
+          "checkedImages": 1,
+          "robotsPolicyReviewedAt": "2026-08-22",
+          "url": "https://example.com/",
+          "deploymentId": "DEPLOYMENT-ARTEFAKT",
+          "environment": "production",
+          "sourceRevision": "PROJEKT-COMMIT",
+          "tool": "social-preview-check"
+        },
+        "tool": "social-preview-check"
+      },
+      "type": "assertion"
+    },
+    {
+      "id": "R000004",
+      "record": {
         "assertionId": "http.security.selected-response-coverage-complete",
         "assertionVersion": 1,
         "outcome": "pass",
@@ -1587,7 +1849,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000004",
+      "id": "R000005",
       "record": {
         "assertionId": "http.hsts.present",
         "assertionVersion": 1,
@@ -1606,7 +1868,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000005",
+      "id": "R000006",
       "record": {
         "assertionId": "http.hsts.max-age-adequate",
         "assertionVersion": 1,
@@ -1625,7 +1887,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000006",
+      "id": "R000007",
       "record": {
         "assertionId": "error.not-found.noindex",
         "assertionVersion": 1,
@@ -1643,7 +1905,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000007",
+      "id": "R000008",
       "record": {
         "assertionId": "error.not-found.no-url-metadata",
         "assertionVersion": 1,
@@ -1661,7 +1923,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000008",
+      "id": "R000009",
       "record": {
         "assertionId": "crawl.resources.status-valid",
         "assertionVersion": 1,
@@ -1681,7 +1943,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000009",
+      "id": "R000010",
       "record": {
         "assertionId": "crawl.resources.mime-valid",
         "assertionVersion": 1,
@@ -1701,7 +1963,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000010",
+      "id": "R000011",
       "record": {
         "assertionId": "cache.not-found.not-publicly-cacheable",
         "assertionVersion": 1,
@@ -1720,7 +1982,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000011",
+      "id": "R000012",
       "record": {
         "assertionId": "http.security.csp-declared",
         "assertionVersion": 1,
@@ -1739,7 +2001,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000012",
+      "id": "R000013",
       "record": {
         "assertionId": "http.security.framing-protection-present",
         "assertionVersion": 1,
@@ -1758,7 +2020,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000013",
+      "id": "R000014",
       "record": {
         "assertionId": "http.security.nosniff-valid",
         "assertionVersion": 1,
@@ -1777,7 +2039,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000014",
+      "id": "R000015",
       "record": {
         "assertionId": "http.security.referrer-policy-declared",
         "assertionVersion": 1,
@@ -1796,7 +2058,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000015",
+      "id": "R000016",
       "record": {
         "assertionId": "http.security.permissions-policy-declared",
         "assertionVersion": 1,
@@ -1815,7 +2077,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000016",
+      "id": "R000017",
       "record": {
         "assertionId": "crawl.metadata.title-present",
         "assertionVersion": 1,
@@ -1835,7 +2097,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000017",
+      "id": "R000018",
       "record": {
         "assertionId": "crawl.metadata.description-single",
         "assertionVersion": 1,
@@ -1855,7 +2117,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000018",
+      "id": "R000019",
       "record": {
         "assertionId": "crawl.metadata.unique",
         "assertionVersion": 1,
@@ -1875,7 +2137,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000019",
+      "id": "R000020",
       "record": {
         "assertionId": "crawl.document.language-present",
         "assertionVersion": 1,
@@ -1895,7 +2157,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000020",
+      "id": "R000021",
       "record": {
         "assertionId": "crawl.document.single-h1",
         "assertionVersion": 1,
@@ -1915,39 +2177,16 @@
       "type": "assertion"
     },
     {
-      "id": "R000021",
+      "id": "R000022",
       "record": {
         "assertionId": "social.metadata.open-graph-complete",
         "assertionVersion": 1,
         "message": "Die geprüfte Seite besitzt eindeutige OpenGraph-Pflichtfelder mit absoluten HTTPS-URLs für og:url und og:image.",
         "outcome": "pass",
         "subject": {
-          "checkedAgents": [
-            "browser",
-            "facebook",
-            "x",
-            "linkedin"
-          ],
-          "checkedImages": 1,
-          "robotsPolicyReviewedAt": "2026-08-22",
-          "url": "https://example.com/",
-          "deploymentId": "DEPLOYMENT-ARTEFAKT",
-          "environment": "production",
-          "sourceRevision": "PROJEKT-COMMIT",
-          "tool": "social-preview-check"
-        },
-        "tool": "social-preview-check"
-      },
-      "type": "assertion"
-    },
-    {
-      "id": "R000022",
-      "record": {
-        "assertionId": "social.metadata.twitter-card-valid",
-        "assertionVersion": 1,
-        "message": "twitter:card sowie die erforderlichen X-/Twitter-Werte oder OpenGraph-Fallbacks sind technisch verwendbar.",
-        "outcome": "pass",
-        "subject": {
+          "aiTrainingOptInDeclaredForRun": false,
+          "allowedTrainingTokens": 0,
+          "blockedTrainingTokens": 6,
           "checkedAgents": [
             "browser",
             "facebook",
@@ -1969,11 +2208,14 @@
     {
       "id": "R000023",
       "record": {
-        "assertionId": "social.crawlers.html-metadata-consistent",
+        "assertionId": "social.metadata.twitter-card-valid",
         "assertionVersion": 1,
-        "message": "Browser, Facebook, X/Twitter und LinkedIn erhalten erfolgreiche, konsistente HTML-Antworten und Social-Metadaten.",
+        "message": "twitter:card sowie die erforderlichen X-/Twitter-Werte oder OpenGraph-Fallbacks sind technisch verwendbar.",
         "outcome": "pass",
         "subject": {
+          "aiTrainingOptInDeclaredForRun": false,
+          "allowedTrainingTokens": 0,
+          "blockedTrainingTokens": 6,
           "checkedAgents": [
             "browser",
             "facebook",
@@ -1995,11 +2237,14 @@
     {
       "id": "R000024",
       "record": {
-        "assertionId": "social.metadata.canonical-open-graph-consistent",
+        "assertionId": "social.crawlers.html-metadata-consistent",
         "assertionVersion": 1,
-        "message": "Canonical, finale Seiten-URL und og:url sind eindeutig und stimmen überein.",
+        "message": "Browser, Facebook, X/Twitter und LinkedIn erhalten erfolgreiche, konsistente HTML-Antworten und Social-Metadaten.",
         "outcome": "pass",
         "subject": {
+          "aiTrainingOptInDeclaredForRun": false,
+          "allowedTrainingTokens": 0,
+          "blockedTrainingTokens": 6,
           "checkedAgents": [
             "browser",
             "facebook",
@@ -2026,6 +2271,9 @@
         "message": "Die vorgesehenen Vorschaubilder erfüllen die geprüften technischen Anforderungen.",
         "outcome": "pass",
         "subject": {
+          "aiTrainingOptInDeclaredForRun": false,
+          "allowedTrainingTokens": 0,
+          "blockedTrainingTokens": 6,
           "checkedAgents": [
             "browser",
             "facebook",
@@ -2052,6 +2300,9 @@
         "message": "Der Social-Lauf dokumentiert den strikten Modus, in dem Warnungen den Exitcode 1 auslösen.",
         "outcome": "pass",
         "subject": {
+          "aiTrainingOptInDeclaredForRun": false,
+          "allowedTrainingTokens": 0,
+          "blockedTrainingTokens": 6,
           "checkedAgents": [
             "browser",
             "facebook",
@@ -2078,6 +2329,9 @@
         "message": "robots.txt wurde erfolgreich abgerufen und ausgewertet.",
         "outcome": "pass",
         "subject": {
+          "aiTrainingOptInDeclaredForRun": false,
+          "allowedTrainingTokens": 0,
+          "blockedTrainingTokens": 6,
           "checkedAgents": [
             "browser",
             "facebook",
@@ -2104,6 +2358,9 @@
         "message": "Die vorgesehenen Social-Crawler sind für die geprüfte Seite nicht durch robots.txt oder Robots-Anweisungen blockiert.",
         "outcome": "pass",
         "subject": {
+          "aiTrainingOptInDeclaredForRun": false,
+          "allowedTrainingTokens": 0,
+          "blockedTrainingTokens": 6,
           "checkedAgents": [
             "browser",
             "facebook",
@@ -2130,6 +2387,9 @@
         "message": "Crawler-/Produktkennungen, Kategorien, offizielle Quellen und Quellenstand sind im technischen Bericht dokumentiert.",
         "outcome": "pass",
         "subject": {
+          "aiTrainingOptInDeclaredForRun": false,
+          "allowedTrainingTokens": 0,
+          "blockedTrainingTokens": 6,
           "checkedAgents": [
             "browser",
             "facebook",
@@ -2156,6 +2416,9 @@
         "message": "Trainings-/Datennutzungstokens sind blockiert oder der Lauf deklariert ausdrücklich ein separat nachzuweisendes Opt-in.",
         "outcome": "pass",
         "subject": {
+          "aiTrainingOptInDeclaredForRun": false,
+          "allowedTrainingTokens": 0,
+          "blockedTrainingTokens": 6,
           "checkedAgents": [
             "browser",
             "facebook",
@@ -2319,10 +2582,11 @@
       "record": {
         "assertionId": "browser.document.main-landmark-single",
         "assertionVersion": 1,
-        "outcome": "pass",
         "message": "Alle geprüften Seiten-/Profil-Läufe besitzen genau ein Main-Landmark.",
+        "outcome": "pass",
         "subject": {
-          "url": "https://example.com/",
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
           "checkedPages": 1,
           "profileRuns": 5,
           "profiles": [
@@ -2332,8 +2596,7 @@
             "reduced-motion",
             "zoom-200"
           ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0",
+          "url": "https://example.com/",
           "deploymentId": "DEPLOYMENT-ARTEFAKT",
           "environment": "production",
           "sourceRevision": "PROJEKT-COMMIT",
@@ -2348,10 +2611,11 @@
       "record": {
         "assertionId": "browser.accessibility.control-names-no-detected-violations",
         "assertionVersion": 1,
-        "outcome": "pass",
         "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine fehlenden zugänglichen Namen für Links und Schaltflächen erkannt.",
+        "outcome": "pass",
         "subject": {
-          "url": "https://example.com/",
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
           "checkedPages": 1,
           "profileRuns": 5,
           "profiles": [
@@ -2361,8 +2625,7 @@
             "reduced-motion",
             "zoom-200"
           ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0",
+          "url": "https://example.com/",
           "deploymentId": "DEPLOYMENT-ARTEFAKT",
           "environment": "production",
           "sourceRevision": "PROJEKT-COMMIT",
@@ -2377,10 +2640,11 @@
       "record": {
         "assertionId": "browser.accessibility.links-not-color-only-no-detected-violations",
         "assertionVersion": 1,
-        "outcome": "pass",
         "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine ausschließlich durch Farbe unterscheidbaren Links erkannt.",
+        "outcome": "pass",
         "subject": {
-          "url": "https://example.com/",
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
           "checkedPages": 1,
           "profileRuns": 5,
           "profiles": [
@@ -2390,8 +2654,7 @@
             "reduced-motion",
             "zoom-200"
           ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0",
+          "url": "https://example.com/",
           "deploymentId": "DEPLOYMENT-ARTEFAKT",
           "environment": "production",
           "sourceRevision": "PROJEKT-COMMIT",
@@ -2404,12 +2667,13 @@
     {
       "id": "R000041",
       "record": {
-        "assertionId": "browser.accessibility.image-alternatives-no-detected-violations",
+        "assertionId": "browser.accessibility.visually-hidden-focusable-controls-no-detected-violations",
         "assertionVersion": 1,
+        "message": "Axe hat im passiven Initialzustand keine fokussierbaren Bedienelemente innerhalb vor assistiver Technik verborgener Bereiche erkannt.",
         "outcome": "pass",
-        "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine technisch fehlenden Bildalternativen erkannt.",
         "subject": {
-          "url": "https://example.com/",
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
           "checkedPages": 1,
           "profileRuns": 5,
           "profiles": [
@@ -2419,8 +2683,7 @@
             "reduced-motion",
             "zoom-200"
           ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0",
+          "url": "https://example.com/",
           "deploymentId": "DEPLOYMENT-ARTEFAKT",
           "environment": "production",
           "sourceRevision": "PROJEKT-COMMIT",
@@ -2433,12 +2696,13 @@
     {
       "id": "R000042",
       "record": {
-        "assertionId": "browser.accessibility.text-contrast-no-detected-violations",
+        "assertionId": "browser.accessibility.form-control-labels-no-detected-violations",
         "assertionVersion": 1,
+        "message": "Axe hat im passiven Initialzustand keine fehlenden oder mehrdeutigen programmatischen Formularbeschriftungen erkannt.",
         "outcome": "pass",
-        "message": "Axe hat im passiven Zustand der geprüften Seiten-/Profil-Läufe keine Textkontrastverstöße erkannt.",
         "subject": {
-          "url": "https://example.com/",
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
           "checkedPages": 1,
           "profileRuns": 5,
           "profiles": [
@@ -2448,8 +2712,7 @@
             "reduced-motion",
             "zoom-200"
           ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0",
+          "url": "https://example.com/",
           "deploymentId": "DEPLOYMENT-ARTEFAKT",
           "environment": "production",
           "sourceRevision": "PROJEKT-COMMIT",
@@ -2462,12 +2725,13 @@
     {
       "id": "R000043",
       "record": {
-        "assertionId": "browser.viewport.narrow-zoom-no-horizontal-overflow",
+        "assertionId": "browser.accessibility.image-alternatives-no-detected-violations",
         "assertionVersion": 1,
+        "message": "Axe hat auf den geprüften Seiten-/Profil-Läufen keine technisch fehlenden Bildalternativen erkannt.",
         "outcome": "pass",
-        "message": "Die schmalen und 200-%-Näherungsprofile weisen auf allen geprüften Seiten keinen horizontalen Dokumentüberlauf auf.",
         "subject": {
-          "url": "https://example.com/",
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
           "checkedPages": 1,
           "profileRuns": 5,
           "profiles": [
@@ -2477,8 +2741,7 @@
             "reduced-motion",
             "zoom-200"
           ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0",
+          "url": "https://example.com/",
           "deploymentId": "DEPLOYMENT-ARTEFAKT",
           "environment": "production",
           "sourceRevision": "PROJEKT-COMMIT",
@@ -2491,12 +2754,13 @@
     {
       "id": "R000044",
       "record": {
-        "assertionId": "browser.accessibility.axe-no-detected-violations",
+        "assertionId": "browser.accessibility.text-contrast-no-detected-violations",
         "assertionVersion": 1,
+        "message": "Axe hat im passiven Zustand der geprüften Seiten-/Profil-Läufe keine Textkontrastverstöße erkannt.",
         "outcome": "pass",
-        "message": "Der automatisierte Axe-Audit hat auf den geprüften Seiten-/Profil-Läufen keine Verstöße erkannt.",
         "subject": {
-          "url": "https://example.com/",
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
           "checkedPages": 1,
           "profileRuns": 5,
           "profiles": [
@@ -2506,8 +2770,7 @@
             "reduced-motion",
             "zoom-200"
           ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0",
+          "url": "https://example.com/",
           "deploymentId": "DEPLOYMENT-ARTEFAKT",
           "environment": "production",
           "sourceRevision": "PROJEKT-COMMIT",
@@ -2520,12 +2783,13 @@
     {
       "id": "R000045",
       "record": {
-        "assertionId": "browser.context.chromium-headless-recorded",
+        "assertionId": "browser.viewport.narrow-zoom-no-horizontal-overflow",
         "assertionVersion": 1,
+        "message": "Die schmalen und 200-%-Näherungsprofile weisen auf allen geprüften Seiten keinen horizontalen Dokumentüberlauf auf.",
         "outcome": "pass",
-        "message": "Chromium-Version und ausgeführte Headless-Emulationsprofile sind dokumentiert.",
         "subject": {
-          "url": "https://example.com/",
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
           "checkedPages": 1,
           "profileRuns": 5,
           "profiles": [
@@ -2535,8 +2799,7 @@
             "reduced-motion",
             "zoom-200"
           ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0",
+          "url": "https://example.com/",
           "deploymentId": "DEPLOYMENT-ARTEFAKT",
           "environment": "production",
           "sourceRevision": "PROJEKT-COMMIT",
@@ -2549,12 +2812,13 @@
     {
       "id": "R000046",
       "record": {
-        "assertionId": "browser.runtime.no-observed-errors",
+        "assertionId": "browser.accessibility.axe-no-detected-violations",
         "assertionVersion": 1,
+        "message": "Der automatisierte Axe-Audit hat auf den geprüften Seiten-/Profil-Läufen keine Verstöße erkannt.",
         "outcome": "pass",
-        "message": "In den geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet.",
         "subject": {
-          "url": "https://example.com/",
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
           "checkedPages": 1,
           "profileRuns": 5,
           "profiles": [
@@ -2564,8 +2828,7 @@
             "reduced-motion",
             "zoom-200"
           ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0",
+          "url": "https://example.com/",
           "deploymentId": "DEPLOYMENT-ARTEFAKT",
           "environment": "production",
           "sourceRevision": "PROJEKT-COMMIT",
@@ -2578,12 +2841,13 @@
     {
       "id": "R000047",
       "record": {
-        "assertionId": "browser.privacy.external-request-observation-complete",
+        "assertionId": "browser.context.chromium-headless-recorded",
         "assertionVersion": 1,
-        "outcome": "pass",
-        "message": "Externe Requestversuche wurden innerhalb der deklarierten passiven Prüfumgebung vollständig inventarisiert und weiterhin blockiert.",
+        "message": "Browserengine, Version oder ausgeführte Emulationsprofile sind nicht vollständig dokumentiert.",
+        "outcome": "inconclusive",
         "subject": {
-          "url": "https://example.com/",
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
           "checkedPages": 1,
           "profileRuns": 5,
           "profiles": [
@@ -2593,8 +2857,65 @@
             "reduced-motion",
             "zoom-200"
           ],
+          "url": "https://example.com/",
+          "deploymentId": "DEPLOYMENT-ARTEFAKT",
+          "environment": "production",
+          "sourceRevision": "PROJEKT-COMMIT",
+          "tool": "browser-check"
+        },
+        "tool": "browser-check"
+      },
+      "type": "assertion"
+    },
+    {
+      "id": "R000048",
+      "record": {
+        "assertionId": "browser.runtime.no-observed-errors",
+        "assertionVersion": 1,
+        "message": "In den geprüften Seiten-/Profil-Läufen wurden keine Konsolen-, JavaScript-, Netzwerk- oder HTTP-Fehler beobachtet.",
+        "outcome": "pass",
+        "subject": {
           "browserProduct": "Chromium",
           "browserVersion": "Chrome/140.0.0.0",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "url": "https://example.com/",
+          "deploymentId": "DEPLOYMENT-ARTEFAKT",
+          "environment": "production",
+          "sourceRevision": "PROJEKT-COMMIT",
+          "tool": "browser-check"
+        },
+        "tool": "browser-check"
+      },
+      "type": "assertion"
+    },
+    {
+      "id": "R000049",
+      "record": {
+        "assertionId": "browser.privacy.external-request-observation-complete",
+        "assertionVersion": 1,
+        "message": "Externe Requestversuche wurden innerhalb der deklarierten passiven Prüfumgebung vollständig inventarisiert und weiterhin blockiert.",
+        "outcome": "pass",
+        "subject": {
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "url": "https://example.com/",
           "observationMode": "passive-initial-load-isolated",
           "observedExternalRequestAttempts": 0,
           "settleMilliseconds": 750,
@@ -2608,14 +2929,15 @@
       "type": "assertion"
     },
     {
-      "id": "R000048",
+      "id": "R000050",
       "record": {
         "assertionId": "browser.privacy.initial-storage-observation-complete",
         "assertionVersion": 1,
-        "outcome": "pass",
         "message": "Cookies und Browser-Storage wurden im passiven Initialzustand ohne Werte vollständig inventarisiert.",
+        "outcome": "pass",
         "subject": {
-          "url": "https://example.com/",
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
           "checkedPages": 1,
           "profileRuns": 5,
           "profiles": [
@@ -2625,8 +2947,7 @@
             "reduced-motion",
             "zoom-200"
           ],
-          "browserProduct": "Chromium",
-          "browserVersion": "Chrome/140.0.0.0",
+          "url": "https://example.com/",
           "cookieObservations": 0,
           "indexedDatabaseObservations": 0,
           "localStorageObservations": 0,
@@ -2644,7 +2965,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000049",
+      "id": "R000051",
       "record": {
         "assertionId": "http.security.document-response-coverage-complete",
         "assertionVersion": 1,
@@ -2672,7 +2993,7 @@
       "type": "assertion"
     },
     {
-      "id": "R000050",
+      "id": "R000052",
       "record": {
         "criterionId": "GOV-RGT-02/C1",
         "outcome": "pass",
@@ -2682,6 +3003,59 @@
         "reference": "interner oder projektspezifischer Nachweisverweis"
       },
       "type": "evidence"
+    },
+    {
+      "id": "R000053",
+      "record": {
+        "assertionId": "browser.run.read-only-boundaries-enforced",
+        "assertionVersion": 1,
+        "message": "Alle ausgeführten Seiten-/Profil-Läufe belegen vor Navigation installierte DOM- und Requestgrenzen; kein Nicht-GET- oder externer Request wurde zugelassen.",
+        "outcome": "pass",
+        "subject": {
+          "browserProduct": "Chromium",
+          "browserVersion": "Chrome/140.0.0.0",
+          "checkedPages": 1,
+          "profileRuns": 5,
+          "profiles": [
+            "desktop",
+            "mobile",
+            "narrow",
+            "reduced-motion",
+            "zoom-200"
+          ],
+          "url": "https://example.com/",
+          "destinationSideEffectsVerified": false,
+          "mode": "passive-get-only-isolated",
+          "deploymentId": "DEPLOYMENT-ARTEFAKT",
+          "environment": "production",
+          "sourceRevision": "PROJEKT-COMMIT",
+          "tool": "browser-check"
+        },
+        "tool": "browser-check"
+      },
+      "type": "assertion"
+    },
+    {
+      "id": "R000054",
+      "record": {
+        "assertionId": "crawl.media.get-observation-complete",
+        "assertionVersion": 1,
+        "message": "Im vollständig geprüften Seitenumfang wurden keine anwendbaren internen Bild- oder Medienressourcen entdeckt.",
+        "outcome": "notApplicable",
+        "subject": {
+          "checkedPages": 3,
+          "checkedResources": 2,
+          "checkedSitemaps": 1,
+          "skippedNavigations": 0,
+          "url": "https://example.com/",
+          "deploymentId": "DEPLOYMENT-ARTEFAKT",
+          "environment": "production",
+          "sourceRevision": "PROJEKT-COMMIT",
+          "tool": "crawl-check"
+        },
+        "tool": "crawl-check"
+      },
+      "type": "assertion"
     }
   ],
   "schemaVersion": 3,
@@ -2690,6 +3064,7 @@
       "CORE-DOM-02",
       "CORE-DOM-04",
       "CORE-DOM-05",
+      "CORE-DOM-06",
       "CORE-DOM-07",
       "CORE-DOM-08",
       "CORE-ERR-01",
@@ -2703,12 +3078,15 @@
       "CORE-SOC-03",
       "CORE-ROB-01",
       "CORE-ROB-02",
+      "CORE-ROB-03",
       "CORE-ROB-04",
       "CORE-MAP-01",
       "CORE-MAP-02",
       "CORE-SEO-04",
       "CORE-A11Y-01",
       "CORE-A11Y-03",
+      "CORE-A11Y-04",
+      "CORE-A11Y-06",
       "CORE-A11Y-08",
       "CORE-A11Y-09",
       "CORE-A11Y-10",
@@ -2723,41 +3101,46 @@
       "CORE-PRIV-04",
       "CORE-SEC-04",
       "CORE-SEC-05",
-      "GOV-RGT-02"
+      "CORE-SEC-07",
+      "GOV-RGT-02",
+      "FORM-TEST-04",
+      "MEDIA-PERF-04"
     ],
     "selectedModules": [
       "core",
-      "auftrag-recht-uebergabe"
+      "auftrag-recht-uebergabe",
+      "formulare-api-daten",
+      "medien-animationen"
     ]
   },
   "summary": {
     "automaticCriteria": {
-      "pass": 50,
+      "pass": 56,
       "fail": 0,
-      "inconclusive": 0,
-      "notApplicable": 0,
-      "noEvidence": 11,
-      "total": 61
+      "inconclusive": 1,
+      "notApplicable": 1,
+      "noEvidence": 12,
+      "total": 70
     },
     "checklistItems": {
       "complete": 3,
       "failed": 0,
-      "partial": 28,
+      "partial": 34,
       "open": 5,
-      "inconclusive": 0,
+      "inconclusive": 1,
       "notApplicable": 0,
       "external": 1,
       "deferred": 0,
       "acceptedDeviation": 0,
-      "total": 37
+      "total": 44
     },
     "nonAutomaticCriteria": {
       "pass": 1,
       "fail": 0,
       "inconclusive": 0,
       "notApplicable": 0,
-      "noEvidence": 40,
-      "total": 41
+      "noEvidence": 47,
+      "total": 48
     }
   },
   "technicalRuns": [
@@ -2784,12 +3167,12 @@
       "tool": "http-check",
       "toolPackage": {
         "name": "@mktcode/website-qa",
-        "version": "1.1.0"
+        "version": "1.2.0"
       },
       "usedForEvaluation": true
     },
     {
-      "assertionCount": 16,
+      "assertionCount": 17,
       "command": "website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json",
       "contextProvenance": {
         "deploymentId": "projectDeclared",
@@ -2815,12 +3198,12 @@
       "tool": "crawl-check",
       "toolPackage": {
         "name": "@mktcode/website-qa",
-        "version": "1.1.0"
+        "version": "1.2.0"
       },
       "usedForEvaluation": true
     },
     {
-      "assertionCount": 11,
+      "assertionCount": 14,
       "command": "website-qa-browser https://example.com/ --max-pages=10 --max-requests=300 --strict --json",
       "contextProvenance": {
         "deploymentId": "projectDeclared",
@@ -2844,7 +3227,7 @@
       "tool": "browser-check",
       "toolPackage": {
         "name": "@mktcode/website-qa",
-        "version": "1.1.0"
+        "version": "1.2.0"
       },
       "usedForEvaluation": true
     },
@@ -2871,7 +3254,7 @@
       "tool": "social-preview-check",
       "toolPackage": {
         "name": "@mktcode/website-qa",
-        "version": "1.1.0"
+        "version": "1.2.0"
       },
       "usedForEvaluation": true
     }
