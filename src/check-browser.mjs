@@ -1278,6 +1278,7 @@ export async function runBrowserCheck(input, suppliedOptions = {}) {
   await assertPublicResolution(requestedUrl, options)
   const preflight = await fetchResource(requestedUrl.href, options, {
     accept: 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.1',
+    explicitInput: true,
     maximumBytes: 5 * 1024 * 1024,
     validateRedirect: nextUrl => !readOnlyNavigationConcern(nextUrl),
   })

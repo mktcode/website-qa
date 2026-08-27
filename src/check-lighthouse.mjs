@@ -263,6 +263,7 @@ export async function runLighthouseCheck(input, suppliedOptions = {}) {
   const preflight = await fetchResource(requestedUrl.href, options, {
     accept: 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.1',
     allowedOrigins: [requestedUrl.origin],
+    explicitInput: true,
     maximumBytes: 5 * 1024 * 1024,
   })
   const finalUrl = validateUrl(preflight.finalUrl, options, 'Finale URL')

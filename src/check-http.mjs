@@ -7,6 +7,7 @@ import { brotliDecompressSync, gunzipSync } from 'node:zlib'
 import { parse } from 'parse5'
 import { fetchResource, normalizeMimeType, redactReportData, redactText, reportUrl, validateUrl } from './lib/http-client.mjs'
 import { writeJsonOutput } from './lib/json-output.mjs'
+import { readOnlyNavigationConcern } from './lib/navigation-safety.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
 import { checklistReference, technicalSignals, technicalSignalSummary } from './lib/signal-report.mjs'
 import { jsonOutputIntent, technicalErrorReport } from './lib/technical-report.mjs'
@@ -472,6 +473,7 @@ async function checkCompression(result, resource, options) {
   const request = {
     accept: resource.type === 'html' ? 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.1' : '*/*',
     maximumBytes: options.maxHtmlBytes,
+    validateRedirect: nextUrl => !readOnlyNavigationConcern(nextUrl),
   }
 
   for (const encoding of ['identity', 'gzip', 'br']) {
@@ -601,6 +603,7 @@ async function checkHttpRedirect(result, finalUrl, options) {
     const response = await fetchResource(probeUrl.href, { ...options, allowHttp: true }, {
       accept: 'text/html,*/*;q=0.1',
       maximumBytes: options.maxHtmlBytes,
+      validateRedirect: nextUrl => !readOnlyNavigationConcern(nextUrl),
     })
     result.httpRedirect = {
       finalUrl: response.finalUrl,
@@ -645,6 +648,7 @@ async function checkNotFound(result, finalUrl, options) {
     const response = await fetchResource(notFoundUrl.href, options, {
       accept: 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.1',
       maximumBytes: options.maxHtmlBytes,
+      validateRedirect: nextUrl => !readOnlyNavigationConcern(nextUrl),
     })
     result.notFound = {
       bytes: response.body.byteLength,
@@ -704,8 +708,10 @@ async function inspectTarget(inputUrl, options) {
   try {
     const page = await fetchResource(inputUrl, options, {
       accept: 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.1',
+      explicitInput: true,
       headers: { 'accept-encoding': 'identity' },
       maximumBytes: options.maxHtmlBytes,
+      validateRedirect: nextUrl => !readOnlyNavigationConcern(nextUrl),
     })
     result.finalUrl = page.finalUrl
     result.page = {
@@ -746,14 +752,31 @@ async function inspectTarget(inputUrl, options) {
 
     const facts = extractHtmlFacts(page.body.toString('utf8'), page.finalUrl)
     const selectedResources = [{ label: 'HTML', type: 'html', url: page.finalUrl }]
-    const stylesheet = facts.resources.find(resource => resource.type === 'css')
-    const script = facts.resources.find(resource => resource.type === 'javascript')
+    const skippedResourceTypes = new Set()
+    const selectReadOnlyResource = type => facts.resources.find((resource) => {
+      if (resource.type !== type) {
+        return false
+      }
+      const concern = readOnlyNavigationConcern(new URL(resource.url))
+      if (concern) {
+        skippedResourceTypes.add(type)
+        addIssue(result, 'warning', 'resource-skipped-read-only', `Automatisch entdeckte ${type === 'css' ? 'CSS' : 'JavaScript'}-Ressource wurde wegen ${concern} nicht abgerufen.`, ['CORE-QA-05', 'FORM-TEST-04'], resource.url)
+        return false
+      }
+      return true
+    })
+    const stylesheet = selectReadOnlyResource('css')
+    const script = selectReadOnlyResource('javascript')
     if (stylesheet) {
       selectedResources.push({ label: 'CSS', type: stylesheet.type, url: stylesheet.url })
+    }
+    if (stylesheet || skippedResourceTypes.has('css')) {
       result.securityHeaderCoverage.expectedResponseClasses.push('CSS')
     }
     if (script) {
       selectedResources.push({ label: 'JavaScript', type: script.type, url: script.url })
+    }
+    if (script || skippedResourceTypes.has('javascript')) {
       result.securityHeaderCoverage.expectedResponseClasses.push('JavaScript')
     }
 

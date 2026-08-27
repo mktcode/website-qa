@@ -78,6 +78,27 @@ describe('lighthouse check', () => {
     expect(closeCalls).toBe(1)
   })
 
+  it('blocks suspicious preflight redirect targets before starting Chromium', async () => {
+    const requestedPaths: string[] = []
+    const server = createServer((request, response) => {
+      requestedPaths.push(request.url || '')
+      if (request.url === '/start') {
+        response.writeHead(302, { location: '/delete-account?token=secret' })
+        response.end()
+        return
+      }
+      response.writeHead(500)
+      response.end('Dieses Redirectziel darf nicht aufgerufen werden.')
+    })
+    const origin = await listen(server)
+
+    await expect(runLighthouseCheck(`${origin}/start`, {
+      allowHttp: true,
+      allowPrivate: true,
+    })).rejects.toThrow(/Nur-Lese-Richtlinie/)
+    expect(requestedPaths).toEqual(['/start'])
+  })
+
   it('compacts Lighthouse details at every published boundary', () => {
     const auditRefs = Array.from({ length: 260 }, (_, index) => ({ id: `audit-${index}` }))
     const metricIds = ['first-contentful-paint', 'largest-contentful-paint', 'cumulative-layout-shift', 'total-blocking-time', 'speed-index', 'interactive', 'total-byte-weight']

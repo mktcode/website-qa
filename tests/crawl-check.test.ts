@@ -322,6 +322,50 @@ describe('crawl checker', () => {
     expect(requestedPaths).toEqual(['/'])
   })
 
+  it('skips suspicious HTML- and CSS-discovered resources and their redirect targets', async () => {
+    const requestedPaths: string[] = []
+    let origin = ''
+    const server = createServer((request, response) => {
+      requestedPaths.push(request.url || '')
+      if (request.url === '/') {
+        response.writeHead(200, { 'content-type': 'text/html' })
+        response.end(htmlPage(origin, '/', {
+          body: '<link rel="stylesheet" href="/delete-style.css"><link rel="stylesheet" href="/safe.css"><script src="/app.js?token=secret"></script><img src="/safe-image">',
+          title: 'Sichere Startseite',
+        }))
+        return
+      }
+      if (request.url === '/safe.css') {
+        response.writeHead(200, { 'content-type': 'text/css' })
+        response.end('body { background-image: url("/unsubscribe?code=secret"); }')
+        return
+      }
+      if (request.url === '/safe-image') {
+        response.writeHead(302, { location: '/remove-account' })
+        response.end()
+        return
+      }
+      response.writeHead(500)
+      response.end('Dieser potenziell zustandsverändernde Ressourcenpfad darf nicht aufgerufen werden.')
+    })
+    origin = await listen(server)
+
+    const report = await runCrawlCheck([origin], {
+      allowHttp: true,
+      allowPrivate: true,
+    })
+    const result = report.results[0] as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
+      issues: Array<{ code: string }>
+    }
+
+    expect(result.issues.filter(issue => issue.code === 'resource-skipped-read-only')).toHaveLength(3)
+    expect(result.issues.map(issue => issue.code)).toContain('resource-fetch-failed')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.resources.status-valid')?.outcome).toBe('inconclusive')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.run.coverage-complete')?.outcome).toBe('inconclusive')
+    expect(requestedPaths).toEqual(['/', '/safe.css', '/safe-image'])
+  })
+
   it('skips suspicious sitemap entries before they can cause a side effect', async () => {
     const requestedPaths = [] as string[]
     let origin = ''
@@ -361,6 +405,51 @@ describe('crawl checker', () => {
     expect(result.skippedLinks.every(link => link.sourceUrl === `${origin}sitemap.xml`)).toBe(true)
     expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.run.coverage-complete')?.outcome).toBe('inconclusive')
     expect(requestedPaths).toEqual(['/', '/sitemap.xml', '/robots.txt'])
+  })
+
+  it('skips suspicious child sitemaps before requesting them', async () => {
+    const requestedPaths: string[] = []
+    let origin = ''
+    const server = createServer((request, response) => {
+      requestedPaths.push(request.url || '')
+      if (request.url === '/') {
+        response.writeHead(200, { 'content-type': 'text/html' })
+        response.end(htmlPage(origin, '/', { title: 'Sichere Startseite' }))
+        return
+      }
+      if (request.url === '/sitemap.xml') {
+        response.writeHead(200, { 'content-type': 'application/xml' })
+        response.end(`<?xml version="1.0"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><sitemap><loc>${origin}safe.xml</loc></sitemap><sitemap><loc>${origin}unsubscribe.xml?code=secret</loc></sitemap></sitemapindex>`)
+        return
+      }
+      if (request.url === '/safe.xml') {
+        response.writeHead(200, { 'content-type': 'application/xml' })
+        response.end(`<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${origin}</loc></url></urlset>`)
+        return
+      }
+      if (request.url === '/robots.txt') {
+        response.writeHead(200, { 'content-type': 'text/plain' })
+        response.end(`Sitemap: ${origin}sitemap.xml`)
+        return
+      }
+      response.writeHead(500)
+      response.end('Diese verdächtige Kind-Sitemap darf nicht aufgerufen werden.')
+    })
+    origin = await listen(server)
+
+    const report = await runCrawlCheck([origin], {
+      allowHttp: true,
+      allowPrivate: true,
+      sitemap: true,
+    })
+    const result = report.results[0] as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
+      issues: Array<{ code: string }>
+    }
+
+    expect(result.issues.map(issue => issue.code)).toContain('sitemap-skipped-read-only')
+    expect(result.assertions.find(assertion => assertion.assertionId === 'crawl.sitemap.coverage-complete')?.outcome).toBe('inconclusive')
+    expect(requestedPaths).toEqual(['/', '/sitemap.xml', '/safe.xml', '/robots.txt'])
   })
 
   it('marks resource-limit-dependent assertions inconclusive', async () => {

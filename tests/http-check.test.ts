@@ -149,6 +149,39 @@ describe('http checker', () => {
     expect(Date.now() - startedAt).toBeLessThan(500)
   })
 
+  it('blocks suspicious automatic targets and every suspicious redirect before requesting them', async () => {
+    const requestedPaths: string[] = []
+    const server = createServer((request, response) => {
+      requestedPaths.push(request.url || '')
+      if (request.url === '/safe') {
+        response.writeHead(302, { location: '/next' })
+        response.end()
+        return
+      }
+      if (request.url === '/next') {
+        response.writeHead(302, { location: '/delete-account?token=secret' })
+        response.end()
+        return
+      }
+      response.writeHead(200, { 'content-type': 'text/plain' })
+      response.end('ok')
+    })
+    const origin = await listen(server)
+    const options = {
+      allowHttp: true,
+      allowPrivate: true,
+      maxHtmlBytes: 1024,
+      maxRedirects: 2,
+      timeoutMilliseconds: 1000,
+    }
+
+    await expect(fetchResource(`${origin}unsubscribe?code=secret`, options)).rejects.toThrow(/Nur-Lese-Richtlinie/)
+    await expect(fetchResource(`${origin}unsubscribe?code=secret`, options, { explicitInput: true })).resolves.toMatchObject({ status: 200 })
+    await expect(fetchResource(`${origin}safe`, options, { explicitInput: true })).rejects.toThrow(/Nur-Lese-Richtlinie/)
+
+    expect(requestedPaths).toEqual(['/unsubscribe?code=secret', '/safe', '/next'])
+  })
+
   it('parses URLs and safe CLI options', () => {
     const parsed = parseArguments([
       'https://example.com/',
@@ -277,6 +310,40 @@ describe('http checker', () => {
     ]))
     expect(JSON.stringify(json)).not.toContain('assertions')
     expect(JSON.stringify(json)).not.toContain('source=qa')
+  })
+
+  it('does not request suspicious discovered assets or their redirect targets', async () => {
+    const requestedPaths: string[] = []
+    const server = createServer((request, response) => {
+      requestedPaths.push(request.url || '')
+      if (request.url === '/safe.css') {
+        response.writeHead(302, { location: '/remove-account' })
+        response.end()
+        return
+      }
+      if (request.url === '/.well-known/ops-http-check-not-found') {
+        response.writeHead(404, { 'content-type': 'text/html' })
+        response.end('<meta name="robots" content="noindex"><h1>Nicht gefunden</h1>')
+        return
+      }
+      response.writeHead(200, { 'content-type': 'text/html' })
+      response.end('<link rel="stylesheet" href="/delete-style.css"><link rel="stylesheet" href="/safe.css"><script src="/app.js?token=secret"></script><h1>Start</h1>')
+    })
+    const url = await listen(server)
+
+    const report = await runHttpCheck([url], { allowHttp: true, allowPrivate: true })
+    const result = report.results[0] as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
+      issues: Array<{ code: string }>
+    }
+
+    expect(result.issues.map(issue => issue.code)).toEqual(expect.arrayContaining([
+      'compression-fetch-failed',
+      'resource-skipped-read-only',
+    ]))
+    expect(result.assertions).toContainEqual(expect.objectContaining({ assertionId: 'http.security.selected-response-coverage-complete', outcome: 'inconclusive' }))
+    expect(requestedPaths.some(path => path.startsWith('/delete-style.css') || path.startsWith('/app.js') || path.startsWith('/remove-account'))).toBe(false)
+    expect(requestedPaths.filter(path => path === '/safe.css')).toHaveLength(3)
   })
 
   it('bounds decompressed compression responses', async () => {

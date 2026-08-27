@@ -5,6 +5,7 @@ import { lookup } from 'node:dns/promises'
 import http from 'node:http'
 import https from 'node:https'
 import { isIP } from 'node:net'
+import { readOnlyNavigationConcern } from './navigation-safety.mjs'
 
 const redirectStatuses = new Set([301, 302, 303, 307, 308])
 const urlFieldNames = new Set([
@@ -421,7 +422,11 @@ export async function fetchResource(input, options, request = {}) {
   const redirects = []
 
   for (let redirectCount = 0; redirectCount <= options.maxRedirects; redirectCount += 1) {
-    // Redirects müssen nacheinander gegen dieselben Sicherheitsgrenzen geprüft werden.
+    // Nur das ausdrücklich angegebene erste Ziel darf die konservative Namensheuristik umgehen; Redirects und automatisch erzeugte Ziele nie.
+    const concern = readOnlyNavigationConcern(currentUrl)
+    if (concern && !(redirectCount === 0 && request.explicitInput)) {
+      throw new Error(`Abrufziel ${reportUrl(currentUrl.href).url} wurde wegen ${concern} durch die Nur-Lese-Richtlinie abgelehnt.`)
+    }
     const response = await requestOnce(currentUrl, options, request)
 
     if (redirectStatuses.has(response.status)) {

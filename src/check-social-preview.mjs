@@ -780,7 +780,7 @@ async function checkRobots(result, pageUrl, agentResults, options) {
   }
 }
 
-async function inspectPage(inputUrl, options) {
+async function inspectPage(inputUrl, options, explicitInput = false) {
   const result = {
     agents: [],
     images: [],
@@ -793,6 +793,7 @@ async function inspectPage(inputUrl, options) {
     try {
       const response = await fetchResource(inputUrl, options, {
         accept: 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.1',
+        explicitInput,
         maximumBytes: options.maxHtmlBytes,
         userAgent: agent.value,
         validateRedirect: nextUrl => !readOnlyNavigationConcern(nextUrl),
@@ -1297,7 +1298,7 @@ export async function runSocialPreviewCheck(inputUrls, options = {}) {
   urls = discoveredUrls.slice(0, mergedOptions.maxPages)
   const results = []
   for (const url of urls) {
-    const result = await inspectPage(url, mergedOptions)
+    const result = await inspectPage(url, mergedOptions, validatedInputs.includes(url))
     result.coverage = {
       discoveredPages: discoveredUrls.length,
       selectedPages: urls.length,

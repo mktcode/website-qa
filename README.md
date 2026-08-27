@@ -146,10 +146,10 @@ Rohberichte können dennoch öffentliche Pfade, DOM-Selektoren, Seitentitel, Res
 - DNS-, Redirect-, Origin-, Größen- und Zeitgrenzen;
 - externe Crawlziele nur inventarisiert;
 - externe Browserrequests und Nicht-GET-Methoden blockiert;
-- verdächtige GET-Navigationen vorsorglich ausgelassen;
+- verdächtige automatisch entdeckte GET-Seiten, Ressourcen und Redirectziele vorsorglich ausgelassen;
 - Begrenzungen werden sichtbar und führen abhängigkeitsbezogen zu unklaren Signalen.
 
-Bei Unsicherheit brechen die Werkzeuge geschlossen ab, statt einen möglicherweise schreibenden Pfad aufzurufen.
+Nur das exakt ausdrücklich angegebene erste Ziel kann die konservative Namensheuristik der zentralen HTTP-Schicht umgehen. Automatisch erzeugte oder entdeckte Ziele und jeder Redirecthop werden vor dem Request geprüft. Bei Unsicherheit brechen die Werkzeuge geschlossen ab, statt einen möglicherweise schreibenden Pfad aufzurufen.
 
 ## Öffentliche Paketoberfläche
 

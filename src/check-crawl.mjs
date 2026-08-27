@@ -198,7 +198,7 @@ function addMediaGetObservationAssertion(result) {
   const mediaTypes = new Set(['audio', 'image', 'video'])
   const observedMedia = result.resources.filter(resource => (resource.types || []).some(type => mediaTypes.has(type)))
   let outcome = outcomeFromIssueCodes(result, {
-    inconclusiveCodes: [...incompletePageCrawlIssueCodes, 'resource-fetch-failed', 'resource-limit-reached'],
+    inconclusiveCodes: [...incompletePageCrawlIssueCodes, 'resource-fetch-failed', 'resource-limit-reached', 'resource-skipped-read-only'],
   })
   if (outcome === 'pass' && observedMedia.length === 0) {
     outcome = 'notApplicable'
@@ -221,7 +221,7 @@ function addExtendedCrawlAssertions(result, options) {
   let outcome = sitemapEnabled
     ? outcomeFromIssueCodes(result, {
         failureCodes: ['sitemap-content-type', 'sitemap-http-status', 'sitemap-redirect', 'sitemap-xml-invalid'],
-        inconclusiveCodes: ['sitemap-fetch-failed', 'sitemap-limit'],
+        inconclusiveCodes: ['sitemap-fetch-failed', 'sitemap-limit', 'sitemap-skipped-read-only'],
       })
     : 'inconclusive'
   if (outcome === 'pass' && !sitemapFilesObserved) {
@@ -252,7 +252,7 @@ function addExtendedCrawlAssertions(result, options) {
   outcome = sitemapEnabled
     ? outcomeFromIssueCodes(result, {
         failureCodes: ['sitemap-location-duplicate', 'sitemap-location-external', 'sitemap-location-invalid'],
-        inconclusiveCodes: ['sitemap-coverage-incomplete', 'sitemap-fetch-failed', 'sitemap-http-status', 'sitemap-limit', 'sitemap-xml-invalid'],
+        inconclusiveCodes: ['sitemap-coverage-incomplete', 'sitemap-fetch-failed', 'sitemap-http-status', 'sitemap-limit', 'sitemap-skipped-read-only', 'sitemap-xml-invalid'],
       })
     : 'inconclusive'
   if (outcome === 'pass' && (resultIssueCodes(result).has('indexable-page-not-in-sitemap') || sitemapPageLocations === 0 || result.pages.some(sitemapPageInvalid))) {
@@ -268,7 +268,7 @@ function addExtendedCrawlAssertions(result, options) {
 
   outcome = sitemapEnabled
     ? outcomeFromIssueCodes(result, {
-        inconclusiveCodes: ['page-limit-reached', 'sitemap-coverage-incomplete', 'sitemap-fetch-failed', 'sitemap-http-status', 'sitemap-limit', 'sitemap-xml-invalid'],
+        inconclusiveCodes: ['page-limit-reached', 'sitemap-coverage-incomplete', 'sitemap-fetch-failed', 'sitemap-http-status', 'sitemap-limit', 'sitemap-skipped-read-only', 'sitemap-xml-invalid'],
       })
     : 'inconclusive'
   if (outcome === 'pass' && !sitemapFilesObserved) {
@@ -303,7 +303,7 @@ function addExtendedCrawlAssertions(result, options) {
 
   outcome = outcomeFromIssueCodes(result, {
     failureCodes: ['resource-http-status'],
-    inconclusiveCodes: [...incompletePageCodes, 'resource-fetch-failed', 'resource-limit-reached'],
+    inconclusiveCodes: [...incompletePageCodes, 'resource-fetch-failed', 'resource-limit-reached', 'resource-skipped-read-only'],
   })
   if (outcome === 'pass' && result.resources.length === 0) {
     outcome = 'notApplicable'
@@ -317,7 +317,7 @@ function addExtendedCrawlAssertions(result, options) {
 
   outcome = outcomeFromIssueCodes(result, {
     failureCodes: ['resource-content-type'],
-    inconclusiveCodes: [...incompletePageCodes, 'resource-fetch-failed', 'resource-http-status', 'resource-limit-reached'],
+    inconclusiveCodes: [...incompletePageCodes, 'resource-fetch-failed', 'resource-http-status', 'resource-limit-reached', 'resource-skipped-read-only'],
   })
   if (outcome === 'pass' && result.resources.length === 0) {
     outcome = 'notApplicable'
@@ -338,7 +338,8 @@ function addExtendedCrawlAssertions(result, options) {
     'page-limit-reached',
     'resource-fetch-failed',
     'resource-limit-reached',
-    ...(sitemapEnabled ? ['sitemap-coverage-incomplete', 'sitemap-fetch-failed', 'sitemap-http-status', 'sitemap-limit', 'sitemap-xml-invalid'] : []),
+    'resource-skipped-read-only',
+    ...(sitemapEnabled ? ['sitemap-coverage-incomplete', 'sitemap-fetch-failed', 'sitemap-http-status', 'sitemap-limit', 'sitemap-skipped-read-only', 'sitemap-xml-invalid'] : []),
   ]
   outcome = outcomeFromIssueCodes(result, { inconclusiveCodes: coverageCodes })
   if (outcome === 'pass' && result.pages.length === 0) {
@@ -794,6 +795,16 @@ function enqueueResource(state, value, type, sourceUrl) {
   }
   url.hash = ''
 
+  const concern = readOnlyNavigationConcern(url)
+  if (concern) {
+    const key = `${sourceUrl}\n${url.href}`
+    if (!state.skippedResourceKeys.has(key)) {
+      state.skippedResourceKeys.add(key)
+      addIssue(state.result, 'warning', 'resource-skipped-read-only', `Automatisch entdeckte Ressource wurde wegen ${concern} nicht abgerufen.`, ['CORE-QA-05', 'FORM-TEST-04'], url.href)
+    }
+    return
+  }
+
   let entry = state.resourceEntries.get(url.href)
   if (!entry) {
     if (state.resourceEntries.size >= state.options.maxResources) {
@@ -918,7 +929,11 @@ async function fetchSitemaps(state) {
           continue
         }
         if (parsed.kind === 'index') {
-          if (!visited.has(locationUrl.href) && !queue.includes(locationUrl.href)) {
+          const concern = readOnlyNavigationConcern(locationUrl)
+          if (concern) {
+            addIssue(state.result, 'warning', 'sitemap-skipped-read-only', `Automatisch entdeckte Sitemap wurde wegen ${concern} nicht abgerufen.`, ['CORE-MAP-02', 'FORM-TEST-04'], locationUrl.href)
+          }
+          else if (!visited.has(locationUrl.href) && !queue.includes(locationUrl.href)) {
             queue.push(locationUrl.href)
           }
         }
@@ -1191,8 +1206,10 @@ async function inspectSite(inputUrl, options) {
   try {
     initialResponse = await fetchResource(inputUrl, options, {
       accept: 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.1',
+      explicitInput: true,
       headers: { 'accept-encoding': 'identity' },
       maximumBytes: options.maxHtmlBytes,
+      validateRedirect: nextUrl => !readOnlyNavigationConcern(nextUrl),
     })
   }
   catch (error) {
@@ -1218,6 +1235,7 @@ async function inspectSite(inputUrl, options) {
     resourceQueue: [],
     result,
     sitemapUrl: undefined,
+    skippedResourceKeys: new Set(),
     skippedLinkKeys: new Set(),
     sitemapUrls: new Set(),
   }

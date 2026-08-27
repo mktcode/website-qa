@@ -61,6 +61,7 @@ Die Arbeitskennungen in diesem Abschnitt dienen ausschließlich der Wartungsplan
 | `WQ-04` | P2 | umgesetzt, unveröffentlicht | WebSocket-Nebenwirkungsnachweis serverseitig vervollständigen |
 | `WQ-05` | P2 | umgesetzt, unveröffentlicht | installierbares Tarball reproduzierbar prüfen |
 | `WQ-06` | P2 | umgesetzt, unveröffentlicht | Social-Seitenlimit über Code und Dokumentation vereinheitlichen |
+| `WQ-08` | P1 | umgesetzt, unveröffentlicht | automatisch entdeckte GET-Ziele und jeden Redirecthop zentral absichern |
 | `WQ-07` | P3 | wartet auf Praxisbeleg | weitere technische Signale nur befundgetrieben auswählen |
 
 ### `WQ-01` – IPv6-/SSRF-Klassifikation und Redaktion
@@ -105,6 +106,13 @@ Die Arbeitskennungen in diesem Abschnitt dienen ausschließlich der Wartungsplan
 - **Abhängigkeiten:** konservativer Standard, CLI-Hilfe, README, Integrationsbeispiel, Kerncheckliste, neutraler Checklistenindex und Prüfverfahren.
 - **Akzeptanz:** Werkzeugstandard und allgemeine Beispielaufrufe verwenden einheitlich 20 Seiten; größere Inventare benötigen eine ausdrückliche Option; Hilfe, README, Integrationsbeispiel, Kerncheckliste, Checklistenindex, Prüfverfahren und Parsertest stimmen mit dieser Entscheidung überein.
 
+### `WQ-08` – zentrale Nur-Lese-Grenze für GET-Ziele
+
+- **Problembeleg:** HTTP- und Crawl-Ressourcen, Crawl-Sitemapindex-Kinder sowie Lighthouse-Preflight-Redirects konnten die vorhandene Heuristik für potenziell zustandsverändernde Pfade und Queryparameter umgehen, wenn ein Aufrufer keinen eigenen Redirectvalidator setzte.
+- **Risiko:** Ein fehlerhaft implementierter GET-Endpunkt kann durch eine automatisch entdeckte Ressource oder einen Redirect eine Servernebenwirkung auslösen, obwohl der Prüfer selbst ausschließlich GET verwendet.
+- **Abhängigkeiten:** zentrale Abruflogik in `src/lib/http-client.mjs`, gemeinsame Heuristik in `src/lib/navigation-safety.mjs`, explizite Eingabeziele und alle fünf Verbraucher.
+- **Akzeptanz:** Nur das exakt ausdrücklich angegebene erste Ziel darf die konservative Namensheuristik umgehen; automatisch erzeugte oder entdeckte Ziele und jeder Redirecthop werden vor dem Request zentral geprüft; HTTP und Crawl weisen ausgelassene Ressourcen sichtbar und abhängigkeitsbezogen unklar aus; lokale Nebenwirkungstests für direkte Ressourcen, CSS-Ressourcen, Sitemapindex-Kinder und mehrstufige Redirects beobachten null Requests am verdächtigen Ziel; Browser-, Social- und Lighthouse-Grenzen bleiben grün.
+
 ### `WQ-07` – befundgetriebene Signalkandidaten
 
 - **Problembeleg:** Die Checkliste reicht bewusst weit über die 42 derzeit durch technische Signale referenzierten Punkte hinaus; daraus folgt weder eine Abdeckungslücke noch automatisch ein sinnvoller Automatisierungskandidat.
@@ -122,10 +130,11 @@ Die Arbeitskennungen in diesem Abschnitt dienen ausschließlich der Wartungsplan
 | Quell-/Paketabweichung | veröffentlichte CLIs oder Schemata funktionieren trotz grüner Quelltests nicht | isolierter Tarball-Verbrauchertest unter beiden Node-Zweigen (`WQ-05`) | Änderung an `bin`, `exports`, `files`, Paketmanager oder Schemata |
 | Abhängigkeitsregression | Parser-, Netzwerk-, Browser- oder Mediengrenzen ändern sich unbemerkt | gezielte Sicherheits- und Nebenwirkungstests statt erzwungener Updates | jede direkte oder transitive sicherheitsrelevante Aktualisierung |
 | Dokumentationsdrift bei Limits | nicht vergleichbare oder unerwartet große Läufe | zentrale Entscheidung und gesonderte Link-/Dokumentprüfung (`WQ-06`) | Änderung eines Defaults, Hilfetexts oder Integrationsbeispiels |
+| zustandsverändernder GET durch automatische Ziele | unbeabsichtigte Servernebenwirkung trotz GET-only | zentrale Zielheuristik vor jedem automatischen Request und Redirecthop sowie lokale Nebenwirkungstests (`WQ-08`) | Änderung an HTTP-Client, Ressourcenentdeckung, Sitemap-Queues oder Redirectlogik |
 
 ## Reihenfolge und Freigabeabhängigkeiten
 
-1. `WQ-01` bis `WQ-03` sind fachliche Releaseblocker und werden vor einem neuen Tag vollständig validiert.
+1. `WQ-01` bis `WQ-03` sowie `WQ-08` sind fachliche Releaseblocker und werden vor einem neuen Tag vollständig validiert.
 2. `WQ-04` und `WQ-05` liefern die erforderlichen Nebenwirkungs- und Paketevidenzen für denselben Stand.
 3. `WQ-06` wird vor einer weiteren Dokumentations- oder Paketveröffentlichung vollständig validiert, damit keine bekannte Limitabweichung fortgeschrieben wird.
 4. `WQ-07` beginnt erst nach ausgewerteten Pilotbefunden; eine gewünschte höhere Checklistenabdeckung allein ist keine Abhängigkeit und kein Akzeptanzgrund.
