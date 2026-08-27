@@ -46,9 +46,48 @@ function isNonPublicIpv4(address) {
     || first >= 224
 }
 
+function ipv6Groups(address) {
+  let normalized = address.toLowerCase()
+  const dottedSuffix = normalized.match(/(\d+\.\d+\.\d+\.\d+)$/)?.[1]
+  if (dottedSuffix) {
+    const octets = dottedSuffix.split('.').map(Number)
+    if (octets.some(octet => !Number.isInteger(octet) || octet < 0 || octet > 255)) {
+      return undefined
+    }
+    normalized = `${normalized.slice(0, -dottedSuffix.length)}${((octets[0] << 8) | octets[1]).toString(16)}:${((octets[2] << 8) | octets[3]).toString(16)}`
+  }
+
+  const halves = normalized.split('::')
+  if (halves.length > 2) {
+    return undefined
+  }
+  const left = halves[0] ? halves[0].split(':') : []
+  const right = halves[1] ? halves[1].split(':') : []
+  const missing = 8 - left.length - right.length
+  if ((halves.length === 1 && missing !== 0) || (halves.length === 2 && missing < 1)) {
+    return undefined
+  }
+
+  const groups = [...left, ...Array.from({ length: missing }).fill('0'), ...right]
+  if (groups.length !== 8 || groups.some(group => !/^[\da-f]{1,4}$/.test(group))) {
+    return undefined
+  }
+  return groups.map(group => Number.parseInt(group, 16))
+}
+
 function mappedIpv4(address) {
-  const match = address.toLowerCase().match(/^(?:::ffff:)?(\d+\.\d+\.\d+\.\d+)$/)
-  return match?.[1]
+  if (isIP(address) === 4) {
+    return address
+  }
+  if (isIP(address) !== 6) {
+    return undefined
+  }
+
+  const groups = ipv6Groups(address)
+  if (!groups || groups.slice(0, 5).some(group => group !== 0) || groups[5] !== 65_535) {
+    return undefined
+  }
+  return [groups[6] >> 8, groups[6] & 255, groups[7] >> 8, groups[7] & 255].join('.')
 }
 
 function isNonPublicIp(address) {
@@ -67,6 +106,7 @@ function isNonPublicIp(address) {
     || normalized.startsWith('fc')
     || normalized.startsWith('fd')
     || /^fe[89ab]/.test(normalized)
+    || /^fe[c-f]/.test(normalized)
     || normalized.startsWith('ff')
     || normalized === '2001:db8::'
     || normalized.startsWith('2001:db8:')
@@ -250,6 +290,13 @@ export async function validatedResolution(url, options) {
 
 export async function assertPublicResolution(url, options) {
   await validatedResolution(url, options)
+}
+
+export async function chromiumHostResolverRule(url, options) {
+  const resolutions = await validatedResolution(url, options)
+  const pinnedResolution = resolutions.find(result => result.family === 4) || resolutions[0]
+  const pinnedAddress = pinnedResolution.family === 6 ? `[${pinnedResolution.address}]` : pinnedResolution.address
+  return `MAP ${normalizedHostname(url.hostname)} ${pinnedAddress}`
 }
 
 function normalizedHeaders(headers) {

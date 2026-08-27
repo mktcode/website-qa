@@ -1,6 +1,6 @@
 {
   "name": "@mktcode/website-qa",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Read-only technical signals and a comprehensive manual checklist for website quality assurance",
   "license": "MIT",
   "type": "module",
@@ -17,7 +17,8 @@
   "exports": {
     "./checklist-index.json": "./catalog/checklist-index.json",
     "./signals.json": "./catalog/signals.json",
-    "./technical-report.schema.json": "./catalog/technical-report.common.schema.json",
+    "./technical-report.schema.json": "./catalog/technical-report.schema.json",
+    "./technical-report.common.schema.json": "./catalog/technical-report.common.schema.json",
     "./http-report.schema.json": "./catalog/http-report.schema.json",
     "./crawl-report.schema.json": "./catalog/crawl-report.schema.json",
     "./browser-report.schema.json": "./catalog/browser-report.schema.json",
@@ -36,6 +37,7 @@
   "scripts": {
     "lint": "oxlint --deny-warnings -D correctness -D suspicious -D perf src tests && eslint --max-warnings 0 src tests",
     "test": "vitest run",
+    "test:chromium": "WEBSITE_QA_REQUIRE_CHROMIUM=1 vitest run tests/browser-check.test.ts tests/lighthouse-check.test.ts",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "check": "npm run lint && npm run typecheck && npm test",

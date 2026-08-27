@@ -11,7 +11,7 @@
 
 Nicht zum Produkt gehören Eingabewizards, manuelle Evidence-Verwaltung, Projektkonfiguration, Workflowzustände, Freigaben, Checklistenaggregation, Gesamtberichtsgeneratoren oder ein universeller Sammelbefehl.
 
-## v2.0 – unveröffentlicht
+## v2.0 – veröffentlicht am 2026-08-27
 
 Der inkompatible Schnitt entfernt die in v1 zu weit ausgebaute Projektberichtsplattform. Technische Berichte verwenden Schema 2 und Signalstatus `positive`, `defect`, `inconclusive` oder `notApplicable`. Der neutrale Checklistenindex validiert ausschließlich stabile Referenzen.
 
@@ -37,22 +37,35 @@ Lighthouse führt einen festen mobilen Navigationstest mit Performance, Accessib
 
 Diese Grenzen werden durch lokale Servertests und echte Chromium-Integrationstests abgesichert.
 
-## Nächste fachliche Arbeit
+## Nächster Wartungsschritt: 2.0.1
 
-Neue Automatisierungen werden nur aufgenommen, wenn sie frameworkunabhängig, passiv, begrenzt und als technisches Signal belastbar sind. Priorität haben klare Defekte und Beobachtungen, die einer QA-Prüferin oder einem QA-Prüfer repetitive Startarbeit abnehmen.
+Priorität P0 ist ein enger Sicherheitspatch ohne neue Produktoberfläche:
+
+- IPv4-mapped-IPv6 wird vollständig durch die private Zielsperre erfasst;
+- der Browser-Prüfer pinnt Chromium-DNS an die vorab geprüfte Adresse;
+- Dekompression, Social-Sitemaps und Browserbeobachtungen besitzen ausdrückliche Grenzen;
+- reale Exitcode-2-Ausgaben aller fünf CLIs entsprechen ihren veröffentlichten Schemata;
+- Release- und Integrationsdokumentation bezeichnen denselben öffentlichen Stand.
+
+**Akzeptanz:** Die jeweiligen Positiv-, Negativ-, Grenz- und Nebenwirkungstests bestehen. `npm run check` und `npm run test:chromium` laufen unter einem unterstützten Node-22- und Node-24-Stand; Browser- und Lighthouse-Integration werden nicht übersprungen. Das erzeugte Tarball wird in einem leeren Verbraucherprojekt installiert, alle fünf installierten Befehle werden ausgeführt und ihre JSON-Berichte gegen die Paketschemata validiert.
+
+## Spätere fachliche Arbeit
+
+Neue Automatisierungen werden nur aufgenommen, wenn sie frameworkunabhängig, passiv, begrenzt und als technisches Signal belastbar sind. Jeder Kandidat nennt Problembeleg, Priorität, betroffenen Prüfer, Aussage und Nichtaussage, GET-/SSRF-/Redirect-/Größen-/Zeitgrenzen, stabile Signalreferenzen sowie Positiv-, Negativ-, Grenz- und Nebenwirkungstests. Kandidaten ohne diese Angaben werden nicht umgesetzt.
 
 Nicht automatisierbare Rechts-, Datenschutz-, Infrastruktur-, Plattform-, Geräte-, Screenreader-, Kommunikations- und Freigabefragen bleiben Bestandteil der menschlichen Checkliste. Das Paket modelliert ihren Projektstatus nicht.
 
 ## Veröffentlichung
 
-Vor einem v2-Tag sind erforderlich:
+Vor jedem neuen Paket-Tag sind erforderlich:
 
 ```bash
 npm ci
 npm run check
+npm run test:chromium
 npm pack --dry-run
 ```
 
-Zusätzlich werden das erzeugte Tarball in einem temporären Verbraucher installiert, alle fünf Befehle ausgeführt und die Chromium-Sicherheitsintegration für Browser und Lighthouse bestätigt. Veröffentlichung und Tagging bleiben bewusste getrennte Entscheidungen.
+Zusätzlich wird das erzeugte Tarball in einem temporären Verbraucher installiert, alle fünf Befehle werden ausgeführt und die JSON-Ausgaben gegen die mitgelieferten Schemata validiert. Die Releaseprüfung wird jeweils unter einem unterstützten Node-22- und Node-24-Stand mit Node-, npm- und Chromium-Version protokolliert. Veröffentlichung und Tagging bleiben bewusste getrennte Entscheidungen; veröffentlichte Tags werden nicht verschoben.
 
 Historische Entscheidungen und veröffentlichte 0.x-/1.x-Stände bleiben im [`CHANGELOG.md`](CHANGELOG.md) und über Git-Tags nachvollziehbar.

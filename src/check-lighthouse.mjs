@@ -5,10 +5,11 @@
 import { startFlow } from 'lighthouse/core/index.js'
 import puppeteer from 'puppeteer-core'
 import { chromiumExecutable, classifyBrowserRequest, installReadOnlyDomGuards } from './lib/browser-safety.mjs'
-import { assertPublicResolution, fetchResource, normalizedHostname, redactReportData, redactText, reportUrl, validatedResolution, validateUrl } from './lib/http-client.mjs'
+import { assertPublicResolution, chromiumHostResolverRule, fetchResource, redactReportData, redactText, reportUrl, validateUrl } from './lib/http-client.mjs'
 import { writeJsonOutput } from './lib/json-output.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
 import { checklistReference } from './lib/signal-report.mjs'
+import { jsonOutputIntent, technicalErrorReport } from './lib/technical-report.mjs'
 
 const categories = ['performance', 'accessibility', 'best-practices', 'seo']
 const maxBlockedRecords = 100
@@ -74,6 +75,9 @@ export function parseArguments(argv) {
     else if (argument.startsWith('--json-file=')) {
       options.jsonFile = argument.slice('--json-file='.length)
       options.json = true
+      if (!options.jsonFile) {
+        throw new TypeError('--json-file benötigt einen Pfad.')
+      }
     }
     else if (argument.startsWith('--chromium-path=')) {
       options.chromiumPath = argument.slice('--chromium-path='.length)
@@ -96,8 +100,8 @@ export function parseArguments(argv) {
 }
 
 function positiveInteger(argument, prefix) {
-  const value = Number.parseInt(argument.slice(prefix.length), 10)
-  if (!Number.isInteger(value) || value < 1) { throw new TypeError(`${prefix.slice(0, -1)} benötigt eine positive Ganzzahl.`) }
+  const value = Number(argument.slice(prefix.length))
+  if (!Number.isSafeInteger(value) || value < 1) { throw new TypeError(`${prefix.slice(0, -1)} benötigt eine positive Ganzzahl.`) }
   return value
 }
 
@@ -113,6 +117,16 @@ async function withTimeout(promise, milliseconds) {
   }
   finally {
     clearTimeout(timer)
+  }
+}
+
+export async function withResourceTimeout(promise, milliseconds, closeResource) {
+  try {
+    return await withTimeout(promise, milliseconds)
+  }
+  catch (error) {
+    void promise.then(resource => closeResource(resource)).catch(() => {})
+    throw error
   }
 }
 
@@ -214,17 +228,10 @@ export async function runLighthouseCheck(input, suppliedOptions = {}) {
   const finalUrl = validateUrl(preflight.finalUrl, options, 'Finale URL')
   if (finalUrl.origin !== requestedUrl.origin) { throw new TypeError('Lighthouse folgt keinem Originwechsel der Startnavigation.') }
   const executablePath = chromiumExecutable(options.chromiumPath)
-  const resolutions = await validatedResolution(finalUrl, options)
-  const pinnedResolution = resolutions.find(result => result.family === 4) || resolutions[0]
-  const pinnedAddress = pinnedResolution.family === 6 ? `[${pinnedResolution.address}]` : pinnedResolution.address
-  const browser = await withTimeout(puppeteer.launch({
-    args: ['--disable-background-networking', '--disable-component-update', '--disable-default-apps', '--disable-quic', '--disable-sync', `--host-resolver-rules=MAP ${normalizedHostname(finalUrl.hostname)} ${pinnedAddress}`, '--metrics-recording-only', '--no-first-run'],
-    executablePath,
-    headless: true,
-  }), remainingMilliseconds(deadline, configuredOptions.timeoutMilliseconds))
-  const context = await withTimeout(browser.createBrowserContext(), remainingMilliseconds(deadline, configuredOptions.timeoutMilliseconds))
-  const page = await withTimeout(context.newPage(), remainingMilliseconds(deadline, configuredOptions.timeoutMilliseconds))
-  const browserVersion = await withTimeout(browser.version(), remainingMilliseconds(deadline, configuredOptions.timeoutMilliseconds))
+  const hostResolverRule = await chromiumHostResolverRule(finalUrl, options)
+  let browser
+  let context
+  let page
   const blockedActions = []
   const blockedRequests = []
   const safeResolutions = new Map()
@@ -234,6 +241,14 @@ export async function runLighthouseCheck(input, suppliedOptions = {}) {
   let interceptionInstalledBeforeNavigation = false
   let guardsInstalledBeforeNavigation = false
   try {
+    browser = await withResourceTimeout(puppeteer.launch({
+      args: ['--disable-background-networking', '--disable-component-update', '--disable-default-apps', '--disable-quic', '--disable-sync', `--host-resolver-rules=${hostResolverRule}`, '--metrics-recording-only', '--no-first-run'],
+      executablePath,
+      headless: true,
+    }), remainingMilliseconds(deadline, configuredOptions.timeoutMilliseconds), lateBrowser => lateBrowser.close())
+    context = await withResourceTimeout(browser.createBrowserContext(), remainingMilliseconds(deadline, configuredOptions.timeoutMilliseconds), lateContext => lateContext.close())
+    page = await withResourceTimeout(context.newPage(), remainingMilliseconds(deadline, configuredOptions.timeoutMilliseconds), latePage => latePage.close())
+    const browserVersion = await withTimeout(browser.version(), remainingMilliseconds(deadline, configuredOptions.timeoutMilliseconds))
     await page.setBypassServiceWorker(true)
     await page.setViewport({ deviceScaleFactor: 2.625, hasTouch: true, height: 823, isMobile: true, width: 412 })
     page.setDefaultNavigationTimeout(remainingMilliseconds(deadline, configuredOptions.timeoutMilliseconds))
@@ -384,8 +399,9 @@ export async function runLighthouseCheck(input, suppliedOptions = {}) {
     }
   }
   finally {
-    await context.close().catch(() => {})
-    await browser.close().catch(() => {})
+    await page?.close().catch(() => {})
+    await context?.close().catch(() => {})
+    await browser?.close().catch(() => {})
   }
 }
 
@@ -405,6 +421,7 @@ function printReport(report) {
 }
 
 async function main() {
+  const outputIntent = jsonOutputIntent(process.argv.slice(2))
   let parsed
   try {
     parsed = parseArguments(process.argv.slice(2))
@@ -428,10 +445,16 @@ async function main() {
     process.exitCode = report.summary.failed ? 1 : 0
   }
   catch (error) {
-    const errorReport = { error: redactText(error.message), schemaVersion: 2, tool: 'lighthouse-check', toolPackage: { name: packageName, version: packageVersion } }
-    if (parsed?.options.json) {
-      if (parsed.options.jsonFile) {
-        writeJsonOutput(parsed.options.jsonFile, errorReport)
+    const errorReport = technicalErrorReport('lighthouse-check', redactText(error.message))
+    if (outputIntent.json || parsed?.options.json) {
+      const jsonFile = parsed?.options.jsonFile || outputIntent.jsonFile
+      if (jsonFile) {
+        try {
+          writeJsonOutput(jsonFile, errorReport)
+        }
+        catch (outputError) {
+          console.error(`Fehler beim Schreiben des JSON-Berichts: ${redactText(outputError.message)}`)
+        }
       }
       else {
         console.log(JSON.stringify(errorReport, null, 2))

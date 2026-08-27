@@ -6,14 +6,17 @@
 import axe from 'axe-core'
 import puppeteer from 'puppeteer-core'
 import { chromiumExecutable, classifyBrowserRequest, installReadOnlyDomGuards } from './lib/browser-safety.mjs'
-import { assertPublicResolution, fetchResource, normalizeMimeType, redactReportData, redactText, reportUrl, validateUrl } from './lib/http-client.mjs'
+import { assertPublicResolution, chromiumHostResolverRule, fetchResource, normalizeMimeType, redactReportData, redactText, reportUrl, validateUrl } from './lib/http-client.mjs'
 import { writeJsonOutput } from './lib/json-output.mjs'
 import { readOnlyNavigationConcern } from './lib/navigation-safety.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
 import { checklistReference, technicalSignals, technicalSignalSummary } from './lib/signal-report.mjs'
 import { parseSitemapXml } from './lib/sitemap-parser.mjs'
+import { jsonOutputIntent, technicalErrorReport } from './lib/technical-report.mjs'
 
 const defaultProfiles = ['desktop', 'mobile', 'narrow', 'reduced-motion', 'zoom-200']
+const maxBrowserDomRecordsPerKind = 100
+const maxBrowserObservationRecordsPerKind = 100
 const maxPrivacyIdentifiersPerProfile = 100
 const maxPrivacyOrigins = 100
 const profileDefinitions = {
@@ -218,6 +221,7 @@ const incompleteBrowserIssueCodes = new Set([
   'beacon-blocked',
   'browser-action-blocked',
   'browser-page-failed',
+  'dom-observation-limit',
   'eventsource-blocked',
   'external-request-blocked',
   'external-sitemap-page-skipped',
@@ -301,8 +305,10 @@ function profilesCoverEveryPage(result, requiredProfiles) {
 
 const incompletePrivacyObservationIssueCodes = new Set([
   'browser-http-error',
+  'browser-observation-limit',
   'browser-page-failed',
   'console-error',
+  'dom-observation-limit',
   'external-sitemap-page-skipped',
   'external-sitemap-skipped',
   'invalid-sitemap-page',
@@ -336,6 +342,17 @@ function createPrivacyObservations(result, options = {}) {
   const externalNetworkRequests = (result.blockedRequests || []).filter(request => request.external)
   const blockedActions = profiles.flatMap(profile => profile.blockedActions || [])
   const externalBlockedActions = blockedActions.filter(action => action.external)
+  const blockedActionObservations = profiles.map((profile) => {
+    const observation = profile.observationLimits?.records?.blockedActions
+    return {
+      externalTotal: observation?.externalTotal ?? (profile.blockedActions || []).filter(action => action.external).length,
+      total: observation?.total ?? profile.blockedActions?.length ?? 0,
+      truncated: Boolean(observation?.truncated),
+    }
+  })
+  const blockedActionTotal = blockedActionObservations.reduce((sum, observation) => sum + observation.total, 0)
+  const externalBlockedActionTotal = blockedActionObservations.reduce((sum, observation) => sum + observation.externalTotal, 0)
+  const blockedActionsTruncated = blockedActionObservations.some(observation => observation.truncated)
   const origins = [...new Set([
     ...externalNetworkRequests.map(request => request.origin),
     ...externalBlockedActions.map(action => action.origin),
@@ -370,13 +387,13 @@ function createPrivacyObservations(result, options = {}) {
       storageDataRecorded,
     },
     externalRequestAttempts: {
-      blockedActions: blockedActions.length,
+      blockedActions: blockedActionTotal,
       blockedNetworkRequests: externalNetworkRequests.length,
-      externalBlockedActions: externalBlockedActions.length,
+      externalBlockedActions: externalBlockedActionTotal,
       originCount: origins.length,
       origins: origins.slice(0, maxPrivacyOrigins),
-      originsTruncated: origins.length > maxPrivacyOrigins,
-      total: externalNetworkRequests.length + externalBlockedActions.length,
+      originsTruncated: blockedActionsTruncated || origins.length > maxPrivacyOrigins,
+      total: externalNetworkRequests.length + externalBlockedActionTotal,
     },
     initialStorage: storage,
     observationMode: 'passive-initial-load-isolated',
@@ -639,7 +656,7 @@ async function sitemapPages(result, options, origin, defaultSitemapUrl) {
       }
       const parsed = parseSitemapXml(response.body.toString('utf8'))
       result.sitemaps.push({ finalUrl: response.finalUrl, kind: parsed.kind, locations: parsed.locations.length, url: sitemapUrl.href })
-      if (parsed.kind === 'sitemapindex') {
+      if (parsed.kind === 'index') {
         sitemapQueue.push(...parsed.locations)
       }
       else {
@@ -672,7 +689,7 @@ async function sitemapPages(result, options, origin, defaultSitemapUrl) {
 }
 
 async function pageFacts(page) {
-  return page.evaluate((privacyIdentifierLimit) => {
+  return page.evaluate((privacyIdentifierLimit, domRecordLimit) => {
     // Die Funktion muss im serialisierten Browser-Kontext definiert sein.
     // oxlint-disable-next-line unicorn/consistent-function-scoping
     const selectorFor = (element) => {
@@ -698,10 +715,15 @@ async function pageFacts(page) {
       })
       .slice(0, 10)
       .map(selectorFor)
-    const links = [...document.querySelectorAll('a[href]')].map(link => ({
+    const linkElements = document.querySelectorAll('a[href]')
+    const links = Array.from({ length: Math.min(linkElements.length, domRecordLimit) }, (_, index) => linkElements[index]).map(link => ({
       download: link.hasAttribute('download'),
       href: link.href,
     }))
+    const formElements = document.forms
+    const forms = Array.from({ length: Math.min(formElements.length, domRecordLimit) }, (_, index) => formElements[index]).map(form => ({ action: form.action, method: form.method.toUpperCase() }))
+    const h1Elements = document.querySelectorAll('h1')
+    const h1 = Array.from({ length: Math.min(h1Elements.length, domRecordLimit) }, (_, index) => h1Elements[index]).map(element => (element.textContent || '').trim()).filter(Boolean)
     const localStorageKeys = Object.keys(localStorage)
     const sessionStorageKeys = Object.keys(sessionStorage)
     const storage = {
@@ -712,8 +734,14 @@ async function pageFacts(page) {
     }
     return {
       buttons: document.querySelectorAll('button, input[type="button"], input[type="submit"], input[type="reset"]').length,
-      forms: [...document.forms].map(form => ({ action: form.action, method: form.method.toUpperCase() })),
-      h1: [...document.querySelectorAll('h1')].map(element => (element.textContent || '').trim()).filter(Boolean),
+      domObservation: {
+        forms: { recorded: forms.length, total: formElements.length, truncated: formElements.length > domRecordLimit },
+        h1: { recorded: h1.length, total: h1Elements.length, truncated: h1Elements.length > domRecordLimit },
+        limitPerKind: domRecordLimit,
+        links: { recorded: links.length, total: linkElements.length, truncated: linkElements.length > domRecordLimit },
+      },
+      forms,
+      h1,
       lang: root.lang,
       landmarks: {
         main: document.querySelectorAll('main, [role="main"]').length,
@@ -728,7 +756,7 @@ async function pageFacts(page) {
       storage,
       title: document.title,
     }
-  }, maxPrivacyIdentifiersPerProfile)
+  }, maxPrivacyIdentifiersPerProfile, maxBrowserDomRecordsPerKind)
 }
 
 async function accessibilityAudit(page) {
@@ -760,7 +788,10 @@ function recordFactsIssues(result, url, profile, facts, violations, privacyObser
     addIssue(result, 'error', 'missing-language', 'Dokumentsprache fehlt.', ['CORE-A11Y-02'], url, profile)
   }
   if (facts.h1.length !== 1) {
-    addIssue(result, 'warning', 'h1-count', `Erwartet wird genau eine H1, gefunden wurden ${facts.h1.length}.`, ['CORE-A11Y-02', 'CORE-SEO-01'], url, profile)
+    addIssue(result, 'warning', 'h1-count', `Erwartet wird genau eine H1, gefunden wurden ${facts.domObservation.h1.total}.`, ['CORE-A11Y-02', 'CORE-SEO-01'], url, profile)
+  }
+  if (Object.entries(facts.domObservation).some(([kind, observation]) => kind !== 'limitPerKind' && observation.truncated)) {
+    addIssue(result, 'warning', 'dom-observation-limit', `Links, Formulare oder H1-Texte überschreiten das Berichtslimit von ${maxBrowserDomRecordsPerKind} Einträgen je Art und Seiten-/Profil-Lauf.`, ['CORE-QA-03', 'CORE-PRIV-02'], url, profile)
   }
   if (facts.landmarks.main !== 1) {
     addIssue(result, 'warning', 'main-landmark-count', `Erwartet wird genau ein Main-Landmark, gefunden wurden ${facts.landmarks.main}.`, ['CORE-A11Y-01'], url, profile)
@@ -784,6 +815,13 @@ function recordFactsIssues(result, url, profile, facts, violations, privacyObser
   }
 }
 
+function recordBoundedObservation(records, totals, kind, value) {
+  totals[kind] += 1
+  if (records.length < maxBrowserObservationRecordsPerKind) {
+    records.push(value)
+  }
+}
+
 async function inspectProfile(browser, result, options, url, profileName, discoverLinks) {
   const profile = profileDefinitions[profileName]
   const context = await browser.createBrowserContext()
@@ -795,9 +833,19 @@ async function inspectProfile(browser, result, options, url, profileName, discov
   const blockedActions = []
   const popupUrls = []
   const safeResolutions = new Map()
+  const observationTotals = {
+    blockedActions: 0,
+    consoleMessages: 0,
+    failedRequests: 0,
+    httpErrorResponses: 0,
+    pageErrors: 0,
+    popupUrls: 0,
+  }
+  let externalBlockedActionCount = 0
   const readOnlyExecution = {
     allowedGetRequests: 0,
     allowedNonGetOrExternalRequests: 0,
+    blockedActionCountsByKind: {},
     blockedRequestCountsByCode: {},
     domGuardsInstalledBeforeNavigation: false,
     interceptedRequests: 0,
@@ -829,8 +877,13 @@ async function inspectProfile(browser, result, options, url, profileName, discov
       catch {
         actionUrl = new URL(url)
       }
-      blockedActions.push({
-        external: actionUrl.origin !== result.origin,
+      const external = actionUrl.origin !== result.origin
+      if (external) {
+        externalBlockedActionCount += 1
+      }
+      readOnlyExecution.blockedActionCountsByKind[kind] = (readOnlyExecution.blockedActionCountsByKind[kind] || 0) + 1
+      recordBoundedObservation(blockedActions, observationTotals, 'blockedActions', {
+        external,
         kind,
         origin: reportUrl(actionUrl.origin).url,
         url: reportUrl(actionUrl.href).url,
@@ -887,24 +940,24 @@ async function inspectProfile(browser, result, options, url, profileName, discov
     })
 
     page.on('console', (message) => {
-      consoleMessages.push({ text: redactText(message.text()), type: message.type() })
+      recordBoundedObservation(consoleMessages, observationTotals, 'consoleMessages', { text: redactText(message.text()), type: message.type() })
     })
     page.on('pageerror', (error) => {
-      pageErrors.push(redactText(error.message))
+      recordBoundedObservation(pageErrors, observationTotals, 'pageErrors', redactText(error.message))
     })
     page.on('requestfailed', (request) => {
       if (!request.failure()?.errorText.includes('ERR_BLOCKED_BY_CLIENT')) {
-        failedRequests.push({ error: request.failure()?.errorText || 'Unbekannter Netzwerkfehler', url: reportUrl(request.url()).url })
+        recordBoundedObservation(failedRequests, observationTotals, 'failedRequests', { error: request.failure()?.errorText || 'Unbekannter Netzwerkfehler', url: reportUrl(request.url()).url })
       }
     })
     page.on('response', (response) => {
       const responseUrl = new URL(response.url())
       if (responseUrl.origin === result.origin && response.status() >= 400) {
-        responses.push({ status: response.status(), url: reportUrl(response.url()).url })
+        recordBoundedObservation(responses, observationTotals, 'httpErrorResponses', { status: response.status(), url: reportUrl(response.url()).url })
       }
     })
     page.on('popup', async (popup) => {
-      popupUrls.push(reportUrl(popup.url()).url)
+      recordBoundedObservation(popupUrls, observationTotals, 'popupUrls', reportUrl(popup.url()).url)
       await popup.close().catch(() => {})
     })
 
@@ -980,8 +1033,8 @@ async function inspectProfile(browser, result, options, url, profileName, discov
     for (const response of responses) {
       addIssue(result, 'error', 'browser-http-error', `Browser-Request antwortete mit HTTP ${response.status}.`, ['CORE-QA-02', 'CORE-QA-08'], response.url, profileName)
     }
-    if (popupUrls.length > 0) {
-      addIssue(result, 'warning', 'popup-blocked', `${popupUrls.length} automatisch geöffnetes Popup(s) wurde(n) geschlossen.`, ['CORE-PRIV-02', 'CORE-SEC-07'], url, profileName)
+    if (observationTotals.popupUrls > 0) {
+      addIssue(result, 'warning', 'popup-blocked', `${observationTotals.popupUrls} automatisch geöffnetes Popup(s) wurde(n) geschlossen.`, ['CORE-PRIV-02', 'CORE-SEC-07'], url, profileName)
     }
     for (const action of blockedActions) {
       const actionDetails = {
@@ -998,6 +1051,23 @@ async function inspectProfile(browser, result, options, url, profileName, discov
       addIssue(result, actionDetails[0], actionDetails[1], actionDetails[2], ['CORE-PRIV-02', 'CORE-SEC-07', 'FORM-TEST-04'], action.url, profileName)
     }
 
+    const observationRecords = Object.fromEntries(Object.entries(observationTotals).map(([kind, total]) => [kind, {
+      recorded: {
+        blockedActions: blockedActions.length,
+        consoleMessages: consoleMessages.length,
+        failedRequests: failedRequests.length,
+        httpErrorResponses: responses.length,
+        pageErrors: pageErrors.length,
+        popupUrls: popupUrls.length,
+      }[kind],
+      total,
+      truncated: total > maxBrowserObservationRecordsPerKind,
+      ...(kind === 'blockedActions' ? { externalTotal: externalBlockedActionCount } : {}),
+    }]))
+    if (Object.values(observationRecords).some(observation => observation.truncated)) {
+      addIssue(result, 'warning', 'browser-observation-limit', `Mindestens eine Browser-Beobachtungskategorie überschreitet das Berichtslimit von ${maxBrowserObservationRecordsPerKind} Einträgen je Art und Seiten-/Profil-Lauf.`, ['CORE-QA-02', 'CORE-PRIV-02'], url, profileName)
+    }
+
     recordFactsIssues(result, url, profileName, facts, violations, privacyObservation)
     result.profiles.push({
       accessibilityIncompleteRuleIds,
@@ -1007,14 +1077,15 @@ async function inspectProfile(browser, result, options, url, profileName, discov
       cookies,
       facts,
       indexedDatabases,
+      observationLimits: {
+        limitPerKind: maxBrowserObservationRecordsPerKind,
+        records: observationRecords,
+      },
       pageErrors,
       popupUrls,
       privacyObservation,
       profile: profileName,
-      readOnlyExecution: {
-        ...readOnlyExecution,
-        blockedActionCountsByKind: Object.fromEntries([...new Set(blockedActions.map(action => action.kind))].map(kind => [kind, blockedActions.filter(action => action.kind === kind).length])),
-      },
+      readOnlyExecution,
       requests: requestNumber,
       url,
     })
@@ -1134,8 +1205,9 @@ export async function runBrowserCheck(input, suppliedOptions = {}) {
   }
 
   const executablePath = chromiumExecutable(options.chromiumPath)
+  const hostResolverRule = await chromiumHostResolverRule(finalUrl, options)
   const browser = await puppeteer.launch({
-    args: ['--disable-background-networking', '--disable-component-update', '--disable-default-apps', '--disable-sync', '--metrics-recording-only', '--no-first-run'],
+    args: ['--disable-background-networking', '--disable-component-update', '--disable-default-apps', '--disable-quic', '--disable-sync', `--host-resolver-rules=${hostResolverRule}`, '--metrics-recording-only', '--no-first-run'],
     executablePath,
     headless: true,
   })
@@ -1270,6 +1342,7 @@ function printReport(report) {
 }
 
 async function main() {
+  const outputIntent = jsonOutputIntent(process.argv.slice(2))
   let parsed
   try {
     parsed = parseArguments(process.argv.slice(2))
@@ -1296,11 +1369,12 @@ async function main() {
     process.exitCode = report.summary.failed ? 1 : 0
   }
   catch (error) {
-    const errorReport = { error: redactText(error.message), schemaVersion: 2, tool: 'browser-check', toolPackage: { name: packageName, version: packageVersion } }
-    if (parsed?.options?.json) {
-      if (parsed.options.jsonFile) {
+    const errorReport = technicalErrorReport('browser-check', redactText(error.message))
+    if (outputIntent.json || parsed?.options?.json) {
+      const jsonFile = parsed?.options?.jsonFile || outputIntent.jsonFile
+      if (jsonFile) {
         try {
-          writeJsonOutput(parsed.options.jsonFile, errorReport)
+          writeJsonOutput(jsonFile, errorReport)
         }
         catch (outputError) {
           console.error(`Fehler beim Schreiben des JSON-Berichts: ${redactText(outputError.message)}`)

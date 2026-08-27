@@ -2,7 +2,16 @@
 
 Dieses Changelog dokumentiert veröffentlichte Paketstände von `@mktcode/website-qa`. Planungs- und reine Dokumentationscommits ohne Paketveröffentlichung erscheinen nicht als eigene Version.
 
-## Unveröffentlicht – 2.0.0
+## Unveröffentlicht – 2.0.1
+
+- SSRF-Sperre für IPv4-mapped-IPv6 und deprecated Site-Local-IPv6 geschlossen und Chromium-DNS im Browser-Prüfer an die geprüfte Zieladresse gepinnt.
+- Dekompression, Social-Sitemap-Abrufe, Browser-Beobachtungslisten und DOM-Inventare mit sichtbaren Limits begrenzt; aktionsverdächtige Social-Sitemap- und Redirectziele werden nicht abgerufen.
+- Browser-Sitemapindizes wieder korrekt traversiert und verspätet gestartete Lighthouse-Ressourcen nach Timeouts geschlossen.
+- Reale Exitcode-2-Ausgaben aller fünf CLIs an die veröffentlichten JSON-Schemata angeglichen und durch CLI-Prozesstests abgesichert; der generische Schemaexport validiert alle fünf Berichtstypen.
+- Lighthouse-Zahlenoptionen gegen stilles Kürzen gehärtet und einen zwingenden Chromium-Attestierungslauf ergänzt.
+- Releasezustand, npm-Aliase, technische Validierungsmatrix und Interpretationshilfen vereinheitlicht.
+
+## 2.0.0 – 2026-08-27
 
 - Produktgrenze bewusst vereinfacht: zentrale manuelle 215-Punkte-Checkliste plus unabhängige technische Temperaturmessungen; keine automatische Checklistenbewertung.
 - Projektbericht-, Evidence-, Workflow-, Bundle- und Checklistenaggregations-APIs ohne Alias entfernt.

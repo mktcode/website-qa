@@ -70,7 +70,7 @@ Versionierte Dateien und öffentlich ausgelieferte Verzeichnisse werden mit geei
 Die wiederverwendbaren öffentlichen Prüfer werden im MIT-lizenzierten Repository [`mktcode/website-qa`](https://github.com/mktcode/website-qa) gepflegt. Das Zielprojekt bindet einen geprüften Commit oder Release unveränderlich als Entwicklungsabhängigkeit ein und stellt für die benötigten Einzelbefehle lokale npm-Aliase bereit. Die Prüfung wird aus dem Zielprojekt ausgeführt:
 
 ```bash
-npm run ops:social:check -- https://example.de/ --sitemap --max-pages=50 --strict
+npm run ops:social:check -- https://example.de/ --sitemap --max-pages=50 --max-sitemaps=20 --strict
 ```
 
 Vor der ersten Verwendung beziehungsweise nach Änderungen an der Lockdatei wird im Zielprojekt mit dessen vorgesehenem Node-/npm-Stand eine saubere Installation ausgeführt:
@@ -89,10 +89,11 @@ Wichtige Optionen:
 
 - `--sitemap` prüft zusätzlich die URLs der Standard-Sitemap.
 - `--sitemap-url=<URL>` verwendet eine abweichende Sitemap.
-- `--max-pages=<N>` begrenzt den Umfang bewusst; der Wert muss alle erwarteten Sitemapseiten abdecken oder die bewusste Stichprobe und ausgelassene Seiten werden dokumentiert.
+- `--max-pages=<N>` begrenzt den Seitenumfang bewusst; der Wert muss alle erwarteten Sitemapseiten abdecken oder die bewusste Stichprobe und ausgelassene Seiten werden dokumentiert.
+- `--max-sitemaps=<N>` begrenzt die Zahl abgerufener Sitemap-Dateien; ein erreichtes Limit bleibt als unvollständige Coverage sichtbar.
 - `--json` erzeugt maschinenlesbare Ausgabe auf stdout; `--json-file=<Pfad>` schreibt sie atomar in eine lokale Datei und legt Elternverzeichnisse an.
 - `--strict` behandelt Warnungen als fehlgeschlagene Prüfung.
-- `--allow-http` und `--allow-private` sind nur für bewusst lokale beziehungsweise private Ziele vorgesehen.
+- `--allow-http` erlaubt unabhängig von der Zieladresse unverschlüsseltes HTTP. `--allow-private` erlaubt unabhängig vom Protokoll private beziehungsweise lokale Zieladressen. Ein lokales HTTP-Ziel benötigt beide bewussten Freigaben.
 
 Exitcodes: `0` ohne Fehlerbefund, `1` mit Fehlerbefund beziehungsweise Warnung im strikten Modus, `2` Aufruf- oder Laufzeitfehler.
 
@@ -210,7 +211,7 @@ Der Standardlauf verwendet isolierte, nicht persistente Browserkontexte für Des
 
 Der statische Browserbericht liefert atomare technische Signale zu Main-Landmark, horizontalem Überlauf in den technischen 320-Pixel- und 200-%-Näherungsprofilen, Axe-Befunden, dokumentiertem Chromium-/Headless-Kontext, beobachteten Konsolen-, JavaScript-, Netzwerk- und HTTP-Fehlern sowie zur passiven Inventarisierung externer Requestversuche und des initialen Cookie-/Storagezustands. Fehlende Profile, Seitenlimits, Laufzeitfehler, Berichtslimits oder relevante sicherheitsbedingte Auslassungen führen bei abhängigen Signalen zu `inconclusive`. Semantische Angemessenheit, tatsächliche reine Textvergrößerung, Tastatur, Screenreader, reale Mobilbrowser und interaktionsabhängige Zustände bleiben manuell zu prüfen. Auch ein vollständig grüner Axe-Lauf ist kein WCAG-Konformitätsnachweis.
 
-Für die passive Datenschutzbeobachtung werden Cookie-Namen, Domain und die Attribute `Secure`, `HttpOnly` und `SameSite`, Local-/Session-Storage-Schlüssel sowie IndexedDB-Datenbanknamen erfasst, aber niemals deren Werte oder Inhalte in den Bericht übernommen. Pro Art und Seiten-/Profil-Lauf werden höchstens 100 Bezeichner berichtet; eine Überschreitung bleibt sichtbar und macht das abhängige Signal unklar. Ein positives Beobachtungsergebnis bedeutet nur, dass der deklarierte isolierte Initiallauf vollständig inventarisiert wurde. Externe Versuche bleiben blockiert und können deshalb keine Folgeanfragen oder eigenen Speicherzustände erzeugen. Quell- und Konfigurationsabgleich, Zweck und Zulässigkeit externer Dienste, Dokumentation, Einwilligungslogik, interaktionsabhängige Zustände sowie die fachliche Eignung von Cookieattributen werden manuell bewertet.
+Für die passive Datenschutzbeobachtung werden Cookie-Namen, Domain und die Attribute `Secure`, `HttpOnly` und `SameSite`, Local-/Session-Storage-Schlüssel sowie IndexedDB-Datenbanknamen erfasst, aber niemals deren Werte oder Inhalte in den Bericht übernommen. Pro Art und Seiten-/Profil-Lauf werden höchstens 100 Bezeichner berichtet; eine Überschreitung bleibt sichtbar und macht das abhängige Signal unklar. Auch Browserkonsole, JavaScript-Fehler, fehlgeschlagene Requests, HTTP-Fehlerantworten, Popups und blockierte DOM-Aktionen sind auf jeweils 100 Berichtseinträge je Seiten-/Profil-Lauf begrenzt. Dasselbe gilt für gespeicherte Links, Formulare und H1-Texte aus der DOM-Inventarisierung; Gesamtzahl, gespeicherte Zahl und Kürzungsstatus bleiben maschinenlesbar. Ein positives Beobachtungsergebnis bedeutet nur, dass der deklarierte isolierte Initiallauf vollständig inventarisiert wurde. Externe Versuche bleiben blockiert und können deshalb keine Folgeanfragen oder eigenen Speicherzustände erzeugen. Quell- und Konfigurationsabgleich, Zweck und Zulässigkeit externer Dienste, Dokumentation, Einwilligungslogik, interaktionsabhängige Zustände sowie die fachliche Eignung von Cookieattributen werden manuell bewertet.
 
 Chromium-Pfad und -Version, Werkzeugcommit, URL, Profile, Limits, blockierte Requests und ausgelassene Seiten werden protokolliert. Ein blockierter externer Dienst kann Darstellung und Folgefehler beeinflussen; solche Befunde werden deshalb mit der dokumentierten Positivliste und einem gesonderten Datenschutztest bewertet. Der Lauf ersetzt keine Tastatur-, Screenreader-, Safari-, reale Mobilgeräte- oder vollständige WCAG-Prüfung.
 
@@ -233,7 +234,7 @@ Chromium, Firefox und Playwright-WebKit werden getrennt benannt. WebKit ist nur 
 Der feste mobile Lighthouse-Lauf gehört zur technischen Standardserie:
 
 ```bash
-website-qa-lighthouse https://example.de/ --strict
+npm run ops:lighthouse:check -- https://example.de/ --strict
 ```
 
 Er verwendet Performance, Accessibility, Best Practices und SEO ohne projektspezifische Scorebudgets. Externe Requests, Nicht-GET-Methoden, Formulare, Beacons, Popups und Workerfamilien werden vor der Navigation blockiert. Haben solche Grenzen eingegriffen, kennzeichnet der Bericht die Messung als nicht repräsentativ. Lighthouse-Version, Chromium-Version, Modus, URL, Kategorien und zentrale Werte werden dokumentiert. Nicht nur den Score betrachten: LCP-Kandidat, LCP Breakdown, Warnungen wie `NO_LCP`, CLS, TBT und übertragene Bytes kontrollieren. Zusätzlich den Netzwerktransfer nach erstem Scroll, Galerieöffnung und anderen wesentlichen Interaktionen prüfen, weil diese Last im Initialaudit fehlen kann.

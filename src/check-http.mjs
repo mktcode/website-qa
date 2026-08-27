@@ -9,6 +9,9 @@ import { fetchResource, normalizeMimeType, redactReportData, redactText, reportU
 import { writeJsonOutput } from './lib/json-output.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
 import { checklistReference, technicalSignals, technicalSignalSummary } from './lib/signal-report.mjs'
+import { jsonOutputIntent, technicalErrorReport } from './lib/technical-report.mjs'
+
+const maximumDecodedBytes = 10 * 1024 * 1024
 
 const defaultOptions = {
   allowHttp: false,
@@ -59,7 +62,8 @@ Optionen:
 
 Geprüft werden Redirects, zentrale Sicherheitsheader, 404-Antworten,
 Cacheheader sowie Identity-, Gzip- und Brotli-Auslieferung von HTML und
-entdeckten CSS-/JavaScript-Ressourcen. Das Werkzeug verwendet nur GET.`
+entdeckten CSS-/JavaScript-Ressourcen. Dekodierte Antworten sind auf
+${maximumDecodedBytes / 1024 / 1024} MiB begrenzt. Das Werkzeug verwendet nur GET.`
 }
 
 function parsePositiveInteger(value, optionName) {
@@ -453,11 +457,12 @@ function checkCacheHeaders(result, response, resourceType, label) {
 }
 
 function decodeCompressedBody(response, encoding) {
+  const decompressionOptions = { maxOutputLength: maximumDecodedBytes }
   if (encoding === 'gzip') {
-    return gunzipSync(response.body)
+    return gunzipSync(response.body, decompressionOptions)
   }
   if (encoding === 'br') {
-    return brotliDecompressSync(response.body)
+    return brotliDecompressSync(response.body, decompressionOptions)
   }
   return response.body
 }
@@ -499,7 +504,17 @@ async function checkCompression(result, resource, options) {
         }
         catch (error) {
           variants[encoding].decodable = false
-          addIssue(result, 'error', 'compression-invalid', `${resource.label}: ${encoding} lässt sich nicht dekodieren: ${error.message}`, ['CORE-PERF-01'], response.finalUrl)
+          const outputLimitExceeded = error.code === 'ERR_BUFFER_TOO_LARGE'
+          addIssue(
+            result,
+            'error',
+            outputLimitExceeded ? 'compression-decoded-limit' : 'compression-invalid',
+            outputLimitExceeded
+              ? `${resource.label}: ${encoding} überschreitet das Dekodierlimit von ${maximumDecodedBytes / 1024 / 1024} MiB.`
+              : `${resource.label}: ${encoding} lässt sich nicht dekodieren: ${error.message}`,
+            ['CORE-PERF-01'],
+            response.finalUrl,
+          )
         }
       }
     }
@@ -891,6 +906,7 @@ export async function runHttpCheck(inputUrls, options = {}) {
 }
 
 async function main() {
+  const outputIntent = jsonOutputIntent(process.argv.slice(2))
   let parsed
   try {
     parsed = parseArguments(process.argv.slice(2))
@@ -921,16 +937,12 @@ async function main() {
     }
   }
   catch (error) {
-    const errorReport = {
-      error: redactText(error.message),
-      schemaVersion: 2,
-      summary: { errors: 1, failed: true, targets: 0, warnings: 0 },
-      tool: 'http-check',
-    }
-    if (process.argv.includes('--json') || parsed?.options?.json) {
-      if (parsed?.options?.jsonFile) {
+    const errorReport = technicalErrorReport('http-check', redactText(error.message))
+    if (outputIntent.json || parsed?.options?.json) {
+      const jsonFile = parsed?.options?.jsonFile || outputIntent.jsonFile
+      if (jsonFile) {
         try {
-          writeJsonOutput(parsed.options.jsonFile, errorReport)
+          writeJsonOutput(jsonFile, errorReport)
         }
         catch (outputError) {
           console.error(`Fehler beim Schreiben des JSON-Berichts: ${redactText(outputError.message)}`)

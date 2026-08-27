@@ -56,9 +56,13 @@ Die tatsächlichen Projektskripte und zentralen Prüfhilfen werden vor Beginn ei
 | Unit-/Integrationstests | | | lokal | |
 | Migration-/Datenbankprüfung | | | lokal | |
 | Produktionsbuild und lokaler Start | | | lokal | |
-| Social-/Sitemap-/Robots-Check | | | öffentlich | |
-| Browser-/Accessibility-/Performanceprüfung | | | | |
-| TLS, Header, Redirects und Kompression | | | öffentlich | |
+| `website-qa-http` | | | öffentlich | |
+| `website-qa-crawl` | | | öffentlich | |
+| `website-qa-browser` | | | öffentlich beziehungsweise lokaler Produktionsbuild | |
+| `website-qa-social` | | | öffentlich | |
+| `website-qa-lighthouse` | | | öffentlich | |
+| manuelle TLS-/Zertifikatsprüfung | | | öffentlich | |
+| manuelle Accessibility-/Cross-Browser-/Geräteprüfung | | | | |
 | Deployment-/Infrastrukturprüfung | | | Produktion | |
 
 ## Release- und Nachweisstand

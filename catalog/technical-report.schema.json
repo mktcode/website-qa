@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mktcode/website-qa/catalog/technical-report.schema.json",
+  "title": "Technischer Bericht von @mktcode/website-qa",
+  "oneOf": [
+    { "$ref": "http-report.schema.json" },
+    { "$ref": "crawl-report.schema.json" },
+    { "$ref": "browser-report.schema.json" },
+    { "$ref": "social-report.schema.json" },
+    { "$ref": "lighthouse-report.schema.json" }
+  ]
+}

@@ -4,7 +4,7 @@ import { createServer } from 'node:http'
 import { brotliCompressSync, gzipSync } from 'node:zlib'
 import { afterEach, describe, expect, it } from 'vitest'
 import { createJsonReport, parseArguments, runHttpCheck } from '../src/check-http.mjs'
-import { reportUrl, validatedResolution } from '../src/lib/http-client.mjs'
+import { chromiumHostResolverRule, reportUrl, validatedResolution, validateUrl } from '../src/lib/http-client.mjs'
 
 const servers = new Set<ReturnType<typeof createServer>>()
 
@@ -61,6 +61,34 @@ describe('http checker', () => {
     expect(reportUrl('data:text/plain,INLINE_SECRET').url).toBe('(data-URL redigiert)')
     await expect(validatedResolution(new URL('http://[::1]/'), { allowPrivate: false })).rejects.toThrow(/nicht öffentliche Adresse/)
     await expect(validatedResolution(new URL('http://[::1]/'), { allowPrivate: true })).resolves.toEqual([{ address: '::1', family: 6 }])
+    await expect(chromiumHostResolverRule(new URL('http://[::1]/'), { allowPrivate: true })).resolves.toBe('MAP ::1 [::1]')
+    await expect(chromiumHostResolverRule(new URL('http://127.0.0.1/'), { allowPrivate: true })).resolves.toBe('MAP 127.0.0.1 127.0.0.1')
+  })
+
+  it('rejects private IPv4-mapped IPv6 literals in every accepted notation', async () => {
+    const privateTargets = [
+      'https://[::ffff:127.0.0.1]/',
+      'https://[::ffff:7f00:1]/',
+      'https://[::ffff:192.168.1.1]/',
+      'https://[::ffff:c0a8:101]/',
+    ]
+
+    for (const target of privateTargets) {
+      expect(() => validateUrl(target, { allowHttp: false, allowPrivate: false })).toThrow(/privates Ziel/)
+    }
+    await Promise.all(privateTargets.map(target => (
+      expect(validatedResolution(new URL(target), { allowPrivate: false })).rejects.toThrow(/nicht öffentliche Adresse/)
+    )))
+
+    expect(validateUrl('https://[::ffff:8.8.8.8]/', { allowHttp: false, allowPrivate: false }).hostname).toBe('[::ffff:808:808]')
+    expect(validateUrl(privateTargets[0], { allowHttp: false, allowPrivate: true }).hostname).toBe('[::ffff:7f00:1]')
+  })
+
+  it('rejects deprecated IPv6 site-local targets', async () => {
+    expect(() => validateUrl('https://[fec0::1]/', { allowHttp: false, allowPrivate: false })).toThrow(/privates Ziel/)
+    expect(() => validateUrl('https://[feff::1]/', { allowHttp: false, allowPrivate: false })).toThrow(/privates Ziel/)
+    await expect(validatedResolution(new URL('https://[fec0::1]/'), { allowPrivate: false })).rejects.toThrow(/nicht öffentliche Adresse/)
+    await expect(validatedResolution(new URL('https://[fec0::1]/'), { allowPrivate: true })).resolves.toEqual([{ address: 'fec0::1', family: 6 }])
   })
 
   it('parses URLs and safe CLI options', () => {
@@ -191,6 +219,34 @@ describe('http checker', () => {
     ]))
     expect(JSON.stringify(json)).not.toContain('assertions')
     expect(JSON.stringify(json)).not.toContain('source=qa')
+  })
+
+  it('bounds decompressed compression responses', async () => {
+    const compressedBomb = gzipSync(Buffer.alloc(11 * 1024 * 1024, 'a'))
+    const html = Buffer.from(`<!doctype html><html lang="de"><head><title>Dekompressionslimit</title></head><body>${'Inhalt '.repeat(300)}</body></html>`)
+    const server = createServer((request, response) => {
+      if (request.headers['accept-encoding'] === 'gzip') {
+        response.writeHead(200, {
+          'content-encoding': 'gzip',
+          'content-type': 'text/html; charset=utf-8',
+          'vary': 'Accept-Encoding',
+        })
+        response.end(compressedBomb)
+        return
+      }
+      response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+      response.end(html)
+    })
+    const url = await listen(server)
+
+    const report = await runHttpCheck([url], { allowHttp: true, allowPrivate: true })
+    const result = report.results[0] as unknown as {
+      assertions: Array<{ assertionId: string, outcome: string }>
+      issues: Array<{ code: string }>
+    }
+
+    expect(result.issues.map(issue => issue.code)).toContain('compression-decoded-limit')
+    expect(result.assertions).toContainEqual(expect.objectContaining({ assertionId: 'compression.gzip.effective', outcome: 'fail' }))
   })
 
   it('reports missing protections, compression and a soft 404', async () => {

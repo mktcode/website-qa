@@ -354,7 +354,46 @@ describe('browser check', () => {
   })
 
   const chromiumPath = ['/usr/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'].find(existsSync)
+  if (!chromiumPath && process.env.WEBSITE_QA_REQUIRE_CHROMIUM === '1') {
+    throw new Error('Chromium-Sicherheitsintegration ist erforderlich, aber kein unterstütztes Browser-Binary wurde gefunden.')
+  }
   const chromiumIt = chromiumPath ? it : it.skip
+
+  chromiumIt('traverses Sitemap indexes before selecting browser pages', async () => {
+    const requestedPaths: string[] = []
+    const server = createServer((request, response) => {
+      requestedPaths.push(request.url || '')
+      const origin = `http://${request.headers.host}`
+      if (request.url === '/sitemap.xml') {
+        response.writeHead(200, { 'content-type': 'application/xml' })
+        response.end(`<?xml version="1.0"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><sitemap><loc>${origin}/child.xml</loc></sitemap></sitemapindex>`)
+        return
+      }
+      if (request.url === '/child.xml') {
+        response.writeHead(200, { 'content-type': 'application/xml' })
+        response.end(`<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${origin}/indexed</loc></url></urlset>`)
+        return
+      }
+      response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+      response.end(`<!doctype html><html lang="de"><head><title>Sitemapindex</title></head><body><main><h1>${request.url}</h1></main></body></html>`)
+    })
+    const origin = await listen(server)
+
+    const result = await runBrowserCheck(origin, {
+      allowHttp: true,
+      allowPrivate: true,
+      chromiumPath,
+      maxPages: 2,
+      profiles: ['desktop'],
+      settleMilliseconds: 0,
+      sitemap: true,
+    }) as unknown as { profiles: Array<{ url: string }>, sitemaps: Array<{ kind: string }> }
+
+    expect(requestedPaths).toContain('/child.xml')
+    expect(requestedPaths).toContain('/indexed')
+    expect(result.sitemaps.map(sitemap => sitemap.kind)).toEqual(['index', 'urlset'])
+    expect(result.profiles.map(profile => profile.url)).toContain(`${origin}/indexed`)
+  }, 30_000)
 
   chromiumIt('propagates relevant real Axe incomplete results as inconclusive', async () => {
     const server = createServer((_request, response) => {
@@ -476,6 +515,104 @@ describe('browser check', () => {
     expect(result.issues.find(issue => issue.code === 'axe-color-contrast')?.checklistRefs).toContain('CORE-A11Y-09')
     expect(result.issues.find(issue => issue.code === 'axe-aria-hidden-focus')?.checklistRefs).toContain('CORE-A11Y-04')
     expect(result.issues.find(issue => issue.code === 'axe-label')?.checklistRefs).toContain('CORE-A11Y-06')
+  }, 30_000)
+
+  chromiumIt('bounds high-volume DOM collections and preserves totals', async () => {
+    const requestedPaths: string[] = []
+    const server = createServer((request, response) => {
+      requestedPaths.push(request.url || '')
+      response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+      response.end(`<!doctype html><html lang="de"><head><title>DOM-Limit</title></head><body><main id="main"></main>
+<script>
+const main = document.querySelector('#main')
+for (let index = 0; index < 150; index += 1) {
+  main.insertAdjacentHTML('beforeend', '<h1>Überschrift ' + index + '</h1><a href="/target-' + index + '">Link</a><form action="/submit-' + index + '" method="post"></form>')
+}
+</script></body></html>`)
+    })
+    const origin = await listen(server)
+
+    const result = await runBrowserCheck(origin, {
+      allowHttp: true,
+      allowPrivate: true,
+      chromiumPath,
+      maxPages: 1,
+      profiles: ['desktop'],
+      settleMilliseconds: 0,
+    }) as unknown as {
+      issues: Array<{ code: string }>
+      profiles: Array<{
+        facts: {
+          domObservation: Record<string, { recorded: number, total: number, truncated: boolean } | number>
+          forms: unknown[]
+          h1: unknown[]
+          links: unknown[]
+        }
+      }>
+    }
+    const facts = result.profiles[0]?.facts
+
+    expect(requestedPaths.every(path => !path.startsWith('/target-') && !path.startsWith('/submit-'))).toBe(true)
+    expect(facts?.links).toHaveLength(100)
+    expect(facts?.forms).toHaveLength(100)
+    expect(facts?.h1).toHaveLength(100)
+    expect(facts?.domObservation).toMatchObject({
+      forms: { recorded: 100, total: 150, truncated: true },
+      h1: { recorded: 100, total: 150, truncated: true },
+      limitPerKind: 100,
+      links: { recorded: 100, total: 150, truncated: true },
+    })
+    expect(result.issues.map(issue => issue.code)).toContain('dom-observation-limit')
+  }, 30_000)
+
+  chromiumIt('bounds high-volume browser observations and reports truncation totals', async () => {
+    const receivedUrls: string[] = []
+    const server = createServer((request, response) => {
+      receivedUrls.push(request.url || '')
+      response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+      response.end(`<!doctype html><html lang="de"><head><title>Beobachtungslimit</title></head><body><main><h1>Test</h1></main>
+<script>
+for (let index = 0; index < 150; index += 1) {
+  console.error('bounded-' + index)
+  navigator.sendBeacon('/beacon', 'x')
+}
+</script></body></html>`)
+    })
+    const origin = await listen(server)
+
+    const result = await runBrowserCheck(origin, {
+      allowHttp: true,
+      allowPrivate: true,
+      chromiumPath,
+      maxPages: 1,
+      profiles: ['desktop'],
+      settleMilliseconds: 100,
+    }) as unknown as {
+      issues: Array<{ code: string }>
+      profiles: Array<{
+        blockedActions: unknown[]
+        consoleMessages: unknown[]
+        observationLimits: {
+          limitPerKind: number
+          records: Record<string, { recorded: number, total: number, truncated: boolean }>
+        }
+        readOnlyExecution: { blockedActionCountsByKind: Record<string, number> }
+      }>
+    }
+    const profile = result.profiles[0]
+
+    expect(receivedUrls).not.toContain('/beacon')
+    expect(profile?.blockedActions).toHaveLength(100)
+    expect(profile?.consoleMessages).toHaveLength(100)
+    expect(profile?.observationLimits).toMatchObject({
+      limitPerKind: 100,
+      records: {
+        blockedActions: { recorded: 100, total: 150, truncated: true },
+        consoleMessages: { recorded: 100, total: 150, truncated: true },
+      },
+    })
+    expect(profile?.readOnlyExecution.blockedActionCountsByKind.beacon).toBe(150)
+    expect(result.issues.map(issue => issue.code)).toContain('browser-observation-limit')
   }, 30_000)
 
   chromiumIt('blocks side effects while inventorying external attempts, cookies and storage without values', async () => {

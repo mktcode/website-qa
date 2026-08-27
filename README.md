@@ -13,7 +13,7 @@ Die Werkzeuge haken niemals Checklistenpunkte ab. Positive Signale bedeuten nur,
 - lokal installiertes Chromium oder Google Chrome für Browser- und Lighthouse-Check
 - Netzwerkzugriff auf die ausdrücklich gewählte Ziel-URL
 
-Private oder lokale Ziele sind standardmäßig gesperrt. Sie benötigen ausdrücklich `--allow-http` und `--allow-private`.
+Private oder lokale Ziele sind standardmäßig gesperrt. Unverschlüsseltes HTTP benötigt ausdrücklich `--allow-http`; private oder lokale Zieladressen benötigen unabhängig vom Protokoll `--allow-private`. Für ein lokales HTTP-Ziel sind beide Schalter erforderlich.
 
 ## Installation
 
@@ -99,16 +99,16 @@ Lighthouse und Axe liefern wertvolle technische Signale, aber keine vollständig
 ```json
 {
   "scripts": {
-    "qa:http": "website-qa-http https://example.com/ --strict --json-file=.website-qa/current/http.json",
-    "qa:crawl": "website-qa-crawl https://example.com/ --sitemap --max-pages=50 --max-resources=500 --strict --json-file=.website-qa/current/crawl.json",
-    "qa:browser": "website-qa-browser https://example.com/ --sitemap --max-pages=10 --max-requests=300 --strict --json-file=.website-qa/current/browser.json",
-    "qa:social": "website-qa-social https://example.com/ --sitemap --max-pages=20 --strict --json-file=.website-qa/current/social.json",
-    "qa:lighthouse": "website-qa-lighthouse https://example.com/ --strict --json-file=.website-qa/current/lighthouse.json"
+    "ops:http:check": "website-qa-http --strict --json-file=.website-qa/current/http.json",
+    "ops:crawl:check": "website-qa-crawl --sitemap --max-pages=50 --max-resources=500 --strict --json-file=.website-qa/current/crawl.json",
+    "ops:browser:check": "website-qa-browser --sitemap --max-pages=10 --max-requests=300 --strict --json-file=.website-qa/current/browser.json",
+    "ops:social:check": "website-qa-social --sitemap --max-pages=20 --max-sitemaps=20 --strict --json-file=.website-qa/current/social.json",
+    "ops:lighthouse:check": "website-qa-lighthouse --strict --json-file=.website-qa/current/lighthouse.json"
   }
 }
 ```
 
-Die Berichte werden anschließend einzeln durch die QA-Prüferin oder den QA-Prüfer ausgewertet. Das Paket erzeugt keinen projektübergreifenden Gesamtstatus.
+Die Ziel-URL wird einheitlich nach dem npm-Trenner übergeben, zum Beispiel `npm run ops:http:check -- https://example.com/`. Die Berichte werden anschließend einzeln durch die QA-Prüferin oder den QA-Prüfer ausgewertet. Das Paket erzeugt keinen projektübergreifenden Gesamtstatus.
 
 Eine kopierbare Minimalintegration liegt unter [`examples/project-integration/`](examples/project-integration/).
 
@@ -155,7 +155,8 @@ Es gibt keine JavaScript-API für Checklistenbewertung oder Projektberichte. Dat
 
 - `@mktcode/website-qa/checklist-index.json`
 - `@mktcode/website-qa/signals.json`
-- `@mktcode/website-qa/technical-report.schema.json`
+- `@mktcode/website-qa/technical-report.schema.json` als Dispatcher über alle fünf Berichtstypen
+- `@mktcode/website-qa/technical-report.common.schema.json` für gemeinsame `$defs`
 - die fünf werkzeugspezifischen `*-report.schema.json`-Exporte
 
 ## Entwicklung
@@ -163,10 +164,11 @@ Es gibt keine JavaScript-API für Checklistenbewertung oder Projektberichte. Dat
 ```bash
 npm ci
 npm run check
+npm run test:chromium
 npm pack --dry-run
 ```
 
-Die Tests verwenden lokale kurzlebige Server. Echte Chromium-Integrationstests weisen für Browser und Lighthouse nach, dass automatische POSTs, Formulare, externe Requests und weitere Nebenwirkungspfade keine Zielservereffekte auslösen.
+Die Tests verwenden lokale kurzlebige Server. Echte Chromium-Integrationstests weisen für Browser und Lighthouse nach, dass automatische POSTs, Formulare, externe Requests und weitere Nebenwirkungspfade keine Zielservereffekte auslösen. `npm run test:chromium` darf für Releaseprüfungen nicht übersprungen werden und schlägt fehl, wenn kein unterstütztes Browser-Binary gefunden wird.
 
 ## Lizenz
 

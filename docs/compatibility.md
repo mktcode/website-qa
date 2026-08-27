@@ -31,6 +31,7 @@ Die Berichte verwenden `schemaVersion: 2` und die Status `positive`, `defect`, `
 
 Schemata:
 
+- [`../catalog/technical-report.schema.json`](../catalog/technical-report.schema.json) als Dispatcher über alle fünf Berichtstypen
 - [`../catalog/http-report.schema.json`](../catalog/http-report.schema.json)
 - [`../catalog/crawl-report.schema.json`](../catalog/crawl-report.schema.json)
 - [`../catalog/browser-report.schema.json`](../catalog/browser-report.schema.json)

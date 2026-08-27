@@ -10,6 +10,7 @@ import { readOnlyNavigationConcern } from './lib/navigation-safety.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
 import { checklistReference, technicalSignals, technicalSignalSummary } from './lib/signal-report.mjs'
 import { parseSitemapXml } from './lib/sitemap-parser.mjs'
+import { jsonOutputIntent, technicalErrorReport } from './lib/technical-report.mjs'
 
 export { readOnlyNavigationConcern } from './lib/navigation-safety.mjs'
 export { parseSitemapXml } from './lib/sitemap-parser.mjs'
@@ -1369,6 +1370,7 @@ export async function runCrawlCheck(inputUrls, options = {}) {
 }
 
 async function main() {
+  const outputIntent = jsonOutputIntent(process.argv.slice(2))
   let parsed
   try {
     parsed = parseArguments(process.argv.slice(2))
@@ -1399,23 +1401,12 @@ async function main() {
     }
   }
   catch (error) {
-    const errorReport = {
-      error: redactText(error.message),
-      readOnlyGuarantees: {
-        buttonsActivated: false,
-        externalLinksFetched: false,
-        formActionsFetched: false,
-        formsSubmitted: false,
-        methods: ['GET'],
-      },
-      schemaVersion: 2,
-      summary: { errors: 1, failed: true, pages: 0, resources: 0, warnings: 0 },
-      tool: 'crawl-check',
-    }
-    if (process.argv.includes('--json') || parsed?.options?.json) {
-      if (parsed?.options?.jsonFile) {
+    const errorReport = technicalErrorReport('crawl-check', redactText(error.message))
+    if (outputIntent.json || parsed?.options?.json) {
+      const jsonFile = parsed?.options?.jsonFile || outputIntent.jsonFile
+      if (jsonFile) {
         try {
-          writeJsonOutput(parsed.options.jsonFile, errorReport)
+          writeJsonOutput(jsonFile, errorReport)
         }
         catch (outputError) {
           console.error(`Fehler beim Schreiben des JSON-Berichts: ${redactText(outputError.message)}`)

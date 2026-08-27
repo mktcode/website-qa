@@ -3,7 +3,7 @@ import type { AddressInfo } from 'node:net'
 import { existsSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { afterEach, describe, expect, it } from 'vitest'
-import { compactLighthouseResult, parseArguments, runLighthouseCheck } from '../src/check-lighthouse.mjs'
+import { compactLighthouseResult, parseArguments, runLighthouseCheck, withResourceTimeout } from '../src/check-lighthouse.mjs'
 
 const openServers: Server[] = []
 
@@ -41,6 +41,41 @@ describe('lighthouse check', () => {
       },
       urls: ['https://example.com/'],
     })
+  })
+
+  it('rejects empty JSON output paths', () => {
+    expect(() => parseArguments(['https://example.com/', '--json-file='])).toThrow(/benötigt einen Pfad/)
+  })
+
+  it('rejects partial and unsafe numeric options without truncating valid numbers', () => {
+    for (const argument of [
+      '--timeout=100abc',
+      '--max-requests=1.5',
+      `--max-requests=${Number.MAX_SAFE_INTEGER + 1}`,
+    ]) {
+      expect(() => parseArguments(['https://example.com/', argument])).toThrow(/positive Ganzzahl/)
+    }
+    expect(parseArguments(['https://example.com/', '--max-requests=1e3']).options.maxRequests).toBe(1000)
+  })
+
+  it('closes startup resources that resolve only after their timeout', async () => {
+    let closeCalls = 0
+    let resolveResource!: (resource: { close: () => Promise<void> }) => void
+    const resource = new Promise<{ close: () => Promise<void> }>((resolve) => {
+      resolveResource = resolve
+    })
+    const timed = withResourceTimeout(resource, 1, (lateResource: { close: () => Promise<void> }) => lateResource.close())
+
+    await expect(timed).rejects.toThrow(/überschritt/)
+    resolveResource({
+      close: async () => {
+        closeCalls += 1
+      },
+    })
+    await resource
+    await new Promise(resolve => setImmediate(resolve))
+
+    expect(closeCalls).toBe(1)
   })
 
   it('compacts Lighthouse details at every published boundary', () => {
@@ -117,6 +152,9 @@ describe('lighthouse check', () => {
   })
 
   const chromiumPath = ['/usr/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'].find(existsSync)
+  if (!chromiumPath && process.env.WEBSITE_QA_REQUIRE_CHROMIUM === '1') {
+    throw new Error('Chromium-Sicherheitsintegration ist erforderlich, aber kein unterstütztes Browser-Binary wurde gefunden.')
+  }
   const chromiumIt = chromiumPath ? it : it.skip
 
   chromiumIt('runs through a caller-owned guarded page without destination side effects', async () => {

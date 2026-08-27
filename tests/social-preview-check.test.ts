@@ -34,6 +34,7 @@ describe('social preview checker', () => {
       '--strict',
       '--sitemap',
       '--max-pages=12',
+      '--max-sitemaps=7',
       '--timeout=5000',
     ])
 
@@ -42,10 +43,109 @@ describe('social preview checker', () => {
       json: true,
       jsonFile: '.website-qa/current/social.json',
       maxPages: 12,
+      maxSitemaps: 7,
       sitemap: true,
       strict: true,
       timeoutMilliseconds: 5000,
     })
+  })
+
+  it('bounds sitemap-index requests without treating nested indexes as pages', async () => {
+    const sitemapRequests: string[] = []
+    const server = createServer((request, response) => {
+      const origin = `http://${request.headers.host}`
+      if (request.url?.endsWith('.xml')) {
+        sitemapRequests.push(request.url)
+        const childNumber = request.url === '/sitemap.xml' ? 1 : Number(request.url.match(/child-(\d+)/)?.[1]) + 1
+        response.writeHead(200, { 'content-type': 'application/xml' })
+        response.end(`<?xml version="1.0"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><sitemap><loc>${origin}/child-${childNumber}.xml</loc></sitemap></sitemapindex>`)
+        return
+      }
+      if (request.url === '/robots.txt') {
+        response.writeHead(200, { 'content-type': 'text/plain' })
+        response.end('User-agent: *\nAllow: /\n')
+        return
+      }
+      response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+      response.end('<!doctype html><html lang="de"><head><title>Sitemap-Limit</title></head><body></body></html>')
+    })
+    servers.add(server)
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
+    const address = server.address() as AddressInfo
+    const origin = `http://127.0.0.1:${address.port}`
+
+    const report = await runSocialPreviewCheck([`${origin}/`], {
+      allowHttp: true,
+      allowPrivate: true,
+      maxPages: 10,
+      maxSitemaps: 2,
+      sitemap: true,
+    })
+    const result = report.results[0] as unknown as {
+      coverage: { discoveredPages: number, selectedPages: number, skippedNavigation: number, truncated: boolean }
+      requestedUrl: string
+    }
+
+    expect(sitemapRequests).toEqual(['/sitemap.xml', '/child-1.xml'])
+    expect(report.results).toHaveLength(1)
+    expect(result.requestedUrl).toBe(`${origin}/`)
+    expect(result.coverage).toEqual({ discoveredPages: 1, selectedPages: 1, skippedNavigation: 0, truncated: true })
+  })
+
+  it('does not request suspicious Sitemap pages or suspicious redirect targets', async () => {
+    const requestedPaths: string[] = []
+    const server = createServer((request, response) => {
+      requestedPaths.push(request.url || '')
+      const origin = `http://${request.headers.host}`
+      if (request.url === '/redirecting-sitemap.xml') {
+        response.writeHead(302, { location: '/delete-account' })
+        response.end()
+        return
+      }
+      if (request.url === '/sitemap.xml') {
+        response.writeHead(200, { 'content-type': 'application/xml' })
+        response.end(`<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${origin}/delete-account</loc></url><url><loc>${origin}/safe</loc></url></urlset>`)
+        return
+      }
+      if (request.url === '/safe') {
+        response.writeHead(302, { location: '/delete-account' })
+        response.end()
+        return
+      }
+      if (request.url === '/robots.txt') {
+        response.writeHead(200, { 'content-type': 'text/plain' })
+        response.end('User-agent: *\nAllow: /\n')
+        return
+      }
+      response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+      response.end('<!doctype html><html lang="de"><head><title>Nur-Lese-Sitemap</title></head><body></body></html>')
+    })
+    servers.add(server)
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
+    const address = server.address() as AddressInfo
+    const origin = `http://127.0.0.1:${address.port}`
+
+    const report = await runSocialPreviewCheck([`${origin}/`], {
+      allowHttp: true,
+      allowPrivate: true,
+      maxPages: 3,
+      sitemap: true,
+    })
+
+    expect(requestedPaths).toContain('/safe')
+    expect(requestedPaths).not.toContain('/delete-account')
+    expect((report.results[0] as unknown as { coverage: { skippedNavigation: number, truncated: boolean } }).coverage).toMatchObject({ skippedNavigation: 1, truncated: true })
+    const issueCodes = report.results.flatMap(result => (result as unknown as { issues: Array<{ code: string }> }).issues).map(issue => issue.code)
+    expect(issueCodes).toContain('crawler-fetch-failed')
+
+    requestedPaths.length = 0
+    await expect(runSocialPreviewCheck([`${origin}/`], {
+      allowHttp: true,
+      allowPrivate: true,
+      sitemap: true,
+      sitemapUrl: `${origin}/redirecting-sitemap.xml`,
+    })).rejects.toThrow(/Nur-Lese-Richtlinie/)
+    expect(requestedPaths).toEqual(['/redirecting-sitemap.xml'])
   })
 
   it('extracts server-rendered social metadata without a browser', () => {
@@ -236,9 +336,9 @@ describe('social preview checker', () => {
     })
     const limitedResult = limitedReport.results[0] as unknown as {
       assertions: Array<{ assertionId: string, outcome: string }>
-      coverage: { discoveredPages: number, selectedPages: number, truncated: boolean }
+      coverage: { discoveredPages: number, selectedPages: number, skippedNavigation: number, truncated: boolean }
     }
-    expect(limitedResult.coverage).toMatchObject({ discoveredPages: 2, selectedPages: 1, truncated: true })
+    expect(limitedResult.coverage).toMatchObject({ discoveredPages: 2, selectedPages: 1, skippedNavigation: 0, truncated: true })
     expect(limitedResult.assertions.find(assertion => assertion.assertionId === 'social.metadata.canonical-open-graph-consistent')?.outcome).toBe('inconclusive')
 
     const jsonReport = createJsonReport(report.results, report.options)

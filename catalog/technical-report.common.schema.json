@@ -87,7 +87,7 @@
     },
     "errorEnvelope": {
       "type": "object",
-      "required": ["schemaVersion", "tool", "error"],
+      "required": ["schemaVersion", "tool", "error", "toolPackage"],
       "properties": {
         "schemaVersion": { "$ref": "#/$defs/schemaVersion" },
         "tool": { "type": "string", "minLength": 1 },

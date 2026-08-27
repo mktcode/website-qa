@@ -9,8 +9,11 @@ import robotsParser from 'robots-parser'
 import sharp from 'sharp'
 import { fetchResource, normalizeMimeType, redactReportData, redactText, reportUrl, validateUrl } from './lib/http-client.mjs'
 import { writeJsonOutput } from './lib/json-output.mjs'
+import { readOnlyNavigationConcern } from './lib/navigation-safety.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
 import { checklistReference, technicalSignals, technicalSignalSummary } from './lib/signal-report.mjs'
+import { parseSitemapXml } from './lib/sitemap-parser.mjs'
+import { jsonOutputIntent, technicalErrorReport } from './lib/technical-report.mjs'
 
 const defaultOptions = {
   allowHttp: false,
@@ -21,6 +24,7 @@ const defaultOptions = {
   maxImageBytes: 10 * 1024 * 1024,
   maxPages: 50,
   maxRedirects: 5,
+  maxSitemaps: 20,
   sitemap: false,
   sitemapUrl: undefined,
   strict: false,
@@ -268,6 +272,7 @@ Optionen:
   --sitemap              Zusätzlich URLs aus /sitemap.xml prüfen
   --sitemap-url=<URL>    Abweichende Sitemap-URL verwenden
   --max-pages=<Anzahl>   Höchstens so viele Seiten prüfen (Standard: 50)
+  --max-sitemaps=<N>     Höchstens so viele Sitemap-Dateien abrufen (Standard: 20)
   --timeout=<Millisek.>  Timeout je Abruf (Standard: 15000)
   --max-redirects=<N>    Maximale Anzahl Weiterleitungen (Standard: 5)
   --allow-http           HTTP-Eingabe für lokale oder bewusste Prüfungen erlauben
@@ -324,6 +329,9 @@ export function parseArguments(argv) {
     }
     else if (argument.startsWith('--max-pages=')) {
       options.maxPages = parsePositiveInteger(argument.slice('--max-pages='.length), '--max-pages')
+    }
+    else if (argument.startsWith('--max-sitemaps=')) {
+      options.maxSitemaps = parsePositiveInteger(argument.slice('--max-sitemaps='.length), '--max-sitemaps')
     }
     else if (argument.startsWith('--timeout=')) {
       options.timeoutMilliseconds = parsePositiveInteger(argument.slice('--timeout='.length), '--timeout')
@@ -781,6 +789,7 @@ async function inspectPage(inputUrl, options) {
         accept: 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.1',
         maximumBytes: options.maxHtmlBytes,
         userAgent: agent.value,
+        validateRedirect: nextUrl => !readOnlyNavigationConcern(nextUrl),
       })
       const contentType = normalizeMimeType(response.headers['content-type'])
       const agentResult = {
@@ -863,29 +872,15 @@ async function inspectPage(inputUrl, options) {
   return result
 }
 
-function decodeXml(value) {
-  return value
-    .replaceAll('&amp;', '&')
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>')
-    .replaceAll('&quot;', '"')
-    .replaceAll('&apos;', '\'')
-}
-
-function sitemapLocations(xml) {
-  return [...xml.matchAll(/<loc\b[^>]*>([\s\S]*?)<\/loc>/gi)]
-    .map(match => decodeXml(match[1].trim()))
-    .filter(Boolean)
-}
-
 async function discoverSitemapUrls(baseUrl, options) {
   const origin = new URL(baseUrl).origin
   const initialSitemap = options.sitemapUrl
     ? validateUrl(options.sitemapUrl, options, 'Sitemap-URL').href
     : new URL('/sitemap.xml', baseUrl).href
-  const queue = [{ depth: 0, url: initialSitemap }]
+  const queue = [initialSitemap]
   const visitedSitemaps = new Set()
   const pages = []
+  let skippedNavigation = 0
   let truncated = false
 
   while (queue.length > 0) {
@@ -893,30 +888,42 @@ async function discoverSitemapUrls(baseUrl, options) {
       truncated = true
       break
     }
-    const current = queue.shift()
-    if (visitedSitemaps.has(current.url)) {
+    if (visitedSitemaps.size >= options.maxSitemaps) {
+      truncated = true
+      break
+    }
+    const currentUrl = queue.shift()
+    if (visitedSitemaps.has(currentUrl)) {
       continue
     }
-    visitedSitemaps.add(current.url)
+    visitedSitemaps.add(currentUrl)
 
-    const response = await fetchResource(current.url, options, {
+    const response = await fetchResource(currentUrl, options, {
       accept: 'application/xml,text/xml;q=0.9,*/*;q=0.1',
+      allowedOrigins: [origin],
       maximumBytes: 5 * 1024 * 1024,
       userAgent: userAgents[0].value,
+      validateRedirect: nextUrl => !readOnlyNavigationConcern(nextUrl),
     })
     if (response.status < 200 || response.status >= 300) {
-      throw new Error(`Sitemap ${current.url} antwortet mit HTTP ${response.status}.`)
+      throw new Error(`Sitemap ${currentUrl} antwortet mit HTTP ${response.status}.`)
     }
 
-    const xml = response.body.toString('utf8')
-    const isIndex = /<sitemapindex\b/i.test(xml)
-    for (const location of sitemapLocations(xml)) {
+    const sitemap = parseSitemapXml(response.body.toString('utf8'))
+    for (const location of sitemap.locations) {
       const locationUrl = validateUrl(location, options, 'Sitemap-Eintrag')
       if (locationUrl.origin !== origin) {
         continue
       }
-      if (isIndex && current.depth < 2) {
-        queue.push({ depth: current.depth + 1, url: locationUrl.href })
+      if (readOnlyNavigationConcern(locationUrl)) {
+        skippedNavigation += 1
+        truncated = true
+        continue
+      }
+      if (sitemap.kind === 'index') {
+        if (!visitedSitemaps.has(locationUrl.href) && !queue.includes(locationUrl.href)) {
+          queue.push(locationUrl.href)
+        }
       }
       else if (!pages.includes(locationUrl.href)) {
         if (pages.length >= options.maxPages) {
@@ -928,7 +935,7 @@ async function discoverSitemapUrls(baseUrl, options) {
     }
   }
 
-  return { pages, truncated }
+  return { pages, skippedNavigation, truncated }
 }
 
 function summarize(results, strict) {
@@ -1189,6 +1196,7 @@ export function createJsonReport(results, options) {
     options: {
       maxPages: options.maxPages,
       maxRedirects: options.maxRedirects,
+      maxSitemaps: options.maxSitemaps,
       privateTargetsRedacted: Boolean(options.allowPrivate),
       sitemap: options.sitemap,
       sitemapUrl: redactReportData(options.sitemapUrl, 'sitemapUrl'),
@@ -1268,12 +1276,14 @@ export async function runSocialPreviewCheck(inputUrls, options = {}) {
   const validatedInputs = inputUrls.map(value => validateUrl(value, mergedOptions).href)
   let urls = [...validatedInputs]
   let sitemapCoverageTruncated = false
+  let sitemapSkippedNavigation = 0
 
   if (mergedOptions.sitemap) {
     for (const input of validatedInputs) {
       const discovered = await discoverSitemapUrls(input, mergedOptions)
       urls.push(...discovered.pages)
       sitemapCoverageTruncated ||= discovered.truncated
+      sitemapSkippedNavigation += discovered.skippedNavigation
     }
   }
 
@@ -1285,6 +1295,7 @@ export async function runSocialPreviewCheck(inputUrls, options = {}) {
     result.coverage = {
       discoveredPages: discoveredUrls.length,
       selectedPages: urls.length,
+      skippedNavigation: sitemapSkippedNavigation,
       truncated: sitemapCoverageTruncated || discoveredUrls.length > urls.length,
     }
     result.assertions = createSocialAssertions(result)
@@ -1299,6 +1310,7 @@ export async function runSocialPreviewCheck(inputUrls, options = {}) {
 }
 
 async function main() {
+  const outputIntent = jsonOutputIntent(process.argv.slice(2))
   let parsed
   try {
     parsed = parseArguments(process.argv.slice(2))
@@ -1329,24 +1341,12 @@ async function main() {
     }
   }
   catch (error) {
-    const errorReport = {
-      error: redactText(error.message),
-      readOnlyGuarantees: {
-        browserInteractions: false,
-        buttonsActivated: false,
-        formActionsFetched: false,
-        formsSubmitted: false,
-        methods: ['GET'],
-      },
-      robotsPolicyReviewedAt,
-      schemaVersion: 2,
-      summary: { errors: 1, failed: true, pages: 0, warnings: 0 },
-      tool: 'social-preview-check',
-    }
-    if (process.argv.includes('--json') || parsed?.options?.json) {
-      if (parsed?.options?.jsonFile) {
+    const errorReport = technicalErrorReport('social-preview-check', redactText(error.message))
+    if (outputIntent.json || parsed?.options?.json) {
+      const jsonFile = parsed?.options?.jsonFile || outputIntent.jsonFile
+      if (jsonFile) {
         try {
-          writeJsonOutput(parsed.options.jsonFile, errorReport)
+          writeJsonOutput(jsonFile, errorReport)
         }
         catch (outputError) {
           console.error(`Fehler beim Schreiben des JSON-Berichts: ${redactText(outputError.message)}`)

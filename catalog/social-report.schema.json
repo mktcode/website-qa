@@ -74,6 +74,10 @@
                   "type": "integer",
                   "minimum": 0
                 },
+                "maxSitemaps": {
+                  "type": "integer",
+                  "minimum": 1
+                },
                 "privateTargetsRedacted": {
                   "type": "boolean"
                 },

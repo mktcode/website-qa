@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import addFormats from 'ajv-formats'
@@ -6,11 +7,11 @@ import { describe, expect, it } from 'vitest'
 
 const catalogDirectory = join(import.meta.dirname, '..', 'catalog')
 const tools = [
-  { name: 'http', tool: 'http-check' },
-  { name: 'crawl', tool: 'crawl-check' },
-  { name: 'browser', tool: 'browser-check' },
-  { name: 'social', tool: 'social-preview-check' },
-  { name: 'lighthouse', tool: 'lighthouse-check' },
+  { name: 'http', source: 'check-http.mjs', tool: 'http-check' },
+  { name: 'crawl', source: 'check-crawl.mjs', tool: 'crawl-check' },
+  { name: 'browser', source: 'check-browser.mjs', tool: 'browser-check' },
+  { name: 'social', source: 'check-social-preview.mjs', tool: 'social-preview-check' },
+  { name: 'lighthouse', source: 'check-lighthouse.mjs', tool: 'lighthouse-check' },
 ]
 
 function json(name: string) {
@@ -22,6 +23,16 @@ function validators() {
   addFormats.default(ajv)
   ajv.addSchema(json('technical-report.common.schema.json'))
   return new Map(tools.map(({ name }) => [name, ajv.compile(json(`${name}-report.schema.json`))]))
+}
+
+function allReportsValidator() {
+  const ajv = new Ajv2020.Ajv2020({ allErrors: true, strict: true })
+  addFormats.default(ajv)
+  ajv.addSchema(json('technical-report.common.schema.json'))
+  for (const { name } of tools) {
+    ajv.addSchema(json(`${name}-report.schema.json`))
+  }
+  return ajv.compile(json('technical-report.schema.json'))
 }
 
 function validationMessage(errors: unknown) {
@@ -37,6 +48,14 @@ describe('technical report schemas', () => {
     }
   })
 
+  it('dispatches generic report validation and rejects arbitrary JSON', () => {
+    const validate = allReportsValidator()
+    for (const { name } of tools) {
+      expect(validate(json(`${name}-report.example.json`)), validationMessage(validate.errors)).toBe(true)
+    }
+    expect(validate({ arbitrary: true })).toBe(false)
+  })
+
   it('contains only technical signals and informational checklist references', () => {
     for (const { name } of tools) {
       const serialized = JSON.stringify(json(`${name}-report.example.json`))
@@ -50,17 +69,44 @@ describe('technical report schemas', () => {
     }
   })
 
-  it('covers the redacted exit-code-2 error envelopes', () => {
+  it('validates the real exit-code-2 CLI error envelopes', () => {
+    const schemas = validators()
+    for (const { name, source, tool } of tools) {
+      const child = spawnSync(process.execPath, [join(import.meta.dirname, '..', 'src', source), 'not-a-url', '--json'], {
+        encoding: 'utf8',
+        maxBuffer: 1024 * 1024,
+      })
+      expect(child.status, child.stderr).toBe(2)
+      const report = JSON.parse(child.stdout)
+      expect(report.tool).toBe(tool)
+      const validate = schemas.get(name)!
+      expect(validate(report), validationMessage(validate.errors)).toBe(true)
+    }
+  })
+
+  it('preserves schema-valid JSON output for real CLI parser failures', () => {
+    const schemas = validators()
+    for (const { name, source } of tools) {
+      const child = spawnSync(process.execPath, [join(import.meta.dirname, '..', 'src', source), '--json', '--unknown-option'], {
+        encoding: 'utf8',
+        maxBuffer: 1024 * 1024,
+      })
+      expect(child.status, child.stderr).toBe(2)
+      const report = JSON.parse(child.stdout)
+      const validate = schemas.get(name)!
+      expect(validate(report), validationMessage(validate.errors)).toBe(true)
+    }
+  })
+
+  it('requires package provenance in error envelopes', () => {
     const schemas = validators()
     for (const { name, tool } of tools) {
       const report = {
         error: 'Ungültige Eingabe.',
         schemaVersion: 2,
         tool,
-        toolPackage: { name: '@mktcode/website-qa', version: '2.0.0' },
       }
-      const validate = schemas.get(name)!
-      expect(validate(report), validationMessage(validate.errors)).toBe(true)
+      expect(schemas.get(name)!(report)).toBe(false)
     }
   })
 
@@ -83,6 +129,13 @@ describe('technical report schemas', () => {
       report.checklistCoverage = { complete: 215 }
       expect(schemas.get(name)!(report)).toBe(false)
     }
+  })
+
+  it('keeps additive Social options compatible within schema version 2', () => {
+    const validate = validators().get('social')!
+    const previousReport = structuredClone(json('social-report.example.json'))
+    delete previousReport.options.maxSitemaps
+    expect(validate(previousReport), validationMessage(validate.errors)).toBe(true)
   })
 
   it('requires bounded Social policy source verification', () => {
