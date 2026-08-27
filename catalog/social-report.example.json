@@ -586,7 +586,7 @@
   "tool": "social-preview-check",
   "toolPackage": {
     "name": "@mktcode/website-qa",
-    "version": "2.0.1"
+    "version": "2.0.2"
   },
   "checklist": {
     "id": "website-qa-checklist",

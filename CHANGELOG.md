@@ -2,6 +2,14 @@
 
 Dieses Changelog dokumentiert veröffentlichte Paketstände von `@mktcode/website-qa`. Planungs- und reine Dokumentationscommits ohne Paketveröffentlichung erscheinen nicht als eigene Version.
 
+## 2.0.2 – 2026-08-27
+
+- Automatisch erzeugte oder entdeckte GET-Ziele und jeder Redirecthop werden zentral vor dem Request gegen potenziell zustandsverändernde Pfade und Queryparameter geprüft; nur das exakt ausdrücklich angegebene erste Ziel kann diese konservative Namensheuristik umgehen.
+- HTTP- und Crawl-Ressourcen, CSS-Folgeressourcen, Sitemapindex-Kinder und Lighthouse-Preflight-Redirects mit verdächtigen Zielen werden ohne Zielrequest sichtbar begrenzt; abhängige technische Signale bleiben `inconclusive`.
+- IPv6-/SSRF-Klassifikation und Redaktion erweitert, HTTP-Antworten gegen Slow-Drip-Laufzeitüberschreitungen abgesichert und den Browser-Prüfer auf eine echte Gesamtlaufdeadline umgestellt.
+- Lighthouse-Referenzen auditbezogen und kataloggebunden erzeugt, WebSocket-Nebenwirkungsnachweis vervollständigt sowie Social-Seitenstandard und sichtbare `--strict`-Limitwarnung vereinheitlicht.
+- Reproduzierbaren Tarball-Verbrauchertest ergänzt, der alle fünf installierten Befehle ausschließlich mit GET ausführt und ihre Berichte gegen die exportierten Paketschemata validiert.
+
 ## 2.0.1 – 2026-08-27
 
 - SSRF-Sperre für IPv4-mapped-IPv6 und deprecated Site-Local-IPv6 geschlossen und Chromium-DNS im Browser-Prüfer an die geprüfte Zieladresse gepinnt.

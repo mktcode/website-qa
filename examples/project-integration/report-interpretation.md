@@ -35,7 +35,7 @@ Typische Ursachen sind Abruffehler, Sicherheitsblockierungen oder erreichte Seit
   "tool": "http-check",
   "toolPackage": {
     "name": "@mktcode/website-qa",
-    "version": "2.0.1"
+    "version": "2.0.2"
   }
 }
 ```

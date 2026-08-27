@@ -1,6 +1,6 @@
 {
   "name": "@mktcode/website-qa",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Read-only technical signals and a comprehensive manual checklist for website quality assurance",
   "license": "MIT",
   "type": "module",

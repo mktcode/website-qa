@@ -37,15 +37,16 @@ Lighthouse führt einen festen mobilen Navigationstest mit Performance, Accessib
 
 Diese Grenzen werden durch lokale Servertests und echte Chromium-Integrationstests abgesichert.
 
-## Veröffentlichter Wartungsstand: 2.0.1
+## Veröffentlichter Wartungsstand: 2.0.2
 
-Der enge Sicherheitspatch ohne neue Produktoberfläche umfasst:
+Der enge Sicherheitspatch ohne neue Produktoberfläche umfasst zusätzlich zu 2.0.1:
 
-- IPv4-mapped-IPv6 wird vollständig durch die private Zielsperre erfasst;
-- der Browser-Prüfer pinnt Chromium-DNS an die vorab geprüfte Adresse;
-- Dekompression, Social-Sitemaps und Browserbeobachtungen besitzen ausdrückliche Grenzen;
-- reale Exitcode-2-Ausgaben aller fünf CLIs entsprechen ihren veröffentlichten Schemata;
-- Release- und Integrationsdokumentation bezeichnen denselben öffentlichen Stand.
+- erweiterte IPv6-/SSRF-Klassifikation und Redaktion;
+- absolute HTTP-Antwort- und Browser-Gesamtlaufdeadlines;
+- zentral abgesicherte automatisch erzeugte oder entdeckte GET-Ziele und Redirecthops;
+- semantisch auditbezogene, kataloggebundene Lighthouse-Referenzen;
+- serverseitigen WebSocket-Nebenwirkungsnachweis und sichtbare Social-Seitenlimits;
+- einen reproduzierbaren Tarball-Verbrauchertest für alle fünf installierten Befehle.
 
 **Freigabekriterien für den nächsten Wartungsstand:** Die jeweiligen Positiv-, Negativ-, Grenz- und Nebenwirkungstests bestehen. `npm run check` und `npm run test:chromium` werden unter einem unterstützten Node-22- und Node-24-Stand ohne übersprungene Browser- oder Lighthouse-Integration ausgeführt. Das erzeugte Tarball wird in einem leeren Verbraucherprojekt installiert; alle fünf installierten Befehle und ihre JSON-Berichte werden gegen die Paketschemata validiert.
 
@@ -55,13 +56,13 @@ Die Arbeitskennungen in diesem Abschnitt dienen ausschließlich der Wartungsplan
 
 | ID | Priorität | Status | Ziel |
 | --- | --- | --- | --- |
-| `WQ-01` | P1 | umgesetzt, unveröffentlicht | IPv6-/SSRF-Klassifikation und Redaktion schließen |
-| `WQ-02` | P1 | umgesetzt, unveröffentlicht | echte Browser-Gesamtlaufdeadline sicherstellen |
-| `WQ-03` | P1 | umgesetzt, unveröffentlicht | Lighthouse-Referenzen semantisch und kataloggebunden erzeugen |
-| `WQ-04` | P2 | umgesetzt, unveröffentlicht | WebSocket-Nebenwirkungsnachweis serverseitig vervollständigen |
-| `WQ-05` | P2 | umgesetzt, unveröffentlicht | installierbares Tarball reproduzierbar prüfen |
-| `WQ-06` | P2 | umgesetzt, unveröffentlicht | Social-Seitenlimit über Code und Dokumentation vereinheitlichen |
-| `WQ-08` | P1 | umgesetzt, unveröffentlicht | automatisch entdeckte GET-Ziele und jeden Redirecthop zentral absichern |
+| `WQ-01` | P1 | veröffentlicht in 2.0.2 | IPv6-/SSRF-Klassifikation und Redaktion schließen |
+| `WQ-02` | P1 | veröffentlicht in 2.0.2 | echte Browser-Gesamtlaufdeadline sicherstellen |
+| `WQ-03` | P1 | veröffentlicht in 2.0.2 | Lighthouse-Referenzen semantisch und kataloggebunden erzeugen |
+| `WQ-04` | P2 | veröffentlicht in 2.0.2 | WebSocket-Nebenwirkungsnachweis serverseitig vervollständigen |
+| `WQ-05` | P2 | veröffentlicht in 2.0.2 | installierbares Tarball reproduzierbar prüfen |
+| `WQ-06` | P2 | veröffentlicht in 2.0.2 | Social-Seitenlimit über Code und Dokumentation vereinheitlichen |
+| `WQ-08` | P1 | veröffentlicht in 2.0.2 | automatisch entdeckte GET-Ziele und jeden Redirecthop zentral absichern |
 | `WQ-07` | P3 | wartet auf Praxisbeleg | weitere technische Signale nur befundgetrieben auswählen |
 
 ### `WQ-01` – IPv6-/SSRF-Klassifikation und Redaktion
