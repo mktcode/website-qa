@@ -407,8 +407,24 @@ function normalizeComparableUrl(value) {
   }
 }
 
+function issueChecklistRefs(code) {
+  if (code === 'ai-discovery-blocked-by-robots') {
+    return ['CORE-ROB-02', 'CORE-SOC-02']
+  }
+  if (code.startsWith('robots-') || code === 'crawler-blocked-by-robots') {
+    return ['CORE-ROB-01', 'CORE-SOC-02']
+  }
+  if (code.includes('canonical')) {
+    return ['CORE-DOM-05', 'CORE-DOM-06', 'CORE-SOC-02']
+  }
+  if (code.includes('image') || code.includes('open-graph') || code.includes('twitter') || code.includes('metadata')) {
+    return ['CORE-SOC-01', 'CORE-SOC-02']
+  }
+  return ['CORE-SOC-02']
+}
+
 function addIssue(result, severity, code, message) {
-  result.issues.push({ code, message, severity })
+  result.issues.push({ checklistRefs: issueChecklistRefs(code), code, message, severity })
 }
 
 function checkAbsoluteUrl(result, value, label, options) {

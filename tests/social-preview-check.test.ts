@@ -132,6 +132,9 @@ describe('social preview checker', () => {
       'social.robots.policy-matrix-recorded': 'inconclusive',
       'social.robots.social-crawlers-allowed': 'inconclusive',
     })
+    const jsonReport = createJsonReport(report.results, report.options)
+    const outputResults = jsonReport.results as Array<{ issues: Array<{ checklistRefs: string[] }> }>
+    expect(outputResults.flatMap(result => result.issues).every(issue => issue.checklistRefs.length > 0)).toBe(true)
   })
 
   it('checks crawler parity, robots policies and the real image', async () => {

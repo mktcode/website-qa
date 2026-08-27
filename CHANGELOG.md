@@ -6,7 +6,7 @@ Dieses Changelog dokumentiert veröffentlichte Paketstände von `@mktcode/websit
 
 - Produktgrenze bewusst vereinfacht: zentrale manuelle 215-Punkte-Checkliste plus unabhängige technische Temperaturmessungen; keine automatische Checklistenbewertung.
 - Projektbericht-, Evidence-, Workflow-, Bundle- und Checklistenaggregations-APIs ohne Alias entfernt.
-- Technische Berichte auf `schemaVersion: 2` und neutrale Signale mit `positive`, `defect`, `inconclusive` und `notApplicable` umgestellt; Checklisten-IDs sind nur Informationsreferenzen.
+- Technische Berichte auf `schemaVersion: 2` und neutrale Signale mit `positive`, `defect`, `inconclusive` und `notApplicable` umgestellt; Checklisten-IDs sind nur Informationsreferenzen. Auch konkrete Social-Befunde tragen schema-konforme informative Referenzen.
 - Neutralen Checklistenindex und technisches Signalregister eingeführt; der Social-Prüfer dokumentiert Trainings-/Datennutzungstokens ohne Freigabeeingabe oder automatische Betreiberentscheidung.
 - `website-qa-lighthouse` als fünften unabhängigen Standardprüfer mit festem mobilen Lauf für Performance, Accessibility, Best Practices und SEO ergänzt.
 - Lighthouse verwendet eine vor Navigation abgesicherte, isolierte Puppeteer-Seite; externe Requests, Nicht-GET, Formulare, Beacons, Popups und Workerfamilien bleiben blockiert. Sicherheitsblockierungen kennzeichnen Messwerte als nicht repräsentativ.
