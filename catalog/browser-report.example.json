@@ -3,6 +3,7 @@
   "options": {
     "maxPages": 10,
     "maxRequests": 300,
+    "maxSitemaps": 10,
     "privateTargetsRedacted": false,
     "profiles": [
       "desktop",
@@ -41,6 +42,13 @@
     "browser": {
       "product": "Chromium",
       "version": "Chrome/140.0.0.0"
+    },
+    "blockedRequestObservation": {
+      "externalTotal": 0,
+      "limit": 100,
+      "recorded": 0,
+      "total": 0,
+      "truncated": false
     },
     "blockedRequests": [],
     "issues": [],

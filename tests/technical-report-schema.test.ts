@@ -131,6 +131,14 @@ describe('technical report schemas', () => {
     }
   })
 
+  it('keeps additive Browser limits compatible within schema version 2', () => {
+    const validate = validators().get('browser')!
+    const previousReport = structuredClone(json('browser-report.example.json'))
+    delete previousReport.options.maxSitemaps
+    delete previousReport.result.blockedRequestObservation
+    expect(validate(previousReport), validationMessage(validate.errors)).toBe(true)
+  })
+
   it('keeps additive Social options compatible within schema version 2', () => {
     const validate = validators().get('social')!
     const previousReport = structuredClone(json('social-report.example.json'))

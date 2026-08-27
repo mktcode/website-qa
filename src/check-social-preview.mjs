@@ -614,10 +614,15 @@ async function checkImage(result, imageUrl, sources, metadata, options) {
   result.images.push(imageResult)
 
   try {
+    const concern = readOnlyNavigationConcern(new URL(imageUrl))
+    if (concern) {
+      throw new Error(`Nur-Lese-Richtlinie: ${concern}`)
+    }
     const response = await fetchResource(imageUrl, options, {
       accept: 'image/avif,image/webp,image/png,image/jpeg,image/gif,image/svg+xml,image/*;q=0.8,*/*;q=0.1',
       maximumBytes: options.maxImageBytes,
       userAgent: userAgents.find(agent => agent.key === 'facebook').value,
+      validateRedirect: nextUrl => !readOnlyNavigationConcern(nextUrl),
     })
     imageResult.finalUrl = response.finalUrl
     imageResult.redirects = response.redirects
@@ -714,6 +719,7 @@ async function checkRobots(result, pageUrl, agentResults, options) {
       accept: 'text/plain,*/*;q=0.1',
       maximumBytes: 512 * 1024,
       userAgent: userAgents[0].value,
+      validateRedirect: nextUrl => !readOnlyNavigationConcern(nextUrl),
     })
     result.robots = {
       status: response.status,

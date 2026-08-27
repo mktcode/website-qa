@@ -112,13 +112,16 @@ describe('social preview checker', () => {
         response.end()
         return
       }
-      if (request.url === '/robots.txt') {
-        response.writeHead(200, { 'content-type': 'text/plain' })
-        response.end('User-agent: *\nAllow: /\n')
+      if (request.url === '/image-redirect' || request.url === '/robots.txt') {
+        response.writeHead(302, { location: '/delete-account' })
+        response.end()
         return
       }
       response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
-      response.end('<!doctype html><html lang="de"><head><title>Nur-Lese-Sitemap</title></head><body></body></html>')
+      response.end(`<!doctype html><html lang="de"><head><title>Nur-Lese-Sitemap</title>
+        <meta property="og:image" content="${origin}/image-redirect">
+        <meta name="twitter:image" content="${origin}/unsubscribe?token=private">
+      </head><body></body></html>`)
     })
     servers.add(server)
     await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
@@ -132,11 +135,11 @@ describe('social preview checker', () => {
       sitemap: true,
     })
 
-    expect(requestedPaths).toContain('/safe')
-    expect(requestedPaths).not.toContain('/delete-account')
+    expect(requestedPaths).toEqual(expect.arrayContaining(['/image-redirect', '/robots.txt', '/safe']))
+    expect(requestedPaths.some(path => path.startsWith('/delete-account') || path.startsWith('/unsubscribe'))).toBe(false)
     expect((report.results[0] as unknown as { coverage: { skippedNavigation: number, truncated: boolean } }).coverage).toMatchObject({ skippedNavigation: 1, truncated: true })
     const issueCodes = report.results.flatMap(result => (result as unknown as { issues: Array<{ code: string }> }).issues).map(issue => issue.code)
-    expect(issueCodes).toContain('crawler-fetch-failed')
+    expect(issueCodes).toEqual(expect.arrayContaining(['crawler-fetch-failed', 'image-fetch-failed', 'robots-fetch-failed']))
 
     requestedPaths.length = 0
     await expect(runSocialPreviewCheck([`${origin}/`], {

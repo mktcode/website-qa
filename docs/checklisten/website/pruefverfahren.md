@@ -204,7 +204,7 @@ Das öffentliche Dateiverzeichnis und ein Medieninventar werden gegen Quellrefer
 Für den allgemeinen ausschließlich beobachtenden Chromium-Lauf steht im Paket `@mktcode/website-qa` ein URL-basiertes Werkzeug bereit:
 
 ```bash
-npm run ops:browser:check -- https://example.de/ --sitemap --max-pages=10 --max-requests=300 --strict
+npm run ops:browser:check -- https://example.de/ --sitemap --max-pages=10 --max-requests=300 --max-sitemaps=10 --strict
 ```
 
 Der Standardlauf verwendet isolierte, nicht persistente Browserkontexte für Desktop, 390 und 320 CSS-Pixel, Reduced Motion und eine ausdrücklich als Näherung bezeichnete 200-%-Zoom-Prüfung. Er inventarisiert Browserkonsole, JavaScript-/Netzwerkfehler, Overflow, Cookies, Local-/Session-Storage, IndexedDB, Grundstruktur und axe-core-Befunde. Das Werkzeug klickt nie und blockiert Formularübermittlungen bereits im DOM sowie auf Netzwerkebene. Alle Nicht-GET-Anfragen, externen Seitenrequests, Popups, Beacons, Worker, WebSockets, WebTransport und WebRTC werden blockiert und protokolliert. `--json-file=<Pfad>` kann den vollständigen redigierten Browserbericht direkt in den ignorierten lokalen Arbeitsbereich schreiben. Diese Grenzen dürfen ohne ein gesondertes Prüfverfahren nicht gelockert werden.

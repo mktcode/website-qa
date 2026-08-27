@@ -26,7 +26,7 @@ npm install --save-dev 'github:mktcode/website-qa#<TAG-ODER-COMMIT>'
 ```bash
 website-qa-http https://example.com/ --strict
 website-qa-crawl https://example.com/ --sitemap --max-pages=50 --strict
-website-qa-browser https://example.com/ --sitemap --max-pages=10 --strict
+website-qa-browser https://example.com/ --sitemap --max-pages=10 --max-sitemaps=10 --strict
 website-qa-social https://example.com/ --sitemap --max-pages=20 --strict
 website-qa-lighthouse https://example.com/ --strict
 ```
@@ -101,7 +101,7 @@ Lighthouse und Axe liefern wertvolle technische Signale, aber keine vollständig
   "scripts": {
     "ops:http:check": "website-qa-http --strict --json-file=.website-qa/current/http.json",
     "ops:crawl:check": "website-qa-crawl --sitemap --max-pages=50 --max-resources=500 --strict --json-file=.website-qa/current/crawl.json",
-    "ops:browser:check": "website-qa-browser --sitemap --max-pages=10 --max-requests=300 --strict --json-file=.website-qa/current/browser.json",
+    "ops:browser:check": "website-qa-browser --sitemap --max-pages=10 --max-requests=300 --max-sitemaps=10 --strict --json-file=.website-qa/current/browser.json",
     "ops:social:check": "website-qa-social --sitemap --max-pages=20 --max-sitemaps=20 --strict --json-file=.website-qa/current/social.json",
     "ops:lighthouse:check": "website-qa-lighthouse --strict --json-file=.website-qa/current/lighthouse.json"
   }

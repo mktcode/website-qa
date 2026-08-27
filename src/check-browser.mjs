@@ -58,6 +58,7 @@ Optionen:
   --sitemap-url=<URL>       Abweichende Sitemap-URL verwenden
   --max-pages=<Anzahl>      Höchstens so viele Seiten prüfen (Standard: 10)
   --max-requests=<Anzahl>   Höchstens so viele Requests je Seite/Profil (Standard: 300)
+  --max-sitemaps=<Anzahl>   Höchstens so viele Sitemap-Dateien abrufen (Standard: 10)
   --profiles=<Liste>        desktop,mobile,narrow,reduced-motion,zoom-200
   --timeout=<Millisek.>     Navigations- und Browser-Timeout (Standard: 20000)
   --settle=<Millisek.>      Beobachtungszeit nach DOMContentLoaded (Standard: 750)
@@ -130,6 +131,9 @@ export function parseArguments(argv) {
     }
     else if (argument.startsWith('--max-requests=')) {
       options.maxRequests = positiveInteger(argument.slice('--max-requests='.length), '--max-requests')
+    }
+    else if (argument.startsWith('--max-sitemaps=')) {
+      options.maxSitemaps = positiveInteger(argument.slice('--max-sitemaps='.length), '--max-sitemaps')
     }
     else if (argument.startsWith('--timeout=')) {
       options.timeoutMilliseconds = positiveInteger(argument.slice('--timeout='.length), '--timeout')
@@ -237,6 +241,7 @@ const incompleteBrowserIssueCodes = new Set([
   'request-limit',
   'sitemap-fetch',
   'sitemap-limit',
+  'sitemap-skipped-read-only',
   'start-mime',
   'start-status',
   'suspicious-get-blocked',
@@ -321,6 +326,7 @@ const incompletePrivacyObservationIssueCodes = new Set([
   'request-limit',
   'sitemap-fetch',
   'sitemap-limit',
+  'sitemap-skipped-read-only',
   'start-mime',
   'start-status',
   'unexpected-navigation-blocked',
@@ -340,6 +346,8 @@ function createPrivacyObservations(result, options = {}) {
   const profiles = result.profiles || []
   const requestedProfiles = result.requestedProfiles || options.profiles || [...new Set(profiles.map(profile => profile.profile))]
   const externalNetworkRequests = (result.blockedRequests || []).filter(request => request.external)
+  const blockedNetworkRequestTotal = result.blockedRequestObservation?.externalTotal ?? externalNetworkRequests.length
+  const blockedNetworkRequestsTruncated = Boolean(result.blockedRequestObservation?.truncated)
   const blockedActions = profiles.flatMap(profile => profile.blockedActions || [])
   const externalBlockedActions = blockedActions.filter(action => action.external)
   const blockedActionObservations = profiles.map((profile) => {
@@ -388,12 +396,12 @@ function createPrivacyObservations(result, options = {}) {
     },
     externalRequestAttempts: {
       blockedActions: blockedActionTotal,
-      blockedNetworkRequests: externalNetworkRequests.length,
+      blockedNetworkRequests: blockedNetworkRequestTotal,
       externalBlockedActions: externalBlockedActionTotal,
       originCount: origins.length,
       origins: origins.slice(0, maxPrivacyOrigins),
-      originsTruncated: blockedActionsTruncated || origins.length > maxPrivacyOrigins,
-      total: externalNetworkRequests.length + externalBlockedActionTotal,
+      originsTruncated: blockedActionsTruncated || blockedNetworkRequestsTruncated || origins.length > maxPrivacyOrigins,
+      total: blockedNetworkRequestTotal + externalBlockedActionTotal,
     },
     initialStorage: storage,
     observationMode: 'passive-initial-load-isolated',
@@ -617,12 +625,25 @@ function addBlockedRequest(result, pageUrl, profile, request, reason, code, seve
     resourceType: request.resourceType(),
     url: reported.url,
   }
+  result.blockedRequestObservation.total += 1
+  if (entry.external) {
+    result.blockedRequestObservation.externalTotal += 1
+  }
   const key = JSON.stringify(entry)
-  if (!result.blockedRequestKeys.has(key)) {
+  if (result.blockedRequestKeys.has(key)) {
+    return
+  }
+  if (result.blockedRequests.length < maxBrowserObservationRecordsPerKind) {
     result.blockedRequestKeys.add(key)
     result.blockedRequests.push(entry)
+    result.blockedRequestObservation.recorded = result.blockedRequests.length
+    addIssue(result, severity, code, reason, ['CORE-PRIV-02', 'CORE-SEC-07', 'FORM-TEST-04'], reported.url, profile)
+    return
   }
-  addIssue(result, severity, code, reason, ['CORE-PRIV-02', 'CORE-SEC-07', 'FORM-TEST-04'], reported.url, profile)
+  result.blockedRequestObservation.truncated = true
+  const aggregateUrl = reportUrl(pageUrl).url
+  addIssue(result, severity, code, `Mindestens ein weiterer Browser-Request des Typs ${code} wurde blockiert; Details sind wegen des Beobachtungslimits nicht einzeln enthalten.`, ['CORE-PRIV-02', 'CORE-SEC-07', 'FORM-TEST-04'], aggregateUrl, profile)
+  addIssue(result, 'warning', 'browser-observation-limit', `Browser-Beobachtungen wurden auf ${maxBrowserObservationRecordsPerKind} Einträge je Art und Lauf begrenzt; Gesamtzahlen bleiben erhalten.`, ['CORE-QA-03', 'CORE-PRIV-02'], aggregateUrl, profile)
 }
 
 export { classifyBrowserRequest } from './lib/browser-safety.mjs'
@@ -642,6 +663,11 @@ async function sitemapPages(result, options, origin, defaultSitemapUrl) {
         addIssue(result, 'warning', 'external-sitemap-skipped', `Externe Sitemap ${sitemapUrl.origin} wurde nicht abgerufen.`, ['CORE-SEO-04'], sitemapUrl.href)
         continue
       }
+      const sitemapConcern = readOnlyNavigationConcern(sitemapUrl)
+      if (sitemapConcern) {
+        addIssue(result, 'warning', 'sitemap-skipped-read-only', `Sitemap wurde wegen ${sitemapConcern} nicht abgerufen.`, ['CORE-SEO-04', 'FORM-TEST-04'], sitemapUrl.href)
+        continue
+      }
       if (seenSitemaps.has(sitemapUrl.href)) {
         continue
       }
@@ -650,6 +676,7 @@ async function sitemapPages(result, options, origin, defaultSitemapUrl) {
         accept: 'application/xml,text/xml;q=0.9,*/*;q=0.1',
         allowedOrigins: [origin],
         maximumBytes: 5 * 1024 * 1024,
+        validateRedirect: nextUrl => !readOnlyNavigationConcern(nextUrl),
       })
       if (response.status !== 200) {
         throw new Error(`HTTP ${response.status}`)
@@ -700,21 +727,34 @@ async function pageFacts(page) {
       let current = element
       while (current && current.nodeType === Node.ELEMENT_NODE && parts.length < 4) {
         const parent = current.parentElement
-        const siblings = parent ? [...parent.children].filter(item => item.tagName === current.tagName) : []
-        const suffix = siblings.length > 1 ? `:nth-of-type(${siblings.indexOf(current) + 1})` : ''
+        let sameTagCount = 0
+        let sameTagIndex = 0
+        if (parent) {
+          for (const child of parent.children) {
+            if (child.tagName === current.tagName) {
+              sameTagCount += 1
+              if (child === current) {
+                sameTagIndex = sameTagCount
+              }
+            }
+          }
+        }
+        const suffix = sameTagCount > 1 ? `:nth-of-type(${sameTagIndex})` : ''
         parts.unshift(`${current.tagName.toLowerCase()}${suffix}`)
         current = parent
       }
       return parts.join(' > ')
     }
     const root = document.documentElement
-    const overflowing = [...document.querySelectorAll('body *')]
-      .filter((element) => {
-        const rect = element.getBoundingClientRect()
-        return rect.right > root.clientWidth + 1 || rect.left < -1
-      })
-      .slice(0, 10)
-      .map(selectorFor)
+    const overflowing = []
+    const bodyElements = document.querySelectorAll('body *')
+    for (let index = 0; index < bodyElements.length && overflowing.length < 10; index += 1) {
+      const element = bodyElements[index]
+      const rect = element.getBoundingClientRect()
+      if (rect.right > root.clientWidth + 1 || rect.left < -1) {
+        overflowing.push(selectorFor(element))
+      }
+    }
     const linkElements = document.querySelectorAll('a[href]')
     const links = Array.from({ length: Math.min(linkElements.length, domRecordLimit) }, (_, index) => linkElements[index]).map(link => ({
       download: link.hasAttribute('download'),
@@ -1142,6 +1182,7 @@ async function probeHtmlCandidate(result, options, candidateUrl, knownResponse) 
       accept: 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.1',
       allowedOrigins: [result.origin],
       maximumBytes: 5 * 1024 * 1024,
+      validateRedirect: nextUrl => !readOnlyNavigationConcern(nextUrl),
     })
     const mimeType = normalizeMimeType(response.headers['content-type'])
     if (response.status !== 200) {
@@ -1167,11 +1208,13 @@ export async function runBrowserCheck(input, suppliedOptions = {}) {
   const preflight = await fetchResource(requestedUrl.href, options, {
     accept: 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.1',
     maximumBytes: 5 * 1024 * 1024,
+    validateRedirect: nextUrl => !readOnlyNavigationConcern(nextUrl),
   })
   const finalUrl = validateUrl(preflight.finalUrl, options, 'Finale URL')
   const result = {
     assertions: [],
     blockedRequestKeys: new Set(),
+    blockedRequestObservation: { externalTotal: 0, limit: maxBrowserObservationRecordsPerKind, recorded: 0, total: 0, truncated: false },
     blockedRequests: [],
     browser: {},
     finalUrl: finalUrl.href,
@@ -1281,6 +1324,7 @@ export function createJsonReport(inputResult, options) {
     options: {
       maxPages: options.maxPages,
       maxRequests: options.maxRequests,
+      maxSitemaps: options.maxSitemaps ?? defaultOptions.maxSitemaps,
       privateTargetsRedacted: Boolean(options.allowPrivate),
       profiles: options.profiles,
       settleMilliseconds: options.settleMilliseconds,
@@ -1300,7 +1344,7 @@ export function createJsonReport(inputResult, options) {
     result,
     schemaVersion: 2,
     summary: {
-      blockedRequests: result.blockedRequests.length,
+      blockedRequests: result.blockedRequestObservation?.total ?? result.blockedRequests.length,
       errors,
       failed: errors > 0 || (options.strict && warnings > 0),
       pages,

@@ -71,6 +71,7 @@ describe('browser check', () => {
       '--sitemap',
       '--max-pages=4',
       '--max-requests=80',
+      '--max-sitemaps=6',
       '--profiles=desktop,narrow',
       '--settle=0',
       '--json-file=.website-qa/current/browser.json',
@@ -83,6 +84,7 @@ describe('browser check', () => {
       jsonFile: '.website-qa/current/browser.json',
       maxPages: 4,
       maxRequests: 80,
+      maxSitemaps: 6,
       profiles: ['desktop', 'narrow'],
       settleMilliseconds: 0,
       sitemap: true,
@@ -138,6 +140,7 @@ describe('browser check', () => {
       timeoutMilliseconds: 20_000,
     })
 
+    expect(report.options.maxSitemaps).toBe(10)
     expect(report.readOnlyGuarantees).toEqual({
       buttonsActivated: false,
       externalRequestsAllowed: false,
@@ -359,19 +362,24 @@ describe('browser check', () => {
   }
   const chromiumIt = chromiumPath ? it : it.skip
 
-  chromiumIt('traverses Sitemap indexes before selecting browser pages', async () => {
+  chromiumIt('traverses Sitemap indexes without requesting suspicious pages or redirects', async () => {
     const requestedPaths: string[] = []
     const server = createServer((request, response) => {
       requestedPaths.push(request.url || '')
       const origin = `http://${request.headers.host}`
       if (request.url === '/sitemap.xml') {
         response.writeHead(200, { 'content-type': 'application/xml' })
-        response.end(`<?xml version="1.0"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><sitemap><loc>${origin}/child.xml</loc></sitemap></sitemapindex>`)
+        response.end(`<?xml version="1.0"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><sitemap><loc>${origin}/child.xml</loc></sitemap><sitemap><loc>${origin}/delete-account.xml</loc></sitemap><sitemap><loc>${origin}/redirecting.xml</loc></sitemap></sitemapindex>`)
         return
       }
       if (request.url === '/child.xml') {
         response.writeHead(200, { 'content-type': 'application/xml' })
-        response.end(`<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${origin}/indexed</loc></url></urlset>`)
+        response.end(`<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${origin}/indexed</loc></url><url><loc>${origin}/delete-account-page</loc></url><url><loc>${origin}/redirecting-page</loc></url></urlset>`)
+        return
+      }
+      if (request.url === '/redirecting.xml' || request.url === '/redirecting-page') {
+        response.writeHead(302, { location: '/delete-account' })
+        response.end()
         return
       }
       response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
@@ -383,16 +391,22 @@ describe('browser check', () => {
       allowHttp: true,
       allowPrivate: true,
       chromiumPath,
-      maxPages: 2,
+      maxPages: 3,
       profiles: ['desktop'],
       settleMilliseconds: 0,
       sitemap: true,
-    }) as unknown as { profiles: Array<{ url: string }>, sitemaps: Array<{ kind: string }> }
+    }) as unknown as { issues: Array<{ code: string }>, profiles: Array<{ url: string }>, sitemaps: Array<{ kind: string }> }
 
-    expect(requestedPaths).toContain('/child.xml')
-    expect(requestedPaths).toContain('/indexed')
+    expect(requestedPaths).toEqual(expect.arrayContaining(['/child.xml', '/indexed', '/redirecting.xml', '/redirecting-page']))
+    expect(requestedPaths.some(path => path.startsWith('/delete-account'))).toBe(false)
     expect(result.sitemaps.map(sitemap => sitemap.kind)).toEqual(['index', 'urlset'])
     expect(result.profiles.map(profile => profile.url)).toContain(`${origin}/indexed`)
+    expect(result.issues.map(issue => issue.code)).toEqual(expect.arrayContaining([
+      'navigation-skipped-read-only',
+      'page-probe-failed',
+      'sitemap-fetch',
+      'sitemap-skipped-read-only',
+    ]))
   }, 30_000)
 
   chromiumIt('propagates relevant real Axe incomplete results as inconclusive', async () => {
@@ -575,7 +589,9 @@ for (let index = 0; index < 150; index += 1) {
 for (let index = 0; index < 150; index += 1) {
   console.error('bounded-' + index)
   navigator.sendBeacon('/beacon', 'x')
+  fetch('https://example.invalid/tracker-' + index).catch(() => {})
 }
+fetch('/mutate-after-warning-limit', { method: 'POST', body: 'blocked' }).catch(() => {})
 </script></body></html>`)
     })
     const origin = await listen(server)
@@ -588,6 +604,8 @@ for (let index = 0; index < 150; index += 1) {
       profiles: ['desktop'],
       settleMilliseconds: 100,
     }) as unknown as {
+      blockedRequestObservation: { externalTotal: number, limit: number, recorded: number, total: number, truncated: boolean }
+      blockedRequests: unknown[]
       issues: Array<{ code: string }>
       profiles: Array<{
         blockedActions: unknown[]
@@ -596,23 +614,41 @@ for (let index = 0; index < 150; index += 1) {
           limitPerKind: number
           records: Record<string, { recorded: number, total: number, truncated: boolean }>
         }
-        readOnlyExecution: { blockedActionCountsByKind: Record<string, number> }
+        readOnlyExecution: { blockedActionCountsByKind: Record<string, number>, blockedRequestCountsByCode: Record<string, number> }
       }>
     }
     const profile = result.profiles[0]
 
     expect(receivedUrls).not.toContain('/beacon')
+    expect(receivedUrls).not.toContain('/mutate-after-warning-limit')
+    expect(result.blockedRequests).toHaveLength(100)
+    expect(result.blockedRequestObservation).toEqual({ externalTotal: 150, limit: 100, recorded: 100, total: 151, truncated: true })
     expect(profile?.blockedActions).toHaveLength(100)
     expect(profile?.consoleMessages).toHaveLength(100)
     expect(profile?.observationLimits).toMatchObject({
       limitPerKind: 100,
       records: {
         blockedActions: { recorded: 100, total: 150, truncated: true },
-        consoleMessages: { recorded: 100, total: 150, truncated: true },
+        consoleMessages: { recorded: 100, truncated: true },
       },
     })
+    expect(profile?.observationLimits.records.consoleMessages.total).toBeGreaterThanOrEqual(150)
     expect(profile?.readOnlyExecution.blockedActionCountsByKind.beacon).toBe(150)
-    expect(result.issues.map(issue => issue.code)).toContain('browser-observation-limit')
+    expect(profile?.readOnlyExecution.blockedRequestCountsByCode['non-get-blocked']).toBe(1)
+    expect(result.issues.map(issue => issue.code)).toEqual(expect.arrayContaining(['browser-observation-limit', 'non-get-blocked']))
+    const report = createJsonReport(result, {
+      allowPrivate: true,
+      maxPages: 1,
+      maxRequests: 300,
+      maxSitemaps: 10,
+      profiles: ['desktop'],
+      settleMilliseconds: 100,
+      sitemap: false,
+      strict: false,
+      timeoutMilliseconds: 20_000,
+    })
+    expect(report.summary.errors).toBeGreaterThan(0)
+    expect(report.summary.failed).toBe(true)
   }, 30_000)
 
   chromiumIt('blocks side effects while inventorying external attempts, cookies and storage without values', async () => {

@@ -46,6 +46,10 @@
                   "type": "integer",
                   "minimum": 1
                 },
+                "maxSitemaps": {
+                  "type": "integer",
+                  "minimum": 1
+                },
                 "privateTargetsRedacted": {
                   "type": "boolean"
                 },
@@ -130,6 +134,35 @@
                     "settleMilliseconds"
                   ],
                   "properties": {
+                    "blockedRequestObservation": {
+                      "type": "object",
+                      "required": [
+                        "externalTotal",
+                        "limit",
+                        "recorded",
+                        "total",
+                        "truncated"
+                      ],
+                      "properties": {
+                        "externalTotal": {
+                          "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                        },
+                        "limit": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "recorded": {
+                          "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                        },
+                        "total": {
+                          "$ref": "technical-report.common.schema.json#/$defs/nonNegativeInteger"
+                        },
+                        "truncated": {
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
                     "blockedRequests": {
                       "type": "array"
                     },

@@ -37,9 +37,9 @@ Lighthouse führt einen festen mobilen Navigationstest mit Performance, Accessib
 
 Diese Grenzen werden durch lokale Servertests und echte Chromium-Integrationstests abgesichert.
 
-## Nächster Wartungsschritt: 2.0.1
+## Veröffentlichter Wartungsstand: 2.0.1
 
-Priorität P0 ist ein enger Sicherheitspatch ohne neue Produktoberfläche:
+Der enge Sicherheitspatch ohne neue Produktoberfläche umfasst:
 
 - IPv4-mapped-IPv6 wird vollständig durch die private Zielsperre erfasst;
 - der Browser-Prüfer pinnt Chromium-DNS an die vorab geprüfte Adresse;
@@ -47,7 +47,7 @@ Priorität P0 ist ein enger Sicherheitspatch ohne neue Produktoberfläche:
 - reale Exitcode-2-Ausgaben aller fünf CLIs entsprechen ihren veröffentlichten Schemata;
 - Release- und Integrationsdokumentation bezeichnen denselben öffentlichen Stand.
 
-**Akzeptanz:** Die jeweiligen Positiv-, Negativ-, Grenz- und Nebenwirkungstests bestehen. `npm run check` und `npm run test:chromium` laufen unter einem unterstützten Node-22- und Node-24-Stand; Browser- und Lighthouse-Integration werden nicht übersprungen. Das erzeugte Tarball wird in einem leeren Verbraucherprojekt installiert, alle fünf installierten Befehle werden ausgeführt und ihre JSON-Berichte gegen die Paketschemata validiert.
+**Akzeptanz:** Die jeweiligen Positiv-, Negativ-, Grenz- und Nebenwirkungstests bestehen. `npm run check` und `npm run test:chromium` wurden unter einem unterstützten Node-22- und Node-24-Stand ohne übersprungene Browser- oder Lighthouse-Integration ausgeführt. Das erzeugte Tarball wurde in einem leeren Verbraucherprojekt installiert; alle fünf installierten Befehle und ihre JSON-Berichte wurden gegen die Paketschemata validiert.
 
 ## Spätere fachliche Arbeit
 
