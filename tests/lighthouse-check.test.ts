@@ -3,7 +3,7 @@ import type { AddressInfo } from 'node:net'
 import { existsSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { afterEach, describe, expect, it } from 'vitest'
-import { compactLighthouseResult, parseArguments, runLighthouseCheck, withResourceTimeout } from '../src/check-lighthouse.mjs'
+import { compactLighthouseResult, createLighthouseSignals, parseArguments, runLighthouseCheck, withResourceTimeout } from '../src/check-lighthouse.mjs'
 
 const openServers: Server[] = []
 
@@ -115,6 +115,48 @@ describe('lighthouse check', () => {
     expect(compact.lcp.candidate).toEqual({ label: 'Hero', selector: '#hero' })
   })
 
+  it('maps Lighthouse audits only to semantically matching checklist points', () => {
+    const auditIds = [
+      'largest-contentful-paint',
+      'total-blocking-time',
+      'cumulative-layout-shift',
+      'landmark-one-main',
+      'link-text',
+      'robots-txt',
+      'is-on-https',
+      'unknown-future-audit',
+    ]
+    const compact = compactLighthouseResult({
+      audits: Object.fromEntries(auditIds.map(id => [id, { score: 0, scoreDisplayMode: 'binary', title: id }])),
+      categories: {
+        'accessibility': { auditRefs: [{ id: 'landmark-one-main' }, { id: 'link-text' }], score: 1, title: 'Accessibility' },
+        'best-practices': { auditRefs: [{ id: 'is-on-https' }, { id: 'unknown-future-audit' }], score: 1, title: 'Best Practices' },
+        'performance': { auditRefs: auditIds.slice(0, 3).map(id => ({ id })), score: 1, title: 'Performance' },
+        'seo': { auditRefs: [{ id: 'robots-txt' }], score: 1, title: 'SEO' },
+      },
+    })
+    const references = new Map(compact.audits.map(audit => [audit.id, audit.checklistRefs]))
+
+    expect(references.get('largest-contentful-paint')).toEqual(['CORE-PERF-03'])
+    expect(references.get('total-blocking-time')).toEqual(['CORE-PERF-03'])
+    expect(references.get('cumulative-layout-shift')).toEqual(['CORE-PERF-03'])
+    expect(references.get('landmark-one-main')).toEqual(['CORE-A11Y-01'])
+    expect(references.get('link-text')).toEqual(['CORE-A11Y-03'])
+    expect(references.get('robots-txt')).toEqual(['CORE-ROB-01'])
+    expect(references.get('is-on-https')).toEqual([])
+    expect(references.get('unknown-future-audit')).toEqual([])
+  })
+
+  it('creates Lighthouse signals through the central signal registry', () => {
+    const categoryResults = Object.fromEntries(['performance', 'accessibility', 'best-practices', 'seo']
+      .map(category => [category, { score: 100 }]))
+    const signals = createLighthouseSignals({ categories: categoryResults }, false)
+
+    expect(signals).toHaveLength(5)
+    expect(signals.every((signal: { signalVersion: number, status: string }) => signal.signalVersion === 1 && signal.status === 'positive')).toBe(true)
+    expect(signals.find((signal: { id: string }) => signal.id === 'lighthouse.category.performance-recorded')?.checklistRefs).toEqual(['CORE-PERF-03'])
+  })
+
   it('blocks preflight redirects to another origin before contacting it', async () => {
     const attackerRequests: string[] = []
     const attacker = await listen(createServer((request, response) => {
@@ -160,11 +202,17 @@ describe('lighthouse check', () => {
   chromiumIt('runs through a caller-owned guarded page without destination side effects', async () => {
     const targetRequests: Array<{ method: string, url: string }> = []
     const attackerRequests: Array<{ method: string, url: string }> = []
-    const attacker = await listen(createServer((request, response) => {
+    const attackerUpgradeRequests: string[] = []
+    const attackerServer = createServer((request, response) => {
       attackerRequests.push({ method: request.method || '', url: request.url || '' })
       response.writeHead(204)
       response.end()
-    }))
+    })
+    attackerServer.on('upgrade', (request, socket) => {
+      attackerUpgradeRequests.push(request.url || '')
+      socket.destroy()
+    })
+    const attacker = await listen(attackerServer)
     const target = await listen(createServer((request, response) => {
       targetRequests.push({ method: request.method || '', url: request.url || '' })
       if (request.url === '/service-worker.js') {
@@ -231,6 +279,7 @@ try { new RTCPeerConnection() } catch {}
       expect.objectContaining({ code: 'non-get-blocked', method: 'POST' }),
     ]))
     expect(attackerRequests).toEqual([])
+    expect(attackerUpgradeRequests).toEqual([])
     expect(targetRequests.every(request => request.method === 'GET')).toBe(true)
     expect(targetRequests.some(request => ['/mutate', '/xhr', '/form', '/beacon', '/service-worker.js', '/service-worker-post'].includes(request.url))).toBe(false)
     expect(JSON.stringify(report)).not.toContain('INLINE_SECRET')

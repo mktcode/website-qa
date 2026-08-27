@@ -60,7 +60,7 @@ Optionen:
   --max-requests=<Anzahl>   Höchstens so viele Requests je Seite/Profil (Standard: 300)
   --max-sitemaps=<Anzahl>   Höchstens so viele Sitemap-Dateien abrufen (Standard: 10)
   --profiles=<Liste>        desktop,mobile,narrow,reduced-motion,zoom-200
-  --timeout=<Millisek.>     Navigations- und Browser-Timeout (Standard: 20000)
+  --timeout=<Millisek.>     Gesamtes Laufzeitlimit (Standard: 20000)
   --settle=<Millisek.>      Beobachtungszeit nach DOMContentLoaded (Standard: 750)
   --chromium-path=<Pfad>    Chromium-/Chrome-Binärdatei
   --json                    Maschinenlesbare JSON-Ausgabe auf stdout
@@ -164,6 +164,43 @@ export function parseArguments(argv) {
     throw new Error('Der Browser-Check prüft genau eine Website pro Lauf.')
   }
   return { options, urls }
+}
+
+function remainingBrowserMilliseconds(options) {
+  const remaining = options.deadline - Date.now()
+  if (remaining <= 0) {
+    throw new Error(`Browser-Lauf überschritt das Gesamtlaufzeitlimit von ${options.timeoutMilliseconds} ms.`)
+  }
+  return remaining
+}
+
+async function withBrowserDeadline(promise, options, abort) {
+  const milliseconds = remainingBrowserMilliseconds(options)
+  let timer
+  try {
+    return await Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        timer = setTimeout(() => {
+          void Promise.resolve().then(abort).catch(() => {})
+          reject(new Error(`Browser-Lauf überschritt das Gesamtlaufzeitlimit von ${options.timeoutMilliseconds} ms.`))
+        }, milliseconds)
+      }),
+    ])
+  }
+  finally {
+    clearTimeout(timer)
+  }
+}
+
+export async function withBrowserResourceDeadline(promise, options, closeResource) {
+  try {
+    return await withBrowserDeadline(promise, options, () => {})
+  }
+  catch (error) {
+    void promise.then(resource => closeResource(resource)).catch(() => {})
+    throw error
+  }
 }
 
 function issueKey(issue) {
@@ -1201,8 +1238,42 @@ async function probeHtmlCandidate(result, options, candidateUrl, knownResponse) 
   }
 }
 
+async function inspectQueuedPages(browser, result, options, queue, queued, preflight, finalUrl, executablePath) {
+  result.browser = {
+    executablePath,
+    product: 'Chromium',
+    version: await browser.version(),
+  }
+  let candidateIndex = 0
+  let htmlPages = 0
+  const inspectedPages = new Set()
+  while (candidateIndex < queue.length && htmlPages < options.maxPages) {
+    const candidateUrl = queue[candidateIndex]
+    candidateIndex += 1
+    const pageUrl = await probeHtmlCandidate(result, options, candidateUrl, candidateUrl === finalUrl.href ? preflight : undefined)
+    if (!pageUrl || inspectedPages.has(pageUrl)) {
+      continue
+    }
+    inspectedPages.add(pageUrl)
+    htmlPages += 1
+    for (let profileIndex = 0; profileIndex < options.profiles.length; profileIndex += 1) {
+      const links = await inspectProfile(browser, result, options, pageUrl, options.profiles[profileIndex], profileIndex === 0)
+      if (profileIndex === 0) {
+        for (const link of links) {
+          enqueuePage(queue, queued, result, link, pageUrl, options)
+        }
+      }
+    }
+  }
+  const omittedCandidates = result.omittedPages + Math.max(0, queue.length - candidateIndex)
+  if (omittedCandidates > 0) {
+    addIssue(result, 'warning', 'page-limit', `Seitenlimit von ${options.maxPages} erreicht; mindestens ${omittedCandidates} weitere Linkziele wurden nicht als Browserseite geprüft.`, ['CORE-QA-03'], finalUrl.href)
+  }
+}
+
 export async function runBrowserCheck(input, suppliedOptions = {}) {
-  const options = { ...defaultOptions, ...suppliedOptions, profiles: suppliedOptions.profiles || [...defaultProfiles] }
+  const configuredOptions = { ...defaultOptions, ...suppliedOptions, profiles: suppliedOptions.profiles || [...defaultProfiles] }
+  const options = { ...configuredOptions, deadline: Date.now() + configuredOptions.timeoutMilliseconds }
   const requestedUrl = validateUrl(input, options, 'Eingabe-URL')
   await assertPublicResolution(requestedUrl, options)
   const preflight = await fetchResource(requestedUrl.href, options, {
@@ -1249,45 +1320,18 @@ export async function runBrowserCheck(input, suppliedOptions = {}) {
 
   const executablePath = chromiumExecutable(options.chromiumPath)
   const hostResolverRule = await chromiumHostResolverRule(finalUrl, options)
-  const browser = await puppeteer.launch({
+  const launch = puppeteer.launch({
     args: ['--disable-background-networking', '--disable-component-update', '--disable-default-apps', '--disable-quic', '--disable-sync', `--host-resolver-rules=${hostResolverRule}`, '--metrics-recording-only', '--no-first-run'],
     executablePath,
     headless: true,
   })
+  const browser = await withBrowserResourceDeadline(launch, options, lateBrowser => lateBrowser.close())
   try {
-    result.browser = {
-      executablePath,
-      product: 'Chromium',
-      version: await browser.version(),
-    }
-    let candidateIndex = 0
-    let htmlPages = 0
-    const inspectedPages = new Set()
-    while (candidateIndex < queue.length && htmlPages < options.maxPages) {
-      const candidateUrl = queue[candidateIndex]
-      candidateIndex += 1
-      const pageUrl = await probeHtmlCandidate(result, options, candidateUrl, candidateUrl === finalUrl.href ? preflight : undefined)
-      if (!pageUrl || inspectedPages.has(pageUrl)) {
-        continue
-      }
-      inspectedPages.add(pageUrl)
-      htmlPages += 1
-      for (let profileIndex = 0; profileIndex < options.profiles.length; profileIndex += 1) {
-        const links = await inspectProfile(browser, result, options, pageUrl, options.profiles[profileIndex], profileIndex === 0)
-        if (profileIndex === 0) {
-          for (const link of links) {
-            enqueuePage(queue, queued, result, link, pageUrl, options)
-          }
-        }
-      }
-    }
-    const omittedCandidates = result.omittedPages + Math.max(0, queue.length - candidateIndex)
-    if (omittedCandidates > 0) {
-      addIssue(result, 'warning', 'page-limit', `Seitenlimit von ${options.maxPages} erreicht; mindestens ${omittedCandidates} weitere Linkziele wurden nicht als Browserseite geprüft.`, ['CORE-QA-03'], finalUrl.href)
-    }
+    const inspection = inspectQueuedPages(browser, result, options, queue, queued, preflight, finalUrl, executablePath)
+    await withBrowserDeadline(inspection, options, () => browser.close())
   }
   finally {
-    await browser.close()
+    await browser.close().catch(() => {})
   }
 
   result.privacyObservations = createPrivacyObservations(result, options)

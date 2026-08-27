@@ -602,7 +602,7 @@
       "tool": "lighthouse-check",
       "description": "Der feste mobile Lighthouse-Navigationslauf wurde mit den vier Standardkategorien ausgeführt.",
       "checklistRefs": [
-        "CORE-PERF-01",
+        "CORE-PERF-03",
         "CORE-A11Y-13",
         "CORE-QA-02",
         "CORE-SEO-01"
@@ -614,7 +614,7 @@
       "tool": "lighthouse-check",
       "description": "Der mobile Lighthouse-Performance-Score wurde als begrenztes technisches Signal aufgezeichnet.",
       "checklistRefs": [
-        "CORE-PERF-01"
+        "CORE-PERF-03"
       ]
     },
     {

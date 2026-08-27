@@ -4,7 +4,7 @@ import { createServer } from 'node:http'
 import { brotliCompressSync, gzipSync } from 'node:zlib'
 import { afterEach, describe, expect, it } from 'vitest'
 import { createJsonReport, parseArguments, runHttpCheck } from '../src/check-http.mjs'
-import { chromiumHostResolverRule, reportUrl, validatedResolution, validateUrl } from '../src/lib/http-client.mjs'
+import { chromiumHostResolverRule, fetchResource, redactText, reportUrl, validatedResolution, validateUrl } from '../src/lib/http-client.mjs'
 
 const servers = new Set<ReturnType<typeof createServer>>()
 
@@ -89,6 +89,64 @@ describe('http checker', () => {
     expect(() => validateUrl('https://[feff::1]/', { allowHttp: false, allowPrivate: false })).toThrow(/privates Ziel/)
     await expect(validatedResolution(new URL('https://[fec0::1]/'), { allowPrivate: false })).rejects.toThrow(/nicht öffentliche Adresse/)
     await expect(validatedResolution(new URL('https://[fec0::1]/'), { allowPrivate: true })).resolves.toEqual([{ address: 'fec0::1', family: 6 }])
+  })
+
+  it('rejects non-public IPv6 translation, transition and special-purpose targets', async () => {
+    const privateTargets = [
+      'https://[::7f00:1]/',
+      'https://[64:ff9b::7f00:1]/',
+      'https://[64:ff9b:1::7f00:1]/',
+      'https://[100::1]/',
+      'https://[2001:1::4]/',
+      'https://[2001:2::1]/',
+      'https://[2001:10::1]/',
+      'https://[2001:100::1]/',
+      'https://[2002:7f00:1::]/',
+      'https://[3fff::1]/',
+    ]
+
+    for (const target of privateTargets) {
+      expect(() => validateUrl(target, { allowHttp: false, allowPrivate: false })).toThrow(/privates Ziel/)
+      expect(reportUrl(target).url).toBe('(privates/lokales Ziel)')
+      expect(redactText(`Ziel ${target}`)).not.toContain(new URL(target).hostname)
+    }
+    await Promise.all(privateTargets.map(target => (
+      expect(validatedResolution(new URL(target), { allowPrivate: false })).rejects.toThrow(/nicht öffentliche Adresse/)
+    )))
+
+    expect(validateUrl('https://[64:ff9b::808:808]/', { allowHttp: false, allowPrivate: false }).hostname).toBe('[64:ff9b::808:808]')
+    expect(validateUrl('https://[2001:3::1]/', { allowHttp: false, allowPrivate: false }).hostname).toBe('[2001:3::1]')
+    expect(validateUrl('https://[2001:20::1]/', { allowHttp: false, allowPrivate: false }).hostname).toBe('[2001:20::1]')
+    expect(validateUrl('https://[2606:4700:4700::1111]/', { allowHttp: false, allowPrivate: false }).hostname).toBe('[2606:4700:4700::1111]')
+  })
+
+  it('redacts query values and bare private addresses from IPv6 text', () => {
+    expect(redactText('Ziel https://[2606:4700:4700::1111]/path?session=TOPSECRET#fragment'))
+      .toBe('Ziel https://[2606:4700:4700::1111]/path')
+    expect(redactText('Ziel https://[2001:db8::1]/path?session=TOPSECRET'))
+      .toBe('Ziel (privates/lokales Ziel)')
+    expect(redactText('Interne Adressen 2001:db8::1 und 64:ff9b::7f00:1'))
+      .toBe('Interne Adressen [REDACTED_PRIVATE_IP] und [REDACTED_PRIVATE_IP]')
+    expect(redactText('net::ERR_BLOCKED_BY_CLIENT.Inspector')).toBe('net::ERR_BLOCKED_BY_CLIENT.Inspector')
+  })
+
+  it('enforces an absolute response deadline even while data keeps arriving', async () => {
+    const server = createServer((_request, response) => {
+      response.writeHead(200, { 'content-type': 'text/plain' })
+      const interval = setInterval(() => response.write('.'), 10)
+      response.on('close', () => clearInterval(interval))
+    })
+    const origin = await listen(server)
+    const startedAt = Date.now()
+
+    await expect(fetchResource(origin, {
+      allowHttp: true,
+      allowPrivate: true,
+      maxHtmlBytes: 1024,
+      maxRedirects: 0,
+      timeoutMilliseconds: 80,
+    })).rejects.toThrow(/Laufzeitlimit/)
+    expect(Date.now() - startedAt).toBeLessThan(500)
   })
 
   it('parses URLs and safe CLI options', () => {

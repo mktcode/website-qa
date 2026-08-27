@@ -8,6 +8,7 @@ import {
   createJsonReport,
   parseArguments,
   runBrowserCheck,
+  withBrowserResourceDeadline,
 } from '../src/check-browser.mjs'
 
 const openServers: Server[] = []
@@ -356,11 +357,54 @@ describe('browser check', () => {
     }
   })
 
+  it('closes a Browser startup resource that resolves only after the total deadline', async () => {
+    let closeCalls = 0
+    let resolveResource!: (resource: { close: () => Promise<void> }) => void
+    const resource = new Promise<{ close: () => Promise<void> }>((resolve) => {
+      resolveResource = resolve
+    })
+    const timed = withBrowserResourceDeadline(resource, {
+      deadline: Date.now() + 1,
+      timeoutMilliseconds: 1,
+    }, (lateResource: { close: () => Promise<void> }) => lateResource.close())
+
+    await expect(timed).rejects.toThrow(/Gesamtlaufzeitlimit/)
+    resolveResource({
+      close: async () => {
+        closeCalls += 1
+      },
+    })
+    await resource
+    await new Promise(resolve => setImmediate(resolve))
+
+    expect(closeCalls).toBe(1)
+  })
+
   const chromiumPath = ['/usr/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'].find(existsSync)
   if (!chromiumPath && process.env.WEBSITE_QA_REQUIRE_CHROMIUM === '1') {
     throw new Error('Chromium-Sicherheitsintegration ist erforderlich, aber kein unterstütztes Browser-Binary wurde gefunden.')
   }
   const chromiumIt = chromiumPath ? it : it.skip
+
+  chromiumIt('enforces one total deadline when the renderer blocks browser evaluation', async () => {
+    const server = createServer((_request, response) => {
+      response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+      response.end(`<!doctype html><html lang="de"><head><title>Blockierter Renderer</title></head><body><main><h1>Test</h1></main><script>setTimeout(() => { while (true) {} }, 0)</script></body></html>`)
+    })
+    const origin = await listen(server)
+    const startedAt = Date.now()
+
+    await expect(runBrowserCheck(origin, {
+      allowHttp: true,
+      allowPrivate: true,
+      chromiumPath,
+      maxPages: 1,
+      profiles: ['desktop'],
+      settleMilliseconds: 0,
+      timeoutMilliseconds: 2_000,
+    })).rejects.toThrow(/Gesamtlaufzeitlimit/)
+    expect(Date.now() - startedAt).toBeLessThan(7_000)
+  }, 10_000)
 
   chromiumIt('traverses Sitemap indexes without requesting suspicious pages or redirects', async () => {
     const requestedPaths: string[] = []

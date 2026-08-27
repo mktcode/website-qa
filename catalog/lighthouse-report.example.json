@@ -39,7 +39,7 @@
   "issues": [
     {
       "checklistRefs": [
-        "CORE-SEO-01"
+        "CORE-ROB-01"
       ],
       "code": "lighthouse-robots-txt",
       "message": "robots.txt is not valid: Lighthouse meldet einen eindeutigen technischen Defekt.",
@@ -50,7 +50,7 @@
     "audits": [
       {
         "checklistRefs": [
-          "CORE-PERF-01"
+          "CORE-PERF-03"
         ],
         "displayValue": "0.6 s",
         "id": "first-contentful-paint",
@@ -64,7 +64,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-PERF-01"
+          "CORE-PERF-03"
         ],
         "displayValue": "0.8 s",
         "id": "largest-contentful-paint",
@@ -78,7 +78,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-PERF-01"
+          "CORE-PERF-03"
         ],
         "displayValue": "0 ms",
         "id": "total-blocking-time",
@@ -92,7 +92,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-PERF-01"
+          "CORE-PERF-03"
         ],
         "displayValue": "0",
         "id": "cumulative-layout-shift",
@@ -106,7 +106,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-PERF-01"
+          "CORE-PERF-03"
         ],
         "displayValue": "0.6 s",
         "id": "speed-index",
@@ -119,9 +119,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "cache-insight",
         "score": 1,
         "scoreDisplayMode": "metricSavings",
@@ -130,9 +128,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "cls-culprits-insight",
         "score": 1,
         "scoreDisplayMode": "numeric",
@@ -141,9 +137,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "document-latency-insight",
         "score": 1,
         "scoreDisplayMode": "metricSavings",
@@ -152,9 +146,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "dom-size-insight",
         "numericUnit": "element",
         "numericValue": 5,
@@ -165,9 +157,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "duplicated-javascript-insight",
         "score": 1,
         "scoreDisplayMode": "metricSavings",
@@ -176,9 +166,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "font-display-insight",
         "score": 1,
         "scoreDisplayMode": "metricSavings",
@@ -187,9 +175,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "forced-reflow-insight",
         "score": 1,
         "scoreDisplayMode": "numeric",
@@ -198,9 +184,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "image-delivery-insight",
         "score": 1,
         "scoreDisplayMode": "metricSavings",
@@ -209,9 +193,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "inp-breakdown-insight",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -221,7 +203,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-PERF-01"
+          "CORE-PERF-03"
         ],
         "id": "lcp-breakdown-insight",
         "score": 1,
@@ -231,9 +213,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "lcp-discovery-insight",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -242,9 +222,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "legacy-javascript-insight",
         "score": 1,
         "scoreDisplayMode": "metricSavings",
@@ -253,9 +231,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "modern-http-insight",
         "score": 1,
         "scoreDisplayMode": "metricSavings",
@@ -264,9 +240,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "network-dependency-tree-insight",
         "score": 1,
         "scoreDisplayMode": "numeric",
@@ -275,9 +249,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "render-blocking-insight",
         "score": 1,
         "scoreDisplayMode": "metricSavings",
@@ -286,9 +258,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "third-parties-insight",
         "score": 1,
         "scoreDisplayMode": "numeric",
@@ -297,9 +267,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "viewport-insight",
         "score": 1,
         "scoreDisplayMode": "numeric",
@@ -309,7 +277,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-PERF-01"
+          "CORE-PERF-03"
         ],
         "displayValue": "0.8 s",
         "id": "interactive",
@@ -322,9 +290,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "displayValue": "20 ms",
         "id": "max-potential-fid",
         "numericUnit": "millisecond",
@@ -336,9 +302,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "unminified-css",
         "numericUnit": "millisecond",
         "numericValue": 0,
@@ -349,9 +313,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "unminified-javascript",
         "numericUnit": "millisecond",
         "numericValue": 0,
@@ -362,9 +324,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "unused-css-rules",
         "numericUnit": "millisecond",
         "numericValue": 0,
@@ -375,9 +335,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "unused-javascript",
         "numericUnit": "millisecond",
         "numericValue": 0,
@@ -388,9 +346,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "displayValue": "Total size was 2 KiB",
         "id": "total-byte-weight",
         "numericUnit": "byte",
@@ -402,9 +358,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "user-timings",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -413,9 +367,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "displayValue": "0.0 s",
         "id": "bootup-time",
         "numericUnit": "millisecond",
@@ -427,9 +379,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "displayValue": "0.1 s",
         "id": "mainthread-work-breakdown",
         "numericUnit": "millisecond",
@@ -441,9 +391,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "long-tasks",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -452,9 +400,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "non-composited-animations",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -463,9 +409,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "unsized-images",
         "score": 1,
         "scoreDisplayMode": "metricSavings",
@@ -474,9 +418,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "bf-cache",
         "score": 1,
         "scoreDisplayMode": "binary",
@@ -486,7 +428,8 @@
       },
       {
         "checklistRefs": [
-          "CORE-PERF-01"
+          "CORE-QA-08",
+          "CORE-SEC-07"
         ],
         "id": "network-requests",
         "score": 1,
@@ -496,9 +439,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "displayValue": "0 ms",
         "id": "network-rtt",
         "numericUnit": "millisecond",
@@ -510,9 +451,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "displayValue": "0 ms",
         "id": "network-server-latency",
         "numericUnit": "millisecond",
@@ -524,9 +463,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "main-thread-tasks",
         "score": 1,
         "scoreDisplayMode": "informative",
@@ -535,9 +472,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "diagnostics",
         "score": 1,
         "scoreDisplayMode": "informative",
@@ -546,9 +481,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "metrics",
         "numericUnit": "millisecond",
         "numericValue": 751,
@@ -559,9 +492,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "screenshot-thumbnails",
         "score": 1,
         "scoreDisplayMode": "informative",
@@ -570,9 +501,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "final-screenshot",
         "score": 1,
         "scoreDisplayMode": "informative",
@@ -581,9 +510,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "script-treemap-data",
         "score": 1,
         "scoreDisplayMode": "informative",
@@ -592,9 +519,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "resource-summary",
         "score": 1,
         "scoreDisplayMode": "informative",
@@ -603,9 +528,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "redirects",
         "numericUnit": "millisecond",
         "numericValue": 0,
@@ -616,9 +539,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "displayValue": "Root document took 0 ms",
         "id": "server-response-time",
         "numericUnit": "millisecond",
@@ -630,9 +551,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-PERF-01"
-        ],
+        "checklistRefs": [],
         "id": "layout-shifts",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -641,9 +560,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "accesskeys",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -652,9 +569,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-allowed-attr",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -663,9 +578,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-command-name",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -674,9 +587,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-conditional-attr",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -685,9 +596,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-deprecated-role",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -696,9 +605,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-dialog-name",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -707,9 +614,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-hidden-body",
         "score": 1,
         "scoreDisplayMode": "binary",
@@ -718,9 +623,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-hidden-focus",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -729,9 +632,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-input-field-name",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -740,9 +641,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-meter-name",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -751,9 +650,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-progressbar-name",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -762,9 +659,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-prohibited-attr",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -773,9 +668,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-required-attr",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -784,9 +677,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-required-children",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -795,9 +686,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-required-parent",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -806,9 +695,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-roles",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -817,9 +704,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-text",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -828,9 +713,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-toggle-field-name",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -839,9 +722,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-tooltip-name",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -850,9 +731,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-treeitem-name",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -861,9 +740,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-valid-attr-value",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -872,9 +749,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-valid-attr",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -884,7 +759,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-A11Y-13"
+          "CORE-A11Y-03"
         ],
         "id": "button-name",
         "score": null,
@@ -894,9 +769,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "bypass",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -906,7 +779,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-A11Y-13"
+          "CORE-A11Y-09"
         ],
         "id": "color-contrast",
         "score": 1,
@@ -916,9 +789,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "definition-list",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -927,9 +798,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "dlitem",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -939,7 +808,6 @@
       },
       {
         "checklistRefs": [
-          "CORE-A11Y-13",
           "CORE-SEO-01"
         ],
         "id": "document-title",
@@ -950,9 +818,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "duplicate-id-aria",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -961,9 +827,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "form-field-multiple-labels",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -972,9 +836,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "frame-title",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -984,7 +846,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-A11Y-13"
+          "CORE-SEO-02"
         ],
         "id": "heading-order",
         "score": 1,
@@ -995,7 +857,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-A11Y-13"
+          "CORE-SEO-02"
         ],
         "id": "html-has-lang",
         "score": 1,
@@ -1005,9 +867,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "html-lang-valid",
         "score": 1,
         "scoreDisplayMode": "binary",
@@ -1016,9 +876,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "html-xml-lang-mismatch",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1028,8 +886,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-A11Y-13",
-          "CORE-SEO-01"
+          "CORE-A11Y-08"
         ],
         "id": "image-alt",
         "score": null,
@@ -1039,9 +896,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "input-button-name",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1050,9 +905,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "input-image-alt",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1062,7 +915,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-A11Y-13"
+          "CORE-A11Y-06"
         ],
         "id": "label",
         "score": null,
@@ -1072,9 +925,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "link-in-text-block",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1084,7 +935,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-A11Y-13"
+          "CORE-A11Y-03"
         ],
         "id": "link-name",
         "score": null,
@@ -1094,9 +945,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "list",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1105,9 +954,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "listitem",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1116,9 +963,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "meta-refresh",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1127,9 +972,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "meta-viewport",
         "score": 1,
         "scoreDisplayMode": "binary",
@@ -1138,9 +981,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "object-alt",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1149,9 +990,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "select-name",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1160,9 +999,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "skip-link",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1171,9 +1008,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "tabindex",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1182,9 +1017,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "target-size",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1193,9 +1026,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "td-headers-attr",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1204,9 +1035,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "th-has-data-cells",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1215,9 +1044,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "valid-lang",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1226,9 +1053,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "video-caption",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1238,7 +1063,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-A11Y-13"
+          "CORE-A11Y-01"
         ],
         "id": "landmark-one-main",
         "score": 1,
@@ -1248,9 +1073,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "autocomplete-valid",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1259,9 +1082,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "presentation-role-conflict",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1270,9 +1091,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "svg-img-alt",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1281,9 +1100,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "focusable-controls",
         "score": null,
         "scoreDisplayMode": "manual",
@@ -1292,9 +1109,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "interactive-element-affordance",
         "score": null,
         "scoreDisplayMode": "manual",
@@ -1303,9 +1118,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "logical-tab-order",
         "score": null,
         "scoreDisplayMode": "manual",
@@ -1314,9 +1127,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "visual-order-follows-dom",
         "score": null,
         "scoreDisplayMode": "manual",
@@ -1325,9 +1136,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "focus-traps",
         "score": null,
         "scoreDisplayMode": "manual",
@@ -1336,9 +1145,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "managed-focus",
         "score": null,
         "scoreDisplayMode": "manual",
@@ -1347,9 +1154,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "use-landmarks",
         "score": null,
         "scoreDisplayMode": "manual",
@@ -1358,9 +1163,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "offscreen-content-hidden",
         "score": null,
         "scoreDisplayMode": "manual",
@@ -1369,9 +1172,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "custom-controls-labels",
         "score": null,
         "scoreDisplayMode": "manual",
@@ -1380,9 +1181,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "custom-controls-roles",
         "score": null,
         "scoreDisplayMode": "manual",
@@ -1391,9 +1190,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "table-duplicate-name",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1402,9 +1199,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "empty-heading",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1413,9 +1208,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "aria-allowed-role",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1424,9 +1217,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "image-redundant-alt",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1435,9 +1226,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "identical-links-same-purpose",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1446,9 +1235,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "label-content-name-mismatch",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1457,9 +1244,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "table-fake-caption",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1468,9 +1253,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-A11Y-13"
-        ],
+        "checklistRefs": [],
         "id": "td-has-header",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1479,10 +1262,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "is-on-https",
         "score": 1,
         "scoreDisplayMode": "binary",
@@ -1491,10 +1271,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "redirects-http",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1503,10 +1280,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "geolocation-on-start",
         "score": 1,
         "scoreDisplayMode": "binary",
@@ -1515,10 +1289,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "notification-on-start",
         "score": 1,
         "scoreDisplayMode": "binary",
@@ -1527,10 +1298,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "csp-xss",
         "score": 1,
         "scoreDisplayMode": "informative",
@@ -1539,10 +1307,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "has-hsts",
         "score": 1,
         "scoreDisplayMode": "informative",
@@ -1551,10 +1316,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "origin-isolation",
         "score": 1,
         "scoreDisplayMode": "informative",
@@ -1563,10 +1325,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "clickjacking-mitigation",
         "score": 1,
         "scoreDisplayMode": "informative",
@@ -1575,10 +1334,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "trusted-types-xss",
         "score": 1,
         "scoreDisplayMode": "informative",
@@ -1587,10 +1343,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "paste-preventing-inputs",
         "score": 1,
         "scoreDisplayMode": "binary",
@@ -1599,10 +1352,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "image-aspect-ratio",
         "score": 1,
         "scoreDisplayMode": "binary",
@@ -1611,10 +1361,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "image-size-responsive",
         "score": 1,
         "scoreDisplayMode": "binary",
@@ -1623,10 +1370,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "doctype",
         "score": 1,
         "scoreDisplayMode": "binary",
@@ -1635,10 +1379,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "charset",
         "score": 1,
         "scoreDisplayMode": "binary",
@@ -1647,10 +1388,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "baseline",
         "score": 1,
         "scoreDisplayMode": "informative",
@@ -1659,10 +1397,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "js-libraries",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1671,10 +1406,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "deprecations",
         "score": 1,
         "scoreDisplayMode": "binary",
@@ -1683,10 +1415,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "third-party-cookies",
         "score": 1,
         "scoreDisplayMode": "binary",
@@ -1696,7 +1425,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-QA-02",
+          "CORE-QA-07",
           "CORE-SEC-07"
         ],
         "id": "errors-in-console",
@@ -1707,10 +1436,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "valid-source-maps",
         "score": 1,
         "scoreDisplayMode": "binary",
@@ -1719,10 +1445,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-QA-02",
-          "CORE-SEC-07"
-        ],
+        "checklistRefs": [],
         "id": "inspector-issues",
         "score": 1,
         "scoreDisplayMode": "binary",
@@ -1732,7 +1455,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-SEO-01"
+          "CORE-SEO-04"
         ],
         "id": "is-crawlable",
         "score": 1,
@@ -1754,7 +1477,8 @@
       },
       {
         "checklistRefs": [
-          "CORE-SEO-01"
+          "CORE-SEO-04",
+          "CORE-QA-08"
         ],
         "id": "http-status-code",
         "score": 1,
@@ -1765,7 +1489,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-SEO-01"
+          "CORE-A11Y-03"
         ],
         "id": "link-text",
         "score": 1,
@@ -1776,7 +1500,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-SEO-01"
+          "CORE-SEO-04"
         ],
         "id": "crawlable-anchors",
         "score": 1,
@@ -1787,7 +1511,7 @@
       },
       {
         "checklistRefs": [
-          "CORE-SEO-01"
+          "CORE-ROB-01"
         ],
         "displayValue": "1 error found",
         "id": "robots-txt",
@@ -1798,9 +1522,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-SEO-01"
-        ],
+        "checklistRefs": [],
         "id": "hreflang",
         "score": 1,
         "scoreDisplayMode": "binary",
@@ -1809,9 +1531,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-SEO-01"
-        ],
+        "checklistRefs": [],
         "id": "canonical",
         "score": null,
         "scoreDisplayMode": "notApplicable",
@@ -1820,9 +1540,7 @@
         "warnings": []
       },
       {
-        "checklistRefs": [
-          "CORE-SEO-01"
-        ],
+        "checklistRefs": [],
         "id": "structured-data",
         "score": null,
         "scoreDisplayMode": "manual",
@@ -1927,10 +1645,9 @@
   "signals": [
     {
       "checklistRefs": [
-        "CORE-PERF-01",
+        "CORE-PERF-03",
         "CORE-A11Y-13",
         "CORE-QA-02",
-        "CORE-SEC-07",
         "CORE-SEO-01"
       ],
       "id": "lighthouse.run.completed",
@@ -1949,7 +1666,7 @@
     },
     {
       "checklistRefs": [
-        "CORE-PERF-01"
+        "CORE-PERF-03"
       ],
       "id": "lighthouse.category.performance-recorded",
       "message": "Der performance-Score beträgt 100.",

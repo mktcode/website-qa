@@ -75,7 +75,7 @@ function ipv6Groups(address) {
   return groups.map(group => Number.parseInt(group, 16))
 }
 
-function mappedIpv4(address) {
+function embeddedIpv4(address) {
   if (isIP(address) === 4) {
     return address
   }
@@ -84,14 +84,53 @@ function mappedIpv4(address) {
   }
 
   const groups = ipv6Groups(address)
-  if (!groups || groups.slice(0, 5).some(group => group !== 0) || groups[5] !== 65_535) {
+  if (!groups) {
+    return undefined
+  }
+  const mapped = groups.slice(0, 5).every(group => group === 0) && groups[5] === 65_535
+  const wellKnownNat64 = groups[0] === 0x64 && groups[1] === 0xFF9B && groups.slice(2, 6).every(group => group === 0)
+  if (!mapped && !wellKnownNat64) {
     return undefined
   }
   return [groups[6] >> 8, groups[6] & 255, groups[7] >> 8, groups[7] & 255].join('.')
 }
 
+function matchesIpv6Prefix(groups, prefix, prefixLength) {
+  const prefixGroups = ipv6Groups(prefix)
+  if (!prefixGroups) {
+    return false
+  }
+  const completeGroups = Math.floor(prefixLength / 16)
+  if (groups.slice(0, completeGroups).some((group, index) => group !== prefixGroups[index])) {
+    return false
+  }
+  const remainingBits = prefixLength % 16
+  if (remainingBits === 0) {
+    return true
+  }
+  const mask = (65_535 << (16 - remainingBits)) & 65_535
+  return (groups[completeGroups] & mask) === (prefixGroups[completeGroups] & mask)
+}
+
+// IANA IPv6 Special-Purpose Address Registry exceptions marked globally reachable.
+const globallyReachableIetfIpv6Prefixes = [
+  ['2001:1::1', 128], // PCP anycast
+  ['2001:1::2', 128], // TURN anycast
+  ['2001:1::3', 128], // DNS-SD service registration anycast
+  ['2001:3::', 32], // AMT
+  ['2001:4:112::', 48], // AS112-v6
+  ['2001:20::', 28], // ORCHIDv2
+  ['2001:30::', 28], // Drone Remote ID protocol entity tags
+]
+const nonPublicGlobalIpv6Prefixes = [
+  ['2001::', 23], // IETF protocol assignments except the documented global exceptions above
+  ['2001:db8::', 32], // Documentation
+  ['2002::', 16], // Deprecated 6to4 with an embedded IPv4 address
+  ['3fff::', 20], // Documentation
+]
+
 function isNonPublicIp(address) {
-  const ipv4 = mappedIpv4(address)
+  const ipv4 = embeddedIpv4(address)
   if (ipv4) {
     return isNonPublicIpv4(ipv4)
   }
@@ -99,17 +138,20 @@ function isNonPublicIp(address) {
   if (isIP(address) !== 6) {
     return true
   }
+  const groups = ipv6Groups(address)
+  if (!groups) {
+    return true
+  }
 
-  const normalized = address.toLowerCase()
-  return normalized === '::'
-    || normalized === '::1'
-    || normalized.startsWith('fc')
-    || normalized.startsWith('fd')
-    || /^fe[89ab]/.test(normalized)
-    || /^fe[c-f]/.test(normalized)
-    || normalized.startsWith('ff')
-    || normalized === '2001:db8::'
-    || normalized.startsWith('2001:db8:')
+  // Ordinary public IPv6 destinations are global-unicast addresses in 2000::/3.
+  // Translation, discard, local, multicast and other special ranges fail closed.
+  if (!matchesIpv6Prefix(groups, '2000::', 3)) {
+    return true
+  }
+  if (globallyReachableIetfIpv6Prefixes.some(([prefix, prefixLength]) => matchesIpv6Prefix(groups, prefix, prefixLength))) {
+    return false
+  }
+  return nonPublicGlobalIpv6Prefixes.some(([prefix, prefixLength]) => matchesIpv6Prefix(groups, prefix, prefixLength))
 }
 
 export function normalizedHostname(hostname) {
@@ -164,12 +206,13 @@ function redactPath(value) {
 
 export function redactText(value, maximumLength = 1000, options = {}) {
   return String(value)
-    .replace(/https?:\/\/(?!\[)[^\s"')<>]+/gi, match => reportUrl(match, options).url)
+    .replace(/https?:\/\/[^\s"')<>]+/gi, match => reportUrl(match, options).url)
     .replace(/\b(token|secret|password|authorization|code)=[^\s&,;]+/gi, '$1=[REDACTED]')
     .replace(/\bbearer\s+[\w.~+/=-]+/gi, 'Bearer [REDACTED]')
     .replace(/\b[\w.!#$%&'*+/=?^`{|}~-]+@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+\b/gi, '[REDACTED_EMAIL]')
     .replace(/\b(?:\d{1,3}\.){3}\d{1,3}\b/g, match => isNonPublicIp(match) ? '[REDACTED_PRIVATE_IP]' : match)
-    .replace(/\[?(?:::1|f[cd][\da-f:]+|fe[89ab][\da-f:]+)\]?/gi, '[REDACTED_PRIVATE_IP]')
+    .replace(/\[([\da-f:.]+)\]/gi, (match, address) => isIP(address) === 6 && isNonPublicIp(address) ? '[REDACTED_PRIVATE_IP]' : match)
+    .replace(/(?<![\w:])(?:[\da-f]{0,4}:){2,7}[\da-f]{0,4}(?![\w:])/gi, match => isIP(match) === 6 && isNonPublicIp(match) ? '[REDACTED_PRIVATE_IP]' : match)
     .replace(/\b(?:localhost|[\w-]+(?:\.[\w-]+)*\.local)\b/gi, '[REDACTED_PRIVATE_HOST]')
     .slice(0, maximumLength)
 }
@@ -315,6 +358,13 @@ async function requestOnce(url, options, request) {
   const maximumBytes = request.maximumBytes || options.maxHtmlBytes || 2 * 1024 * 1024
 
   return new Promise((resolve, reject) => {
+    let timer
+    const settle = (callback, value) => {
+      clearTimeout(timer)
+      callback(value)
+    }
+    const resolveResponse = value => settle(resolve, value)
+    const rejectRequest = error => settle(reject, error)
     const clientRequest = transport.request(url, {
       headers: {
         'accept': request.accept || '*/*',
@@ -334,7 +384,7 @@ async function requestOnce(url, options, request) {
       const declaredLength = Number(response.headers['content-length'])
       if (Number.isFinite(declaredLength) && declaredLength > maximumBytes) {
         response.destroy()
-        reject(new Error(`Antwort ist mit ${declaredLength} Bytes größer als das Limit von ${maximumBytes} Bytes.`))
+        rejectRequest(new Error(`Antwort ist mit ${declaredLength} Bytes größer als das Limit von ${maximumBytes} Bytes.`))
         return
       }
 
@@ -349,19 +399,19 @@ async function requestOnce(url, options, request) {
         chunks.push(Buffer.from(chunk))
       })
       response.on('end', () => {
-        resolve({
+        resolveResponse({
           body: Buffer.concat(chunks, size),
           headers: normalizedHeaders(response.headers),
           status: response.statusCode || 0,
         })
       })
-      response.on('error', reject)
+      response.on('error', rejectRequest)
     })
 
-    clientRequest.setTimeout(timeoutMilliseconds, () => {
+    timer = setTimeout(() => {
       clientRequest.destroy(new Error(`Abruf von ${reportUrl(url.href).url} überschritt das verbleibende Laufzeitlimit.`))
-    })
-    clientRequest.on('error', reject)
+    }, timeoutMilliseconds)
+    clientRequest.on('error', rejectRequest)
     clientRequest.end()
   })
 }

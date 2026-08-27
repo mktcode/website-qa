@@ -6,6 +6,7 @@ import { validateSignalCatalog } from '../src/lib/signal-report.mjs'
 const repositoryDirectory = join(import.meta.dirname, '..')
 const index = JSON.parse(readFileSync(join(repositoryDirectory, 'catalog', 'checklist-index.json'), 'utf8'))
 const signals = JSON.parse(readFileSync(join(repositoryDirectory, 'catalog', 'signals.json'), 'utf8'))
+const lighthouseExample = JSON.parse(readFileSync(join(repositoryDirectory, 'catalog', 'lighthouse-report.example.json'), 'utf8'))
 const sources = [
   'docs/checklisten/website/kern.md',
   'docs/checklisten/website/module/auftrag-recht-uebergabe.md',
@@ -47,6 +48,18 @@ describe('central website checklist and technical signal references', () => {
     expect(validateSignalCatalog(index, signals)).toBe(true)
     expect(objectKeys(index)).not.toEqual(expect.arrayContaining(['outcome', 'complete', 'partial', 'noEvidence', 'workflow', 'evidenceOutcome', 'projectStatus']))
     expect(objectKeys(signals)).not.toEqual(expect.arrayContaining(['outcome', 'complete', 'partial', 'noEvidence', 'workflow', 'evidenceOutcome', 'projectStatus']))
+  })
+
+  it('keeps the Lighthouse example aligned with the central signal registry', () => {
+    const definitions = new Map(signals.signals.map((signal: { id: string }) => [signal.id, signal]))
+
+    for (const signal of lighthouseExample.signals) {
+      const definition = definitions.get(signal.id) as { checklistRefs: string[], tool: string, version: number } | undefined
+      expect(definition).toBeDefined()
+      expect(definition?.tool).toBe('lighthouse-check')
+      expect(signal.signalVersion).toBe(definition?.version)
+      expect(signal.checklistRefs).toEqual(definition?.checklistRefs)
+    }
   })
 
   it('keeps signal and source issue references resolvable', () => {

@@ -8,16 +8,37 @@ import { chromiumExecutable, classifyBrowserRequest, installReadOnlyDomGuards } 
 import { assertPublicResolution, chromiumHostResolverRule, fetchResource, redactReportData, redactText, reportUrl, validateUrl } from './lib/http-client.mjs'
 import { writeJsonOutput } from './lib/json-output.mjs'
 import { isMainModule, packageName, packageVersion } from './lib/package-info.mjs'
-import { checklistReference } from './lib/signal-report.mjs'
+import { checklistReference, technicalSignals } from './lib/signal-report.mjs'
 import { jsonOutputIntent, technicalErrorReport } from './lib/technical-report.mjs'
 
 const categories = ['performance', 'accessibility', 'best-practices', 'seo']
 const maxBlockedRecords = 100
-const categoryChecklistRefs = {
-  'accessibility': ['CORE-A11Y-13'],
-  'best-practices': ['CORE-QA-02', 'CORE-SEC-07'],
-  'performance': ['CORE-PERF-01'],
-  'seo': ['CORE-SEO-01'],
+const auditChecklistRefs = {
+  'button-name': ['CORE-A11Y-03'],
+  'color-contrast': ['CORE-A11Y-09'],
+  'crawlable-anchors': ['CORE-SEO-04'],
+  'cumulative-layout-shift': ['CORE-PERF-03'],
+  'document-title': ['CORE-SEO-01'],
+  'errors-in-console': ['CORE-QA-07', 'CORE-SEC-07'],
+  'first-contentful-paint': ['CORE-PERF-03'],
+  'heading-order': ['CORE-SEO-02'],
+  'html-has-lang': ['CORE-SEO-02'],
+  'http-status-code': ['CORE-SEO-04', 'CORE-QA-08'],
+  'image-alt': ['CORE-A11Y-08'],
+  'interactive': ['CORE-PERF-03'],
+  'is-crawlable': ['CORE-SEO-04'],
+  'label': ['CORE-A11Y-06'],
+  'landmark-one-main': ['CORE-A11Y-01'],
+  'largest-contentful-paint': ['CORE-PERF-03'],
+  'lcp-breakdown-insight': ['CORE-PERF-03'],
+  'link-name': ['CORE-A11Y-03'],
+  'link-text': ['CORE-A11Y-03'],
+  'meta-description': ['CORE-SEO-01'],
+  'network-requests': ['CORE-QA-08', 'CORE-SEC-07'],
+  'no-vulnerable-libraries': ['CORE-SEC-02'],
+  'robots-txt': ['CORE-ROB-01'],
+  'speed-index': ['CORE-PERF-03'],
+  'total-blocking-time': ['CORE-PERF-03'],
 }
 const defaultOptions = {
   allowHttp: false,
@@ -179,8 +200,7 @@ export function compactLighthouseResult(lhr) {
   const audits = auditIds.map((id) => {
     const audit = lhr.audits?.[id] || {}
     return {
-      checklistRefs: [...new Set(categories.filter(category => lhr.categories?.[category]?.auditRefs?.some(reference => reference.id === id))
-        .flatMap(category => categoryChecklistRefs[category]))],
+      checklistRefs: auditChecklistRefs[id] || [],
       displayValue: audit.displayValue ? redactText(audit.displayValue, 200) : undefined,
       errorMessage: audit.errorMessage ? redactText(audit.errorMessage, 300) : undefined,
       id,
@@ -212,6 +232,26 @@ export function compactLighthouseResult(lhr) {
     lcp: compactLcpDetails(lhr.audits?.['lcp-breakdown-insight']),
     metrics,
   }
+}
+
+export function createLighthouseSignals(lighthouse, constrained) {
+  const assertions = [
+    {
+      assertionId: 'lighthouse.run.completed',
+      assertionVersion: 1,
+      message: constrained ? 'Der Lauf wurde ausgeführt, seine Repräsentativität ist durch Sicherheitsblockierungen eingeschränkt.' : 'Der feste mobile Lighthouse-Lauf wurde ohne Sicherheitsblockierung ausgeführt.',
+      outcome: constrained ? 'inconclusive' : 'pass',
+      subject: { categories, formFactor: 'mobile' },
+    },
+    ...categories.map(category => ({
+      assertionId: `lighthouse.category.${category}-recorded`,
+      assertionVersion: 1,
+      message: lighthouse.categories[category].score === null ? `Der ${category}-Score blieb unklar.` : `Der ${category}-Score beträgt ${lighthouse.categories[category].score}.`,
+      outcome: lighthouse.categories[category].score === null || constrained ? 'inconclusive' : 'pass',
+      subject: { category, score: lighthouse.categories[category].score },
+    })),
+  ]
+  return technicalSignals(assertions, 'lighthouse-check')
 }
 
 export async function runLighthouseCheck(input, suppliedOptions = {}) {
@@ -324,24 +364,7 @@ export async function runLighthouseCheck(input, suppliedOptions = {}) {
     if (!lhr) { throw new TypeError('Lighthouse lieferte kein Navigationsergebnis.') }
     const lighthouse = compactLighthouseResult(lhr)
     const constrained = blockedRequestCount > 0 || blockedActionCount > 0
-    const signals = [
-      {
-        checklistRefs: categories.flatMap(category => categoryChecklistRefs[category]),
-        id: 'lighthouse.run.completed',
-        message: constrained ? 'Der Lauf wurde ausgeführt, seine Repräsentativität ist durch Sicherheitsblockierungen eingeschränkt.' : 'Der feste mobile Lighthouse-Lauf wurde ohne Sicherheitsblockierung ausgeführt.',
-        signalVersion: 1,
-        status: constrained ? 'inconclusive' : 'positive',
-        subject: { categories, formFactor: 'mobile' },
-      },
-      ...categories.map(category => ({
-        checklistRefs: categoryChecklistRefs[category],
-        id: `lighthouse.category.${category}-recorded`,
-        message: lighthouse.categories[category].score === null ? `Der ${category}-Score blieb unklar.` : `Der ${category}-Score beträgt ${lighthouse.categories[category].score}.`,
-        signalVersion: 1,
-        status: lighthouse.categories[category].score === null || constrained ? 'inconclusive' : 'positive',
-        subject: { category, score: lighthouse.categories[category].score },
-      })),
-    ]
+    const signals = createLighthouseSignals(lighthouse, constrained)
     const issues = [
       ...blockedRequests.map(request => ({ checklistRefs: ['CORE-SEC-07'], code: request.code, message: request.reason, severity: request.code === 'non-get-blocked' ? 'error' : 'warning', url: request.url })),
       ...blockedActions.map(action => ({ checklistRefs: ['CORE-SEC-07'], code: `${action.kind}-blocked`, message: `Automatischer ${action.kind}-Versuch wurde vor einer Nebenwirkung blockiert.`, severity: ['beacon', 'form-submit'].includes(action.kind) ? 'error' : 'warning', url: action.url })),
