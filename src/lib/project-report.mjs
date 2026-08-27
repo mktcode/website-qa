@@ -386,7 +386,7 @@ export function renderPilotProjectReportMarkdown(report) {
       lines.push(`Workflow: **${statusLabel(item.workflow.status)}** – ${markdownText(item.workflow.note)}`, '')
     }
     for (const criterion of item.criteria) {
-      const checked = ['notApplicable', 'pass'].includes(criterion.outcome) || item.projectStatus === 'notApplicable'
+      const checked = ['notApplicable', 'pass'].includes(criterion.outcome)
       lines.push(`- [${checked ? 'x' : ' '}] \`${criterion.id}\` ${criterion.statement} — ${criterion.mode}, ${criterion.outcome}`)
       if (!checked && criterion.evidenceInstructions) {
         lines.push(`  - Erforderlicher Nachweis: ${criterion.evidenceInstructions}`)

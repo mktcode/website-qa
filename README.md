@@ -239,6 +239,12 @@ const files = writePilotProjectReportBundle({
 
 Schemas und Beispiele liegen unter [`catalog/`](catalog/). `report.json` verwendet Ausgabeschema 2, weil berichtete Ziel-URLs ohne Querywerte gebunden werden; bei Queryzielen werden zusätzlich nur die Parameternamen verglichen. Der Pilot umfasst noch nicht die vollständige Website-Checkliste und verändert keine Projektcheckliste automatisch.
 
+### Nachweis- und Statuspflege
+
+Kriterien verwenden ausschließlich `pass`, `fail`, `inconclusive`, `notApplicable` oder `noEvidence`. `partial` und `open` sind daraus abgeleitete Ergebnisse zusammengesetzter Checklistenpunkte, keine Ergebnisse einzelner Kriterien. Davon getrennte Workflowzustände wie `external`, `deferred`, `acceptedDeviation` oder eine Nichtanwendbarkeit des gesamten Punkts verändern die zugrunde liegenden Kriterienergebnisse nicht. Im vollständigen Markdownbericht gilt deshalb nur ein Kriterium mit `pass` oder eigenem `notApplicable` als geklärt; eine Nichtanwendbarkeit auf Punktebene setzt fehlende oder negative Kriteriennachweise nicht nachträglich auf erledigt.
+
+Alle Records in einer Evidence-Datei gelten als gleichzeitig aktive Nachweise; es gibt kein stilles „neuester Eintrag gewinnt“ und keinen automatischen Ablauf allein aufgrund des Datums. Mehrere Records für dasselbe Kriterium werden konservativ zusammengeführt: Ein aktives `fail` hat Vorrang, ein aktives `inconclusive` verhindert ein eindeutiges Ergebnis, und eine Mischung aus `pass` und `notApplicable` bleibt `pass`. Ersetzte oder fachlich nicht mehr geltende Records müssen deshalb bewusst aus der aktiven Projektkopie entfernt und bei Bedarf über deren Versionshistorie beziehungsweise Projektakte erhalten werden. Freie Notizen und Referenzen werden nur als Nachweisdaten übernommen; das Werkzeug öffnet oder bestätigt referenzierte Unterlagen nicht. Vertrauliche Unterlagen werden weiterhin ausschließlich außerhalb empfohlener Berichte verwahrt und nur redigiert referenziert.
+
 ### Migration von 0.6.0
 
 - Die vollständige und die datenarme Markdowndarstellung nennen für automatische und nicht automatische Kriterien nun jeweils Gesamtzahl, bestandene beziehungsweise belegte, fehlgeschlagene, unklare, nicht zutreffende und nicht belegte Kriterien. Die Kurzzeilen sind damit summengleich.

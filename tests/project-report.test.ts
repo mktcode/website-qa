@@ -337,6 +337,126 @@ describe('project report pilot', () => {
     expect(fullMarkdown).toContain('| CORE-PRIV-04 | core | Vollständig nachgewiesen | 1/1 | 2/2 |')
   })
 
+  it('renders every evidence and workflow status without conflating item and criterion outcomes', () => {
+    const config = projectConfig()
+    config.itemStates.push({
+      itemId: 'CORE-DOM-04',
+      note: 'Vertrauliche externe Zuordnung',
+      recordedAt: '2026-08-26',
+      recordedBy: 'verantwortliche Stelle',
+      responsible: 'externe Stelle',
+      status: 'external',
+    } as never, {
+      itemId: 'CORE-ERR-01',
+      note: 'Vertrauliche Zurückstellungsbegründung',
+      recordedAt: '2026-08-26',
+      recordedBy: 'verantwortliche Stelle',
+      responsible: 'Projektverantwortung',
+      reviewAt: '2026-09-26',
+      status: 'deferred',
+    } as never, {
+      itemId: 'CORE-ERR-03',
+      note: 'Vertrauliche Abweichungsbegründung',
+      recordedAt: '2026-08-26',
+      recordedBy: 'verantwortliche Stelle',
+      responsible: 'Projektverantwortung',
+      reviewAt: '2026-09-26',
+      status: 'acceptedDeviation',
+    } as never, {
+      itemId: 'CORE-SEO-01',
+      note: 'Vertrauliche Nichtanwendbarkeitsbegründung',
+      recordedAt: '2026-08-26',
+      recordedBy: 'verantwortliche Stelle',
+      status: 'notApplicable',
+    } as never)
+    const report = createPilotProjectReport({
+      config,
+      evidenceDocument: {
+        catalog: { id: 'website-qa-pilot', version: '1.0.0-pilot.7' },
+        evidence: [{
+          checkedAt: '2026-08-26',
+          checkedBy: 'verantwortliche Stelle',
+          criterionId: 'CORE-SOC-03/C1',
+          note: 'Für diesen Projektumfang nicht zutreffend.',
+          outcome: 'notApplicable',
+        }],
+        schemaVersion: 1,
+      },
+      technicalRuns: [technicalRun(technicalReport([
+        assertion('http.redirect.permanent', 'fail'),
+        assertion('http.redirect.path-query-preserved'),
+        assertion('crawl.canonical.single-absolute'),
+        assertion('crawl.canonical.matches-final-url'),
+        assertion('error.not-found.noindex', 'inconclusive'),
+        assertion('error.not-found.no-url-metadata', 'inconclusive'),
+        assertion('social.crawlers.html-metadata-consistent'),
+        assertion('social.metadata.canonical-open-graph-consistent'),
+        assertion('social.images.preview-technically-valid'),
+        assertion('social.run.strict-mode-recorded'),
+      ]))],
+    })
+    const checklistStatusLabels = {
+      acceptedDeviation: 'Akzeptierte Abweichung (offen)',
+      complete: 'Vollständig nachgewiesen',
+      deferred: 'Zurückgestellt',
+      external: 'Externer Nachweis offen',
+      failed: 'Fehlgeschlagen',
+      inconclusive: 'Unklar',
+      notApplicable: 'Nicht zutreffend',
+      open: 'Offen',
+      partial: 'Teilweise nachgewiesen',
+    }
+    const criterionOutcomeKeys = ['pass', 'fail', 'inconclusive', 'notApplicable', 'noEvidence'] as const
+    const checklistStatusKeys = Object.keys(checklistStatusLabels) as Array<keyof typeof checklistStatusLabels>
+
+    expect(report.items.find((item: { id: string }) => item.id === 'CORE-SOC-02')?.projectStatus).toBe('complete')
+    expect(report.items.find((item: { id: string }) => item.id === 'CORE-DOM-02')?.projectStatus).toBe('failed')
+    expect(report.items.find((item: { id: string }) => item.id === 'CORE-DOM-05')?.projectStatus).toBe('partial')
+    expect(report.items.find((item: { id: string }) => item.id === 'CORE-ERR-02')?.projectStatus).toBe('inconclusive')
+    expect(report.items.find((item: { id: string }) => item.id === 'CORE-SOC-03')?.projectStatus).toBe('notApplicable')
+    expect(report.items.find((item: { id: string }) => item.id === 'CORE-DOM-04')?.projectStatus).toBe('external')
+    expect(report.items.find((item: { id: string }) => item.id === 'CORE-ERR-01')?.projectStatus).toBe('deferred')
+    expect(report.items.find((item: { id: string }) => item.id === 'CORE-ERR-03')?.projectStatus).toBe('acceptedDeviation')
+    expect(report.items.find((item: { id: string }) => item.id === 'CORE-DOM-07')?.projectStatus).toBe('open')
+
+    expect(checklistStatusKeys.reduce((sum, status) => sum + report.summary.checklistItems[status], 0)).toBe(report.summary.checklistItems.total)
+    for (const counts of [report.summary.automaticCriteria, report.summary.nonAutomaticCriteria]) {
+      expect(criterionOutcomeKeys.reduce((sum, outcome) => sum + counts[outcome], 0)).toBe(counts.total)
+      expect(counts.partial).toBe(0)
+      expect(counts.open).toBe(0)
+    }
+
+    const fullMarkdown = renderPilotProjectReportMarkdown(report)
+    const summaryMarkdown = renderPilotProjectSummaryMarkdown(report)
+    for (const [label, counts, successfulLabel] of [
+      ['Automatische Kriterien', report.summary.automaticCriteria, 'bestanden'],
+      ['Nicht automatische Kriterien', report.summary.nonAutomaticCriteria, 'belegt'],
+    ] as const) {
+      const expected = `${label} (${counts.total} gesamt): ${counts.pass} ${successfulLabel}, ${counts.fail} fehlgeschlagen, ${counts.inconclusive} unklar, ${counts.notApplicable} nicht zutreffend, ${counts.noEvidence} ohne Nachweis.`
+      expect(fullMarkdown).toContain(expected)
+      expect(summaryMarkdown).toContain(expected)
+    }
+    for (const [status, label] of Object.entries(checklistStatusLabels)) {
+      const count = report.summary.checklistItems[status as keyof typeof checklistStatusLabels]
+      expect(fullMarkdown).toContain(`| ${label} | ${count} |`)
+      expect(summaryMarkdown).toContain(`| ${label} | ${count} |`)
+    }
+    expect(fullMarkdown).toContain(`| **Ausgewählte Pilotpunkte** | **${report.summary.checklistItems.total}** |`)
+    expect(summaryMarkdown).toContain(`| **Ausgewählte Pilotpunkte** | **${report.summary.checklistItems.total}** |`)
+    expect(fullMarkdown).toContain('- [x] `CORE-SOC-03/C1`')
+    expect(fullMarkdown).toContain('- [ ] `CORE-SEO-01/C1`')
+    expect(fullMarkdown).toContain('| CORE-SEO-01 | core | Nicht zutreffend | 0/3 | 0/1 |')
+    expect(fullMarkdown).toContain('Vertrauliche Nichtanwendbarkeitsbegründung')
+    expect(summaryMarkdown).not.toContain('Vertrauliche')
+    expect(summaryMarkdown).toContain('| CORE-DOM-02 | Fehlgeschlagen |')
+    expect(summaryMarkdown).toContain('| CORE-DOM-04 | Externer Nachweis offen |')
+    expect(summaryMarkdown).toContain('| CORE-ERR-01 | Zurückgestellt |')
+    expect(summaryMarkdown).toContain('| CORE-ERR-03 | Akzeptierte Abweichung (offen) |')
+    expect(summaryMarkdown).not.toContain('| CORE-SOC-02 |')
+    expect(summaryMarkdown).not.toContain('| CORE-SOC-03 |')
+    expect(summaryMarkdown).not.toContain('| CORE-SEO-01 |')
+  })
+
   it('writes a timestamped bundle with byte-identical raw reports and a separate summary', () => {
     const directory = mkdtempSync(join(tmpdir(), 'website-qa-bundle-'))
     temporaryDirectories.add(directory)

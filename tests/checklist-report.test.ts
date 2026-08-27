@@ -17,6 +17,16 @@ function assertion(assertionId: string, outcome: 'fail' | 'inconclusive' | 'notA
   }
 }
 
+function evidenceRecord(outcome: 'fail' | 'inconclusive' | 'notApplicable' | 'pass', checkedAt: string) {
+  return {
+    checkedAt,
+    checkedBy: 'verantwortliche Stelle',
+    criterionId: 'GOV-RGT-02/C1',
+    note: `Aktiver Nachweis mit Ergebnis ${outcome}.`,
+    outcome,
+  }
+}
+
 describe('structured checklist pilot', () => {
   it('validates unique checklist criteria and registered assertions', () => {
     const catalog = loadPilotCatalog()
@@ -105,6 +115,21 @@ describe('structured checklist pilot', () => {
       automaticallyPassed: 0,
       pass: 1,
     })
+  })
+
+  it('aggregates every active manual or external evidence record conservatively', () => {
+    const evaluate = (outcomes: Array<'fail' | 'inconclusive' | 'notApplicable' | 'pass'>) => evaluatePilotChecklist({
+      evidence: outcomes.map((outcome, index) => evidenceRecord(outcome, `2026-08-${String(index + 20).padStart(2, '0')}`)),
+      itemIds: ['GOV-RGT-02'],
+    })
+
+    expect(evaluate(['pass', 'fail']).items[0]?.criteria[0]).toMatchObject({ outcome: 'fail', records: expect.arrayContaining([
+      expect.objectContaining({ outcome: 'pass' }),
+      expect.objectContaining({ outcome: 'fail' }),
+    ]) })
+    expect(evaluate(['pass', 'inconclusive']).items[0]?.criteria[0]?.outcome).toBe('inconclusive')
+    expect(evaluate(['pass', 'notApplicable']).items[0]?.criteria[0]?.outcome).toBe('pass')
+    expect(evaluate(['notApplicable', 'notApplicable']).items[0]?.criteria[0]?.outcome).toBe('notApplicable')
   })
 
   it('does not complete communication or infrastructure points without explicit evidence', () => {
