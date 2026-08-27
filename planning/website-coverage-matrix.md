@@ -18,7 +18,7 @@ Die maschinenlesbare Einzelklassifikation aller 215 Punkte liegt in [`website-co
 
 37 Punkte kommen im stabilen Basiskatalog vor. Davon besitzen 34 automatische Kriterien. `CORE-DOM-04`, `CORE-SOC-03` und `GOV-RGT-02` sind dort bewusst nur über manuelle oder externe Kriterien modelliert und werden deshalb nicht als bestehende automatische Abdeckung gezählt.
 
-Die 41 noch nicht modellierten technischen Kandidaten sind keine Zusage für 41 neue Assertions: 14 wurden als hoch, 23 als mittel und vier als niedrig priorisiert. Die v1.1-Auswahl bleibt auf sechs Kandidaten begrenzt; die drei Accessibility-Punkte sind implementiert, aber noch nicht veröffentlicht oder im Verbraucher geprüft.
+Die 41 noch nicht modellierten technischen Kandidaten sind keine Zusage für 41 neue Assertions: 14 wurden als hoch, 23 als mittel und vier als niedrig priorisiert. Die v1.1-Auswahl bleibt auf sechs Kandidaten begrenzt; die drei Accessibility-Punkte wurden als 1.1.0 veröffentlicht und zuvor gegen den exakten Implementierungscommit in einem installierten Verbraucher geprüft.
 
 ## Begrenzte v1.1-Auswahl zur fachlichen Prüfung
 
@@ -29,9 +29,9 @@ Alle sechs Kandidaten vermeiden neue Zielklassen und mutierende Interaktionen. S
 | `CORE-DOM-06` | Planung | Finale URL, Canonical, interne Links, Sitemap- und OpenGraph-URLs gegen den deklarierten öffentlichen Origin abgleichen. | Vollständigkeit des projektspezifischen Host-, Routen- und Migrationsinventars. |
 | `CORE-SEO-03` | Planung | Strukturierte Daten aus bereits geladenem HTML syntaktisch parsen und erkennbare Typ- oder Pflichtfeldprobleme atomar berichten. | Übereinstimmung mit sichtbarem Inhalt, redaktionelle Vollständigkeit und offizieller Validatornachweis. |
 | `CORE-ROB-03` | Planung | Ausgelieferte `robots.txt` getrennt nach Training/Datennutzung, Suche und nutzerinitiiertem Abruf bewerten. | Betreiberentscheidung, Rechtsbewertung, Freigabe und Quellenaktualität. |
-| `CORE-A11Y-03` | Implementiert, unveröffentlicht | Bereits ausgeführte Axe-/DOM-Befunde zu fehlenden zugänglichen Namen atomar zuordnen. | Verständlichkeit, dynamische Zustände und ausschließlich visuell vermittelte Bedeutung. |
-| `CORE-A11Y-08` | Implementiert, unveröffentlicht | Bereits beobachtete Axe-/DOM-Befunde zu fehlenden Bildalternativen und technischer Dekorativauszeichnung atomar zuordnen. | Inhaltliche und kontextuelle Qualität der Alternativtexte sowie dekorative Absicht. |
-| `CORE-A11Y-09` | Implementiert, unveröffentlicht | Bereits vorhandene Axe-Kontrastbefunde als eigene atomare Assertion zuordnen. | Fokus-, Hover-, Aktiv- und dynamische Zustände sowie bildbasierte Sonderfälle. |
+| `CORE-A11Y-03` | Veröffentlicht in 1.1.0 | Bereits ausgeführte Axe-/DOM-Befunde zu fehlenden zugänglichen Namen atomar zuordnen. | Verständlichkeit, dynamische Zustände und ausschließlich visuell vermittelte Bedeutung. |
+| `CORE-A11Y-08` | Veröffentlicht in 1.1.0 | Bereits beobachtete Axe-/DOM-Befunde zu fehlenden Bildalternativen und technischer Dekorativauszeichnung atomar zuordnen. | Inhaltliche und kontextuelle Qualität der Alternativtexte sowie dekorative Absicht. |
+| `CORE-A11Y-09` | Veröffentlicht in 1.1.0 | Bereits vorhandene Axe-Kontrastbefunde als eigene atomare Assertion zuordnen. | Fokus-, Hover-, Aktiv- und dynamische Zustände sowie bildbasierte Sonderfälle. |
 
 Die drei Accessibility-Kandidaten sind absichtlich keine WCAG-Konformitätsaussage. Sie zerlegen nur das bisherige allgemeine Axe-Gesamtergebnis in fachlich besser zuordenbare technische Teilbefunde.
 
@@ -58,4 +58,4 @@ Ein Kandidat gelangt erst in eine Implementierungsrunde, wenn alle folgenden Fra
 6. Welche neuen Positiv-, Negativ-, Grenz-, Redaktions- und Nebenwirkungstests sind erforderlich?
 7. Rechtfertigt der Nutzen eine neue Katalogversion, Assertionversion oder technische Berichtserweiterung?
 
-Die drei Accessibility-Entscheidungen wurden für `website-qa-baseline` 1.1.0 getroffen; die übrigen Matrixeinträge erzeugen weiterhin weder automatisch neue Assertions noch Checklistenstatus. Auch die neuen technischen Teilnachweise haken ohne ihre getrennten manuellen Kriterien keinen Gesamtpunkt vollständig ab.
+Die drei Accessibility-Entscheidungen wurden mit `website-qa-baseline` 1.1.0 veröffentlicht; die übrigen Matrixeinträge erzeugen weiterhin weder automatisch neue Assertions noch Checklistenstatus. Auch die neuen technischen Teilnachweise haken ohne ihre getrennten manuellen Kriterien keinen Gesamtpunkt vollständig ab.

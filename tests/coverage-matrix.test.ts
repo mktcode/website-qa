@@ -144,12 +144,12 @@ describe('website checklist coverage matrix', () => {
     expect(shortlistIds).toHaveLength(6)
     expect(new Set(shortlistIds).size).toBe(shortlistIds.length)
     expect(matrix.v1_1Shortlist.filter(
-      (candidate: any) => candidate.stage === 'v1.1-implemented-unreleased',
+      (candidate: any) => candidate.stage === 'v1.1-released',
     )).toHaveLength(3)
     for (const candidate of matrix.v1_1Shortlist) {
       const item = matrix.items.find((entry: any) => entry.id === candidate.id)
       expect(item).toBeDefined()
-      if (candidate.stage === 'v1.1-implemented-unreleased') {
+      if (candidate.stage === 'v1.1-released') {
         expect(item).toMatchObject({
           classification: 'existing-baseline',
           existingCatalog: true,

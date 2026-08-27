@@ -1,10 +1,10 @@
 # Website-QA: abgeschlossene Umsetzung und nächste Konsolidierungsphase
 
-> **Status:** Die Pilotreihe `0.2.0` bis `0.6.2` wurde mit `v1.0.0` in einen einzigen stabilen Berichtsvertrag, den begrenzten Basiskatalog `website-qa-baseline` 1.0.0 und allgemeine APIs überführt. v1.0.0 wurde lokal, als installierter Tarball, im ersten Nuxt-Verbraucher und anschließend in einem temporären zweiten Verbraucher gegen die öffentlich erreichbare WordPress-Version von `handpanzauber.de` geprüft. Die systematische Abdeckungsmatrix aller 215 Checklistenpunkte ist abgeschlossen; die erste begrenzte v1.1-Scheibe für drei Accessibility-Punkte ist implementiert, aber noch nicht veröffentlicht oder im Verbraucher geprüft.
+> **Status:** Die Pilotreihe `0.2.0` bis `0.6.2` wurde mit `v1.0.0` in einen einzigen stabilen Berichtsvertrag, den begrenzten Basiskatalog `website-qa-baseline` 1.0.0 und allgemeine APIs überführt. v1.0.0 wurde lokal, als installierter Tarball, im ersten Nuxt-Verbraucher und anschließend in einem temporären zweiten Verbraucher gegen die öffentlich erreichbare WordPress-Version von `handpanzauber.de` geprüft. Die systematische Abdeckungsmatrix aller 215 Checklistenpunkte ist abgeschlossen; die erste begrenzte Accessibility-Scheibe wurde als `v1.1.0` veröffentlicht und zuvor gegen den exakten Implementierungscommit in einem installierten Nuxt-Verbraucher geprüft.
 >
 > Dieses Dokument bewahrt Planung, Entscheidungen, Sicherheitsanforderungen und Abnahmekriterien des frameworkunabhängigen Refactorings von `@mktcode/website-qa`. Es enthält keine ausgefüllten Nachweise oder Vorgaben für eine bestimmte Website. Zukunftsformulierungen in den historischen Planungsabschnitten beschreiben den damaligen Implementierungsweg und keine noch offene Zusage.
 >
-> Implementiert sind die gemeinsame Berichtsredaktion, `--json-file`, automatisch datierte lokale Bundles, bytegleiche technische Rohberichte für alle vier Prüfer, das Prüfsummenmanifest, der getrennte Whitelist-Markdownrenderer, kopierbare Projektvorlagen und die programmatische Reporting-API. Der stabile Releasecommit `cd105c834d2f27f4a065ed67aca6622b0d90ef22` ist als `v1.0.0` getaggt; beide Verbraucherprüfungen blieben GET-only und führten zu keiner schreibenden Produktionsaktion.
+> Implementiert sind die gemeinsame Berichtsredaktion, `--json-file`, automatisch datierte lokale Bundles, bytegleiche technische Rohberichte für alle vier Prüfer, das Prüfsummenmanifest, der getrennte Whitelist-Markdownrenderer, kopierbare Projektvorlagen und die programmatische Reporting-API. Der stabile Releasecommit `cd105c834d2f27f4a065ed67aca6622b0d90ef22` ist als `v1.0.0` getaggt; auch die installierte v1.1-Verbraucherprüfung blieb GET-only und führte zu keiner schreibenden Produktionsaktion.
 
 ## 1. Ausgangslage
 
@@ -678,7 +678,7 @@ Releasecommit `cd105c834d2f27f4a065ed67aca6622b0d90ef22` und Tag `v1.0.0` wurden
 
 ### Phase J – Abdeckungsmatrix und begrenzte v1.1-Kandidaten
 
-**Status 27. August 2026: Klassifikation abgeschlossen, erste Accessibility-Scheibe implementiert und noch unveröffentlicht.** Die vollständige Einzelmatrix liegt unter [`planning/website-coverage-matrix.json`](https://github.com/mktcode/website-qa/blob/main/planning/website-coverage-matrix.json); die [Kurzfassung](https://github.com/mktcode/website-qa/blob/main/planning/website-coverage-matrix.md) erläutert Ergebnis, Grenzen und Auswahlregeln.
+**Status 27. August 2026: Klassifikation abgeschlossen, erste Accessibility-Scheibe als v1.1.0 veröffentlicht und installiert im Verbraucher geprüft.** Die vollständige Einzelmatrix liegt unter [`planning/website-coverage-matrix.json`](https://github.com/mktcode/website-qa/blob/main/planning/website-coverage-matrix.json); die [Kurzfassung](https://github.com/mktcode/website-qa/blob/main/planning/website-coverage-matrix.md) erläutert Ergebnis, Grenzen und Auswahlregeln.
 
 Alle 215 Punkte wurden genau einmal klassifiziert:
 
@@ -689,7 +689,9 @@ Alle 215 Punkte wurden genau einmal klassifiziert:
 - 41 bleiben überwiegend manuell, extern oder administrativ;
 - 20 würden einen gesondert freizugebenden mutierenden, authentifizierten oder sensiblen Betriebsnachweis erfordern und bleiben außerhalb der Standardwerkzeuge.
 
-Von ursprünglich 44 möglichen neuen technischen Teilbeobachtungen wurden nur sechs zur v1.1-Einzelprüfung vorgemerkt: `CORE-DOM-06`, `CORE-SEO-03`, `CORE-ROB-03`, `CORE-A11Y-03`, `CORE-A11Y-08` und `CORE-A11Y-09`. Die drei Accessibility-Punkte sind mit vier passiven Axe-Assertions und fünf ausdrücklich manuellen Restkriterien implementiert. Uneindeutige Regelauswertungen bleiben `inconclusive`; zusätzliche Requests, Klicks oder Zustandswechsel wurden nicht eingeführt. Die übrigen drei Kandidaten bleiben ohne Implementierungszusage.
+Von ursprünglich 44 möglichen neuen technischen Teilbeobachtungen wurden nur sechs zur v1.1-Einzelprüfung vorgemerkt: `CORE-DOM-06`, `CORE-SEO-03`, `CORE-ROB-03`, `CORE-A11Y-03`, `CORE-A11Y-08` und `CORE-A11Y-09`. Die drei Accessibility-Punkte wurden mit vier passiven Axe-Assertions und fünf ausdrücklich manuellen Restkriterien veröffentlicht. Uneindeutige Regelauswertungen bleiben `inconclusive`; zusätzliche Requests, Klicks oder Zustandswechsel wurden nicht eingeführt. Die übrigen drei Kandidaten bleiben ohne Implementierungszusage.
+
+Vor der Veröffentlichung installierte ein temporärer Snapshot des bestehenden Nuxt-Verbrauchers den exakten Implementierungscommit `ea8db0802996bd5e66dfa9a384d95c6037bf00d5`. Alle vier unabhängigen öffentlichen Prüfer liefen ausschließlich mit GET und Exitcode 0. Von 140 technischen Assertions waren 139 bestanden; die neue Textkontrastassertion blieb wegen realer Axe-`incomplete`-Ergebnisse erwartungsgemäß `inconclusive`. Projektbericht, Manifest, Bytekopien und Whitelist-Zusammenfassung wurden validiert; Lint, Typecheck, 22 Unit-Tests und Produktionsbuild des Verbrauchers bestanden.
 
 ### Unveränderte Grenzen
 

@@ -174,7 +174,7 @@
     },
     {
       "id": "CORE-A11Y-03",
-      "stage": "v1.1-implemented-unreleased",
+      "stage": "v1.1-released",
       "proposedEvidence": "Bereits ausgeführte Axe-/DOM-Befunde zu fehlenden zugänglichen Namen als eigene atomare Assertionfamilie zuordnen.",
       "requestImpact": "Vorhandene Browserprofile und Axe-Ausführung wiederverwenden.",
       "manualRemainder": "Verständlichkeit der Namen, dynamische Zustände und ausschließlich visuell vermittelte Bedeutung.",
@@ -182,7 +182,7 @@
     },
     {
       "id": "CORE-A11Y-08",
-      "stage": "v1.1-implemented-unreleased",
+      "stage": "v1.1-released",
       "proposedEvidence": "Bereits beobachtete Axe-/DOM-Befunde zu fehlenden Bildalternativen und technischer Dekorativauszeichnung atomar zuordnen.",
       "requestImpact": "Vorhandene HTML- und Browserbeobachtungen wiederverwenden.",
       "manualRemainder": "Inhaltliche und kontextuelle Eignung des Alternativtexts sowie dekorative Absicht.",
@@ -190,7 +190,7 @@
     },
     {
       "id": "CORE-A11Y-09",
-      "stage": "v1.1-implemented-unreleased",
+      "stage": "v1.1-released",
       "proposedEvidence": "Bereits vorhandene Axe-Kontrastbefunde als eigene atomare Assertionfamilie zuordnen.",
       "requestImpact": "Vorhandene Browserprofile und Axe-Ausführung wiederverwenden.",
       "manualRemainder": "Fokus-, Hover-, Aktiv- und dynamische Zustände sowie bildbasierte Sonderfälle.",
