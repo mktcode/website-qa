@@ -63,7 +63,7 @@ Die Arbeitskennungen in diesem Abschnitt dienen ausschließlich der Wartungsplan
 | `WQ-05` | P2 | veröffentlicht in 2.0.2 | installierbares Tarball reproduzierbar prüfen |
 | `WQ-06` | P2 | veröffentlicht in 2.0.2 | Social-Seitenlimit über Code und Dokumentation vereinheitlichen |
 | `WQ-08` | P1 | veröffentlicht in 2.0.2 | automatisch entdeckte GET-Ziele und jeden Redirecthop zentral absichern |
-| `WQ-07` | P3 | wartet auf Praxisbeleg | weitere technische Signale nur befundgetrieben auswählen |
+| `WQ-07` | P3 | Pilot ausgewertet; kein Kandidat | weitere technische Signale nur befundgetrieben auswählen |
 
 ### `WQ-01` – IPv6-/SSRF-Klassifikation und Redaktion
 
@@ -120,6 +120,7 @@ Die Arbeitskennungen in diesem Abschnitt dienen ausschließlich der Wartungsplan
 - **Risiko:** Ohne reale wiederkehrende Befunde entstehen laute, schwer interpretierbare Signale oder eine unzulässige Scheinsicherheit durch bloße Checklistenabdeckung.
 - **Abhängigkeiten:** anonymisierte, websiteunabhängige Pilotbefunde und vollständig beschriebene Aussage-, Sicherheits-, Limit- und Testgrenzen.
 - **Akzeptanz:** Ein Kandidat wird erst priorisiert, wenn mehrere reale Befunde oder ein klarer schwerwiegender Einzelbeleg vorliegen und das unten definierte Kandidatenraster vollständig erfüllt ist.
+- **Pilotbefund 2026-08-28:** Der begrenzte [öffentliche Praxispilot](PRAXISPILOT.md) auf Google, Amazon, Wikipedia, GitHub und BBC bestätigte die beabsichtigte Werkzeuggrenze. Wiederkehrende technische Beobachtungen werden bereits durch vorhandene Signale abgedeckt; kein neuer Signalkandidat wird priorisiert.
 
 ## Risikoregister
 

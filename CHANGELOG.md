@@ -2,7 +2,7 @@
 
 Dieses Changelog dokumentiert veröffentlichte Paketstände von `@mktcode/website-qa`. Planungs- und reine Dokumentationscommits ohne Paketveröffentlichung erscheinen nicht als eigene Version.
 
-## 2.0.2 – 2026-08-27
+## 2.0.2 – 2026-08-28
 
 - Automatisch erzeugte oder entdeckte GET-Ziele und jeder Redirecthop werden zentral vor dem Request gegen potenziell zustandsverändernde Pfade und Queryparameter geprüft; nur das exakt ausdrücklich angegebene erste Ziel kann diese konservative Namensheuristik umgehen.
 - HTTP- und Crawl-Ressourcen, CSS-Folgeressourcen, Sitemapindex-Kinder und Lighthouse-Preflight-Redirects mit verdächtigen Zielen werden ohne Zielrequest sichtbar begrenzt; abhängige technische Signale bleiben `inconclusive`.

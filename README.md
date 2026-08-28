@@ -7,6 +7,8 @@
 
 Die Werkzeuge haken niemals Checklistenpunkte ab. Positive Signale bedeuten nur, dass ein bestimmter Defekt im dokumentierten, begrenzten Prüfumfang nicht beobachtet wurde. Die eigentliche QA-Bewertung bleibt bei der prüfenden Person.
 
+Der datierte [öffentliche Praxispilot für 2.0.2](PRAXISPILOT.md) dokumentiert diese Produktgrenze anhand fünf unterschiedlicher populärer Websites. Die Ziele und Befunde sind eine begrenzte Werkzeugstichprobe und keine generischen Erwartungen oder Websitefreigaben.
+
 ## Voraussetzungen
 
 - Node.js `>=22.19 <23` oder `>=24.11 <25`
